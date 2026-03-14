@@ -16,14 +16,13 @@ export default function Hero() {
 
   return (
     <section className="relative min-h-screen flex flex-col justify-center overflow-hidden">
-      {/* Real Vermont photo — Unsplash free license */}
+      {/* Vermont autumn landscape — Unsplash free license, photo by Caleb Minear */}
       <div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-        style={{backgroundImage: "url('https://images.unsplash.com/photo-1572985025058-0e31c9d50e8f?auto=format&fit=crop&w=1920&q=80')"}}
+        style={{backgroundImage:"url('https://images.unsplash.com/photo-1572985025058-0e31c9d50e8f?auto=format&fit=crop&w=1920&q=80')"}}
       />
-      {/* Dark overlay to keep text readable */}
-      <div className="absolute inset-0 bg-[#1C2B1A]/80" />
-      {/* Amber accent bar */}
+      {/* Dark forest green overlay */}
+      <div className="absolute inset-0 bg-[#1C2B1A]/78" />
       <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-[#C8732A] to-transparent" />
 
       <div className="relative z-10 max-w-6xl mx-auto px-6 pt-32 pb-24 grid md:grid-cols-2 gap-16 items-center">
@@ -47,21 +46,16 @@ export default function Hero() {
             </a>
           </div>
         </div>
-
         <div className="flex flex-col gap-5">
           <div className="bg-[#1C2B1A]/60 backdrop-blur-sm border border-[#7A9B6F]/20 rounded-sm p-5">
             <p className="text-[#7A9B6F] text-xs font-mono uppercase tracking-widest mb-3">All 14 Vermont Counties</p>
             <div className="flex flex-wrap gap-2">
               {VT.map(c => (
-                <span key={c} className="px-2.5 py-1 bg-[#1C2B1A]/60 border border-[#7A9B6F]/25 text-[#F5EFE0]/60 text-xs rounded-sm font-mono">
-                  {c}
-                </span>
+                <span key={c} className="px-2.5 py-1 bg-[#1C2B1A]/60 border border-[#7A9B6F]/25 text-[#F5EFE0]/60 text-xs rounded-sm font-mono">{c}</span>
               ))}
             </div>
           </div>
-          <p className="text-[#F5EFE0]/30 text-xs font-mono text-right">
-            Licensed · Insured · Vermont-based
-          </p>
+          <p className="text-[#F5EFE0]/30 text-xs font-mono text-right">Licensed · Insured · Vermont-based</p>
         </div>
       </div>
     </section>

@@ -1,5 +1,7 @@
 # Alder Projects
 
-Vermont's construction lead engine. Connecting homeowners with qualified local contractors across all 14 counties.
+Vermont's construction lead engine.
 
-Built with Next.js 14 · TypeScript · Tailwind CSS · Deployed on Vercel.
+Built with Next.js 14 · TypeScript · Tailwind CSS
+
+Deployed on Vercel at [alderprojects.com](https://alderprojects.com)

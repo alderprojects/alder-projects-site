@@ -1,20 +1,20 @@
 const B = [
-  {t:'Qualified Leads Only',d:'Every project is pre-screened. You only see leads that match your trade, your service area, and your capacity.'},
+  {t:'Qualified Leads Only',d:'Every project is pre-screened. You only see leads matching your trade, your service area, and your capacity.'},
   {t:'No Subscription Fees',d:'Pay only when you win a job. Our success-based model means we grow when you grow.'},
-  {t:'Vermont-First Network',d:'Built exclusively for Vermont contractors. No competing with out-of-state nationals for local work.'},
+  {t:'Vermont-First Network',d:'Built exclusively for Vermont contractors. No competing with out-of-state nationals for work in your own backyard.'},
   {t:'Your Profile Does the Work',d:'Build a verified profile once. Let homeowners in your county find you year-round.'},
 ]
 
 export default function ForContractors() {
   return (
     <section id="for-contractors" className="py-28 bg-[#1C2B1A] overflow-hidden relative">
-      {/* Vermont barn photo — right side */}
-      <div className="absolute right-0 top-0 w-1/2 h-full hidden lg:block opacity-20">
+      {/* Vermont mountain photo — subtle texture on right side */}
+      <div className="absolute right-0 top-0 w-1/2 h-full hidden lg:block">
         <div
-          className="w-full h-full bg-cover bg-center"
-          style={{backgroundImage: "url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=960&q=80')"}}
+          className="w-full h-full bg-cover bg-center opacity-20"
+          style={{backgroundImage:"url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=960&q=80')"}}
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-[#1C2B1A] via-[#1C2B1A]/60 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#1C2B1A] to-transparent" />
       </div>
 
       <div className="max-w-6xl mx-auto px-6 relative z-10">
@@ -25,7 +25,7 @@ export default function ForContractors() {
               Your pipeline,<br/><em className="text-[#C8732A]">filled.</em>
             </h2>
             <p className="mt-6 text-[#F5EFE0]/50 text-lg font-light leading-relaxed">
-              You know these towns. You know the terrain, the permit offices, the weather. Stop chasing referrals and let qualified project leads come to you.
+              You know these towns. You know the terrain, the permit offices, the mud season. Stop chasing referrals and let qualified project leads come to you.
             </p>
             <div className="mt-10 flex flex-col gap-5">
               {B.map((b, i) => (
@@ -45,12 +45,12 @@ export default function ForContractors() {
             </a>
           </div>
 
-          {/* Vermont landscape photo — visible on mobile, hidden on desktop (decorative) */}
-          <div className="reveal lg:hidden rounded-sm overflow-hidden h-64">
+          {/* Vermont photo — mobile only */}
+          <div className="reveal lg:hidden rounded-sm overflow-hidden h-56">
             <img
               src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=960&q=80"
-              alt="Vermont landscape"
-              className="w-full h-full object-cover opacity-60"
+              alt="Vermont mountains"
+              className="w-full h-full object-cover opacity-50"
             />
           </div>
         </div>

@@ -8,6 +8,7 @@ export const metadata: Metadata = {
 
 const content = {
   "h1": "Home Additions Contractors in Burlington, VT",
+  "heroImg": "https://images.unsplash.com/photo-1505798577917-a65157d3320a",
   "intro": "Find vetted home addition contractors in Burlington, VT. Post your project free — matched with local contractors in 48 hours.",
   "sections": [
     {"heading": "Home Additions in Burlington", "body": "Burlington’s tight housing inventory has pushed many homeowners toward adding on rather than moving. Key considerations include Burlington’s zoning and lot coverage limits, setback requirements, Act 250 review for larger projects, and the challenges of tying into the city’s older housing stock. Common addition types: first-floor bedroom and bathroom additions, mudrooms, garage additions, and second-floor additions on single-story ranches."}

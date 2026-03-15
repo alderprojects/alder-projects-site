@@ -8,6 +8,7 @@ export const metadata: Metadata = {
 
 const content = {
   "h1": "Kitchen Remodeling Contractors in Vermont",
+  "heroImg": "https://plus.unsplash.com/premium_photo-1686090447480-9eef06ce4723",
   "intro": "Find vetted kitchen remodeling contractors across Vermont. Post your project free — matched with local contractors in 48 hours. No spam, no cold calls.",
   "sections": [
     {"heading": "How Alder Projects Works", "body": "Post your kitchen remodeling project in minutes. We match you with 2–4 vetted Vermont contractors who specialize in kitchen work in your area. Compare bids and credentials, then hire the one that fits.<br/><br/><strong>Free to post</strong> — homeowners pay nothing to submit a project. <strong>Vetted contractors only</strong> — every contractor is reviewed before they can receive leads. <strong>You choose</strong> — no obligation to hire anyone."},

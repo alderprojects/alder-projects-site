@@ -8,6 +8,7 @@ export const metadata: Metadata = {
 
 const content = {
   "h1": "Deck Builders in Stowe, VT",
+  "heroImg": "https://images.unsplash.com/photo-1754597215918-b4b1f113ca77",
   "intro": "Find vetted deck builders in Stowe, VT. Post your project free — matched with local deck contractors in 48 hours.",
   "sections": [
     {"heading": "Building a Deck in Stowe", "body": "In Stowe, outdoor space is part of what you’re paying for. Deck builders here need to handle significant snow loads — the area receives 100+ inches in a typical winter. Structural framing, hardware, and fasteners must be specified for these conditions. Popular projects: multi-level decks on sloped lots, covered decks and screened porches, wraparound porches on chalets and farmhouses, premium composite decking, and hot tub platforms."}

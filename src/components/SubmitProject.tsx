@@ -6,14 +6,14 @@ const BUDGET_BANDS = ['Under $10,000','$10,000 – $25,000','$25,000 – $50,000
 const TIMELINES = ['Ready to start now','Within 1–3 months','Within 3–6 months','Within 6–12 months','Planning phase, 12+ months out','Flexible / not sure']
 const PROPERTY_TYPES = ['Single-family home','Multi-family / duplex','Condo / townhouse','Commercial property','Vacant land','Barn / agricultural','Other']
 const FINANCING = ['Cash / no financing needed','Pre-approved for financing','Exploring financing options','Not sure yet']
-const COUNTIES = ['Addison','Bennington','Caledonia','Chittenden','Essex','Franklin','Grand Isle','Lamoille','Orange','Orleans','Rutland','Washington','Windham','Windsor']
 
 type F = {
-  homeownerName:string; email:string; phone:string; town:string; zipCode:string; county:string;
-  propertyType:string; category:string; budgetBand:string; timeline:string;
+  homeownerName:string; email:string; phone:string
+  town:string; zipCode:string
+  propertyType:string; category:string; budgetBand:string; timeline:string
   financingStatus:string; plansReady:string; description:string
 }
-const EMPTY:F = {homeownerName:'',email:'',phone:'',town:'',zipCode:'',county:'',propertyType:'',category:'',budgetBand:'',timeline:'',financingStatus:'',plansReady:'',description:''}
+const EMPTY:F = {homeownerName:'',email:'',phone:'',town:'',zipCode:'',propertyType:'',category:'',budgetBand:'',timeline:'',financingStatus:'',plansReady:'',description:''}
 
 const B: React.CSSProperties = {width:'100%',backgroundColor:'rgba(45,74,42,0.4)',border:'1px solid rgba(122,155,111,0.25)',borderRadius:'2px',padding:'11px 14px',fontSize:'14px',color:'#F5EFE0',outline:'none',fontFamily:"'DM Sans',system-ui,sans-serif",boxSizing:'border-box' as const}
 const L: React.CSSProperties = {display:'block',fontSize:'11px',fontFamily:'monospace',textTransform:'uppercase' as const,letterSpacing:'0.08em',color:'rgba(245,239,224,0.45)',marginBottom:'5px'}
@@ -61,7 +61,6 @@ export default function SubmitProject() {
     <section id="submit-project" style={{backgroundColor:'#1C2B1A',padding:'clamp(56px,8vw,96px) 24px'}}>
       <div style={{maxWidth:'680px',margin:'0 auto'}}>
 
-        {/* Header */}
         <div style={{marginBottom:'36px'}}>
           <span style={{fontSize:'11px',fontFamily:'monospace',textTransform:'uppercase',letterSpacing:'0.1em',color:'#7A9B6F'}}>Free · No Account Needed</span>
           <h2 style={{fontFamily:"'Playfair Display',Georgia,serif",fontSize:'clamp(1.8rem,4vw,2.6rem)',fontWeight:600,color:'#F5EFE0',lineHeight:1.1,marginTop:'8px',marginBottom:'0'}}>
@@ -69,7 +68,6 @@ export default function SubmitProject() {
           </h2>
         </div>
 
-        {/* Form */}
         <form onSubmit={submit} style={{display:'flex',flexDirection:'column',gap:'14px'}}>
           <Row2>
             <Field label="Your Name" req><input required type="text" placeholder="Jane Smith" value={form.homeownerName} onChange={set('homeownerName')} style={B}/></Field>
@@ -77,10 +75,13 @@ export default function SubmitProject() {
           </Row2>
           <Field label="Phone (optional)"><input type="tel" placeholder="(802) 555-0100" value={form.phone} onChange={set('phone')} style={B}/></Field>
           <Row2>
-            <Field label="Town" req><input required type="text" placeholder="Stowe" value={form.town} onChange={set('town')} style={B}/></Field>
-            <Field label="Zip Code" req><input required type="text" placeholder="05672" maxLength={5} value={form.zipCode} onChange={set('zipCode')} style={B}/></Field>
+            <Field label="Town" req>
+              <input required type="text" placeholder="Burlington, Stowe, Woodstock…" value={form.town} onChange={set('town')} style={B}/>
+            </Field>
+            <Field label="Zip Code" req>
+              <input required type="text" placeholder="05401" maxLength={5} value={form.zipCode} onChange={set('zipCode')} style={B}/>
+            </Field>
           </Row2>
-          <Field label="County" req><Sel val={form.county} onChange={set('county')} placeholder="Select your county…" opts={COUNTIES}/></Field>
           <Field label="Property Type" req><Sel val={form.propertyType} onChange={set('propertyType')} placeholder="Type of property…" opts={PROPERTY_TYPES}/></Field>
           <Field label="Project Type" req><Sel val={form.category} onChange={set('category')} placeholder="What kind of work?" opts={CATEGORIES}/></Field>
           <Row2>

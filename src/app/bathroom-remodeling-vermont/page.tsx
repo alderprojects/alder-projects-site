@@ -8,6 +8,7 @@ export const metadata: Metadata = {
 
 const content = {
   "h1": "Bathroom Remodeling Contractors in Vermont",
+  "heroImg": "https://plus.unsplash.com/premium_photo-1686090446868-92b77789ad08",
   "intro": "Find vetted bathroom remodeling contractors across Vermont. Post your project free — matched with local contractors in 48 hours.",
   "sections": [
     {"heading": "How It Works", "body": "Post your bathroom project free. We match you with 2–4 vetted Vermont contractors who specialize in bathroom work in your area. No cold calls, no spam — just qualified local contractors."},

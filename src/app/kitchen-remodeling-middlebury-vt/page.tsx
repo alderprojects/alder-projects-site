@@ -8,6 +8,7 @@ export const metadata: Metadata = {
 
 const content = {
   "h1": "Kitchen Remodeling Contractors in Middlebury, VT",
+  "heroImg": "https://plus.unsplash.com/premium_photo-1686090447480-9eef06ce4723",
   "intro": "Find vetted kitchen remodeling contractors in Middlebury, VT. Post your project free — matched with local contractors in 48 hours.",
   "sections": [
     {"heading": "Kitchen Remodeling in Middlebury", "body": "Middlebury is Addison County’s shire town — a college town with a historic downtown, Victorian homes, and working-class neighborhoods stretching toward the Champlain Valley farmland. Kitchens are often small, dated, and not laid out for how people cook today. Common goals: opening kitchens to adjacent space, updating cabinets and countertops while preserving period details, adding storage in tight layouts, replacing aging plumbing and electrical, and new flooring."}

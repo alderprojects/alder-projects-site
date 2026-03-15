@@ -8,6 +8,7 @@ export const metadata: Metadata = {
 
 const content = {
   "h1": "Bathroom Remodeling Contractors in Burlington, VT",
+  "heroImg": "https://plus.unsplash.com/premium_photo-1686090446868-92b77789ad08",
   "intro": "Find vetted bathroom remodeling contractors in Burlington, VT. Post your project free — matched with local contractors in 48 hours.",
   "sections": [
     {"heading": "Bathroom Remodeling in Burlington", "body": "Burlington’s older housing stock means most bathrooms were built 30–80 years ago — original tile, cast iron tubs, and galvanized pipes. Common projects include full gut renovations, tub-to-shower conversions, expanding small bathrooms, adding a second bathroom, and accessibility updates."},

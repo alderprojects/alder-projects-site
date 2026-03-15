@@ -52,7 +52,7 @@ export default function Hero() {
             <a href="#submit-project" style={{display:'inline-block',padding:'14px 28px',backgroundColor:'#C8732A',color:'#FAF7F2',fontWeight:600,fontSize:'14px',borderRadius:'3px',textDecoration:'none'}}>
               Post Your Project &rarr;
             </a>
-            <a href="#for-contractors" style={{display:'inline-block',padding:'14px 28px',border:'1px solid rgba(122,155,111,0.45)',color:'rgba(245,239,224,0.8)',fontWeight:500,fontSize:'14px',borderRadius:'3px',textDecoration:'none'}}>
+            <a href="/contractors" style={{display:'inline-block',padding:'14px 28px',border:'1px solid rgba(122,155,111,0.45)',color:'rgba(245,239,224,0.8)',fontWeight:500,fontSize:'14px',borderRadius:'3px',textDecoration:'none'}}>
               I&apos;m a Contractor
             </a>
           </div>

@@ -8,6 +8,7 @@ export const metadata: Metadata = {
 
 const content = {
   "h1": "Home Renovation Contractors in Lamoille County, VT",
+  "heroImg": "https://images.unsplash.com/photo-1757661543986-6f418adc8cb6",
   "intro": "Find vetted renovation contractors in Lamoille County, VT — Stowe, Morristown, Hyde Park and surrounding towns.",
   "sections": [
     {"heading": "How Alder Projects Works", "body": "Post your project free. We match you with 2–4 vetted Lamoille County contractors. You compare bids and choose — no obligation."},

@@ -1,8 +1,6 @@
 'use client'
 import { useEffect, useRef } from 'react'
 
-const COUNTIES = ['Addison','Bennington','Caledonia','Chittenden','Essex','Franklin','Grand Isle','Lamoille','Orange','Orleans','Rutland','Washington','Windham','Windsor']
-
 export default function Hero() {
   const headRef = useRef<HTMLHeadingElement>(null)
   useEffect(() => {
@@ -67,9 +65,9 @@ export default function Hero() {
             Coverage &mdash; All 14 Counties
           </p>
           <div>
-            {COUNTIES.map(c => (
-              <span key={c} style={{display:'inline-block',margin:'3px',padding:'4px 10px',backgroundColor:'rgba(8,16,6,0.6)',border:'1px solid rgba(122,155,111,0.18)',color:'rgba(245,239,224,0.6)',fontSize:'11px',fontFamily:'monospace',borderRadius:'2px'}}>
-                {c}
+            {['Burlington','Montpelier','Stowe','Woodstock','Middlebury','Brattleboro','Rutland','Barre','St. Johnsbury','Bennington','Manchester','Waitsfield','Morrisville','Newport','Shelburne','Williston','South Burlington','Essex Junction','Colchester','Winooski'].map(t => (
+              <span key={t} style={{display:'inline-block',margin:'3px',padding:'4px 10px',backgroundColor:'rgba(8,16,6,0.6)',border:'1px solid rgba(122,155,111,0.18)',color:'rgba(245,239,224,0.6)',fontSize:'11px',fontFamily:'monospace',borderRadius:'2px'}}>
+                {t}
               </span>
             ))}
           </div>

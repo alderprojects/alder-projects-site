@@ -21,10 +21,6 @@ export default function HowItWorks() {
             </div>
           ))}
         </div>
-        <div className="mt-16 reveal flex flex-col sm:flex-row items-center justify-between gap-6 bg-[#1C2B1A] px-8 py-7 rounded-sm">
-          <p className="font-display text-2xl text-[#F5EFE0] font-medium italic">Ready to find your contractor?</p>
-          <a href="#submit-project" className="shrink-0 px-7 py-3.5 bg-[#C8732A] hover:bg-[#A84E1A] text-[#FAF7F2] text-sm font-semibold rounded-sm">Post a Project Free →</a>
-        </div>
       </div>
     </section>
   )

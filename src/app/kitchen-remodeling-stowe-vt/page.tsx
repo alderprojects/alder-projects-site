@@ -8,6 +8,7 @@ export const metadata: Metadata = {
 
 const content = {
   "h1": "Kitchen Remodeling Contractors in Stowe, VT",
+  "heroImg": "https://plus.unsplash.com/premium_photo-1686090447480-9eef06ce4723",
   "intro": "Find vetted kitchen remodeling contractors in Stowe, VT. Post your project free — matched with local contractors in 48 hours.",
   "sections": [
     {"heading": "Kitchen Remodeling in Stowe", "body": "Stowe is Vermont’s premier outdoor recreation destination. Kitchen remodeling here ranges from practical updates in year-round homes to premium renovations in vacation properties where the kitchen anchors the gathering space. Common projects: high-end custom cabinetry, premium appliance packages, large kitchen islands for entertaining, open-concept layouts connecting to great rooms, and practical updates in primary residences."},

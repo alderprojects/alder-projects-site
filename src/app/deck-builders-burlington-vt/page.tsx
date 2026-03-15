@@ -8,6 +8,7 @@ export const metadata: Metadata = {
 
 const content = {
   "h1": "Deck Builders in Burlington, VT",
+  "heroImg": "https://images.unsplash.com/photo-1754597215918-b4b1f113ca77",
   "intro": "Find vetted deck builders in Burlington, VT. Post your project free — matched with local deck contractors in 48 hours.",
   "sections": [
     {"heading": "Building a Deck in Burlington", "body": "Burlington decks face specific requirements: footings must extend below the frost line (~4 feet), framing must handle Vermont snow loads, and Burlington’s zoning regulations limit lot coverage. Popular options include pressure-treated lumber, composite decking (Trex, TimberTech), rooftop decks on flat-roof buildings, and multi-level decks on Burlington’s hillside lots."}

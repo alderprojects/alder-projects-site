@@ -8,6 +8,7 @@ export const metadata: Metadata = {
 
 const content = {
   "h1": "Kitchen Remodeling Contractors in Burlington, VT",
+  "heroImg": "https://plus.unsplash.com/premium_photo-1686090447480-9eef06ce4723",
   "intro": "Find vetted kitchen remodeling contractors in Burlington, VT. Post your project free — matched with local contractors in 48 hours.",
   "sections": [
     {"heading": "Kitchen Remodeling in Burlington", "body": "Burlington is Vermont’s largest city with a diverse housing stock — Victorian and Craftsman homes on the Hill and New North End, triple-deckers on the South End, and newer construction near UVM. Common projects include opening kitchen walls to adjacent dining areas, cabinet replacement, countertop upgrades (quartz and granite), new flooring, and appliance packages."},

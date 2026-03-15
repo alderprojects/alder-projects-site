@@ -5,8 +5,8 @@ const COUNTIES = ['Addison','Bennington','Caledonia','Chittenden','Essex','Frank
 
 const S = {
   section: {position:'relative' as const,minHeight:'100vh',display:'flex',flexDirection:'column' as const,justifyContent:'center',overflow:'hidden'},
-  photoBg: {position:'absolute' as const,inset:0,backgroundImage:"url('https://images.unsplash.com/photo-1570641963303-37e2e27aed7b?auto=format&fit=crop&w=1920&q=80')",backgroundSize:'cover',backgroundPosition:'center top',backgroundRepeat:'no-repeat'},
-  overlay: {position:'absolute' as const,inset:0,background:'linear-gradient(to right, rgba(15,26,13,0.92) 45%, rgba(15,26,13,0.65) 100%)'},
+  photoBg: {position:'absolute' as const,inset:0,backgroundImage:"url('https://images.unsplash.com/photo-1559827260-dc66d52bef19?auto=format&fit=crop&w=1920&q=80')",backgroundSize:'cover',backgroundPosition:'center top',backgroundRepeat:'no-repeat'},
+  overlay: {position:'absolute' as const,inset:0,background:'linear-gradient(to right, rgba(15,26,13,0.82) 40%, rgba(15,26,13,0.45) 100%)'},
   inner: {position:'relative' as const,zIndex:10,maxWidth:'1152px',margin:'0 auto',padding:'clamp(100px,12vw,130px) 24px clamp(60px,8vw,96px)',display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(300px,1fr))',gap:'48px',alignItems:'center'},
   badge: {display:'inline-flex',alignItems:'center',gap:'8px',padding:'6px 12px',border:'1px solid rgba(122,155,111,0.4)',borderRadius:'999px',marginBottom:'28px'},
   dot: {width:'8px',height:'8px',borderRadius:'50%',backgroundColor:'#7A9B6F'},

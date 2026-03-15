@@ -8,6 +8,7 @@ export const metadata: Metadata = {
 
 const content = {
   "h1": "Kitchen Remodeling Contractors in South Burlington, VT",
+  "heroImg": "https://plus.unsplash.com/premium_photo-1686090447480-9eef06ce4723",
   "intro": "Find vetted kitchen remodeling contractors in South Burlington, VT. Post your project free — matched with local contractors in 48 hours.",
   "sections": [
     {"heading": "Kitchen Remodeling in South Burlington", "body": "South Burlington is Vermont’s second largest city — a mix of 1960s–1990s suburban homes and newer construction near Williston Road. Kitchens from this era are ripe for renovation. Most common requests: full cabinet replacement (painted shaker cabinets are the current standard), quartz or granite countertop replacement, opening kitchens to dining areas, appliance upgrades, and new flooring."}

@@ -4,7 +4,6 @@ import Nav from'@/components/Nav'
 import Hero from'@/components/Hero'
 import HowItWorks from'@/components/HowItWorks'
 import ProjectTypes from'@/components/ProjectTypes'
-import ContractorBand from'@/components/ContractorBand'
 import SubmitProject from'@/components/SubmitProject'
 import Footer from'@/components/Footer'
 
@@ -14,5 +13,5 @@ export default function Home(){
     document.querySelectorAll('.reveal').forEach(el=>obs.observe(el))
     return()=>obs.disconnect()
   },[])
-  return(<main><Nav/><Hero/><HowItWorks/><ProjectTypes/><ContractorBand/><SubmitProject/><Footer/></main>)
+  return(<main><Nav/><Hero/><HowItWorks/><ProjectTypes/><SubmitProject/><Footer/></main>)
 }

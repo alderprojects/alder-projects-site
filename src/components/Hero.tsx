@@ -33,7 +33,7 @@ export default function Hero() {
         <div>
           <div style={{display:'inline-flex',alignItems:'center',gap:'8px',padding:'5px 12px',border:'1px solid rgba(122,155,111,0.4)',borderRadius:'999px',marginBottom:'28px'}}>
             <span style={{width:'7px',height:'7px',borderRadius:'50%',backgroundColor:'#7A9B6F',flexShrink:0}} />
-            <span style={{fontSize:'11px',fontFamily:'monospace',letterSpacing:'0.12em',textTransform:'uppercase',color:'#7A9B6F'}}>Vermont&apos;s Renovation Network</span>
+            <span style={{fontSize:'11px',fontFamily:'monospace',letterSpacing:'0.12em',textTransform:'uppercase',color:'#7A9B6F'}}>Post your project. Get matched in 48 hours.</span>
           </div>
 
           <h1 ref={headRef} style={{fontFamily:"'Playfair Display',Georgia,serif",fontWeight:600,fontSize:'clamp(2.2rem,4.5vw,3.4rem)',lineHeight:1.08,letterSpacing:'-0.02em',color:'#F5EFE0',marginBottom:'20px'}}>

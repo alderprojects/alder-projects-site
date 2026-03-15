@@ -15,13 +15,15 @@ type F = {
 }
 const EMPTY:F = {homeownerName:'',email:'',phone:'',town:'',zipCode:'',county:'',propertyType:'',category:'',budgetBand:'',timeline:'',financingStatus:'',plansReady:'',description:''}
 
-const B: React.CSSProperties = {width:'100%',backgroundColor:'rgba(45,74,42,0.4)',border:'1px solid rgba(122,155,111,0.25)',borderRadius:'2px',padding:'11px 14px',fontSize:'14px',color:'#F5EFE0',outline:'none',fontFamily:"'DM Sans',system-ui,sans-serif",boxSizing:'border-box'}
-const L: React.CSSProperties = {display:'block',fontSize:'11px',fontFamily:'monospace',textTransform:'uppercase',letterSpacing:'0.08em',color:'rgba(245,239,224,0.45)',marginBottom:'5px'}
+const B: React.CSSProperties = {width:'100%',backgroundColor:'rgba(45,74,42,0.4)',border:'1px solid rgba(122,155,111,0.25)',borderRadius:'2px',padding:'11px 14px',fontSize:'14px',color:'#F5EFE0',outline:'none',fontFamily:"'DM Sans',system-ui,sans-serif",boxSizing:'border-box' as const}
+const L: React.CSSProperties = {display:'block',fontSize:'11px',fontFamily:'monospace',textTransform:'uppercase' as const,letterSpacing:'0.08em',color:'rgba(245,239,224,0.45)',marginBottom:'5px'}
 
 export default function SubmitProject() {
   const [form,setForm] = useState<F>(EMPTY)
   const [status,setStatus] = useState<'idle'|'submitting'|'success'|'error'>('idle')
-  const set = (k:keyof F) => (e:React.ChangeEvent<HTMLInputElement|HTMLSelectElement|HTMLTextAreaElement>) => setForm(p=>({...p,[k]:e.target.value}))
+
+  const set = (k:keyof F) => (e:React.ChangeEvent<HTMLInputElement|HTMLSelectElement|HTMLTextAreaElement>) =>
+    setForm(p=>({...p,[k]:e.target.value}))
 
   const submit = async (e:React.FormEvent) => {
     e.preventDefault(); setStatus('submitting')
@@ -42,8 +44,12 @@ export default function SubmitProject() {
     </section>
   )
 
-  const Row2 = ({children}:{children:React.ReactNode}) => <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(200px,1fr))',gap:'12px'}}>{children}</div>
-  const Field = ({label,req,children}:{label:string;req?:boolean;children:React.ReactNode}) => <div><label style={L}>{label}{req?' *':''}</label>{children}</div>
+  const Row2 = ({children}:{children:React.ReactNode}) => (
+    <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(200px,1fr))',gap:'12px'}}>{children}</div>
+  )
+  const Field = ({label,req,children}:{label:string;req?:boolean;children:React.ReactNode}) => (
+    <div><label style={L}>{label}{req?' *':''}</label>{children}</div>
+  )
   const Sel = ({val,onChange,placeholder,opts}:{val:string;onChange:any;placeholder:string;opts:string[]}) => (
     <select required value={val} onChange={onChange} style={{...B,appearance:'none' as const}}>
       <option value="" disabled>{placeholder}</option>
@@ -52,19 +58,18 @@ export default function SubmitProject() {
   )
 
   return (
-    <section id="submit-project" style={{padding:'clamp(56px,8vw,96px) 24px',backgroundColor:'#1C2B1A'}}>
-      <div style={{maxWidth:'1152px',margin:'0 auto',display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(min(100%,340px),1fr))',gap:'48px',alignItems:'start'}}>
-        <div style={{position:'relative'}}>
+    <section id="submit-project" style={{backgroundColor:'#1C2B1A',padding:'clamp(56px,8vw,96px) 24px'}}>
+      <div style={{maxWidth:'680px',margin:'0 auto'}}>
+
+        {/* Header */}
+        <div style={{marginBottom:'36px'}}>
           <span style={{fontSize:'11px',fontFamily:'monospace',textTransform:'uppercase',letterSpacing:'0.1em',color:'#7A9B6F'}}>Free · No Account Needed</span>
-          <h2 style={{fontFamily:"'Playfair Display',Georgia,serif",fontSize:'clamp(1.8rem,4vw,2.8rem)',fontWeight:600,color:'#F5EFE0',lineHeight:1.1,marginTop:'10px',marginBottom:'14px'}}>Post your<br/><em style={{color:'#C8732A',fontStyle:'normal'}}>project.</em></h2>
-          <p style={{color:'rgba(245,239,224,0.5)',fontSize:'15px',lineHeight:1.7,maxWidth:'360px',marginBottom:'28px'}}>{"Describe your build. We'll match you with 2–4 vetted Vermont contractors within 48 hours. Always free."}</p>
-          {['Vetted Vermont contractors only','No spam or cold calls','You choose who to work with'].map(t=>(
-            <div key={t} style={{display:'flex',alignItems:'center',gap:'10px',marginBottom:'8px'}}>
-              <span style={{color:'#7A9B6F',fontSize:'13px'}}>&#10003;</span>
-              <span style={{color:'rgba(245,239,224,0.5)',fontSize:'14px'}}>{t}</span>
-            </div>
-          ))}
+          <h2 style={{fontFamily:"'Playfair Display',Georgia,serif",fontSize:'clamp(1.8rem,4vw,2.6rem)',fontWeight:600,color:'#F5EFE0',lineHeight:1.1,marginTop:'8px',marginBottom:'0'}}>
+            Post your project.
+          </h2>
         </div>
+
+        {/* Form */}
         <form onSubmit={submit} style={{display:'flex',flexDirection:'column',gap:'14px'}}>
           <Row2>
             <Field label="Your Name" req><input required type="text" placeholder="Jane Smith" value={form.homeownerName} onChange={set('homeownerName')} style={B}/></Field>
@@ -98,7 +103,7 @@ export default function SubmitProject() {
             <textarea required rows={5} placeholder="Describe your project — scope, key details, site conditions, any special requirements…" value={form.description} onChange={set('description')} style={{...B,resize:'vertical'}}/>
           </Field>
           <button type="submit" disabled={status==='submitting'} style={{padding:'15px 28px',backgroundColor:status==='submitting'?'rgba(200,115,42,0.5)':'#C8732A',color:'#FAF7F2',fontWeight:600,fontSize:'14px',border:'none',borderRadius:'2px',cursor:status==='submitting'?'not-allowed':'pointer',fontFamily:"'DM Sans',system-ui,sans-serif",marginTop:'4px'}}>
-            {status==='submitting' ? 'Submitting…' : 'Submit Project & Get Matched →'}
+            {status==='submitting' ? 'Submitting…' : 'Submit Project →'}
           </button>
           {status==='error' && <p style={{color:'#E87B7B',fontSize:'12px',fontFamily:'monospace',marginTop:'4px'}}>Something went wrong. Email hello@alderprojects.com directly.</p>}
           <p style={{color:'rgba(245,239,224,0.2)',fontSize:'11px',fontFamily:'monospace',marginTop:'4px'}}>Your info is only shared with matched contractors.</p>

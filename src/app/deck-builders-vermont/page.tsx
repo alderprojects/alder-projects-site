@@ -8,6 +8,7 @@ export const metadata: Metadata = {
 
 const content = {
   "h1": "Deck Builders in Vermont",
+  "heroImg": "https://images.unsplash.com/photo-1754597215918-b4b1f113ca77",
   "intro": "Find vetted deck builders across Vermont. Post your project free — matched with local deck contractors who build for Vermont conditions.",
   "sections": [
     {"heading": "How It Works", "body": "Post your deck project free. We match you with 2–4 vetted Vermont deck contractors in your area. Compare credentials and bids, then choose your contractor."},

@@ -3,6 +3,7 @@ import Link from 'next/link'
 export type SeoPageContent = {
   h1: string
   intro: string
+  heroImg?: string
   sections: { heading: string; body: string }[]
   townLinks?: { label: string; href: string }[]
   faqs: { q: string; a: string }[]
@@ -28,9 +29,20 @@ export default function SeoPage({ content }: { content: SeoPageContent }) {
         </Link>
       </div>
 
-      {/* Hero */}
-      <div style={{ backgroundColor: '#1C2B1A', padding: 'clamp(40px,6vw,72px) 24px', borderBottom: '1px solid rgba(122,155,111,0.15)' }}>
-        <div style={{ maxWidth: '720px', margin: '0 auto' }}>
+      {/* Hero — with optional photo */}
+      <div style={{ backgroundColor: '#1C2B1A', position: 'relative', overflow: 'hidden', borderBottom: '1px solid rgba(122,155,111,0.15)' }}>
+        {content.heroImg && (
+          <>
+            <img
+              src={content.heroImg + '?auto=format&fit=crop&w=1200&q=70'}
+              alt=""
+              aria-hidden="true"
+              style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center', zIndex: 0, opacity: 0.25 }}
+            />
+            <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(90deg, rgba(13,26,11,0.95) 0%, rgba(13,26,11,0.7) 100%)', zIndex: 1 }} />
+          </>
+        )}
+        <div style={{ position: 'relative', zIndex: 2, maxWidth: '720px', margin: '0 auto', padding: 'clamp(40px,6vw,72px) 24px' }}>
           <h1 style={{ fontFamily: "'Playfair Display', Georgia, serif", fontSize: 'clamp(1.8rem,4vw,2.8rem)', fontWeight: 600, color: '#F5EFE0', lineHeight: 1.1, marginBottom: '16px' }}>
             {content.h1}
           </h1>
@@ -45,6 +57,7 @@ export default function SeoPage({ content }: { content: SeoPageContent }) {
 
       {/* Body */}
       <div style={{ maxWidth: '720px', margin: '0 auto', padding: 'clamp(40px,6vw,64px) 24px' }}>
+
         {content.sections.map((s, i) => (
           <div key={i} style={{ marginBottom: '36px' }}>
             <h2 style={{ fontFamily: "'Playfair Display', Georgia, serif", fontSize: 'clamp(1.2rem,2.5vw,1.6rem)', fontWeight: 600, color: '#1C2B1A', marginBottom: '12px' }}>
@@ -55,6 +68,7 @@ export default function SeoPage({ content }: { content: SeoPageContent }) {
             />
           </div>
         ))}
+
         {content.townLinks && content.townLinks.length > 0 && (
           <div style={{ marginBottom: '36px' }}>
             <h2 style={{ fontFamily: "'Playfair Display', Georgia, serif", fontSize: 'clamp(1.2rem,2.5vw,1.6rem)', fontWeight: 600, color: '#1C2B1A', marginBottom: '14px' }}>
@@ -69,10 +83,14 @@ export default function SeoPage({ content }: { content: SeoPageContent }) {
             </div>
           </div>
         )}
+
         <div style={{ backgroundColor: '#1C2B1A', borderRadius: '4px', padding: '28px 32px', marginBottom: '40px', display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: '16px' }}>
           <p style={{ fontFamily: "'Playfair Display', Georgia, serif", fontSize: '1.2rem', color: '#F5EFE0', fontWeight: 500, margin: 0 }}>Ready to find a contractor?</p>
-          <Link href="/#submit-project" style={{ padding: '12px 24px', backgroundColor: '#C8732A', color: '#FAF7F2', fontWeight: 600, fontSize: '14px', borderRadius: '2px', textDecoration: 'none', flexShrink: 0, fontFamily: "'DM Sans', system-ui, sans-serif" }}>Post Your Project Free →</Link>
+          <Link href="/#submit-project" style={{ padding: '12px 24px', backgroundColor: '#C8732A', color: '#FAF7F2', fontWeight: 600, fontSize: '14px', borderRadius: '2px', textDecoration: 'none', flexShrink: 0, fontFamily: "'DM Sans', system-ui, sans-serif" }}>
+            Post Your Project Free →
+          </Link>
         </div>
+
         {content.faqs.length > 0 && (
           <div style={{ marginBottom: '40px' }}>
             <h2 style={{ fontFamily: "'Playfair Display', Georgia, serif", fontSize: 'clamp(1.2rem,2.5vw,1.6rem)', fontWeight: 600, color: '#1C2B1A', marginBottom: '20px' }}>Frequently Asked Questions</h2>
@@ -84,6 +102,7 @@ export default function SeoPage({ content }: { content: SeoPageContent }) {
             ))}
           </div>
         )}
+
         {content.internalLinks.length > 0 && (
           <div style={{ paddingTop: '24px', borderTop: '1px solid rgba(28,43,26,0.08)' }}>
             <p style={{ fontSize: '11px', fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.08em', color: 'rgba(28,43,26,0.4)', marginBottom: '12px' }}>See Also</p>
@@ -95,6 +114,7 @@ export default function SeoPage({ content }: { content: SeoPageContent }) {
           </div>
         )}
       </div>
+
       <div style={{ backgroundColor: '#1C2B1A', padding: '24px', textAlign: 'center', marginTop: '40px' }}>
         <p style={{ fontSize: '12px', fontFamily: 'monospace', color: 'rgba(245,239,224,0.3)', margin: 0 }}>
           © {new Date().getFullYear()} Alder Projects LLC · Vermont · <Link href="/" style={{ color: 'rgba(245,239,224,0.4)', textDecoration: 'none' }}>alderprojects.com</Link>

@@ -3,15 +3,14 @@ import { useState } from 'react'
 import Link from 'next/link'
 
 const TRADES = ['General Contractor','Carpenter / Finish Work','Kitchen & Bath Specialist','Deck & Outdoor Structures','Roofing','Plumbing','HVAC / Heating','Electrical','Painting & Interior','Basement Finishing','Masonry / Stonework','Insulation & Weatherization','Other']
-const COUNTIES = ['Addison','Bennington','Caledonia','Chittenden','Essex','Franklin','Grand Isle','Lamoille','Orange','Orleans','Rutland','Washington','Windham','Windsor']
 const EXP = ['1-2 years','3-5 years','6-10 years','10-20 years','20+ years']
 
 type F = {
   name:string; businessName:string; email:string; phone:string
   trade:string; otherTrade:string; yearsExp:string; insured:string
-  licenseNumber:string; counties:string[]; website:string; notes:string
+  licenseNumber:string; serviceArea:string; website:string; notes:string
 }
-const EMPTY:F = {name:'',businessName:'',email:'',phone:'',trade:'',otherTrade:'',yearsExp:'',insured:'',licenseNumber:'',counties:[],website:'',notes:''}
+const EMPTY:F = {name:'',businessName:'',email:'',phone:'',trade:'',otherTrade:'',yearsExp:'',insured:'',licenseNumber:'',serviceArea:'',website:'',notes:''}
 
 const I: React.CSSProperties = {width:'100%',backgroundColor:'white',border:'1px solid rgba(28,43,26,0.18)',borderRadius:'3px',padding:'11px 14px',fontSize:'14px',color:'#1C2B1A',outline:'none',fontFamily:"'DM Sans',system-ui,sans-serif",boxSizing:'border-box' as const}
 const L: React.CSSProperties = {display:'block',fontSize:'12px',fontWeight:500,color:'rgba(28,43,26,0.55)',marginBottom:'5px'}
@@ -23,12 +22,8 @@ export default function ContractorsPage() {
   const set = (k:keyof F) => (e:React.ChangeEvent<HTMLInputElement|HTMLSelectElement|HTMLTextAreaElement>) =>
     setForm(p => ({...p, [k]: e.target.value}))
 
-  const toggleCounty = (c:string) =>
-    setForm(p => ({...p, counties: p.counties.includes(c) ? p.counties.filter(x=>x!==c) : [...p.counties, c]}))
-
   const submit = async (e:React.FormEvent) => {
     e.preventDefault()
-    if (form.counties.length === 0) return
     setStatus('submitting')
     try {
       const r = await fetch('/api/contractors/apply', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(form)})
@@ -71,10 +66,10 @@ export default function ContractorsPage() {
             Get matched with Vermont<br/><em style={{color:'#C8732A',fontStyle:'normal'}}>renovation leads.</em>
           </h1>
           <p style={{color:'rgba(245,239,224,0.5)',fontSize:'16px',lineHeight:1.7,maxWidth:'480px',margin:'0 auto 28px'}}>
-            Join Vermont&apos;s renovation network. Pre-screened homeowner projects matched to contractors by county and trade. No subscription — pay only when you win a job.
+            Pre-screened homeowner projects matched to your trade and service area. No subscription &mdash; pay only when you win a job.
           </p>
           <div style={{display:'flex',justifyContent:'center',flexWrap:'wrap',gap:'24px'}}>
-            {['Vermont contractors only','Pay per job won','2-4 leads per match'].map(t => (
+            {['Vermont contractors only','Pay per job won','No cold outreach'].map(t => (
               <div key={t} style={{display:'flex',alignItems:'center',gap:'8px'}}>
                 <span style={{color:'#7A9B6F',fontSize:'13px'}}>&#10003;</span>
                 <span style={{color:'rgba(245,239,224,0.55)',fontSize:'14px'}}>{t}</span>
@@ -143,17 +138,20 @@ export default function ContractorsPage() {
 
           {/* Section 3 */}
           <div>
-            <p style={{fontSize:'11px',fontFamily:'monospace',textTransform:'uppercase',letterSpacing:'0.12em',color:'#C8732A',marginBottom:'8px',paddingBottom:'10px',borderBottom:'1px solid rgba(28,43,26,0.1)'}}>03 — Counties You Serve *</p>
-            <p style={{fontSize:'13px',color:'rgba(28,43,26,0.45)',marginBottom:'14px'}}>Select all counties where you actively take on work.</p>
-            <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(150px,1fr))',gap:'8px'}}>
-              {COUNTIES.map(county => (
-                <label key={county} style={{display:'flex',alignItems:'center',gap:'8px',padding:'9px 12px',backgroundColor:form.counties.includes(county)?'#1C2B1A':'white',border:form.counties.includes(county)?'1px solid #1C2B1A':'1px solid rgba(28,43,26,0.15)',borderRadius:'3px',cursor:'pointer'}}>
-                  <input type="checkbox" checked={form.counties.includes(county)} onChange={()=>toggleCounty(county)} style={{accentColor:'#C8732A',width:'14px',height:'14px'}}/>
-                  <span style={{fontSize:'13px',fontWeight:500,color:form.counties.includes(county)?'#F5EFE0':'#1C2B1A'}}>{county}</span>
-                </label>
-              ))}
-            </div>
-            {form.counties.length===0 && <p style={{fontSize:'12px',color:'#C8732A',marginTop:'8px',fontFamily:'monospace'}}>Select at least one county to continue.</p>}
+            <p style={{fontSize:'11px',fontFamily:'monospace',textTransform:'uppercase',letterSpacing:'0.12em',color:'#C8732A',marginBottom:'8px',paddingBottom:'10px',borderBottom:'1px solid rgba(28,43,26,0.1)'}}>03 — Where You Work *</p>
+            <p style={{fontSize:'13px',color:'rgba(28,43,26,0.45)',marginBottom:'14px'}}>
+              List the towns and areas you serve. The more specific the better — we use this to match you to nearby projects.
+            </p>
+            <Field label="Towns / Service Area" req>
+              <textarea
+                required
+                rows={3}
+                placeholder="e.g. Burlington, South Burlington, Williston, Shelburne, Essex, Hinesburg..."
+                value={form.serviceArea}
+                onChange={set('serviceArea')}
+                style={{...I, resize:'vertical'}}
+              />
+            </Field>
           </div>
 
           {/* Section 4 */}
@@ -166,8 +164,8 @@ export default function ContractorsPage() {
 
           <button
             type="submit"
-            disabled={status==='submitting' || form.counties.length===0}
-            style={{padding:'16px 32px',backgroundColor:status==='submitting'||form.counties.length===0?'rgba(200,115,42,0.35)':'#C8732A',color:'#FAF7F2',fontWeight:600,fontSize:'15px',border:'none',borderRadius:'3px',cursor:status==='submitting'||form.counties.length===0?'not-allowed':'pointer',fontFamily:"'DM Sans',system-ui,sans-serif"}}
+            disabled={status==='submitting'}
+            style={{padding:'16px 32px',backgroundColor:status==='submitting'?'rgba(200,115,42,0.35)':'#C8732A',color:'#FAF7F2',fontWeight:600,fontSize:'15px',border:'none',borderRadius:'3px',cursor:status==='submitting'?'not-allowed':'pointer',fontFamily:"'DM Sans',system-ui,sans-serif"}}
           >
             {status==='submitting' ? 'Submitting...' : 'Submit Application →'}
           </button>

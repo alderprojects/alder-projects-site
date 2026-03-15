@@ -8,6 +8,7 @@ export const metadata: Metadata = {
 
 const content = {
   "h1": "Home Renovation Contractors in Addison County, VT",
+  "heroImg": "https://images.unsplash.com/photo-1757661543986-6f418adc8cb6",
   "intro": "Find vetted renovation contractors in Addison County, VT — Middlebury, Vergennes, Bristol and surrounding towns.",
   "sections": [
     {"heading": "How Alder Projects Works", "body": "Post your project free. We match you with vetted Addison County contractors who specialize in your project type. No cold calls, no spam."},

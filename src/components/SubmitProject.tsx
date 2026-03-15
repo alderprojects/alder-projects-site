@@ -42,7 +42,7 @@ export default function SubmitProject() {
     </section>
   )
 
-  const Row2 = ({children}:{children:React.ReactNode}) => <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'12px'}}>{children}</div>
+  const Row2 = ({children}:{children:React.ReactNode}) => <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(200px,1fr))',gap:'12px'}}>{children}</div>
   const Field = ({label,req,children}:{label:string;req?:boolean;children:React.ReactNode}) => <div><label style={L}>{label}{req?' *':''}</label>{children}</div>
   const Sel = ({val,onChange,placeholder,opts}:{val:string;onChange:any;placeholder:string;opts:string[]}) => (
     <select required value={val} onChange={onChange} style={{...B,appearance:'none' as const}}>
@@ -53,8 +53,8 @@ export default function SubmitProject() {
 
   return (
     <section id="submit-project" style={{padding:'clamp(56px,8vw,96px) 24px',backgroundColor:'#1C2B1A'}}>
-      <div style={{maxWidth:'1152px',margin:'0 auto',display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(300px,1fr))',gap:'48px',alignItems:'start'}}>
-        <div style={{position:'sticky',top:'100px'}}>
+      <div style={{maxWidth:'1152px',margin:'0 auto',display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(min(100%,340px),1fr))',gap:'48px',alignItems:'start'}}>
+        <div style={{position:'relative'}}>
           <span style={{fontSize:'11px',fontFamily:'monospace',textTransform:'uppercase',letterSpacing:'0.1em',color:'#7A9B6F'}}>Free · No Account Needed</span>
           <h2 style={{fontFamily:"'Playfair Display',Georgia,serif",fontSize:'clamp(1.8rem,4vw,2.8rem)',fontWeight:600,color:'#F5EFE0',lineHeight:1.1,marginTop:'10px',marginBottom:'14px'}}>Post your<br/><em style={{color:'#C8732A',fontStyle:'normal'}}>project.</em></h2>
           <p style={{color:'rgba(245,239,224,0.5)',fontSize:'15px',lineHeight:1.7,maxWidth:'360px',marginBottom:'28px'}}>{"Describe your build. We'll match you with 2–4 vetted Vermont contractors within 48 hours. Always free."}</p>

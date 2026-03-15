@@ -8,6 +8,7 @@ export const metadata: Metadata = {
 
 const content = {
   "h1": "Home Additions Contractors in Vermont",
+  "heroImg": "https://images.unsplash.com/photo-1505798577917-a65157d3320a",
   "intro": "Find vetted home addition contractors across Vermont. Post your project free — matched with local general contractors in 48 hours.",
   "sections": [
     {"heading": "How It Works", "body": "Post your home addition project free. We match you with 2–4 vetted Vermont contractors experienced in additions. Compare bids and choose who you want to work with."},

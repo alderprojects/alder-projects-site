@@ -1,13 +1,13 @@
 const PT = [
   {
     t:'Kitchen Remodel',
-    d:'Cabinets, counters, appliances, layout changes. Vermont’s most requested project.',
+    d:'Cabinets, counters, appliances, layout changes. Vermont\u2019s most requested project.',
     img:'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?auto=format&fit=crop&w=600&q=80',
     tag:'Most Requested',
   },
   {
     t:'Bathroom Renovation',
-    d:'Full gut-and-replace or targeted upgrades — tile, vanity, shower, fixtures.',
+    d:'Full gut-and-replace or targeted upgrades \u2014 tile, vanity, shower, fixtures.',
     img:'https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?auto=format&fit=crop&w=600&q=80',
     tag:null,
   },
@@ -20,25 +20,25 @@ const PT = [
   {
     t:'Basement Finishing',
     d:'Convert unfinished space to living area, home office, or apartment.',
-    img:'https://images.unsplash.com/photo-1560185893-a55cbc8c57e8?auto=format&fit=crop&w=600&q=80',
+    img:'https://images.unsplash.com/photo-1588854337236-6889d631faa8?auto=format&fit=crop&w=600&q=80',
     tag:null,
   },
   {
     t:'Additions & Expansions',
     d:'Bump-outs, sunrooms, garages, and second-floor additions.',
-    img:'https://images.unsplash.com/photo-1582268611958-ebfd161ef9cf?auto=format&fit=crop&w=600&q=80',
+    img:'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=600&q=80',
     tag:null,
   },
   {
     t:'Roofing & Weatherization',
     d:'Roof replacement, insulation, windows, and weatherproofing. Critical in Vermont.',
-    img:'https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=600&q=80',
+    img:'https://images.unsplash.com/photo-1598228723793-52759bba239c?auto=format&fit=crop&w=600&q=80',
     tag:'Seasonal',
   },
   {
     t:'Plumbing & HVAC',
     d:'Heating systems, radiant floor, boiler upgrades, and plumbing rough-in.',
-    img:'https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?auto=format&fit=crop&w=600&q=80',
+    img:'https://images.unsplash.com/photo-1581578731548-c64695cc6952?auto=format&fit=crop&w=600&q=80',
     tag:null,
   },
   {
@@ -58,20 +58,25 @@ export default function ProjectTypes() {
           <h2 style={{fontFamily:"'Playfair Display',Georgia,serif",fontSize:'clamp(1.8rem,4vw,3rem)',fontWeight:600,color:'#1C2B1A',lineHeight:1.1,marginTop:'10px'}}>
             Every kind of<br/><em style={{fontStyle:'normal',color:'#C8732A'}}>Vermont renovation.</em>
           </h2>
+          <p style={{color:'rgba(28,43,26,0.55)',fontSize:'16px',lineHeight:1.7,marginTop:'12px',maxWidth:'480px'}}>
+            Click any project type to get started \u2014 we\u2019ll match you with the right Vermont contractor within 48 hours.
+          </p>
         </div>
 
         <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(260px,1fr))',gap:'20px'}}>
           {PT.map((p) => (
-            <a key={p.t} href="#submit-project" style={{textDecoration:'none',display:'flex',flexDirection:'column',backgroundColor:'white',borderRadius:'4px',overflow:'hidden',border:'1px solid rgba(28,43,26,0.08)',transition:'transform 0.2s,box-shadow 0.2s',cursor:'pointer'}}
+            <a
+              key={p.t}
+              href="#submit-project"
+              style={{textDecoration:'none',display:'flex',flexDirection:'column',backgroundColor:'white',borderRadius:'4px',overflow:'hidden',border:'1px solid rgba(28,43,26,0.08)',transition:'transform 0.2s,box-shadow 0.2s',cursor:'pointer'}}
               onMouseEnter={e=>{(e.currentTarget as HTMLElement).style.transform='translateY(-4px)';(e.currentTarget as HTMLElement).style.boxShadow='0 12px 32px rgba(28,43,26,0.12)'}}
               onMouseLeave={e=>{(e.currentTarget as HTMLElement).style.transform='none';(e.currentTarget as HTMLElement).style.boxShadow='none'}}
             >
-              {/* Photo */}
-              <div style={{height:'160px',overflow:'hidden',position:'relative'}}>
+              <div style={{height:'180px',overflow:'hidden',position:'relative',backgroundColor:'#e8e0d5'}}>
                 <img
                   src={p.img}
                   alt={p.t}
-                  style={{width:'100%',height:'100%',objectFit:'cover'}}
+                  style={{width:'100%',height:'100%',objectFit:'cover',display:'block'}}
                   loading="lazy"
                 />
                 {p.tag && (
@@ -79,9 +84,9 @@ export default function ProjectTypes() {
                     {p.tag}
                   </span>
                 )}
+                <div style={{position:'absolute',inset:0,background:'linear-gradient(to top,rgba(28,43,26,0.3),transparent 60%)'}} />
               </div>
-              {/* Text */}
-              <div style={{padding:'16px 18px 18px'}}>
+              <div style={{padding:'16px 18px 20px'}}>
                 <h3 style={{fontFamily:"'Playfair Display',Georgia,serif",fontSize:'16px',fontWeight:600,color:'#1C2B1A',marginBottom:'6px'}}>{p.t}</h3>
                 <p style={{fontSize:'13px',color:'rgba(28,43,26,0.6)',lineHeight:1.6,margin:0}}>{p.d}</p>
               </div>
@@ -89,7 +94,7 @@ export default function ProjectTypes() {
           ))}
         </div>
 
-        <div style={{marginTop:'40px',textAlign:'center'}}>
+        <div style={{marginTop:'48px',textAlign:'center'}}>
           <a href="#submit-project" style={{display:'inline-block',padding:'14px 32px',backgroundColor:'#1C2B1A',color:'#F5EFE0',fontWeight:600,fontSize:'14px',borderRadius:'2px',textDecoration:'none'}}>
             Post Any Project Free &rarr;
           </a>

@@ -62,7 +62,7 @@ export default function Hero() {
 
         <div style={{backgroundColor:'rgba(8,16,6,0.72)',border:'1px solid rgba(122,155,111,0.18)',borderRadius:'4px',padding:'22px',backdropFilter:'blur(12px)'}}>
           <p style={{fontSize:'10px',fontFamily:'monospace',letterSpacing:'0.12em',textTransform:'uppercase',color:'#7A9B6F',marginBottom:'14px'}}>
-            Coverage &mdash; All 14 Counties
+            Popular Vermont Towns
           </p>
           <div>
             {['Burlington','Montpelier','Stowe','Woodstock','Middlebury','Brattleboro','Rutland','Barre','St. Johnsbury','Bennington','Manchester','Waitsfield','Morrisville','Newport','Shelburne','Williston','South Burlington','Essex Junction','Colchester','Winooski'].map(t => (
@@ -72,7 +72,7 @@ export default function Hero() {
             ))}
           </div>
           <div style={{display:'flex',marginTop:'18px',paddingTop:'16px',borderTop:'1px solid rgba(122,155,111,0.12)'}}>
-            {[{n:'14',l:'Counties'},{n:'Free',l:'To Post'},{n:'48hr',l:'Avg Match'}].map((s,i) => (
+            {[{n:'VT',l:'Statewide'},{n:'Free',l:'To Post'},{n:'48hr',l:'Avg Match'}].map((s,i) => (
               <div key={s.l} style={{flex:1,textAlign:'center',borderRight:i<2?'1px solid rgba(122,155,111,0.12)':'none',padding:'0 8px'}}>
                 <div style={{fontFamily:"'Playfair Display',Georgia,serif",fontWeight:700,fontSize:'20px',color:'#C8732A'}}>{s.n}</div>
                 <div style={{fontSize:'10px',fontFamily:'monospace',color:'rgba(245,239,224,0.35)',marginTop:'2px',letterSpacing:'0.06em'}}>{s.l}</div>

@@ -3,7 +3,7 @@ import SeoPage from '@/components/SeoPage'
 
 export const metadata: Metadata = {
   title: 'Home Additions Vermont | Alder Projects',
-  description: 'Find vetted home additions contractors across Vermont. Home additions in Vermont are a popular alternative to moving in a tight housing market. Post your project free — matched with local contractors in 48 hours.',
+  description: 'Find vetted home addition contractors across Vermont. Post your project free — matched with local contractors in 48 hours.',
 }
 
 const content = {

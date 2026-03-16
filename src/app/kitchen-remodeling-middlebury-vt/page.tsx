@@ -3,7 +3,7 @@ import SeoPage from '@/components/SeoPage'
 
 export const metadata: Metadata = {
   title: 'Kitchen Remodeling Middlebury VT | Alder Projects',
-  description: 'Find vetted kitchen remodeling contractors in Middlebury, VT. Post your project free — matched in 48 hours.',
+  description: 'Find vetted kitchen remodeling Middlebury VT contractors. Kitchen remodeling in Middlebury often means working with historic Victorian homes and tight galley kitchens. Post your project free — matched in 48 hours.',
 }
 
 const content = {

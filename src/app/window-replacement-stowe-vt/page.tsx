@@ -2,7 +2,7 @@ import { Metadata } from 'next'
 import SeoPage from '@/components/SeoPage'
 export const metadata: Metadata = {
   title: 'Window Replacement Stowe VT | Alder Projects',
-  description: 'Find vetted window replacement contractors in Stowe, VT. Post your project free — matched with local window installers in 48 hours.',
+  description: 'Find vetted window replacement Stowe VT contractors. Window replacement in Stowe is a high priority given the area's extreme cold and many vacation properties. Post your project free — matched with local window installers in 48 hours.',
 }
 const content = {
   "h1": "Window Replacement Contractors in Stowe, VT",

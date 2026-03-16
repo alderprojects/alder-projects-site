@@ -2,7 +2,7 @@ import { Metadata } from 'next'
 import SeoPage from '@/components/SeoPage'
 export const metadata: Metadata = {
   title: 'Painting Contractors Burlington VT | Alder Projects',
-  description: 'Find vetted painting contractors in Burlington, VT. Post your project free — matched with local painters in 48 hours.',
+  description: 'Find vetted painting contractors Burlington VT homeowners trust. Painting contractors in Burlington must be EPA RRP certified for the city's older housing stock. Post your project free — matched with local painters in 48 hours.',
 }
 const content = {
   "h1": "Painting Contractors in Burlington, VT",

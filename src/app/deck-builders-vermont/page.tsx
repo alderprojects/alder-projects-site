@@ -3,7 +3,7 @@ import SeoPage from '@/components/SeoPage'
 
 export const metadata: Metadata = {
   title: 'Deck Builders Vermont | Alder Projects',
-  description: 'Find vetted deck builders across Vermont. Deck builders in Vermont must account for frost depths, snow loads, and freeze-thaw cycles. Post your project free — get matched with local deck contractors in 48 hours.',
+  description: 'Find vetted deck builders across Vermont. Post your project free — get matched with local deck contractors in 48 hours.',
 }
 
 const content = {

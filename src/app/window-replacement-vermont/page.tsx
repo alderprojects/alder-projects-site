@@ -26,3 +26,4 @@ const content = {
   "internalLinks": [{"label": "Window replacement Burlington", "href": "/window-replacement-burlington-vt"}, {"label": "Window replacement Stowe", "href": "/window-replacement-stowe-vt"}, {"label": "Contractors Chittenden County", "href": "/chittenden-county-vt"}]
 }
 export default function Page() { return <SeoPage content={content} /> }
+

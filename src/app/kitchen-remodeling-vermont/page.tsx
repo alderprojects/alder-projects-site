@@ -3,7 +3,7 @@ import SeoPage from '@/components/SeoPage'
 
 export const metadata: Metadata = {
   title: 'Kitchen Remodeling Vermont | Alder Projects',
-  description: 'Find vetted kitchen remodeling contractors across Vermont. Kitchen remodeling in Vermont ranges from Burlington farmhouses to Stowe vacation homes. Post your project free — get matched with local contractors in 48 hours.',
+  description: 'Find vetted kitchen remodeling contractors across Vermont. Post your project free — get matched with local contractors in 48 hours.',
 }
 
 const content = {

@@ -3,7 +3,7 @@ import SeoPage from '@/components/SeoPage'
 
 export const metadata: Metadata = {
   title: 'Deck Builders Stowe VT | Alder Projects',
-  description: 'Find vetted deck builders in Stowe, VT. Post your project free — matched with local deck contractors in 48 hours.',
+  description: 'Find vetted deck builders Stowe VT homeowners trust. Deck builders in Stowe must handle 100+ inches of annual snowfall and extreme freeze-thaw conditions. Post your project free — matched with local deck contractors in 48 hours.',
 }
 
 const content = {

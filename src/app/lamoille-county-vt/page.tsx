@@ -3,7 +3,7 @@ import SeoPage from '@/components/SeoPage'
 
 export const metadata: Metadata = {
   title: 'Contractors Lamoille County VT | Alder Projects',
-  description: 'Find vetted renovation contractors in Lamoille County, VT — Stowe, Morristown, Hyde Park and surrounding towns.',
+  description: 'Find vetted renovation contractors in Lamoille County VT — Stowe, Morristown, Hyde Park and surrounding towns.',
 }
 
 const content = {

@@ -3,7 +3,7 @@ import SeoPage from '@/components/SeoPage'
 
 export const metadata: Metadata = {
   title: 'Kitchen Remodeling Stowe VT | Alder Projects',
-  description: 'Find vetted kitchen remodeling Stowe VT contractors. Kitchen remodeling in Stowe ranges from year-round homes to high-end vacation property renovations. Post your project free — matched with local contractors in 48 hours.',
+  description: 'Find vetted kitchen remodeling contractors in Stowe, VT. Post your project free — matched with local contractors in 48 hours.',
 }
 
 const content = {

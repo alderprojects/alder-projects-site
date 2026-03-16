@@ -3,7 +3,7 @@ import SeoPage from '@/components/SeoPage'
 
 export const metadata: Metadata = {
   title: 'Bathroom Remodeling Burlington VT | Alder Projects',
-  description: 'Find vetted bathroom remodeling Burlington VT contractors. Bathroom remodeling in Burlington often means navigating original cast iron plumbing and lead paint. Post your project free — matched with local contractors in 48 hours.',
+  description: 'Find vetted bathroom remodeling contractors in Burlington, VT. Post your project free — matched with local contractors in 48 hours.',
 }
 
 const content = {

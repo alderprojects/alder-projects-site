@@ -2,7 +2,7 @@ import { Metadata } from 'next'
 import SeoPage from '@/components/SeoPage'
 export const metadata: Metadata = {
   title: 'Roofing Contractors South Burlington VT | Alder Projects',
-  description: 'Find vetted roofing contractors in South Burlington, VT. Post your project free — matched with local roofers in 48 hours.',
+  description: 'Find vetted roofing South Burlington VT contractors. Roofing in South Burlington is in high demand as 1990s-era roofs across the suburb reach end of life. Post your project free — matched with local roofers in 48 hours.',
 }
 const content = {
   "h1": "Roofing Contractors in South Burlington, VT",

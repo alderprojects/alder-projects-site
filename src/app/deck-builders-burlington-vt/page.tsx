@@ -3,7 +3,7 @@ import SeoPage from '@/components/SeoPage'
 
 export const metadata: Metadata = {
   title: 'Deck Builders Burlington VT | Alder Projects',
-  description: 'Find vetted deck builders Burlington VT homeowners rely on. Building a deck in Burlington requires frost-depth footings and Burlington zoning compliance. Post your project free — matched with local deck contractors in 48 hours.',
+  description: 'Find vetted deck builders in Burlington, VT. Post your project free — matched with local deck contractors in 48 hours.',
 }
 
 const content = {

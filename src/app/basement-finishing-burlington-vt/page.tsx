@@ -2,7 +2,7 @@ import { Metadata } from 'next'
 import SeoPage from '@/components/SeoPage'
 export const metadata: Metadata = {
   title: 'Basement Finishing Burlington VT | Alder Projects',
-  description: 'Find vetted basement finishing contractors in Burlington, VT. Post your project free — matched with local contractors in 48 hours.',
+  description: 'Find vetted basement finishing Burlington VT contractors. Basement finishing in Burlington is one of the highest-ROI projects in the city's tight housing market. Post your project free — matched with local contractors in 48 hours.',
 }
 const content = {
   "h1": "Basement Finishing Contractors in Burlington, VT",

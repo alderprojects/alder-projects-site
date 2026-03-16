@@ -2,7 +2,7 @@ import { Metadata } from 'next'
 import SeoPage from '@/components/SeoPage'
 export const metadata: Metadata = {
   title: 'Roofing Contractors Middlebury VT | Alder Projects',
-  description: 'Find vetted roofing Middlebury VT contractors. Roofing in Middlebury often involves historic slate roofs worth restoring alongside standard asphalt replacements. Post your project free — matched with local roofers in 48 hours.',
+  description: 'Find vetted roofing contractors in Middlebury, VT. Post your project free — matched with local roofers in 48 hours.',
 }
 const content = {
   "h1": "Roofing Contractors in Middlebury, VT",

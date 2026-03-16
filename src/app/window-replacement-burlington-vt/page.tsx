@@ -2,7 +2,7 @@ import { Metadata } from 'next'
 import SeoPage from '@/components/SeoPage'
 export const metadata: Metadata = {
   title: 'Window Replacement Burlington VT | Alder Projects',
-  description: 'Find vetted window replacement contractors in Burlington, VT. Post your project free — matched with local window installers in 48 hours.',
+  description: 'Find vetted window replacement Burlington VT contractors. Window replacement in Burlington must balance energy efficiency with historic character requirements. Post your project free — matched with local window installers in 48 hours.',
 }
 const content = {
   "h1": "Window Replacement Contractors in Burlington, VT",

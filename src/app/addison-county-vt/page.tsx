@@ -3,7 +3,7 @@ import SeoPage from '@/components/SeoPage'
 
 export const metadata: Metadata = {
   title: 'Contractors Addison County VT | Alder Projects',
-  description: 'Find vetted renovation contractors in Addison County, VT — Middlebury, Vergennes, Bristol and surrounding towns.',
+  description: 'Find vetted renovation contractors in Addison County VT — Middlebury, Vergennes, Bristol and surrounding towns.',
 }
 
 const content = {

@@ -3,7 +3,7 @@ import SeoPage from '@/components/SeoPage'
 
 export const metadata: Metadata = {
   title: 'Basement Finishing Vermont | Alder Projects',
-  description: 'Find vetted basement finishing contractors across Vermont. Post your project free — get matched with local contractors in 48 hours.',
+  description: 'Find vetted basement finishing contractors across Vermont. Basement finishing in Vermont requires moisture barriers and insulation suited to the state's climate. Post your project free — get matched with local contractors in 48 hours.',
 }
 
 const content = {

@@ -2,7 +2,7 @@ import { Metadata } from 'next'
 import SeoPage from '@/components/SeoPage'
 export const metadata: Metadata = {
   title: 'Window Replacement Williston VT | Alder Projects',
-  description: 'Find vetted window replacement contractors in Williston, VT. Post your project free — matched with local window installers in 48 hours.',
+  description: 'Find vetted window replacement Williston VT contractors. Window replacement in Williston is popular as 1980s-2000s builder-grade windows reach end of useful life. Post your project free — matched with local window installers in 48 hours.',
 }
 const content = {
   "h1": "Window Replacement Contractors in Williston, VT",

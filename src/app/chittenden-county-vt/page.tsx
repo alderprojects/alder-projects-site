@@ -3,7 +3,7 @@ import SeoPage from '@/components/SeoPage'
 
 export const metadata: Metadata = {
   title: 'Contractors Chittenden County VT | Alder Projects',
-  description: 'Find vetted renovation contractors in Chittenden County, VT — Burlington, South Burlington, Essex, Williston and more.',
+  description: 'Find vetted renovation contractors in Chittenden County VT — Burlington, South Burlington, Essex, Williston and more.',
 }
 
 const content = {

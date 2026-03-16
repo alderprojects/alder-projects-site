@@ -3,7 +3,7 @@ import SeoPage from '@/components/SeoPage'
 
 export const metadata: Metadata = {
   title: 'Bathroom Remodeling Vermont | Alder Projects',
-  description: 'Find vetted bathroom remodeling contractors across Vermont. Post your project free — matched with local contractors in 48 hours.',
+  description: 'Find vetted bathroom remodeling contractors across Vermont. Bathroom remodeling in Vermont requires contractors who understand older plumbing and Vermont winters. Post your project free — matched with local contractors in 48 hours.',
 }
 
 const content = {

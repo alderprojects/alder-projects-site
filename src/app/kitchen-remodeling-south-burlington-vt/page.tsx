@@ -3,7 +3,7 @@ import SeoPage from '@/components/SeoPage'
 
 export const metadata: Metadata = {
   title: 'Kitchen Remodeling South Burlington VT | Alder Projects',
-  description: 'Find vetted kitchen remodeling contractors in South Burlington, VT. Post your project free — matched in 48 hours.',
+  description: 'Find vetted kitchen remodeling South Burlington VT contractors. Kitchen remodeling in South Burlington typically means updating 1970s-90s homes with modern layouts. Post your project free — matched in 48 hours.',
 }
 
 const content = {

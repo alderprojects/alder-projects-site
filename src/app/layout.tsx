@@ -2,11 +2,11 @@ import type { Metadata } from 'next'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'Alder Projects — Vermont Home Renovation',
+  title: 'Alder Projects \u2014 Vermont Home Renovation',
   description: 'Describe your Vermont renovation project and get connected with local contractors who match your scope, location, and timeline. Serving all 14 Vermont counties.',
   keywords: ['Vermont contractors','Vermont home renovation','Vermont remodeling','Vermont general contractor','find contractor Vermont','Burlington VT contractor','kitchen remodel Vermont'],
   openGraph: {
-    title: 'Alder Projects — Vermont Home Renovation',
+    title: 'Alder Projects \u2014 Vermont Home Renovation',
     description: 'Describe your project. We connect you with local Vermont contractors who are the right fit.',
     url: 'https://alderprojects.com',
     siteName: 'Alder Projects',
@@ -15,7 +15,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Alder Projects — Vermont Home Renovation',
+    title: 'Alder Projects \u2014 Vermont Home Renovation',
     description: 'Describe your project. Get connected with local Vermont contractors.',
   },
   alternates: { canonical: 'https://alderprojects.com' },

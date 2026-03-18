@@ -20,6 +20,7 @@ export default function Nav() {
             <a key={i.h} href={i.h} className="text-sm font-medium text-[#F5EFE0]/70 hover:text-[#F5EFE0] transition-colors">{i.l}</a>
           ))}
           <Link href="/plan" className="text-sm font-medium text-[#F5EFE0]/70 hover:text-[#F5EFE0] transition-colors">Start Planning</Link>
+          <Link href="/faq" className="text-sm font-medium text-[#F5EFE0]/70 hover:text-[#F5EFE0] transition-colors">FAQ</Link>
           <Link href="/contractors" className="text-sm font-medium text-[#7A9B6F]/90 hover:text-[#7A9B6F] transition-colors border border-[#7A9B6F]/30 hover:border-[#7A9B6F]/60 px-3 py-1.5 rounded-sm">For Contractors</Link>
           <a href="#submit-project" className="ml-2 px-5 py-2.5 bg-[#C8732A] hover:bg-[#A84E1A] text-[#FAF7F2] text-sm font-semibold rounded-sm transition-colors">Post a Project</a>
         </div>

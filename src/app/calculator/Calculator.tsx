@@ -44,7 +44,7 @@ const PROJECTS = [
   ]},
 ]
 
-const LOCS = {
+const LOCS: Record<string, { label: string; mult: number }> = {
   burlington: { label: 'Burlington / South Burlington', mult: 1.0 },
   chittenden: { label: 'Chittenden County suburbs', mult: 0.97 },
   stowe: { label: 'Stowe / Lamoille County', mult: 1.05 },
@@ -53,7 +53,7 @@ const LOCS = {
   other: { label: 'Other Vermont location', mult: 0.95 },
 }
 
-function fmt(n) {
+function fmt(n: number): string {
   return '$' + (Math.round(n / 500) * 500).toLocaleString()
 }
 
@@ -72,8 +72,8 @@ export default function Calculator() {
   const low = baseLow ? Math.round(baseLow * (1 + contingency / 100)) : null
   const high = baseHigh ? Math.round(baseHigh * (1 + contingency / 100)) : null
 
-  const sel = { width: '100%', padding: '11px 14px', border: '1px solid rgba(28,43,26,0.18)', borderRadius: '3px', fontSize: '14px', color: '#1C2B1A', backgroundColor: 'white', appearance: 'none', fontFamily: "'DM Sans',system-ui,sans-serif" }
-  const lbl = { display: 'block', fontSize: '12px', fontWeight: '600', color: 'rgba(28,43,26,0.55)', marginBottom: '8px' }
+  const sel: React.CSSProperties = { width: '100%', padding: '11px 14px', border: '1px solid rgba(28,43,26,0.18)', borderRadius: '3px', fontSize: '14px', color: '#1C2B1A', backgroundColor: 'white', fontFamily: "'DM Sans',system-ui,sans-serif" }
+  const lbl: React.CSSProperties = { display: 'block', fontSize: '12px', fontWeight: 600, color: 'rgba(28,43,26,0.55)', marginBottom: '8px' }
 
   return (
     <div style={{ minHeight: '100vh', backgroundColor: '#FAF7F2' }}>
@@ -124,7 +124,9 @@ export default function Calculator() {
             <div>
               <label style={lbl}>Contingency buffer: {contingency}%</label>
               <div style={{ paddingTop: '8px' }}>
-                <input type="range" min={0} max={30} value={contingency} onChange={e => setContingency(Number(e.target.value))} style={{ width: '100%', accentColor: '#C8732A' }} />
+                <input type="range" min={0} max={30} value={contingency}
+                  onChange={e => setContingency(Number(e.target.value))}
+                  style={{ width: '100%', accentColor: '#C8732A' }} />
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', fontFamily: 'monospace', color: 'rgba(28,43,26,0.4)', marginTop: '4px' }}>
                   <span>0%</span><span>15% recommended</span><span>30%</span>
                 </div>
@@ -133,20 +135,22 @@ export default function Calculator() {
           </div>
         </div>
 
-        {low && high && baseLow && baseHigh ? (
+        {(low != null && high != null && baseLow != null && baseHigh != null) ? (
           <>
             <div style={{ backgroundColor: '#1C2B1A', borderRadius: '4px', padding: '28px 32px', marginBottom: '16px' }}>
               <p style={{ fontSize: '11px', fontFamily: 'monospace', letterSpacing: '0.06em', color: 'rgba(245,239,224,0.4)', marginBottom: '8px' }}>Estimated total range (with {contingency}% contingency)</p>
               <p style={{ fontFamily: "'Playfair Display',Georgia,serif", fontSize: 'clamp(1.8rem,5vw,2.8rem)', fontWeight: 600, color: '#F5EFE0', margin: '0 0 20px' }}>{fmt(low)} – {fmt(high)}</p>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', paddingTop: '16px', borderTop: '1px solid rgba(122,155,111,0.15)' }}>
-                {[
+                {([
                   ['Base range (no contingency)', fmt(baseLow) + ' – ' + fmt(baseHigh)],
                   ['Contingency (' + contingency + '%)', fmt(low - baseLow) + ' – ' + fmt(high - baseHigh)],
-                  ['Location', LOCS[locId]?.label],
-                  ['Project', project?.label + ' — ' + scope?.label.split('(')[0].trim()],
-                ].map(([k,v]) => (
-                  <><span key={k+'k'} style={{ fontSize: '12px', fontFamily: 'monospace', color: 'rgba(245,239,224,0.4)' }}>{k}</span>
-                  <span key={k+'v'} style={{ fontSize: '12px', fontFamily: 'monospace', color: 'rgba(245,239,224,0.65)' }}>{v}</span></>
+                  ['Location', LOCS[locId]?.label ?? ''],
+                  ['Project', (project?.label ?? '') + ' — ' + (scope?.label.split('(')[0].trim() ?? '')],
+                ] as [string, string][]).map(([k, v]) => (
+                  <div key={k} style={{ display: 'contents' }}>
+                    <span style={{ fontSize: '12px', fontFamily: 'monospace', color: 'rgba(245,239,224,0.4)' }}>{k}</span>
+                    <span style={{ fontSize: '12px', fontFamily: 'monospace', color: 'rgba(245,239,224,0.65)' }}>{v}</span>
+                  </div>
                 ))}
               </div>
             </div>
@@ -155,10 +159,10 @@ export default function Calculator() {
                 <p style={{ fontWeight: 600, fontSize: '14px', color: '#1C2B1A', margin: '0 0 3px' }}>Ready to get a real quote?</p>
                 <p style={{ fontSize: '13px', color: 'rgba(28,43,26,0.55)', margin: 0 }}>Post your project — we match you with local Vermont contractors for your trade and area.</p>
               </div>
-              <Link href="/#submit-project" style={{ padding: '10px 20px', backgroundColor: '#C8732A', color: '#FAF7F2', fontWeight: 600, fontSize: '14px', borderRadius: '2px', textDecoration: 'none', flexShrink: 0 }}>Post Your Project →</Link>
+              <Link href="/#submit-project" style={{ padding: '10px 20px', backgroundColor: '#C8732A', color: '#FAF7F2', fontWeight: 600, fontSize: '14px', borderRadius: '2px', textDecoration: 'none' }}>Post Your Project →</Link>
             </div>
             <p style={{ fontSize: '12px', fontFamily: 'monospace', color: 'rgba(28,43,26,0.4)', lineHeight: 1.7, padding: '14px 16px', backgroundColor: 'rgba(28,43,26,0.04)', borderRadius: '2px' }}>
-              Estimates based on typical Vermont project costs as of 2026. Actual costs depend on site conditions, material choices, and contractor availability. Older homes frequently have conditions behind walls that affect final cost. Always get multiple quotes before committing.
+              Estimates based on typical Vermont project costs as of 2026. Actual costs depend on site conditions, material choices, and contractor availability. Always get multiple quotes before committing.
             </p>
           </>
         ) : (
@@ -170,12 +174,12 @@ export default function Calculator() {
         <div style={{ marginTop: '40px', paddingTop: '28px', borderTop: '1px solid rgba(28,43,26,0.08)' }}>
           <p style={{ fontSize: '11px', fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.08em', color: 'rgba(28,43,26,0.4)', marginBottom: '10px' }}>Related guides</p>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-            {[
+            {([
               ['Kitchen remodel costs in Vermont', '/guides/how-much-does-kitchen-remodel-cost-vermont'],
               ['How long does a bathroom remodel take?', '/guides/how-long-does-bathroom-remodel-take-vermont'],
-              ['How to find a contractor in Vermont', '/guides/how-to-find-contractor-vermont'],
+              ['How to find a contractor', '/guides/how-to-find-contractor-vermont'],
               ['Vermont permit guide', '/guides/vermont-renovation-permit-guide'],
-            ].map(([l, h]) => (
+            ] as [string, string][]).map(([l, h]) => (
               <Link key={h} href={h} style={{ padding: '6px 12px', border: '1px solid rgba(28,43,26,0.12)', borderRadius: '2px', fontSize: '12px', color: 'rgba(28,43,26,0.65)', textDecoration: 'none', fontFamily: 'monospace' }}>{l} →</Link>
             ))}
           </div>

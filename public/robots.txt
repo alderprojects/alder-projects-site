@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /thanks
+Disallow: /contractors/welcome
+Disallow: /api/
+
+Sitemap: https://alderprojects.com/sitemap.xml

@@ -1,7 +1,6 @@
 'use client'
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-
 export default function Nav() {
   const [s, setS] = useState(false)
   useEffect(() => {
@@ -9,7 +8,6 @@ export default function Nav() {
     window.addEventListener('scroll', f)
     return () => window.removeEventListener('scroll', f)
   }, [])
-
   return (
     <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${s ? 'bg-[#1C2B1A]/95 backdrop-blur-sm py-3' : 'bg-transparent py-5'}`}>
       <div className="max-w-6xl mx-auto px-6 flex items-center justify-between">
@@ -21,12 +19,8 @@ export default function Nav() {
           {[{l:'How It Works',h:'#how-it-works'},{l:'Project Types',h:'#project-types'}].map(i => (
             <a key={i.h} href={i.h} className="text-sm font-medium text-[#F5EFE0]/70 hover:text-[#F5EFE0] transition-colors">{i.l}</a>
           ))}
-          <Link
-            href="/contractors"
-            className="text-sm font-medium text-[#7A9B6F]/90 hover:text-[#7A9B6F] transition-colors border border-[#7A9B6F]/30 hover:border-[#7A9B6F]/60 px-3 py-1.5 rounded-sm"
-          >
-            For Contractors
-          </Link>
+          <Link href="/plan" className="text-sm font-medium text-[#F5EFE0]/70 hover:text-[#F5EFE0] transition-colors">Start Planning</Link>
+          <Link href="/contractors" className="text-sm font-medium text-[#7A9B6F]/90 hover:text-[#7A9B6F] transition-colors border border-[#7A9B6F]/30 hover:border-[#7A9B6F]/60 px-3 py-1.5 rounded-sm">For Contractors</Link>
           <a href="#submit-project" className="ml-2 px-5 py-2.5 bg-[#C8732A] hover:bg-[#A84E1A] text-[#FAF7F2] text-sm font-semibold rounded-sm transition-colors">Post a Project</a>
         </div>
       </div>

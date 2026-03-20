@@ -2,15 +2,19 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 export const metadata: Metadata = {
   title: 'Vermont Home Renovation Guides | Alder Projects',
-  description: 'Practical guides for Vermont homeowners on renovation costs, finding contractors, permits, and timelines.',
+  description: 'Practical guides for Vermont homeowners on renovation costs, finding contractors, permits, timelines, and what to watch out for.',
   alternates: { canonical: 'https://alderprojects.com/guides' },
 }
 const guides = [
-  { href: '/guides/how-much-does-kitchen-remodel-cost-vermont', eyebrow: 'Cost Guide', title: 'How Much Does a Kitchen Remodel Cost in Vermont?', desc: 'Real Vermont ranges by scope. What drives cost up in Vermont specifically.', rt: '6 min' },
-  { href: '/guides/how-to-find-contractor-vermont', eyebrow: 'Hiring Guide', title: 'How to Find a Good Contractor in Vermont', desc: "Vermont's contractor market is tight. What works and what to verify before signing.", rt: '5 min' },
+  { href: '/guides/how-much-does-kitchen-remodel-cost-vermont', eyebrow: 'Cost Guide', title: 'How Much Does a Kitchen Remodel Cost in Vermont?', desc: 'Real Vermont ranges by scope — minor refresh through full gut.', rt: '6 min' },
+  { href: '/guides/how-much-does-a-deck-cost-vermont', eyebrow: 'Cost Guide', title: 'How Much Does a Deck Cost in Vermont?', desc: 'PT wood vs composite, permit requirements, and what drives price.', rt: '5 min' },
+  { href: '/guides/how-much-does-roof-replacement-cost-vermont', eyebrow: 'Cost Guide', title: 'How Much Does a Roof Replacement Cost in Vermont?', desc: 'Asphalt vs metal, ice dam risks, and Vermont-specific cost factors.', rt: '5 min' },
+  { href: '/guides/how-to-find-contractor-vermont', eyebrow: 'Hiring Guide', title: 'How to Find a Good Contractor in Vermont', desc: "Vermont's contractor market is tight. What works and what to verify.", rt: '5 min' },
+  { href: '/guides/vermont-contractor-red-flags', eyebrow: 'Hiring Guide', title: 'Vermont Contractor Red Flags: What to Watch For', desc: 'The warning signs visible before any work begins.', rt: '5 min' },
+  { href: '/guides/what-to-ask-contractor-before-hiring', eyebrow: 'Hiring Checklist', title: 'What to Ask a Contractor Before Hiring', desc: 'The questions that separate good contractors from problems.', rt: '6 min' },
   { href: '/guides/vermont-renovation-permit-guide', eyebrow: 'Permits', title: 'Do I Need a Permit for My Vermont Renovation?', desc: 'Which projects require permits and why skipping them is riskier than it sounds.', rt: '5 min' },
-  { href: '/guides/what-to-ask-contractor-before-hiring', eyebrow: 'Hiring Checklist', title: 'What to Ask a Contractor Before Hiring', desc: 'The questions that separate good contractors from problems before you sign anything.', rt: '6 min' },
   { href: '/guides/how-long-does-bathroom-remodel-take-vermont', eyebrow: 'Timeline Guide', title: 'How Long Does a Bathroom Remodel Take in Vermont?', desc: 'Realistic timelines by scope and what causes most delays.', rt: '5 min' },
+  { href: '/guides/vermont-home-renovation-winter', eyebrow: 'Planning Guide', title: 'Renovating Your Vermont Home in Winter', desc: 'What works year-round, what to skip, and the off-season availability advantage.', rt: '4 min' },
 ]
 export default function GuidesPage() {
   return (
@@ -26,7 +30,7 @@ export default function GuidesPage() {
         <div style={{ maxWidth: '720px', margin: '0 auto' }}>
           <span style={{ fontSize: '10px', fontFamily: 'monospace', letterSpacing: '0.12em', textTransform: 'uppercase', color: '#7A9B6F', display: 'block', marginBottom: '12px' }}>Vermont Renovation Guides</span>
           <h1 style={{ fontFamily: "'Playfair Display',Georgia,serif", fontSize: 'clamp(1.8rem,4vw,2.6rem)', fontWeight: 600, color: '#F5EFE0', lineHeight: 1.1, marginBottom: '14px' }}>What Vermont homeowners need to know.</h1>
-          <p style={{ fontSize: '16px', color: 'rgba(245,239,224,0.55)', lineHeight: 1.7, margin: 0 }}>Practical guides on costs, hiring, permits, and timelines — specific to Vermont, not recycled national averages.</p>
+          <p style={{ fontSize: '16px', color: 'rgba(245,239,224,0.55)', lineHeight: 1.7, margin: 0 }}>Practical guides on costs, hiring, permits, and timelines — specific to Vermont.</p>
         </div>
       </div>
       <div style={{ maxWidth: '720px', margin: '0 auto', padding: 'clamp(40px,6vw,64px) 24px 80px' }}>
@@ -35,7 +39,7 @@ export default function GuidesPage() {
             <div>
               <span style={{ fontSize: '10px', fontFamily: 'monospace', letterSpacing: '0.12em', textTransform: 'uppercase', color: '#C8732A' }}>Interactive Tool</span>
               <h2 style={{ fontFamily: "'Playfair Display',Georgia,serif", fontSize: '1.3rem', fontWeight: 600, color: '#F5EFE0', margin: '6px 0 4px' }}>Vermont Renovation Cost Calculator</h2>
-              <p style={{ fontSize: '13px', color: 'rgba(245,239,224,0.5)', margin: 0 }}>Estimate costs by project type, scope, and location — with contingency built in.</p>
+              <p style={{ fontSize: '13px', color: 'rgba(245,239,224,0.5)', margin: 0 }}>Estimate costs by project type, scope, and location.</p>
             </div>
             <span style={{ fontSize: '13px', fontFamily: 'monospace', color: '#7A9B6F', whiteSpace: 'nowrap' }}>Open calculator →</span>
           </div>

@@ -40,8 +40,7 @@ export default function SeasonalHomeReport() {
 
   useEffect(() => {
     function h(e: MouseEvent) { if (ddRef.current && !ddRef.current.contains(e.target as Node) && inputRef.current && !inputRef.current.contains(e.target as Node)) setShowDd(false) }
-    document.addEventListener('mousedown', h)
-    return () => document.removeEventListener('mousedown', h)
+    document.addEventListener('mousedown', h); return () => document.removeEventListener('mousedown', h)
   }, [])
 
   function onType(val: string) {
@@ -51,7 +50,9 @@ export default function SeasonalHomeReport() {
     const search = last || (parts.length === 1 && val.length > 3 ? val.split(' ').slice(-1)[0] : '')
     if (search && search.length >= 2) {
       const l = search.toLowerCase()
-      const m = VT_TOWNS.filter(t => t.toLowerCase().startsWith(l) || t.toLowerCase().includes(l)).slice(0, 6)
+      const starts = VT_TOWNS.filter(t => t.toLowerCase().startsWith(l))
+      const contains = VT_TOWNS.filter(t => !t.toLowerCase().startsWith(l) && t.toLowerCase().includes(l))
+      const m = [...starts, ...contains].slice(0, 6)
       setFiltered(m); setShowDd(m.length > 0)
     } else { setShowDd(false); setFiltered([]) }
   }
@@ -66,8 +67,7 @@ export default function SeasonalHomeReport() {
   async function analyze(addr?: string) {
     const t = addr || address; if (!t.trim()) return; setAddress(t); setLoading(true); setError(''); setSuggestion(''); setReport(null); setShowDd(false)
     try { const r = await fetch('/api/seasonal-report', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ address: t }) }); const d = await r.json(); if (!r.ok) { setError(d.error || 'Analysis failed.'); setSuggestion(d.suggestion || '') } else setReport(d) }
-    catch { setError('Network error. Please try again.') }
-    finally { setLoading(false) }
+    catch { setError('Network error. Please try again.') } finally { setLoading(false) }
   }
   function handleSubmit(e: React.FormEvent) { e.preventDefault(); analyze() }
 

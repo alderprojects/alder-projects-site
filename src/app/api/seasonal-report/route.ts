@@ -1,12 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-interface Problem { constraint: string; soWhat: string; whenItMatters: string }
-interface ActionItem { title: string; priority: string; soWhat: string; whyItMatters: string; whenToDo: string; watchFor: string; nextStep: string }
+interface Strength { point: string; detail: string }
+interface Concern { title: string; whyCheck: string; howToResolve: string; resolvedWhen: string; cost: string }
+interface ActionItem { title: string; priority: string; why: string; whatItUnlocks: string; nextStep: string; timing: string }
 interface Avoidance { action: string; why: string }
-interface SeasonalItem { action: string; consequence: string; timing: string }
-interface ProgramScreen { name: string; provider: string; whyScreen: string; value: string; caveat: string; url?: string }
-interface SnapshotFact { label: string; value: string; basis: string }
-interface Report { summary: string; snapshot: { address: string; town: string; county: string; facts: SnapshotFact[] }; problems: Problem[]; actions: ActionItem[]; avoidances: Avoidance[]; seasonal: SeasonalItem[]; reasoning: string; programs: ProgramScreen[]; generatedAt: string }
+interface SeasonalItem { action: string; why: string; timing: string }
+interface ProgramScreen { name: string; why: string; value: string; caveat: string; url?: string }
+interface SnapshotFact { label: string; value: string }
+interface Report { summary: string; snapshot: { address: string; town: string; county: string; facts: SnapshotFact[] }; strengths: Strength[]; concerns: Concern[]; actions: ActionItem[]; avoidances: Avoidance[]; seasonal: SeasonalItem[]; reasoning: string; programs: ProgramScreen[]; generatedAt: string }
 
 const TC: Record<string,string> = {
   'addison':'Addison','bridport':'Addison','bristol':'Addison','cornwall':'Addison','ferrisburgh':'Addison','goshen':'Addison','granville':'Addison','hancock':'Addison','leicester':'Addison','lincoln':'Addison','middlebury':'Addison','monkton':'Addison','new haven':'Addison','orwell':'Addison','panton':'Addison','ripton':'Addison','salisbury':'Addison','shoreham':'Addison','starksboro':'Addison','vergennes':'Addison','waltham':'Addison','weybridge':'Addison','whiting':'Addison',
@@ -28,123 +29,69 @@ const LAKE_TOWNS: Record<string,string> = {'charlotte':'Lake Champlain','shelbur
 const ZONED = new Set(['burlington','south burlington','essex','colchester','williston','shelburne','charlotte','hinesburg','richmond','stowe','waterbury','montpelier','barre','middlebury','vergennes','bennington','brattleboro','rutland','st. albans','newport','hartford','norwich','woodstock','manchester','wilmington','dover','killington','ludlow','springfield','st. johnsbury','lyndon','morristown','johnson','waitsfield','warren','fayston'])
 const RESORT = new Set(['stowe','killington','manchester','wilmington','dover','west dover','ludlow','waitsfield','warren','jay','burke','stratton','peru','winhall','landgrove'])
 const ALL_TOWNS = Object.keys(TC)
+function fuzzyMatch(input:string):string|null{const l=input.toLowerCase().trim();if(TC[l])return l;const c=l.replace(/\s+(village|city|town|center|centre)$/i,'');if(TC[c])return c;for(const t of ALL_TOWNS){if(l.includes(t)&&t.length>3)return t}for(const t of ALL_TOWNS){if(t.startsWith(l)||l.startsWith(t))return t}return null}
+interface Parsed{street:string;town:string;county:string;isWaterfront:boolean;isRural:boolean;lakeName?:string;hasZoning:boolean;isResort:boolean}
+function parse(raw:string):{ok:boolean;parsed?:Parsed;error?:string;suggestion?:string}{let cleaned=raw.trim().replace(/\s+/g,' ').replace(/\b\d{5}(-\d{4})?\b/g,'').trim();if(cleaned.length<3)return{ok:false,error:'Address is too short.',suggestion:'Try: 142 Lakeshore Drive, Greensboro, VT'};const ws=cleaned.replace(/,?\s*(VT|Vermont|V\.T\.)\s*$/i,'').trim();const hasState=ws!==cleaned;const parts=ws.split(',').map(s=>s.trim()).filter(Boolean);let street='',townRaw='';if(parts.length>=2){street=parts[0];townRaw=parts[1]}else{const words=parts[0]?.split(' ')||[];let found:string|null=null;for(let i=words.length-1;i>=1;i--){const m=fuzzyMatch(words.slice(i).join(' '));if(m){found=m;street=words.slice(0,i).join(' ');break}}if(!found)for(let i=words.length-2;i>=1;i--){const m=fuzzyMatch(words.slice(i,i+2).join(' '));if(m){found=m;street=words.slice(0,i).join(' ');break}}if(found)townRaw=found;else if(!hasState)return{ok:false,error:`Could not identify a Vermont town in "${raw}".`,suggestion:'Add comma and town: 123 Main St, Stowe, VT'};else{street=parts[0]||'';townRaw=''}}const matched=fuzzyMatch(townRaw);if(matched){const proper=matched.split(' ').map(w=>w[0].toUpperCase()+w.slice(1)).join(' ').replace(/^St\. /i,'St. ');const lf=raw.toLowerCase();const isWF=['lake','shore','pond','river','beach','cove','bay','point','landing','harbor','marina','waterfront','island'].some(s=>lf.includes(s))||!!LAKE_TOWNS[matched];const isR=['route ','rt ','mountain','hill','hollow','ridge','kingdom','lot ','class 4','dirt road','gravel'].some(s=>lf.includes(s));return{ok:true,parsed:{street:street||raw.split(',')[0]?.trim()||raw,town:proper,county:TC[matched]||'Unknown',isWaterfront:isWF,isRural:isR,lakeName:LAKE_TOWNS[matched],hasZoning:ZONED.has(matched),isResort:RESORT.has(matched)}}}if(townRaw){const close=ALL_TOWNS.filter(t=>t.includes(townRaw.toLowerCase().slice(0,4))||townRaw.toLowerCase().includes(t.slice(0,4))).slice(0,3);return{ok:false,error:`"${townRaw}" not recognized as a Vermont town.`,suggestion:close.length?`Did you mean: ${close.map(t=>t.split(' ').map(w=>w[0].toUpperCase()+w.slice(1)).join(' ')).join(', ')}?`:'Example: 123 Main St, Stowe, VT'}}return{ok:false,error:`Could not identify a town in "${raw}".`,suggestion:'Include a Vermont town: 142 Lakeshore Drive, Greensboro, VT'}}
 
-function fuzzyMatch(input: string): string|null {
-  const l = input.toLowerCase().trim(); if (TC[l]) return l
-  const c = l.replace(/\s+(village|city|town|center|centre)$/i,''); if (TC[c]) return c
-  for (const t of ALL_TOWNS) { if (l.includes(t)&&t.length>3) return t }
-  for (const t of ALL_TOWNS) { if (t.startsWith(l)||l.startsWith(t)) return t }
-  return null
-}
-interface Parsed { street:string; town:string; county:string; isWaterfront:boolean; isRural:boolean; lakeName?:string; hasZoning:boolean; isResort:boolean }
-interface ParseResult { ok:boolean; parsed?:Parsed; error?:string; suggestion?:string }
+function buildReport(p:Parsed):Report{
+  const month=new Date().getMonth();const isWinter=month>=10||month<=3,isSummer=month>=5&&month<=8
+  const strengths:Strength[]=[]
+  if(p.isWaterfront)strengths.push({point:`Waterfront location${p.lakeName?` on ${p.lakeName}`:''}`,detail:'Waterfront properties in Vermont hold value well and have consistent demand from buyers and renters. This is a durable asset.'})
+  if(p.isResort)strengths.push({point:`${p.town} is a recognized destination market`,detail:'Resort towns support higher rental rates and have a broader buyer pool than rural Vermont generally.'})
+  strengths.push({point:`${p.county} County location`,detail:`Properties in ${p.county} County benefit from Vermont\'s strong seasonal market. The state\'s brand — clean water, outdoor access, four-season landscape — supports long-term property values.`})
+  if(!p.isRural)strengths.push({point:'Accessible location',detail:'Properties with town-maintained road access are easier to use year-round, easier to insure, and more attractive to buyers.'})
+  strengths.push({point:'Vermont energy incentives are strong',detail:'Vermont has some of the best energy upgrade incentives in the country. If this property needs heating or insulation improvements, rebates can offset 30–50% of the cost.'})
 
-function parse(raw: string): ParseResult {
-  let cleaned = raw.trim().replace(/\s+/g,' ').replace(/\b\d{5}(-\d{4})?\b/g,'').trim()
-  if (cleaned.length<3) return {ok:false,error:'Address is too short.',suggestion:'Try: 142 Lakeshore Drive, Greensboro, VT'}
-  const ws = cleaned.replace(/,?\s*(VT|Vermont|V\.T\.)\s*$/i,'').trim()
-  const hasState = ws !== cleaned
-  const parts = ws.split(',').map(s=>s.trim()).filter(Boolean)
-  let street='',townRaw=''
-  if (parts.length>=2){street=parts[0];townRaw=parts[1]}
-  else {
-    const words = parts[0]?.split(' ')||[]; let found:string|null=null
-    for (let i=words.length-1;i>=1;i--){const m=fuzzyMatch(words.slice(i).join(' '));if(m){found=m;street=words.slice(0,i).join(' ');break}}
-    if (!found) for (let i=words.length-2;i>=1;i--){const m=fuzzyMatch(words.slice(i,i+2).join(' '));if(m){found=m;street=words.slice(0,i).join(' ');break}}
-    if (found) townRaw=found; else if (!hasState) return {ok:false,error:`Could not identify a Vermont town in "${raw}".`,suggestion:'Add comma and town: 123 Main St, Stowe, VT'}
-    else {street=parts[0]||'';townRaw=''}
-  }
-  const matched = fuzzyMatch(townRaw)
-  if (matched) {
-    const proper=matched.split(' ').map(w=>w[0].toUpperCase()+w.slice(1)).join(' ').replace(/^St\. /i,'St. ')
-    const lf=raw.toLowerCase()
-    const isWF=['lake','shore','pond','river','beach','cove','bay','point','landing','harbor','marina','waterfront','island'].some(s=>lf.includes(s))||!!LAKE_TOWNS[matched]
-    const isR=['route ','rt ','mountain','hill','hollow','ridge','kingdom','lot ','class 4','dirt road','gravel'].some(s=>lf.includes(s))
-    return {ok:true,parsed:{street:street||raw.split(',')[0]?.trim()||raw,town:proper,county:TC[matched]||'Unknown',isWaterfront:isWF,isRural:isR,lakeName:LAKE_TOWNS[matched],hasZoning:ZONED.has(matched),isResort:RESORT.has(matched)}}
-  }
-  if (townRaw) {
-    const close=ALL_TOWNS.filter(t=>t.includes(townRaw.toLowerCase().slice(0,4))||townRaw.toLowerCase().includes(t.slice(0,4))).slice(0,3)
-    return {ok:false,error:`"${townRaw}" not recognized as a Vermont town.`,suggestion:close.length?`Did you mean: ${close.map(t=>t.split(' ').map(w=>w[0].toUpperCase()+w.slice(1)).join(' ')).join(', ')}?`:'Example: 123 Main St, Stowe, VT'}
-  }
-  return {ok:false,error:`Could not identify a town in "${raw}".`,suggestion:'Include a Vermont town: 142 Lakeshore Drive, Greensboro, VT'}
-}
+  let summary=''
+  if(p.isWaterfront)summary=`This is a ${p.town} waterfront property${p.lakeName?` on ${p.lakeName}`:''} — a strong location in Vermont\'s seasonal market. To get the most out of it, the priority is making sure the home\'s systems (septic, well, heating) are in good shape before investing in renovations. For waterfront properties, it\'s also worth checking what shoreline rules allow before planning any outdoor work.`
+  else if(p.isRural)summary=`This ${p.town} property has the appeal of rural Vermont — privacy, land, and access to the outdoors. The key to protecting that investment is making sure the basics are solid: septic system, well water, and heating. Getting those confirmed early saves money and prevents surprises.`
+  else summary=`This ${p.town} property is well-positioned in ${p.county} County\'s seasonal market. The smartest first move is confirming the home\'s core systems are working — septic, water, heat. Once those check out, you can plan improvements with confidence.`
 
-function buildReport(p: Parsed): Report {
-  const month = new Date().getMonth()
-  const isWinter = month>=10||month<=3, isSummer = month>=5&&month<=8
+  const facts:SnapshotFact[]=[{label:'Town',value:p.town},{label:'County',value:p.county},{label:'Zoning',value:p.hasZoning?'Town has local zoning':'Limited local zoning'}]
+  if(p.isWaterfront)facts.push({label:'Water body',value:p.lakeName||'Waterfront indicated'})
+  if(p.isResort)facts.push({label:'Market type',value:'Resort / destination town'})
 
-  let summary = ''
-  if (p.isWaterfront) summary = `This ${p.town} waterfront property${p.lakeName?` near ${p.lakeName}`:''} is most likely constrained by wastewater capacity, shoreline regulation, and winter reliability. Before planning any expansion or renovation, confirm the septic system can support it and check what shoreland rules actually allow. The most expensive mistake is designing improvements that require permits you can\'t get.`
-  else if (p.isRural) summary = `This ${p.town} property is most likely constrained by wastewater and water system reliability, heating adequacy, and access during mud season. The priority is confirming infrastructure can handle the intended use before spending on anything visible. Skipping system checks and jumping to finishes is the most common way owners waste money on Vermont seasonal properties.`
-  else summary = `This ${p.town} property is most likely constrained by the condition of its wastewater, water, and heating systems. For a seasonal home in ${p.county} County, the priority is confirming these systems support your intended use pattern before committing to improvements. Spending on finishes before resolving infrastructure is the single most common sequencing mistake.`
-
-  const facts: SnapshotFact[] = [
-    {label:'Town',value:p.town,basis:'Address match'},
-    {label:'County',value:p.county,basis:'Town lookup'},
-    {label:'Local zoning',value:p.hasZoning?'Town has zoning bylaws':`No comprehensive zoning — Act 250 at 1 acre`,basis:'Municipal records'},
+  const concerns:Concern[]=[
+    {title:'Septic system — is it in good shape?',whyCheck:'Most Vermont seasonal homes have a septic system instead of town sewer. If it\'s old or undersized, it can limit what you do with the property — from adding a bathroom to renting it out. A system in good shape is a non-issue. One that needs replacing runs $15,000–$40,000.',howToResolve:'Call a licensed septic hauler and get it pumped and inspected. Ask them to assess the drain field. You can also request the original permit and design from the Vermont DEC regional office — this tells you the system\'s age and capacity.',resolvedWhen:'You have a recent inspection showing the system is functioning and the design capacity matches your intended use.',cost:'$300–$500 for pump-out and inspection. Free to request permit records.'},
+    {title:'Well water — has it been tested recently?',whyCheck:'If the property has a private well (most rural Vermont homes do), water quality and flow rate matter. Vermont has naturally occurring arsenic in some areas. A clean test means you\'re good. A problem is fixable but costs $2,000–$8,000 for treatment.',howToResolve:'Get a water test from a state-certified lab. They\'ll send you a kit with instructions. Test for bacteria (coliform, E. coli) and minerals (arsenic, lead). Also ask about flow rate — under 3 gallons per minute can be limiting.',resolvedWhen:'You have a clean water test on file and flow rate is adequate.',cost:'$100–$400 for a comprehensive test. Results in 1–2 weeks.'},
+    {title:'Heating — can this property be used beyond summer?',whyCheck:'Many Vermont seasonal homes were built for summer use only. If the heating is just a woodstove or a small propane heater, the property may not be safe to use in cold weather — pipes can freeze and burst, causing major damage. Upgrading heating also opens up shoulder-season rental income.',howToResolve:'Walk through the property and note the heating setup. Is there central heat? What fuel? Are water pipes in areas that could freeze? If the system is minimal, get a quote for a heat pump installation — Vermont rebates make this more affordable than most states.',resolvedWhen:'You know the heating system can keep the property above freezing when unoccupied, or you\'ve winterized the plumbing.',cost:'Free to assess yourself. Heat pump install: $3,000–$12,000 after rebates.'},
   ]
-  if (p.isWaterfront) facts.push({label:'Water body',value:p.lakeName||'Waterfront indicated by address',basis:p.lakeName?'VT lake database':'Address keywords'})
-  if (p.isResort) facts.push({label:'Market',value:'Resort/ski town — different rental rules and comps',basis:'Market classification'})
-  facts.push({label:'Tax classification',value:'Non-homestead education tax rate applies to seasonal homes',basis:'VT 32 V.S.A. § 5401'})
+  if(p.isWaterfront)concerns.push({title:`Shoreline rules — what can you actually build near ${p.lakeName||'the water'}?`,whyCheck:`Vermont\'s Shoreland Protection Act limits what you can do within 250 feet of the water — clearing trees, adding patios, building additions. This doesn\'t mean you can\'t improve the property, but you need to know the boundaries before drawing up plans.`,howToResolve:`Get a property survey that shows the shoreland buffer zone. Call the ${p.town} zoning office and ask about local setback requirements. For anything beyond basic maintenance, you may need a shoreland permit from Vermont ANR.`,resolvedWhen:'You have a survey showing setbacks and know what requires a permit vs. what\'s allowed by right.',cost:'$500–$2,000 for a survey. Permit applications are $50–$200.'})
+  concerns.push({title:'Property taxes — will improvements trigger a big increase?',whyCheck:`Seasonal homes in Vermont are taxed at a higher education tax rate than primary residences. That\'s normal. The question is whether your property is currently assessed close to market value. If it\'s under-assessed, major improvements could trigger a reappraisal that jumps your tax bill.`,howToResolve:`Pull your property\'s record card from the ${p.town} town clerk (often available online). Compare the assessed value to what similar properties have sold for recently.`,resolvedWhen:'You know your assessed value, understand the gap to market, and have modeled the tax impact of planned improvements.',cost:'Free. Town records are public.'})
 
-  const problems: Problem[] = [
-    {constraint:'Wastewater capacity may limit what you can do with this property',soWhat:'Septic design flow caps bedrooms and blocks expansion. Replacement runs $15,000–$40,000+.',whenItMatters:'Before any renovation, addition, or use change.'},
-    {constraint:'Water system reliability is unverified',soWhat:'A failed well test or low flow rate can block a sale, void a rental permit, or require $2,000–$10,000 in treatment.',whenItMatters:'Before committing to improvements or listing for sale.'},
-    {constraint:'Heating and freeze protection determine whether this is a 3-season or 4-season property',soWhat:'Without adequate heat, pipes freeze, insurance gets harder, and the property can only be used May–October.',whenItMatters:'Before planning shoulder-season or winter use.'},
+  const actions:ActionItem[]=[
+    {title:'Get the septic inspected',priority:'First',why:'Everything else — renovations, rentals, resale — goes smoother when you know this is solid. It\'s the single most important system to verify.',whatItUnlocks:'Confidence to plan renovations, ability to add bedrooms if capacity allows, clean path to sale or rental.',nextStep:'Call a licensed septic service in your area and schedule a pump-out with inspection.',timing:'Before planning any renovation.'},
+    {title:'Test the well water',priority:'First',why:'Quick, cheap, and resolves one of the biggest unknowns. Either it\'s clean and you move on, or you catch a problem before it becomes a health issue.',whatItUnlocks:'Peace of mind, lender/rental compliance, baseline for the property.',nextStep:'Search "Vermont certified water testing labs" and order a test kit.',timing:'This month — results take 1–2 weeks.'},
+    {title:'Walk the property and assess the heating',priority:'Before fall',why:'Understanding the heating situation tells you whether this is a 3-season or 4-season property — and what it would take to change that.',whatItUnlocks:'Shoulder-season and winter use, rental income potential, freeze protection confidence.',nextStep:'Note the heating type, fuel, and whether any water pipes run through unheated areas. If upgrading, get a heat pump quote.',timing:'Before October if you plan to use it in cold weather.'},
   ]
-  if (p.isWaterfront) problems.push({constraint:`Shoreline regulation limits what can be built within 250 ft of ${p.lakeName||'the water'}`,soWhat:'Vermont Shoreland Protection Act restricts clearing, impervious surface, and expansion. Violations carry fines up to $27,500/day.',whenItMatters:'Before designing any site work, addition, or dock modification.'})
+  if(p.isWaterfront)actions.splice(2,0,{title:'Understand what the shoreline rules allow',priority:'Before planning outdoor work',why:'Knowing the boundaries early prevents wasted design costs and permit surprises. Most waterfront improvements are doable — you just need to know the rules.',whatItUnlocks:'Ability to plan decks, docks, landscaping, and additions with realistic scope.',nextStep:`Call the ${p.town} zoning office and ask about shoreland setback requirements for your parcel.`,timing:'Before hiring a contractor for any outdoor work.'})
+  actions.push({title:'Check your property tax situation',priority:'Before big spending',why:'Knowing where you stand on assessed value vs. market value helps you budget accurately — including the tax impact of improvements.',whatItUnlocks:'Accurate renovation budgeting, no surprise tax jumps.',nextStep:`Look up your property on the ${p.town} town clerk website or call the lister\'s office.`,timing:'Before committing to a renovation budget over $25,000.'})
+  actions.push({title:'Look into energy rebates before upgrading heating or insulation',priority:'When ready to upgrade',why:'Vermont has unusually strong rebates. If you\'re going to upgrade anyway, stacking state and federal incentives can save 30–50% on the project.',whatItUnlocks:'Lower upgrade cost, reduced ongoing energy bills.',nextStep:'Visit efficiencyvermont.com/rebates and check what applies to your planned work.',timing:'When you\'re ready to move forward on heating or insulation.'})
 
-  const actions: ActionItem[] = [
-    {title:'Confirm wastewater system can support your plans',priority:'Do now',soWhat:'If septic can\'t handle additional load, nothing else matters — can\'t add bedrooms, convert use, or pass sale inspection.',whyItMatters:'This is the gate. Every downstream decision depends on wastewater capacity.',whenToDo:'Before planning any renovation or expansion.',watchFor:'Systems older than 25 years, unknown inspection history, or design flow below current bedroom count.',nextStep:'Request septic permit and design records from Vermont DEC regional office. Get pump-out and inspection from licensed hauler.'},
-    {title:'Test water supply and confirm flow rate',priority:'Do now',soWhat:'Arsenic is naturally occurring in Vermont bedrock. A failed test means treatment ($2,000–$8,000) before the property is habitable or financeable.',whyItMatters:'Lenders require passing water tests. Rental permits may too. Cheap to check, expensive to discover late.',whenToDo:'This month. Testing takes 1–2 weeks for results.',watchFor:'Coliform, E. coli, arsenic, lead, uranium. Flow rate under 3 GPM limits practical use.',nextStep:'Contact a state-certified lab. Draw samples per instructions. Cost $100–$400.'},
-    {title:'Assess heating system and freeze protection',priority:'Do before winter',soWhat:'Woodstove-only or wall-heater setups leave pipes exposed. One freeze event can cause $10,000–$50,000 in damage.',whyItMatters:'Determines whether property is usable beyond summer and insurable for vacant periods.',whenToDo:'Before October. Heat pump installs have 4–8 week lead times.',watchFor:'Fuel type, distribution method, whether any plumbing runs through unheated spaces.',nextStep:'Walk the property. Identify every water line. Unheated crawlspaces or exterior walls without insulation are the priority.'},
-  ]
-  if (p.isWaterfront) actions.splice(2,0,{title:`Check what shoreland rules actually allow on this parcel`,priority:'Do before designing anything',soWhat:'Designing an addition or deck within the 250-ft shoreland zone is wasted money if you can\'t get the permit.',whyItMatters:`Shoreland Protection Act applies to all properties near ${p.lakeName||'lakes over 10 acres'}. Existing nonconforming structures face strict expansion limits.`,whenToDo:'Before hiring architect or contractor for site work.',watchFor:'250-ft setback from mean water level, impervious surface limits, clearing restrictions.',nextStep:'Get property survey showing shoreland buffer. Contact Vermont ANR for permit history. Talk to town zoning administrator.'})
-  actions.push({title:`Pull ${p.town} grand list entry and model tax exposure`,priority:'Do before committing to large scope',soWhat:`Major improvements to underassessed property trigger reappraisal. In ${p.town}, this can increase annual tax $1,000–$5,000+ depending on scope.`,whyItMatters:'Can\'t model true cost of improvements without knowing current assessed value and gap to market.',whenToDo:'Before finalizing any renovation budget over $25,000.',watchFor:`Gap between assessed and market value. If town CLA is below 80%, you\'re already under-assessed.`,nextStep:`Request property record card from ${p.town} town clerk. Compare assessed value to recent comps.`})
-
-  const avoidances: Avoidance[] = [
-    {action:'Don\'t renovate kitchens or bathrooms until wastewater and water are confirmed',why:'A septic replacement tears through finished spaces. A failed water test after a $30,000 kitchen remodel means you can\'t use it.'},
-    {action:'Don\'t design additions before checking permits and setbacks',why:`${p.isWaterfront?'Shoreland rules may prohibit what you\'re planning. ':''}Act 250 review kicks in at ${p.hasZoning?'10 acres':'1 acre'} of involved land in ${p.town}. Getting this wrong means permit denial after you\'ve already paid for plans.`},
-    {action:'Don\'t invest in custom or high-end finishes for a seasonal property with unresolved systems',why:'Custom tile, exotic floors, and designer fixtures have the worst ROI in rural Vermont markets. They don\'t survive system replacements and they don\'t move the needle at sale.'},
+  const avoidances:Avoidance[]=[
+    {action:'Don\'t start a kitchen or bathroom renovation before checking the septic',why:'If the septic needs work, contractors may need to dig through areas you just renovated. Check the system first and save yourself from doing the work twice.'},
+    {action:'Don\'t draw up addition plans before understanding setbacks and permits',why:`${p.isWaterfront?'Shoreline rules can change what\'s buildable. ':''}Getting plans drawn that don\'t comply with local rules means paying for design work you can\'t use.`},
+    {action:'Don\'t prioritize cosmetic upgrades over system reliability',why:'A new kitchen in a house with a failing septic or no heat is a bad investment. Systems first, finishes second — especially in a seasonal property where the resale market rewards reliability over luxury.'},
   ]
 
-  const seasonal: SeasonalItem[] = []
-  if (isWinter) {
-    seasonal.push({action:'Verify freeze protection on all water lines before the next cold snap',consequence:'One burst pipe during a vacancy can cause $10,000+ in water damage before anyone notices.',timing:'This week.'})
-    seasonal.push({action:'Confirm heating system is running and fuel supply is adequate',consequence:'A heating failure during extended cold can freeze entire plumbing system in 24–48 hours.',timing:'Check weekly if property is vacant.'})
-    seasonal.push({action:'Clear roof of heavy snow loads if structure is older',consequence:'Pre-1980 framing may not meet modern snow load standards. Ice dams cause interior water damage.',timing:'After any storm dropping 12+ inches.'})
-  } else if (isSummer) {
-    seasonal.push({action:'Get septic pumped and inspected before peak use season',consequence:'Hosting guests on a system not serviced in 3+ years risks backups and accelerated failure.',timing:'Before Memorial Day or first extended stay.'})
-    seasonal.push({action:'Test water quality now — results take 1–2 weeks',consequence:'You don\'t want to find out about coliform or arsenic after a week of drinking it.',timing:'This month.'})
-    seasonal.push({action:`Check ${p.town} short-term rental rules if renting any portion of the season`,consequence:'Many Vermont towns now require registration. Operating without it can trigger fines.',timing:'Before listing.'})
-  } else {
-    seasonal.push({action:'Winterize or confirm winterization before freeze risk begins',consequence:'Vermont can see freezing temps as early as late September at elevation. Drain-down or heat — pick one.',timing:'By mid-October.'})
-    seasonal.push({action:'Schedule contractor work now — Vermont contractors book 2–4 months out',consequence:'Waiting until spring means your project starts in July at earliest.',timing:'Now, for spring/summer execution.'})
-    seasonal.push({action:'Inspect roof, gutters, and drainage before snow load arrives',consequence:'Damaged gutters and poor drainage cause ice dams and foundation water intrusion.',timing:'Before first snowfall.'})
-  }
-  if (p.isWaterfront) seasonal.push({action:'Inspect dock, shoreline, and erosion status',consequence:'Storm damage and ice heave can change shoreline access. Unpermitted repairs in shoreland zone carry fines.',timing:isSummer?'At start of lake season.':'In spring before launch.'})
+  const seasonal:SeasonalItem[]=[]
+  if(isWinter){seasonal.push({action:'Make sure the property is protected against freezing',why:'A burst pipe while the place is empty can cause tens of thousands in damage. Confirm heat is running or plumbing is drained.',timing:'Check now and weekly through winter.'});seasonal.push({action:'Clear heavy snow from the roof if the building is older',why:'Older roof framing may not handle extreme snow loads. Ice dams can cause interior leaks.',timing:'After major storms.'});seasonal.push({action:'Book contractors now for spring/summer work',why:'Vermont contractors fill up fast. Waiting until April means your project starts in July.',timing:'Now.'})}
+  else if(isSummer){seasonal.push({action:'Get the septic pumped before hosting peak-season guests',why:'Heavy use on a system that hasn\'t been serviced in years increases the risk of backups.',timing:'Before Memorial Day.'});seasonal.push({action:'Test well water now if you haven\'t recently',why:'Better to know about any water quality issues before a summer of using it.',timing:'This month.'});seasonal.push({action:`Check if ${p.town} requires short-term rental registration`,why:'More Vermont towns are requiring registration. Better to be compliant than to get a fine.',timing:'Before listing.'})}
+  else{seasonal.push({action:'Winterize before the first hard freeze',why:'Vermont can freeze as early as late September at elevation. Drain the plumbing or make sure heat can keep up.',timing:'By mid-October.'});seasonal.push({action:'Line up contractors now for spring work',why:'The good ones book months ahead. If you wait until spring, you\'re looking at summer start dates.',timing:'Now.'});seasonal.push({action:'Check roof and gutters before snow season',why:'Damaged gutters cause ice dams. Ice dams cause interior water damage.',timing:'Before first snowfall.'})}
+  if(p.isWaterfront)seasonal.push({action:'Inspect the dock and shoreline',why:'Ice and storms shift things around. Check for damage before making repairs — unpermitted work in the shoreline zone can result in fines.',timing:isSummer?'Start of lake season.':'Spring, before putting the dock in.'})
 
-  let reasoning = `Vermont seasonal properties in ${p.county} County share a common pattern: the systems you can\'t see — wastewater, water supply, heating — determine what the property can actually do. `
-  reasoning += `Most owners focus on kitchens and bathrooms first, but in this market those investments are gated by infrastructure. `
-  if (p.isWaterfront) reasoning += `Waterfront parcels${p.lakeName?` on ${p.lakeName}`:''} carry regulatory constraints under the Shoreland Protection Act that can block common improvement plans. `
-  if (p.isResort) reasoning += `As a resort-market property in ${p.town}, STR regulation and higher carrying costs add complexity. `
-  reasoning += `The recommendations above are sequenced to resolve constraints before committing capital — the order matters as much as the actions themselves.`
+  let reasoning=`These recommendations are based on how Vermont seasonal properties actually work: the systems below the surface — septic, well, heating — determine what the property can do and what it\'s worth. Most owners want to jump straight to visible improvements, but in this market, the smartest money goes to confirming the basics first. `
+  if(p.isWaterfront)reasoning+=`Waterfront properties${p.lakeName?` on ${p.lakeName}`:''} are valuable but come with shoreline regulations worth understanding early. `
+  if(p.isResort)reasoning+=`${p.town}\'s resort market adds rental income potential but also regulatory requirements worth checking. `
+  reasoning+=`The actions above are sequenced so that each step either confirms you\'re in good shape or catches a problem before it gets expensive.`
 
-  const programs: ProgramScreen[] = [
-    {name:'Efficiency Vermont Rebates',provider:'Efficiency Vermont',whyScreen:'If upgrading to heat pumps, rebates offset $800–$2,000. Insulation rebates $200–$2,000.',value:'$500–$4,000 depending on scope',caveat:'Requires cold-climate rated equipment and participating contractors.',url:'https://www.efficiencyvermont.com/rebates'},
-    {name:'Federal 25C Clean Energy Credit',provider:'IRS',whyScreen:'Heat pump and insulation upgrades may qualify for 30% federal tax credit. Heat pumps capped $2,000/year.',value:'Up to $3,200/year combined',caveat:'Second homes have limited eligibility. Talk to your tax advisor.'},
-    {name:'Vermont Weatherization',provider:'VT Office of Economic Opportunity',whyScreen:'Free weatherization for income-eligible. Market-rate via Efficiency Vermont network.',value:'Free if eligible; $3,000–$8,000 market rate',caveat:'Income thresholds apply. Seasonal homes may have limited eligibility. 6–12 month wait.'},
+  const programs:ProgramScreen[]=[
+    {name:'Efficiency Vermont Rebates',why:'If you\'re upgrading heating or insulation, these rebates offset $500–$4,000 of the cost. Heat pump rebates are especially strong.',value:'$500–$4,000',caveat:'Requires specific equipment and participating contractors. Check current terms first.',url:'https://www.efficiencyvermont.com/rebates'},
+    {name:'Federal Clean Energy Tax Credit',why:'Heat pumps and insulation qualify for a 30% federal tax credit on top of state rebates.',value:'Up to $3,200/year',caveat:'Second homes have some eligibility limits. Worth confirming with a tax advisor.'},
+    {name:'Vermont Weatherization Program',why:'Free insulation and air sealing for income-eligible homeowners. Even if you don\'t qualify for free services, market-rate weatherization is available.',value:'Free if eligible, or $3,000–$8,000 market rate',caveat:'Income limits apply. Wait times can be 6–12 months for the free program.'},
   ]
 
-  return {summary,snapshot:{address:`${p.street}, ${p.town}, ${p.county} County, VT`,town:p.town,county:p.county,facts},problems,actions,avoidances,seasonal,reasoning,programs,generatedAt:new Date().toISOString()}
+  return{summary,snapshot:{address:`${p.street}, ${p.town}, ${p.county} County, VT`,town:p.town,county:p.county,facts},strengths,concerns,actions,avoidances,seasonal,reasoning,programs,generatedAt:new Date().toISOString()}
 }
 
-export async function POST(req: NextRequest) {
-  try {
-    const {address} = await req.json()
-    if (!address||address.trim().length<3) return NextResponse.json({error:'Please enter an address.',suggestion:'Example: 142 Lakeshore Drive, Greensboro, VT'},{status:400})
-    const result = parse(address)
-    if (!result.ok||!result.parsed) return NextResponse.json({error:result.error,suggestion:result.suggestion},{status:400})
-    return NextResponse.json(buildReport(result.parsed))
-  } catch { return NextResponse.json({error:'Analysis failed. Please try again.'},{status:500}) }
-}
+export async function POST(req:NextRequest){try{const{address}=await req.json();if(!address||address.trim().length<3)return NextResponse.json({error:'Please enter an address.',suggestion:'Example: 142 Lakeshore Drive, Greensboro, VT'},{status:400});const result=parse(address);if(!result.ok||!result.parsed)return NextResponse.json({error:result.error,suggestion:result.suggestion},{status:400});return NextResponse.json(buildReport(result.parsed))}catch{return NextResponse.json({error:'Analysis failed. Please try again.'},{status:500})}}

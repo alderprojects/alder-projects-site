@@ -11,6 +11,9 @@ const seasonal = [
   { href: '/guides/vermont-flood-zone-renovation', title: 'Renovating in a Vermont Flood Zone', desc: 'The 50% substantial improvement rule explained.', rt: '5 min' },
   { href: '/guides/heat-pump-rebates-vermont', title: 'Vermont Heat Pump Rebates in 2026', desc: 'Efficiency Vermont + federal credits. Real numbers.', rt: '5 min' },
   { href: '/guides/handyman-seasonal-home-vermont', title: 'What a Handyman Can Do for Your Seasonal Home', desc: 'The gap between DIY and hiring a contractor.', rt: '5 min' },
+  { href: '/guides/opening-lake-house-summer-vermont', title: 'Opening a Lake House for Summer', desc: 'The step-by-step sequence. What to check first.', rt: '5 min' },
+  { href: '/guides/can-i-add-bedroom-vermont-lake-house', title: 'Can I Add a Bedroom to My Vermont Lake House?', desc: 'Septic capacity decides. Check before you design.', rt: '5 min' },
+  { href: '/guides/winterizing-lake-house-vermont', title: 'Winterizing a Lake House in Vermont', desc: 'Docks, intake lines, shoreline — lake-specific steps.', rt: '6 min' },
 ]
 const costs = [
   { href: '/guides/how-much-does-kitchen-remodel-cost-vermont', title: 'How Much Does a Kitchen Remodel Cost in Vermont?', desc: 'Real Vermont ranges by scope — minor refresh through full gut.', rt: '6 min' },
@@ -97,4 +100,5 @@ export default function Page(){
     </div>
   )
             }
+
 

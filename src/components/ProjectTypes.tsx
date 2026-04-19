@@ -2,12 +2,12 @@
 import Link from 'next/link'
 
 const PT = [
-  { t:'Kitchen Remodel', d:"Cabinets, counters, appliances, layout changes. Vermont\u2019s most requested project.", img:'https://plus.unsplash.com/premium_photo-1686090447480-9eef06ce4723?auto=format&fit=crop&w=600&q=80', tag:'Most Requested', links:[{label:'Cost guide',href:'/guides/how-much-does-kitchen-remodel-cost-vermont'},{label:'Estimate cost',href:'/calculator'}] },
-  { t:'Bathroom Renovation', d:'Full gut-and-replace or targeted upgrades \u2014 tile, vanity, shower, fixtures.', img:'https://plus.unsplash.com/premium_photo-1686090446868-92b77789ad08?auto=format&fit=crop&w=600&q=80', tag:null, links:[{label:'Timeline guide',href:'/guides/how-long-does-bathroom-remodel-take-vermont'},{label:'Estimate cost',href:'/calculator'}] },
+  { t:'Kitchen Remodel', d:"Cabinets, counters, appliances, layout changes. Vermont’s most requested project.", img:'https://plus.unsplash.com/premium_photo-1686090447480-9eef06ce4723?auto=format&fit=crop&w=600&q=80', tag:'Most Requested', links:[{label:'Cost guide',href:'/guides/how-much-does-kitchen-remodel-cost-vermont'},{label:'Estimate cost',href:'/calculator'}] },
+  { t:'Bathroom Renovation', d:'Full gut-and-replace or targeted upgrades — tile, vanity, shower, fixtures.', img:'https://plus.unsplash.com/premium_photo-1686090446868-92b77789ad08?auto=format&fit=crop&w=600&q=80', tag:null, links:[{label:'Timeline guide',href:'/guides/how-long-does-bathroom-remodel-take-vermont'},{label:'Estimate cost',href:'/calculator'}] },
   { t:'Deck & Porch', d:'New builds, replacements, screened porches, and seasonal outdoor structures.', img:'https://images.unsplash.com/photo-1754597215918-b4b1f113ca77?auto=format&fit=crop&w=600&q=80', tag:'Summer Favorite', links:[{label:'Deck cost guide',href:'/guides/how-much-does-a-deck-cost-vermont'},{label:'Estimate cost',href:'/calculator'}] },
   { t:'Basement Finishing', d:'Convert unfinished space to living area, home office, or rental apartment.', img:'https://images.unsplash.com/photo-1646592491741-e79ae5953486?auto=format&fit=crop&w=600&q=80', tag:null, links:[{label:'Estimate cost',href:'/calculator'}] },
   { t:'Room Addition', d:'Bump-outs, sunrooms, mudrooms, and garage conversions.', img:'https://images.unsplash.com/photo-1505798577917-a65157d3320a?auto=format&fit=crop&w=600&q=80', tag:null, links:[{label:'Permit guide',href:'/guides/vermont-renovation-permit-guide'},{label:'Estimate cost',href:'/calculator'}] },
-  { t:'Roofing & Weatherization', d:'Roof replacement, insulation, windows, and weatherproofing \u2014 critical in Vermont.', img:'https://plus.unsplash.com/premium_photo-1686090449192-4ab1d00cb735?auto=format&fit=crop&w=600&q=80', tag:'Seasonal', links:[{label:'Roof cost guide',href:'/guides/how-much-does-roof-replacement-cost-vermont'},{label:'Estimate cost',href:'/calculator'}] },
+  { t:'Roofing & Weatherization', d:'Roof replacement, insulation, windows, and weatherproofing — critical in Vermont.', img:'https://plus.unsplash.com/premium_photo-1686090449192-4ab1d00cb735?auto=format&fit=crop&w=600&q=80', tag:'Seasonal', links:[{label:'Roof cost guide',href:'/guides/how-much-does-roof-replacement-cost-vermont'},{label:'Estimate cost',href:'/calculator'}] },
   { t:'Plumbing & HVAC', d:'Heating systems, radiant floor, boiler upgrades, and plumbing repairs.', img:'https://plus.unsplash.com/premium_photo-1664298589198-b15ff5382648?auto=format&fit=crop&w=600&q=80', tag:null, links:[{label:'HVAC contractors',href:'/hvac-contractors-vermont'},{label:'Plumbing contractors',href:'/plumbing-contractors-vermont'}] },
   { t:'Electrical', d:'Panel upgrades, wiring, EV chargers, and solar-ready prep.', img:'https://images.unsplash.com/photo-1621905251918-48416bd8575a?auto=format&fit=crop&w=600&q=80', tag:'High Demand', links:[{label:'Electrical contractors',href:'/electrical-contractors-vermont'},{label:'Estimate cost',href:'/calculator'}] },
 ]
@@ -48,7 +48,7 @@ export default function ProjectTypes() {
               <div style={{padding:'8px 18px 14px',borderTop:'1px solid rgba(28,43,26,0.06)',display:'flex',gap:'14px',flexWrap:'wrap'}}>
                 {p.links.map(l => (
                   <Link key={l.href} href={l.href} style={{fontSize:'11px',fontFamily:'monospace',color:'#C8732A',textDecoration:'none',letterSpacing:'0.03em'}}>
-                    {l.label} \u2192
+                    {l.label} →
                   </Link>
                 ))}
               </div>
@@ -64,3 +64,4 @@ export default function ProjectTypes() {
     </section>
   )
 }
+

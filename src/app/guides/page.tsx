@@ -1,3 +1,4 @@
+// Guides index — 17 guide pages, 4 categories
 import type { Metadata } from 'next'
 import Link from 'next/link'
 export const metadata: Metadata = {

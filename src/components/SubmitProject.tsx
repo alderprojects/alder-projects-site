@@ -2,7 +2,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 
-const CATEGORIES=['Kitchen Remodel','Bathroom Renovation','Deck / Porch','Basement Finishing','Room Addition / Expansion','Roofing / Weatherization','Plumbing / HVAC','Electrical','Painting & Interior','Commercial Renovation','Other']
+const CATEGORIES=['Kitchen Remodel','Bathroom Renovation','Deck / Porch','Basement Finishing','Room Addition / Expansion','Roofing / Weatherization','Plumbing / HVAC','Electrical','Painting & Interior','Handyman / Seasonal Prep','Commercial Renovation','Other']
 const BUDGET_BANDS=['Under $10,000','$10,000 – $25,000','$25,000 – $50,000','$50,000 – $100,000','$100,000 – $250,000','$250,000 – $500,000','Over $500,000','Not sure yet']
 const TIMELINES=['Ready to start now','Within 1–3 months','Within 3–6 months','Within 6–12 months','Planning phase, 12+ months out','Flexible / not sure']
 const PROPERTY_TYPES=['Single-family home','Multi-family / duplex','Condo / townhouse','Commercial property','Vacant land','Barn / agricultural','Other']
@@ -57,4 +57,4 @@ export default function SubmitProject() {
       </div>
     </section>
   )
-}
+      }

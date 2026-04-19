@@ -10,6 +10,7 @@ const seasonal = [
   { href: '/guides/vermont-septic-what-to-know', title: 'Vermont Septic Systems: What Seasonal Owners Should Know', desc: 'Capacity, inspections, wetlands, and the bedroom rule.', rt: '6 min' },
   { href: '/guides/vermont-flood-zone-renovation', title: 'Renovating in a Vermont Flood Zone', desc: 'The 50% substantial improvement rule explained.', rt: '5 min' },
   { href: '/guides/heat-pump-rebates-vermont', title: 'Vermont Heat Pump Rebates in 2026', desc: 'Efficiency Vermont + federal credits. Real numbers.', rt: '5 min' },
+  { href: '/guides/handyman-seasonal-home-vermont', title: 'What a Handyman Can Do for Your Seasonal Home', desc: 'The gap between DIY and hiring a contractor.', rt: '5 min' },
 ]
 const costs = [
   { href: '/guides/how-much-does-kitchen-remodel-cost-vermont', title: 'How Much Does a Kitchen Remodel Cost in Vermont?', desc: 'Real Vermont ranges by scope — minor refresh through full gut.', rt: '6 min' },
@@ -96,3 +97,4 @@ export default function Page(){
     </div>
   )
             }
+

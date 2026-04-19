@@ -42,7 +42,7 @@ export default function Page(){
     if(lake)subs.push({title:'Dock rebuild',detail:`Adds real value on ${lake}.`,cost:'$5k–$25k'})
     subs.push({title:'Insulation + air sealing',detail:'Cuts heating costs 30–50%.',cost:'$5k–$15k'})
     subs.push({title:'Guest cabin / ADU',detail:'Rental income or family space.',cost:'$50k+'})
-    steps.push({title:'Not the DIY type? Get a handyman out there',why:'Everything in steps 2 and 3 can be done in a single day visit. A Vermont handyman charges $200–$800 for a full-day seasonal prep — install sensors, seal mouse holes, insulate pipes, put up gutter guards, cap the chimney. One trip, everything handled.',cost:'$200–$800 for a day',cta:'Post your project',ctaUrl:'/#submit-project',guideLabel:'Read: finding a handyman for your seasonal home',guideUrl:'/guides/how-to-find-contractor-vermont'})
+    steps.push({title:'Not the DIY type? Get a handyman out there',why:'Everything in steps 2 and 3 can be done in a single day visit. A Vermont handyman charges $200–$800 for a full-day seasonal prep — install sensors, seal mouse holes, insulate pipes, put up gutter guards, cap the chimney. One trip, everything handled.',cost:'$200–$800 for a day',cta:'Post your project',ctaUrl:'/#submit-project',guideLabel:'Read: what a handyman can do for your seasonal home',guideUrl:'/guides/handyman-seasonal-home-vermont'})
     steps.push({title:'Plan a bigger project',why:'Once the basics check out, here\'s where owners like you typically invest.',cost:'',guideLabel:'Read: heat pump rebates in 2026',guideUrl:'/guides/heat-pump-rebates-vermont',subs})
   }else{for(const a of (r?.actions||[])){steps.push({title:a.title,why:a.why,cost:a.cost,cta:'Post your project',ctaUrl:'/#submit-project'})}}
   let sum=r?.summary||'';if(gis?.geocoded){const flags=[gis.inFloodZone&&'it\'s in a flood zone — that changes what you can renovate',gis.inWetland&&'wetlands nearby affect drainage and where you can dig',gis.inShoreland&&'shoreland rules limit outdoor work near the water',gis.inRiverCorridor&&'a river corridor restricts where you can build'].filter(Boolean);if(flags.length>0)sum='We scanned your parcel against state environmental records. We found that '+flags.join(', and ')+'. Here\'s what to do about it.';else sum='We scanned your parcel against state environmental records. Everything came back clean — no flood zone, no environmental restrictions. You have real flexibility here.'}
@@ -87,4 +87,5 @@ export default function Page(){
 {!r&&!loading&&!err&&(<div style={{textAlign:'center',padding:'80px 0'}}><p style={{fontSize:12,color:'#d6d3d1'}}>Enter an address to begin.</p></div>)}
 </main></div>)
 }
+
 

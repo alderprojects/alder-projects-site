@@ -1,4 +1,3 @@
-// Guides index — 17 guide pages, 4 categories
 import type { Metadata } from 'next'
 import Link from 'next/link'
 export const metadata: Metadata = {
@@ -31,7 +30,7 @@ const planning = [
   { href: '/guides/how-long-does-bathroom-remodel-take-vermont', title: 'How Long Does a Bathroom Remodel Take?', desc: 'Realistic timelines by scope and what causes delays.', rt: '5 min' },
   { href: '/guides/vermont-home-renovation-winter', title: 'Renovating Your Vermont Home in Winter', desc: 'What works year-round and the off-season advantage.', rt: '4 min' },
 ]
-function Section({title,subtitle,guides,accent}:{title:string;subtitle:string;guides:typeof seasonal;accent?:boolean}){
+function Section({title,subtitle,guides,accent}:{title:string;subtitle:string;guides:{href:string;title:string;desc:string;rt:string}[];accent?:boolean}){
   return (
     <div style={{marginBottom:'48px'}}>
       <h2 style={{fontFamily:"'Playfair Display',Georgia,serif",fontSize:'1.3rem',fontWeight:600,color:'#1C2B1A',margin:'0 0 4px'}}>{title}</h2>
@@ -101,5 +100,6 @@ export default function Page(){
     </div>
   )
             }
+
 
 

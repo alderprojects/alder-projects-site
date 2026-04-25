@@ -314,7 +314,7 @@ export default function Page() {
                     onMouseEnter={() => setHighlightIdx(i)}
                     style={{ display: 'block', width: '100%', textAlign: 'left' as const, padding: '11px 16px', border: 'none', background: highlightIdx === i ? '#fafaf8' : 'transparent', fontSize: 13, color: '#1c1917', cursor: 'pointer', fontFamily: F, borderBottom: i < suggestions.length - 1 ? '1px solid #fafaf8' : 'none' }}
                   >
-                    <span style={{ display: 'inline-block', marginRight: 8, color: '#d6d3d1' }}>â</span>
+                    <span style={{ display: 'inline-block', marginRight: 8, color: '#d6d3d1' }}>→</span>
                     {formatSuggestion(s.text)}
                   </button>
                 ))}
@@ -330,7 +330,7 @@ export default function Page() {
                 ))}
               </div>
               <button onClick={useMyLocation} style={{ border: 'none', background: 'transparent', fontSize: 11, color: '#a8a29e', cursor: 'pointer', fontFamily: F, padding: 0, display: 'flex', alignItems: 'center', gap: 4 }}>
-                <span style={{ fontSize: 12 }}>â</span> Use my location
+                <span style={{ fontSize: 12 }}>◎</span> Use my location
               </button>
             </div>
           )}
@@ -375,13 +375,13 @@ export default function Page() {
                       </p>
                       <p style={{ fontSize: 12, color: '#78716c', margin: '3px 0 0', lineHeight: 1.5 }}>{s.why}{s.cost && <span style={{ color: '#a8a29e' }}> {s.cost}.</span>}</p>
                       <div style={{ display: 'flex', gap: 12, marginTop: 6, flexWrap: 'wrap' }}>
-                        {s.guideUrl && (<a href={s.guideUrl} style={{ fontSize: 11, color: '#78716c', textDecoration: 'none', borderBottom: '1px solid #eeedeb' }}>{s.guideLabel} â</a>)}
-                        {s.cta && s.ctaUrl && (<a href={s.ctaUrl} style={{ fontSize: 11, color: '#185FA5', textDecoration: 'none' }}>{s.cta} â</a>)}
+                        {s.guideUrl && (<a href={s.guideUrl} style={{ fontSize: 11, color: '#78716c', textDecoration: 'none', borderBottom: '1px solid #eeedeb' }}>{s.guideLabel} →</a>)}
+                        {s.cta && s.ctaUrl && (<a href={s.ctaUrl} style={{ fontSize: 11, color: '#185FA5', textDecoration: 'none' }}>{s.cta} →</a>)}
                       </div>
                       {s.products && (
                         <div style={{ display: 'flex', gap: 6, marginTop: 8, flexWrap: 'wrap' }}>
                           {s.products.map(p => (
-                            <a key={p.label} href={p.url} target="_blank" rel="noopener noreferrer" style={{ fontSize: 11, color: '#185FA5', textDecoration: 'none', padding: '4px 10px', border: '1px solid #eeedeb', borderRadius: 6 }}>{p.label} â</a>
+                            <a key={p.label} href={p.url} target="_blank" rel="noopener noreferrer" style={{ fontSize: 11, color: '#185FA5', textDecoration: 'none', padding: '4px 10px', border: '1px solid #eeedeb', borderRadius: 6 }}>{p.label} →</a>
                           ))}
                         </div>
                       )}
@@ -393,7 +393,7 @@ export default function Page() {
                                 <p style={{ fontSize: 12, fontWeight: 500, color: '#1c1917', margin: 0 }}>{sub.title}</p>
                                 <p style={{ fontSize: 11, color: '#78716c', margin: 0 }}>{sub.detail} {sub.cost}.</p>
                               </div>
-                              <a href="/#submit-project" style={{ fontSize: 11, color: '#185FA5', textDecoration: 'none', whiteSpace: 'nowrap', marginLeft: 8 }}>Get quotes â</a>
+                              <a href="/#submit-project" style={{ fontSize: 11, color: '#185FA5', textDecoration: 'none', whiteSpace: 'nowrap', marginLeft: 8 }}>Get quotes →</a>
                             </div>
                           ))}
                         </div>
@@ -408,7 +408,7 @@ export default function Page() {
                 <p style={{ fontSize: 13, fontWeight: 500, color: '#1c1917', margin: 0 }}>Need a contractor?</p>
                 <p style={{ fontSize: 11, color: '#78716c', margin: '2px 0 0' }}>Describe your project. We match you locally.</p>
               </div>
-              <a href="/#submit-project" style={{ fontSize: 11, fontWeight: 600, color: 'white', background: '#1c1917', textDecoration: 'none', padding: '8px 16px', borderRadius: 999 }}>Post project â</a>
+              <a href="/#submit-project" style={{ fontSize: 11, fontWeight: 600, color: 'white', background: '#1c1917', textDecoration: 'none', padding: '8px 16px', borderRadius: 999 }}>Post project →</a>
             </div>
           </div>
         )}
@@ -441,8 +441,8 @@ export default function Page() {
         )}
         {r && (
           <div style={{ display: 'flex', gap: 12, marginTop: 16, flexWrap: 'wrap' }}>
-            {r.dataLinks?.map(dl => (<a key={dl.label} href={dl.url} target="_blank" rel="noopener noreferrer" style={{ fontSize: 10, color: '#c4c0b8', textDecoration: 'none' }}>{dl.label} â</a>))}
-            <span style={{ fontSize: 9, color: '#d6d3d1' }}>Not advice. Â© 2026 Alder Projects</span>
+            {r.dataLinks?.map(dl => (<a key={dl.label} href={dl.url} target="_blank" rel="noopener noreferrer" style={{ fontSize: 10, color: '#c4c0b8', textDecoration: 'none' }}>{dl.label} →</a>))}
+            <span style={{ fontSize: 9, color: '#d6d3d1' }}>Not advice. © 2026 Alder Projects</span>
           </div>
         )}
         {!r && !loading && !err && (

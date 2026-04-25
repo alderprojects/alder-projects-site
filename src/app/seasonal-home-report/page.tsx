@@ -179,8 +179,8 @@ export default function Page() {
     const t = (a || addr).trim()
     if (!t) return
     const withVT = t.match(/,\s*VT/i) ? t : `${t}, VT`
-    setAddr(t.split(',').slice(0, 2).map(p => p.trim()).join(', ').replace(/^/, formatSuggestion(t).split(',').length >= 2 ? '' : ''))
-    // Just keep the user's display version clean
+    // Display formatted version (Title Case) of the picked address
+    setAddr(formatSuggestion(t))
     setLoading(true)
     setErr('')
     setSug('')
@@ -237,7 +237,7 @@ export default function Page() {
       { label: 'Heat tape', url: az('roof heat cable ice dam') },
     ]})
     if (gis.inShoreland) steps.push({ title: 'Get a shoreland survey before designing outdoor work', why: "You're inside the 250-foot shoreland buffer. Without a survey, you can't design a deck, dock, or landscaping plan that will actually get permitted.", cost: '$500\u20132,000', tag: 'shoreland', tagType: 'warn', cta: 'Post your project', ctaUrl: '/#submit-project', guideLabel: 'Read: flood zone guide', guideUrl: '/guides/vermont-flood-zone-renovation' })
-    steps.push({ title: 'Not the DIY type? Get a handyman out there', why: "Everything in steps 2 and 3 can be done in a single day visit. A Vermont handyman charges $200\u2013$800 for a foll-day seasonal prep \u2014 install sensors, seal mouse holes, insulate pipes, put up gutter guards, cap the chimney. One trip, everything handled.", cost: '$200\u2013$800 for a day', cta: 'Post your project', ctaUrl: '/#submit-project', guideLabel: 'Read: what a handyman can do for your seasonal home', guideUrl: '/guides/handyman-seasonal-home-vermont' })
+    steps.push({ title: 'Not the DIY type? Get a handyman out there', why: "Everything in steps 2 and 3 can be done in a single day visit. A Vermont handyman charges $200\u2013$800 for a full-day seasonal prep \u2014 install sensors, seal mouse holes, insulate pipes, put up gutter guards, cap the chimney. One trip, everything handled.", cost: '$200\u2013$800 for a day', cta: 'Post your project', ctaUrl: '/#submit-project', guideLabel: 'Read: what a handyman can do for your seasonal home', guideUrl: '/guides/handyman-seasonal-home-vermont' })
     const lake = r?.snapshot?.facts?.find(f => f.label === 'Water')?.value
     const subs: { title: string; detail: string; cost: string }[] = []
     subs.push({ title: 'Heat pump', detail: 'Use it year-round. Strong rebates available.', cost: '$3k\u2013$12k after rebates' })
@@ -314,7 +314,7 @@ export default function Page() {
                     onMouseEnter={() => setHighlightIdx(i)}
                     style={{ display: 'block', width: '100%', textAlign: 'left' as const, padding: '11px 16px', border: 'none', background: highlightIdx === i ? '#fafaf8' : 'transparent', fontSize: 13, color: '#1c1917', cursor: 'pointer', fontFamily: F, borderBottom: i < suggestions.length - 1 ? '1px solid #fafaf8' : 'none' }}
                   >
-                    <span style={{ display: 'inline-block', marginRight: 8, color: '#d6d3d1' }}>â³</span>
+                    <span style={{ display: 'inline-block', marginRight: 8, color: '#d6d3d1' }}>â</span>
                     {formatSuggestion(s.text)}
                   </button>
                 ))}
@@ -330,7 +330,7 @@ export default function Page() {
                 ))}
               </div>
               <button onClick={useMyLocation} style={{ border: 'none', background: 'transparent', fontSize: 11, color: '#a8a29e', cursor: 'pointer', fontFamily: F, padding: 0, display: 'flex', alignItems: 'center', gap: 4 }}>
-                <span style={{ fontSize: 12 }}>â</span> Use my location
+                <span style={{ fontSize: 12 }}>â</span> Use my location
               </button>
             </div>
           )}

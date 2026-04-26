@@ -1,0 +1,74 @@
+{
+  "_meta": {
+    "as_of_date": "2026-04-26",
+    "notes": "Annual VT homeowner programs and key dates. Drives seasonal context across answer pages."
+  },
+  "homestead_declaration": {
+    "name": "Vermont Homestead Declaration (HS-122)",
+    "due_date_annual": "April 15",
+    "season": "spring",
+    "what_it_is": "A form filed annually with the Vermont Tax Department telling the state your house is your primary residence.",
+    "what_it_does": "Without filing, your house is taxed at the higher non-homestead rate. Filing is also the gateway to the property tax credit (HI-144) for households under the income limit.",
+    "url": "https://tax.vermont.gov",
+    "associated_forms": [
+      "HS-122 (Homestead Declaration)",
+      "HI-144 (Property Tax Credit Claim)"
+    ],
+    "search_intent": "high"
+  },
+  "property_tax_credit": {
+    "name": "Vermont Property Tax Credit (HI-144)",
+    "due_date_annual": "April 15 (with HS-122)",
+    "season": "spring",
+    "what_it_is": "Income-based credit reducing your education property tax.",
+    "what_it_does": "Households under the 2026 income limit (~$115,000) may qualify for a credit. Determination letters mail in June-July.",
+    "url": "https://tax.vermont.gov/property-tax-credit",
+    "search_intent": "high"
+  },
+  "button_up_vermont": {
+    "name": "Button Up Vermont",
+    "season": "fall",
+    "what_it_is": "Annual statewide weatherization campaign launched by Efficiency Vermont every October 1.",
+    "what_it_does": "Aggregates available state and utility rebates for weatherization and electrification, plus highlights any expiring federal credits.",
+    "url": "https://www.buttonupvermont.org/",
+    "search_intent": "high"
+  },
+  "december_tax_letter": {
+    "name": "Vermont Tax Commissioner's Annual Property Tax Projection Letter",
+    "due_date_annual": "December 1",
+    "season": "winter",
+    "what_it_is": "The Tax Commissioner publishes the projected statewide property tax change for the upcoming fiscal year.",
+    "what_it_does": "First public signal of how much tax bills will go up the following August. The Dec 2025 letter projected a 12% increase; the legislature is currently negotiating that down to ~7% for FY2027.",
+    "search_intent": "high"
+  },
+  "property_tax_bill": {
+    "name": "Vermont property tax bill",
+    "due_date_annual": "August (varies by town)",
+    "season": "summer",
+    "what_it_is": "Annual bill from your town for property taxes (education + municipal).",
+    "what_it_does": "FY2027 bills will reflect the legislature's negotiated rate change. Statewide average increase forecast at 7-12% over FY2026.",
+    "search_intent": "high"
+  },
+  "spir": {
+    "name": "Seller's Property Information Report (SPIR)",
+    "season": "year-round",
+    "what_it_is": "Vermont's standard property disclosure form completed by sellers and provided to buyers.",
+    "what_it_does": "Covers structural components, utilities, water/septic, environmental hazards, and (since June 2024 under Act 181) flood history.",
+    "search_intent": "buyer"
+  },
+  "act_181_flood_disclosure": {
+    "name": "Act 181 Flood Disclosure",
+    "season": "year-round",
+    "what_it_is": "Vermont law (effective June 2024) requiring sellers to disclose flood zone status and prior flood damage.",
+    "what_it_does": "Mandatory flood section in the SPIR. Buyers can sue for non-disclosure.",
+    "search_intent": "buyer"
+  },
+  "mud_season": {
+    "name": "Vermont mud season",
+    "season": "spring",
+    "due_date_annual": "Late March through late May (varies by elevation)",
+    "what_it_is": "Annual freeze-thaw cycle that turns dirt roads to mud and restricts heavy vehicle traffic.",
+    "what_it_does": "Many dirt roads close to heavy trucks. Outdoor projects (paving, landscaping, foundation work) are typically blocked until mud season ends.",
+    "search_intent": "medium"
+  }
+}

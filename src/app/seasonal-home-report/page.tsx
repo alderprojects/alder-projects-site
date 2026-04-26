@@ -16,6 +16,12 @@ const GEO = 'https://maps.vcgi.vermont.gov/arcgis/rest/services/EGC_services/GCS
 const ANR = 'https://anrmaps.vermont.gov/arcgis/rest/services/Open_Data'
 const TAG = 'alderprojects-20'
 const az = (q: string) => `https://www.amazon.com/s?k=${encodeURIComponent(q)}&tag=${TAG}`
+const qparams = (params: Record<string, string>) => {
+  const sp = new URLSearchParams()
+  sp.set('source', 'seasonal-report')
+  Object.entries(params).forEach(([k, v]) => { if (v) sp.set(k, v) })
+  return '/?' + sp.toString() + '#submit-project'
+}
 
 async function qGIS(addr: string, magicKey?: string): Promise<GIS> {
   try {
@@ -218,36 +224,24 @@ export default function Page() {
     pills.push({ label: gis.inShoreland ? 'Shoreland rules apply' : 'No shoreland restrictions', status: gis.inShoreland ? 'warn' : 'good' })
     if (gis.inWetland) pills.push({ label: 'Wetlands affect where you can dig', status: 'warn' })
     if (gis.inRiverCorridor) pills.push({ label: 'River corridor limits building', status: 'warn' })
-    if (gis.inFloodZone) steps.push({ title: 'Get a flood elevation certificate', why: "You're in a flood zone. This $300 certificate determines whether you can renovate at all \u2014 improvements over 50% of your home's value trigger a full rebuild-to-code requirement.", cost: '$300\u2013$600', tag: 'flood zone', tagType: 'warn', cta: 'Post your project', ctaUrl: '/#submit-project', guideLabel: 'Read: the 50% rule explained', guideUrl: '/guides/vermont-flood-zone-renovation' })
-    if (!gis.inFloodZone) steps.push({ title: 'Walk the property and take notes', why: 'Heat source, water source, where the septic access is. This 30-minute check tells you more than anything else will.', cost: 'Free', tag: 'good news', tagType: 'good', cta: 'Post your project', ctaUrl: '/#submit-project', guideLabel: 'Read: winterizing checklist', guideUrl: '/guides/winterizing-vermont-seasonal-home' })
-    if (gis.inWetland) steps.push({ title: 'Get the septic inspected', why: "Wetlands within 100m mean your septic system is working harder than most. An inspection tells you if it can handle your plans \u2014 or if it's a $30k surprise waiting to happen.", cost: '$300\u2013$500', tag: 'wetlands', tagType: 'warn', cta: 'Post your project', ctaUrl: '/#submit-project', guideLabel: 'Read: septic guide for seasonal owners', guideUrl: '/guides/vermont-septic-what-to-know' })
-    if (gis.inRiverCorridor) steps.push({ title: 'Call town zoning about the river corridor', why: 'Your parcel is in a mapped erosion zone. One free phone call tells you if the town restricts what you can build and where.', cost: 'Free', tag: 'corridor', tagType: 'warn', cta: 'Post your project', ctaUrl: '/#submit-project', guideLabel: 'Read: flood zone guide', guideUrl: '/guides/vermont-flood-zone-renovation' })
-    steps.push({ title: "Set it up so you don't worry when you leave", why: "Most damage to seasonal homes happens when nobody's there. A few inexpensive things make the difference between catching a problem on your phone and coming back to a disaster.", cost: '$50\u2013$800 total', cta: 'Get a handyman to do it', ctaUrl: '/#submit-project', guideLabel: 'Read: winterizing checklist', guideUrl: '/guides/winterizing-vermont-seasonal-home', products: [
-      { label: 'Leak & freeze sensors', url: az('wifi water leak sensor freeze alert') },
-      { label: 'Dehumidifier', url: az('basement dehumidifier energy star') },
-      { label: 'Smart thermostat', url: az('smart thermostat wifi remote') },
-      { label: 'Chimney cap', url: az('stainless steel chimney cap') },
-      { label: 'Mouse-proofing kit', url: az('mouse exclusion kit steel wool') },
-      { label: 'Radon test', url: az('radon test kit home') },
-    ]})
-    steps.push({ title: 'Button up the exterior', why: 'Ice dams, clogged gutters, and drafty windows cost more to fix than to prevent. These pay for themselves in one Vermont winter.', cost: '$100\u20132,000', cta: 'Get a handyman to do it', ctaUrl: '/#submit-project', guideLabel: 'Read: winterizing checklist', guideUrl: '/guides/winterizing-vermont-seasonal-home', products: [
-      { label: 'Gutter guards', url: az('gutter guards stainless steel') },
-      { label: 'Storm window inserts', url: az('interior storm window insert kit') },
-      { label: 'Pipe insulation', url: az('pipe insulation foam outdoor') },
-      { label: 'Heat tape', url: az('roof heat cable ice dam') },
-    ]})
-    if (gis.inShoreland) steps.push({ title: 'Get a shoreland survey before designing outdoor work', why: "You're inside the 250-foot shoreland buffer. Without a survey, you can't design a deck, dock, or landscaping plan that will actually get permitted.", cost: '$500\u20132,000', tag: 'shoreland', tagType: 'warn', cta: 'Post your project', ctaUrl: '/#submit-project', guideLabel: 'Read: flood zone guide', guideUrl: '/guides/vermont-flood-zone-renovation' })
-    steps.push({ title: 'Not the DIY type? Get a handyman out there', why: "Everything in steps 2 and 3 can be done in a single day visit. A Vermont handyman charges $200\u2013$800 for a full-day seasonal prep \u2014 install sensors, seal mouse holes, insulate pipes, put up gutter guards, cap the chimney. One trip, everything handled.", cost: '$200\u2013$800 for a day', cta: 'Post your project', ctaUrl: '/#submit-project', guideLabel: 'Read: what a handyman can do for your seasonal home', guideUrl: '/guides/handyman-seasonal-home-vermont' })
+    if (gis.inFloodZone) steps.push({ title: 'Get a flood elevation certificate', why: "You're in a flood zone. This $300 certificate determines whether you can renovate at all \u2014 improvements over 50% of your home's value trigger a full rebuild-to-code requirement.", cost: '$300\u2013$600', tag: 'flood zone', tagType: 'warn', cta: 'Post your project', ctaUrl: qparams({ category: 'Other', town: r?.snapshot?.town || '', description: `Flood elevation certificate. Property is in flood zone ${gis.floodZone || ''}. Need a certified land surveyor to determine base flood elevation for renovation planning.`, budget: 'Under $10,000', timeline: 'Within 1\u20133 months' }), guideLabel: 'Read: the 50% rule explained', guideUrl: '/guides/vermont-flood-zone-renovation' })
+    if (!gis.inFloodZone) steps.push({ title: 'Walk the property and take notes', why: 'Heat source, water source, where the septic access is. This 30-minute check tells you more than anything else will.', cost: 'Free', tag: 'good news', tagType: 'good', cta: 'Post your project', ctaUrl: qparams({ town: r?.snapshot?.town || '' }), guideLabel: 'Read: winterizing checklist', guideUrl: '/guides/winterizing-vermont-seasonal-home' })
+    if (gis.inWetland) steps.push({ title: 'Get the septic inspected', why: "Wetlands within 100m mean your septic system is working harder than most. An inspection tells you if it can handle your plans \u2014 or if it's a $30k surprise waiting to happen.", cost: '$300\u2013$500', tag: 'wetlands', tagType: 'warn', cta: 'Post your project', ctaUrl: qparams({ category: 'Plumbing / HVAC', town: r?.snapshot?.town || '', description: 'Septic system inspection. Wetlands present within 100m of property \u2014 need a licensed septic inspector to verify capacity and condition before any renovation planning.', budget: 'Under $10,000', timeline: 'Within 1\u20133 months' }), guideLabel: 'Read: septic guide for seasonal owners', guideUrl: '/guides/vermont-septic-what-to-know' })
+    if (gis.inRiverCorridor) steps.push({ title: 'Call town zoning about the river corridor', why: 'Your parcel is in a mapped erosion zone. One free phone call tells you if the town restricts what you can build and where.', cost: 'Free', tag: 'corridor', tagType: 'warn', cta: 'Post your project', ctaUrl: qparams({ category: 'Other', town: r?.snapshot?.town || '', description: 'Property is in a Vermont river corridor / mapped erosion zone. Looking for guidance on zoning restrictions and what we can build where.', budget: 'Not sure yet', timeline: 'Flexible / not sure' }), guideLabel: 'Read: flood zone guide', guideUrl: '/guides/vermont-flood-zone-renovation' })
+    steps.push({ title: "Set it up so you don't worry when you leave", why: "Most damage to seasonal homes happens when nobody's there. A few inexpensive things make the difference between catching a problem on your phone and coming back to a disaster.", cost: '$50\u2013$800 total', cta: 'Get a handyman to do it', ctaUrl: qparams({ category: 'Other', town: r?.snapshot?.town || '', description: 'Handyman day visit for seasonal prep: install leak/freeze sensors, set up dehumidifier and smart thermostat, install chimney cap, mouse-proof the basement, set out radon test. Looking for someone to do it all in one visit.', budget: 'Under $10,000', timeline: 'Within 1\u20133 months' }), guideLabel: 'Read: winterizing checklist', guideUrl: '/guides/winterizing-vermont-seasonal-home'})
+    steps.push({ title: 'Button up the exterior', why: 'Ice dams, clogged gutters, and drafty windows cost more to fix than to prevent. These pay for themselves in one Vermont winter.', cost: '$100\u20132,000', cta: 'Get a handyman to do it', ctaUrl: qparams({ category: 'Other', town: r?.snapshot?.town || '', description: 'Exterior buttoning for winter: install gutter guards, add interior storm window inserts, insulate exposed pipes, install heat tape on roof edge for ice dam prevention.', budget: 'Under $10,000', timeline: 'Within 1\u20133 months' }), guideLabel: 'Read: winterizing checklist', guideUrl: '/guides/winterizing-vermont-seasonal-home'})
+    if (gis.inShoreland) steps.push({ title: 'Get a shoreland survey before designing outdoor work', why: "You're inside the 250-foot shoreland buffer. Without a survey, you can't design a deck, dock, or landscaping plan that will actually get permitted.", cost: '$500\u20132,000', tag: 'shoreland', tagType: 'warn', cta: 'Post your project', ctaUrl: qparams({ category: 'Other', town: r?.snapshot?.town || '', description: 'Property is inside the Vermont 250-foot shoreland buffer. Need a licensed land surveyor to delineate the buffer for designing a deck / dock / landscaping that will be permittable.', budget: 'Under $10,000', timeline: 'Within 1\u20133 months' }), guideLabel: 'Read: flood zone guide', guideUrl: '/guides/vermont-flood-zone-renovation' })
+    steps.push({ title: 'Not the DIY type? Get a handyman out there', why: "Everything in steps 2 and 3 can be done in a single day visit. A Vermont handyman charges $200\u2013$800 for a full-day seasonal prep \u2014 install sensors, seal mouse holes, insulate pipes, put up gutter guards, cap the chimney. One trip, everything handled.", cost: '$200\u2013$800 for a day', cta: 'Post your project', ctaUrl: qparams({ category: 'Other', town: r?.snapshot?.town || '', description: 'Full-day handyman seasonal prep: sensors, mouse exclusion, pipe insulation, gutter guards, chimney cap, basic winterizing checklist. Looking for one person to handle all of it in a single visit.', budget: 'Under $10,000', timeline: 'Within 1\u20133 months' }), guideLabel: 'Read: what a handyman can do for your seasonal home', guideUrl: '/guides/handyman-seasonal-home-vermont' })
     const lake = r?.snapshot?.facts?.find(f => f.label === 'Water')?.value
     const subs: { title: string; detail: string; cost: string }[] = []
     subs.push({ title: 'Heat pump', detail: 'Use it year-round. Strong rebates available.', cost: '$3k\u2013$12k after rebates' })
     if (lake) subs.push({ title: 'Dock rebuild', detail: `Adds real value on ${lake}.`, cost: '$5k\u2013$25k' })
     subs.push({ title: 'Insulation + air sealing', detail: 'Cuts heating costs 30\u201350%.', cost: '$5k\u2013$15k' })
     subs.push({ title: 'Guest cabin / ADU', detail: 'Rental income or family space.', cost: '$50k+' })
-    steps.push({ title: 'Plan a bigger project', why: "Once the basics check out, here's where owners like you typically invest.", cost: '', cta: 'Post your project', ctaUrl: '/#submit-project', guideLabel: 'Read: heat pump rebates in 2026', guideUrl: '/guides/heat-pump-rebates-vermont', subs })
+    steps.push({ title: 'Plan a bigger project', why: "Once the basics check out, here's where owners like you typically invest.", cost: '', cta: 'Post your project', ctaUrl: qparams({ category: 'Other', town: r?.snapshot?.town || '', description: 'Planning a larger renovation \u2014 looking for contractor matches. Open to discussion on scope (heat pump, insulation, dock, ADU, etc.).', budget: '$25,000 \u2013 $50,000', timeline: 'Within 3\u20136 months' }), guideLabel: 'Read: heat pump rebates in 2026', guideUrl: '/guides/heat-pump-rebates-vermont', subs })
   } else {
     for (const a of (r?.actions || [])) {
-      steps.push({ title: a.title, why: a.why, cost: a.cost, cta: 'Post your project', ctaUrl: '/#submit-project' })
+      steps.push({ title: a.title, why: a.why, cost: a.cost, cta: 'Post your project', ctaUrl: qparams({ town: r?.snapshot?.town || '', description: a.title + '. ' + a.why }) })
     }
   }
   let sum = r?.summary || ''
@@ -410,6 +404,30 @@ export default function Page() {
               </div>
               <a href="/#submit-project" style={{ fontSize: 11, fontWeight: 600, color: 'white', background: '#1c1917', textDecoration: 'none', padding: '8px 16px', borderRadius: 999 }}>Post project →</a>
             </div>
+          </div>
+        )}
+        {r && (
+          <div style={{ marginTop: 32, padding: '20px 24px', background: 'white', border: '1px solid #eeedeb', borderRadius: 12 }}>
+            <p style={{ fontSize: 11, color: '#a8a29e', marginBottom: 4, fontWeight: 500, letterSpacing: '0.08em', textTransform: 'uppercase' as const }}>If you'd rather DIY</p>
+            <p style={{ fontSize: 13, fontWeight: 500, color: '#1c1917', margin: '0 0 4px' }}>The Vermont seasonal home prep kit</p>
+            <p style={{ fontSize: 12, color: '#78716c', margin: '0 0 14px', lineHeight: 1.5 }}>Everything in steps 2 and 3, sourced. Total kit runs about $300–$800 depending on house size.</p>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+              {[
+                { label: 'Leak & freeze sensors', url: az('wifi water leak sensor freeze alert') },
+                { label: 'Dehumidifier', url: az('basement dehumidifier energy star') },
+                { label: 'Smart thermostat', url: az('smart thermostat wifi remote') },
+                { label: 'Chimney cap', url: az('stainless steel chimney cap') },
+                { label: 'Mouse-proofing kit', url: az('mouse exclusion kit steel wool') },
+                { label: 'Radon test', url: az('radon test kit home') },
+                { label: 'Gutter guards', url: az('gutter guards stainless steel') },
+                { label: 'Storm window inserts', url: az('interior storm window insert kit') },
+                { label: 'Pipe insulation', url: az('pipe insulation foam outdoor') },
+                { label: 'Heat tape', url: az('roof heat cable ice dam') },
+              ].map(p => (
+                <a key={p.label} href={p.url} target="_blank" rel="noopener noreferrer sponsored" style={{ fontSize: 11, color: '#185FA5', textDecoration: 'none', padding: '4px 10px', border: '1px solid #eeedeb', borderRadius: 6 }}>{p.label} →</a>
+              ))}
+            </div>
+            <p style={{ fontSize: 10, color: '#c4c0b8', marginTop: 12, marginBottom: 0 }}>Affiliate links. Same price for you, small commission for us — helps keep this tool free.</p>
           </div>
         )}
         {r && (

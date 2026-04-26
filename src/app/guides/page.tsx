@@ -94,7 +94,7 @@ export default function Page(){
             <p style={{fontFamily:"'Playfair Display',Georgia,serif",fontSize:'1.1rem',color:'#F5EFE0',fontWeight:500,margin:'0 0 4px'}}>Ready to post your project?</p>
             <p style={{fontSize:'13px',color:'rgba(245,239,224,0.5)',margin:0}}>Free · No account required · Matched within 1–2 business days.</p>
           </div>
-          <Link href="/#submit-project" style={{padding:'11px 22px',backgroundColor:'#C8732A',color:'#FAF7F2',fontWeight:600,fontSize:'14px',borderRadius:'2px',textDecoration:'none'}}>Post a Project →</Link>
+          <Link href="/?source=guides-index&description=Coming+from+guides+index+%E2%80%94+ready+to+talk+to+a+contractor.#submit-project" style={{padding:'11px 22px',backgroundColor:'#C8732A',color:'#FAF7F2',fontWeight:600,fontSize:'14px',borderRadius:'2px',textDecoration:'none'}}>Post a Project →</Link>
         </div>
       </div>
     </div>

@@ -1,5 +1,51 @@
 import Link from 'next/link'
 
+// Map H1 text to form CATEGORY values for pre-filling the project form.
+const CATEGORY_KEYWORDS: Array<[RegExp, string]> = [
+  [/kitchen/i, 'Kitchen Remodel'],
+  [/bathroom/i, 'Bathroom Renovation'],
+  [/deck|porch/i, 'Deck / Porch'],
+  [/basement/i, 'Basement Finishing'],
+  [/(addition|extension|expansion)/i, 'Room Addition / Expansion'],
+  [/(roof|weatheriz)/i, 'Roofing / Weatherization'],
+  [/(plumb|hvac|heating)/i, 'Plumbing / HVAC'],
+  [/electric/i, 'Electrical'],
+  [/paint/i, 'Painting & Interior'],
+  [/window/i, 'Other'],
+  [/general contractor/i, 'Other'],
+  [/handyman/i, 'Other'],
+]
+
+function deriveCategory(h1: string): string {
+  for (const [re, cat] of CATEGORY_KEYWORDS) {
+    if (re.test(h1)) return cat
+  }
+  return ''
+}
+
+// Common Vermont town names to extract from H1.
+const VT_TOWNS = ['Burlington','South Burlington','Stowe','Middlebury','Williston','Essex','Colchester','Winooski','Shelburne','Montpelier','Woodstock','Brattleboro','Rutland','Manchester','Bennington','Barre','Newport','Waitsfield','Morrisville','St. Johnsbury','Hardwick','Charlotte','Chittenden County','Addison County','Lamoille County','Rutland County','Washington County','Windsor County']
+
+function deriveTown(h1: string): string {
+  for (const t of VT_TOWNS) {
+    const re = new RegExp('\\b' + t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b', 'i')
+    if (re.test(h1)) return t
+  }
+  return ''
+}
+
+function buildSubmitUrl(h1: string, source = 'service-page'): string {
+  const sp = new URLSearchParams()
+  sp.set('source', source)
+  const cat = deriveCategory(h1)
+  const town = deriveTown(h1)
+  if (cat) sp.set('category', cat)
+  if (town) sp.set('town', town)
+  const desc = 'Coming from: ' + h1
+  sp.set('description', desc)
+  return '/?' + sp.toString() + '#submit-project'
+}
+
 export type SeoPageContent = {
   h1: string
   intro: string
@@ -49,7 +95,7 @@ export default function SeoPage({ content }: { content: SeoPageContent }) {
           <p style={{ fontSize: '17px', color: 'rgba(245,239,224,0.65)', lineHeight: 1.7, maxWidth: '560px', marginBottom: '28px' }}>
             {content.intro}
           </p>
-          <Link href="/#submit-project" style={{ display: 'inline-block', padding: '13px 26px', backgroundColor: '#C8732A', color: '#FAF7F2', fontWeight: 600, fontSize: '14px', borderRadius: '2px', textDecoration: 'none', fontFamily: "'DM Sans', system-ui, sans-serif" }}>
+          <Link href={buildSubmitUrl(content.h1)} style={{ display: 'inline-block', padding: '13px 26px', backgroundColor: '#C8732A', color: '#FAF7F2', fontWeight: 600, fontSize: '14px', borderRadius: '2px', textDecoration: 'none', fontFamily: "'DM Sans', system-ui, sans-serif" }}>
             {content.ctaText || 'Post Your Project Free →'}
           </Link>
         </div>
@@ -86,7 +132,7 @@ export default function SeoPage({ content }: { content: SeoPageContent }) {
 
         <div style={{ backgroundColor: '#1C2B1A', borderRadius: '4px', padding: '28px 32px', marginBottom: '40px', display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: '16px' }}>
           <p style={{ fontFamily: "'Playfair Display', Georgia, serif", fontSize: '1.2rem', color: '#F5EFE0', fontWeight: 500, margin: 0 }}>Ready to find a contractor?</p>
-          <Link href="/#submit-project" style={{ padding: '12px 24px', backgroundColor: '#C8732A', color: '#FAF7F2', fontWeight: 600, fontSize: '14px', borderRadius: '2px', textDecoration: 'none', flexShrink: 0, fontFamily: "'DM Sans', system-ui, sans-serif" }}>
+          <Link href={buildSubmitUrl(content.h1)} style={{ padding: '12px 24px', backgroundColor: '#C8732A', color: '#FAF7F2', fontWeight: 600, fontSize: '14px', borderRadius: '2px', textDecoration: 'none', flexShrink: 0, fontFamily: "'DM Sans', system-ui, sans-serif" }}>
             Post Your Project Free →
           </Link>
         </div>

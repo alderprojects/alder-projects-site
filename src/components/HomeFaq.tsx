@@ -1,13 +1,13 @@
 export default function HomeFaq() {
   const faqs = [
-    { q: 'What happens after I submit a project?', a: "We review your submission and match it to Vermont contractors who specialize in your work and serve your area. You'll hear from us by email within 1–2 business days." },
-    { q: 'Is it really free to post?', a: "Yes. There's no charge to submit a project, no account required, and no obligation to hire anyone." },
-    { q: 'How many contractors will contact me?', a: "We don't send your project to every contractor on the platform. A small, matched set of local contractors sees your request — no flood of calls from people you didn't ask." },
-    { q: 'Do I have to hire someone?', a: "No. Submitting a project doesn't commit you to anything. You decide whether to move forward, and when." },
-    { q: "What if I'm not ready yet?", a: "Use our planning guide to work through scope and budget first, then post when you're ready. Or submit now and we'll follow up when the timing works for you." },
-    { q: 'Are the contractors licensed and insured?', a: "We only work with Vermont-based contractors. Every application is reviewed — we check trade, location, and insurance coverage before approving anyone." },
-    { q: 'What kinds of projects do you match?', a: "Kitchens, bathrooms, decks, additions, roofing, electrical, plumbing, HVAC, painting, basement finishing — any residential renovation across all 14 Vermont counties." },
-    { q: 'How is this different from Angi or HomeAdvisor?', a: "We review every project before routing it. You're not entered into an auction. A small matched set of local contractors sees your request — not a national platform's entire database." },
+    { q: 'What happens after I submit?', a: "Someone here actually reads what you wrote. We pull a few contractors who do this kind of work in your town and email you their info in a couple days. That's it." },
+    { q: 'Is it really free to post?', a: "Yeah, free. No account, no hidden fees, no obligation. Contractors pay us when they take your job — that's our model." },
+    { q: 'How many contractors will contact me?', a: "Two or three. Not the 17-call avalanche you get from Angi." },
+    { q: 'Do I have to hire someone?', a: "Nope. If their bids are too high, the timing's wrong, or you change your mind — walk away. No charge." },
+    { q: "What if I'm not ready yet?", a: "That's fine. Use the cost calculator and the guides to figure out roughly what you're looking at, then come back. Or post now and tell us 'spring 2027' — we'll keep it on file." },
+    { q: 'Are the contractors licensed and insured?', a: "Yes. Every contractor we work with is Vermont-based, and we check their license and insurance before letting them in. We talk to them — not just check their LinkedIn." },
+    { q: 'What kinds of projects do you match?', a: "Kitchens, bathrooms, decks, additions, roofing, plumbing, HVAC, electrical, paint, basements — basically any residential project, anywhere in the state." },
+    { q: 'How is this different from Angi?', a: "Angi sells your phone number to ten contractors who buy leads in bulk. We don't. Your info goes to two or three Vermont contractors we know. They call you, you call them. That's the whole transaction." },
   ]
   return (
     <section style={{ backgroundColor: '#FAF7F2', padding: 'clamp(56px,8vw,96px) 24px', borderTop: '1px solid rgba(28,43,26,0.08)' }}>
@@ -15,7 +15,7 @@ export default function HomeFaq() {
         <div style={{ marginBottom: '40px' }}>
           <span style={{ fontSize: '11px', fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.1em', color: '#C8732A' }}>Common Questions</span>
           <h2 style={{ fontFamily: "'Playfair Display', Georgia, serif", fontSize: 'clamp(1.8rem,4vw,2.4rem)', fontWeight: 600, color: '#1C2B1A', lineHeight: 1.1, marginTop: '10px', marginBottom: 0 }}>
-            What homeowners ask us.
+            Stuff people ask.
           </h2>
         </div>
         <div>

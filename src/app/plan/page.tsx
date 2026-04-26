@@ -75,7 +75,7 @@ export default function PlanPage() {
         </div>
         <div style={{ textAlign:'center', padding:'32px', border:'1px solid rgba(28,43,26,0.1)', borderRadius:'3px', backgroundColor:'white' }}>
           <p style={{ fontSize:'14px', color:'rgba(28,43,26,0.6)', marginBottom:'16px' }}>When you are ready to find a contractor —</p>
-          <Link href="/#submit-project" style={{ display:'inline-block', padding:'14px 28px', backgroundColor:'#C8732A', color:'#FAF7F2', fontWeight:600, fontSize:'14px', borderRadius:'3px', textDecoration:'none' }}>Post Your Project Request &rarr;</Link>
+          <Link href="/?source=plan-page&description=From+the+planning+page+%E2%80%94+ready+to+talk+to+a+contractor.&timeline=Within+1%E2%80%933+months#submit-project" style={{ display:'inline-block', padding:'14px 28px', backgroundColor:'#C8732A', color:'#FAF7F2', fontWeight:600, fontSize:'14px', borderRadius:'3px', textDecoration:'none' }}>Post Your Project Request &rarr;</Link>
           <p style={{ fontSize:'11px', fontFamily:'monospace', color:'rgba(28,43,26,0.3)', marginTop:'12px' }}>Free &middot; No account required &middot; We review and follow up by email</p>
         </div>
       </div>

@@ -22,7 +22,9 @@ export const metadata: Metadata = {
   alternates: { canonical: 'https://alderprojects.com' },
 }
 
-const GA_ID = process.env.NEXT_PUBLIC_GA_ID
+// GA Measurement ID is intentionally hardcoded so it ships regardless of env var state.
+// This is a public ID (visible in client HTML) — not a secret. To change it, edit this line.
+const GA_ID = 'G-BH9L1VF4ZQ'
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (

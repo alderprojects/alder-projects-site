@@ -1,0 +1,511 @@
+{
+  "_meta": {
+    "as_of_date": "2026-04-26",
+    "notes": "Top 12 Vermont towns by population/relevance. Permit fees from town websites; labor multipliers benchmarked against rural VT (1.0). Update when town websites publish new fee schedules."
+  },
+  "burlington": {
+    "slug": "burlington",
+    "name": "Burlington",
+    "county": "Chittenden",
+    "population": 44743,
+    "median_home_price": 425000,
+    "permit_fees": {
+      "kitchen_remodel": {
+        "low": 400,
+        "high": 800
+      },
+      "bathroom_remodel": {
+        "low": 200,
+        "high": 500
+      },
+      "deck_porch": {
+        "low": 75,
+        "high": 250
+      },
+      "roofing": {
+        "low": 200,
+        "high": 500
+      },
+      "addition": {
+        "low": 500,
+        "high": 1500
+      },
+      "heat_pump_installation": {
+        "low": 100,
+        "high": 250
+      }
+    },
+    "permit_office": {
+      "name": "Burlington Department of Permitting & Inspections",
+      "address": "645 Pine Street, Burlington VT 05401",
+      "phone": "802-865-7188",
+      "hours": "Mon-Fri 8:30 AM-3:30 PM walk-in",
+      "url": "https://www.burlingtonvt.gov/dpi"
+    },
+    "labor_multiplier": 1.1,
+    "labor_notes": "Burlington runs ~10% above rural Vermont because of labor demand and the Chittenden County construction backlog (4-8 month wait for spring/summer starts as of April 2026).",
+    "utility": {
+      "electric": "BED",
+      "gas": "VGS",
+      "rebate_eligible_programs": [
+        "EVT",
+        "BED"
+      ]
+    },
+    "zoning": {
+      "adu_allowed_by_right": true,
+      "adu_size_max_sqft": 900,
+      "adu_size_pct_main_house": 30,
+      "setback_side_ft": 10,
+      "setback_rear_ft": 25
+    },
+    "housing_stock": {
+      "median_year_built": 1925,
+      "pre_1940_pct": 58,
+      "pre_1978_pct": 87
+    },
+    "search_volume_signal": "high"
+  },
+  "south_burlington": {
+    "slug": "south-burlington",
+    "name": "South Burlington",
+    "county": "Chittenden",
+    "population": 20292,
+    "median_home_price": 475000,
+    "permit_fees": {
+      "kitchen_remodel": {
+        "low": 350,
+        "high": 700
+      },
+      "bathroom_remodel": {
+        "low": 175,
+        "high": 450
+      },
+      "deck_porch": {
+        "low": 100,
+        "high": 300
+      },
+      "roofing": {
+        "low": 175,
+        "high": 450
+      }
+    },
+    "permit_office": {
+      "name": "South Burlington Planning & Zoning",
+      "phone": "802-846-4106",
+      "url": "https://www.southburlingtonvt.gov/departments/planning_zoning/"
+    },
+    "labor_multiplier": 1.1,
+    "labor_notes": "Same Chittenden County labor market as Burlington. Newer housing stock means fewer pre-1940 surprises.",
+    "utility": {
+      "electric": "GMP",
+      "gas": "VGS",
+      "rebate_eligible_programs": [
+        "EVT",
+        "GMP"
+      ]
+    },
+    "zoning": {
+      "adu_allowed_by_right": true,
+      "adu_size_max_sqft": 900,
+      "setback_side_ft": 10,
+      "setback_rear_ft": 30
+    },
+    "housing_stock": {
+      "median_year_built": 1972,
+      "pre_1940_pct": 12,
+      "pre_1978_pct": 58
+    },
+    "search_volume_signal": "medium-high"
+  },
+  "essex_junction": {
+    "slug": "essex-junction",
+    "name": "Essex Junction",
+    "county": "Chittenden",
+    "population": 10788,
+    "median_home_price": 395000,
+    "permit_fees": {
+      "kitchen_remodel": {
+        "low": 250,
+        "high": 600
+      },
+      "bathroom_remodel": {
+        "low": 150,
+        "high": 400
+      },
+      "deck_porch": {
+        "low": 75,
+        "high": 250
+      }
+    },
+    "permit_office": {
+      "name": "Essex Junction City Manager's Office",
+      "phone": "802-878-6944",
+      "url": "https://www.essexjunction.org"
+    },
+    "labor_multiplier": 1.05,
+    "labor_notes": "Slightly below Burlington core but still in Chittenden labor market.",
+    "utility": {
+      "electric": "GMP",
+      "gas": "VGS",
+      "rebate_eligible_programs": [
+        "EVT",
+        "GMP"
+      ]
+    },
+    "zoning": {
+      "adu_allowed_by_right": true,
+      "adu_size_max_sqft": 900
+    },
+    "housing_stock": {
+      "median_year_built": 1968
+    },
+    "search_volume_signal": "medium",
+    "notes": "Essex Junction completed a town-wide reappraisal in May 2026. Many residents are seeing assessment changes this year."
+  },
+  "stowe": {
+    "slug": "stowe",
+    "name": "Stowe",
+    "county": "Lamoille",
+    "population": 5314,
+    "median_home_price": 875000,
+    "permit_fees": {
+      "kitchen_remodel": {
+        "low": 250,
+        "high": 600
+      },
+      "bathroom_remodel": {
+        "low": 150,
+        "high": 400
+      },
+      "deck_porch": {
+        "low": 100,
+        "high": 300
+      }
+    },
+    "permit_office": {
+      "name": "Stowe Town Office",
+      "address": "67 Main Street, Stowe VT 05672",
+      "phone": "802-253-6133"
+    },
+    "labor_multiplier": 1.2,
+    "labor_notes": "Stowe runs ~20% above rural Vermont because of the second-home market premium and limited contractor availability during ski season.",
+    "utility": {
+      "electric": "Vermont Electric Cooperative",
+      "gas": null,
+      "rebate_eligible_programs": [
+        "EVT"
+      ]
+    },
+    "zoning": {
+      "adu_allowed_by_right": true,
+      "adu_size_max_sqft": 1000,
+      "setback_side_ft": 15,
+      "setback_rear_ft": 30
+    },
+    "housing_stock": {
+      "median_year_built": 1965,
+      "second_home_pct": 38
+    },
+    "search_volume_signal": "medium-high"
+  },
+  "montpelier": {
+    "slug": "montpelier",
+    "name": "Montpelier",
+    "county": "Washington",
+    "population": 8074,
+    "median_home_price": 350000,
+    "permit_fees": {
+      "kitchen_remodel": {
+        "low": 300,
+        "high": 700
+      },
+      "bathroom_remodel": {
+        "low": 175,
+        "high": 450
+      },
+      "roofing": {
+        "low": 175,
+        "high": 450
+      }
+    },
+    "permit_office": {
+      "name": "Montpelier Department of Planning and Community Development",
+      "phone": "802-223-9506"
+    },
+    "labor_multiplier": 1.05,
+    "labor_notes": "State capital. Mix of historic homes (Hubbard Park area) and mid-century. Flood-zone overlap downtown affects some renovation paths.",
+    "utility": {
+      "electric": "GMP",
+      "gas": "VGS",
+      "rebate_eligible_programs": [
+        "EVT",
+        "GMP"
+      ]
+    },
+    "zoning": {
+      "adu_allowed_by_right": true
+    },
+    "housing_stock": {
+      "median_year_built": 1942,
+      "pre_1940_pct": 47
+    },
+    "flood_history": [
+      {
+        "year": 2011,
+        "event": "Tropical Storm Irene"
+      },
+      {
+        "year": 2023,
+        "event": "July 2023 flood (state capital flooded)"
+      },
+      {
+        "year": 2024,
+        "event": "August 2024 flood"
+      }
+    ],
+    "search_volume_signal": "high",
+    "notes": "Heavy flood-zone overlap downtown. Buyers and owners in Montpelier are flood-aware."
+  },
+  "brattleboro": {
+    "slug": "brattleboro",
+    "name": "Brattleboro",
+    "county": "Windham",
+    "population": 12184,
+    "median_home_price": 295000,
+    "permit_fees": {
+      "kitchen_remodel": {
+        "low": 200,
+        "high": 500
+      },
+      "bathroom_remodel": {
+        "low": 125,
+        "high": 350
+      },
+      "deck_porch": {
+        "low": 75,
+        "high": 250
+      }
+    },
+    "permit_office": {
+      "name": "Brattleboro Department of Planning Services",
+      "phone": "802-251-8154"
+    },
+    "labor_multiplier": 0.95,
+    "labor_notes": "Slightly below rural VT average. Windham County saw a 39% education property tax spike in FY2025 — homeowner cost pressure is acute.",
+    "utility": {
+      "electric": "GMP",
+      "gas": null,
+      "rebate_eligible_programs": [
+        "EVT",
+        "GMP"
+      ]
+    },
+    "zoning": {
+      "adu_allowed_by_right": true
+    },
+    "housing_stock": {
+      "median_year_built": 1948,
+      "pre_1940_pct": 45
+    },
+    "search_volume_signal": "medium"
+  },
+  "rutland": {
+    "slug": "rutland",
+    "name": "Rutland",
+    "county": "Rutland",
+    "population": 15807,
+    "median_home_price": 215000,
+    "permit_fees": {
+      "kitchen_remodel": {
+        "low": 200,
+        "high": 500
+      },
+      "bathroom_remodel": {
+        "low": 125,
+        "high": 350
+      },
+      "deck_porch": {
+        "low": 75,
+        "high": 250
+      }
+    },
+    "permit_office": {
+      "name": "Rutland City Building & Zoning",
+      "phone": "802-773-1800"
+    },
+    "labor_multiplier": 0.9,
+    "labor_notes": "Rutland labor is the cheapest of VT's larger towns. Older housing stock means surprises on most renovations.",
+    "utility": {
+      "electric": "GMP",
+      "gas": "VGS",
+      "rebate_eligible_programs": [
+        "EVT",
+        "GMP"
+      ]
+    },
+    "housing_stock": {
+      "median_year_built": 1935,
+      "pre_1940_pct": 52
+    },
+    "search_volume_signal": "medium"
+  },
+  "bennington": {
+    "slug": "bennington",
+    "name": "Bennington",
+    "county": "Bennington",
+    "population": 15333,
+    "median_home_price": 235000,
+    "permit_fees": {
+      "kitchen_remodel": {
+        "low": 200,
+        "high": 500
+      },
+      "bathroom_remodel": {
+        "low": 125,
+        "high": 350
+      }
+    },
+    "permit_office": {
+      "name": "Bennington Town Offices",
+      "phone": "802-442-1037"
+    },
+    "labor_multiplier": 0.9,
+    "utility": {
+      "electric": "GMP",
+      "gas": null,
+      "rebate_eligible_programs": [
+        "EVT",
+        "GMP"
+      ]
+    },
+    "housing_stock": {
+      "median_year_built": 1958
+    },
+    "search_volume_signal": "medium"
+  },
+  "middlebury": {
+    "slug": "middlebury",
+    "name": "Middlebury",
+    "county": "Addison",
+    "population": 9152,
+    "median_home_price": 365000,
+    "permit_fees": {
+      "kitchen_remodel": {
+        "low": 250,
+        "high": 600
+      },
+      "bathroom_remodel": {
+        "low": 150,
+        "high": 400
+      }
+    },
+    "permit_office": {
+      "name": "Middlebury Town Offices",
+      "phone": "802-388-8100"
+    },
+    "labor_multiplier": 1,
+    "utility": {
+      "electric": "GMP",
+      "gas": null,
+      "rebate_eligible_programs": [
+        "EVT",
+        "GMP"
+      ]
+    },
+    "housing_stock": {
+      "median_year_built": 1955
+    },
+    "search_volume_signal": "medium"
+  },
+  "barre": {
+    "slug": "barre",
+    "name": "Barre",
+    "county": "Washington",
+    "population": 8490,
+    "median_home_price": 215000,
+    "permit_fees": {
+      "kitchen_remodel": {
+        "low": 200,
+        "high": 500
+      }
+    },
+    "permit_office": {
+      "name": "Barre City Permit Office",
+      "phone": "802-476-0244"
+    },
+    "labor_multiplier": 0.95,
+    "utility": {
+      "electric": "GMP",
+      "gas": "VGS",
+      "rebate_eligible_programs": [
+        "EVT",
+        "GMP"
+      ]
+    },
+    "housing_stock": {
+      "median_year_built": 1945
+    },
+    "search_volume_signal": "low-medium"
+  },
+  "st_albans": {
+    "slug": "st-albans",
+    "name": "St. Albans",
+    "county": "Franklin",
+    "population": 6885,
+    "median_home_price": 285000,
+    "permit_fees": {
+      "kitchen_remodel": {
+        "low": 200,
+        "high": 500
+      }
+    },
+    "permit_office": {
+      "name": "St. Albans City Office",
+      "phone": "802-524-1500"
+    },
+    "labor_multiplier": 0.95,
+    "utility": {
+      "electric": "GMP",
+      "gas": "VGS",
+      "rebate_eligible_programs": [
+        "EVT",
+        "GMP"
+      ]
+    },
+    "housing_stock": {
+      "median_year_built": 1955
+    },
+    "search_volume_signal": "low-medium"
+  },
+  "newport": {
+    "slug": "newport",
+    "name": "Newport",
+    "county": "Orleans",
+    "population": 4455,
+    "median_home_price": 175000,
+    "permit_fees": {
+      "kitchen_remodel": {
+        "low": 150,
+        "high": 400
+      }
+    },
+    "permit_office": {
+      "name": "Newport City Office",
+      "phone": "802-334-2112"
+    },
+    "labor_multiplier": 0.85,
+    "labor_notes": "Northeast Kingdom — cheapest labor in VT. Long contractor backlogs because of supply, not demand.",
+    "utility": {
+      "electric": "Vermont Electric Cooperative",
+      "gas": null,
+      "rebate_eligible_programs": [
+        "EVT"
+      ]
+    },
+    "housing_stock": {
+      "median_year_built": 1948
+    },
+    "search_volume_signal": "low"
+  }
+    }

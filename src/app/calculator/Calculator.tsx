@@ -57,6 +57,49 @@ function fmt(n: number): string {
   return '$' + (Math.round(n / 500) * 500).toLocaleString()
 }
 
+const CAT_MAP: Record<string, string> = {
+  kitchen: 'Kitchen Remodel',
+  bathroom: 'Bathroom Renovation',
+  deck: 'Deck / Porch',
+  basement: 'Basement Finishing',
+  addition: 'Room Addition / Expansion',
+  roofing: 'Roofing / Weatherization',
+  painting: 'Painting & Interior',
+  windows: 'Other',
+}
+
+const TOWN_MAP: Record<string, string> = {
+  burlington: 'Burlington',
+  chittenden: 'South Burlington',
+  stowe: 'Stowe',
+  middlebury: 'Middlebury',
+  rural: '',
+  other: '',
+}
+
+function budgetBandFor(low: number, high: number): string {
+  const mid = (low + high) / 2
+  if (mid < 10000) return 'Under $10,000'
+  if (mid < 25000) return '$10,000 – $25,000'
+  if (mid < 50000) return '$25,000 – $50,000'
+  if (mid < 100000) return '$50,000 – $100,000'
+  if (mid < 250000) return '$100,000 – $250,000'
+  if (mid < 500000) return '$250,000 – $500,000'
+  return 'Over $500,000'
+}
+
+function calcQparams(project: { id: string; label: string } | undefined, scope: { label: string } | undefined, locId: string, locLabel: string, low: number, high: number, contingency: number): string {
+  if (!project || !scope) return '/#submit-project'
+  const sp = new URLSearchParams()
+  sp.set('source', 'calculator')
+  sp.set('category', CAT_MAP[project.id] || 'Other')
+  if (TOWN_MAP[locId]) sp.set('town', TOWN_MAP[locId])
+  sp.set('budget', budgetBandFor(low, high))
+  const desc = project.label + ' — ' + scope.label + '. Located in ' + locLabel + '. Estimated range: ' + fmt(low) + ' – ' + fmt(high) + ' (with ' + contingency + '% contingency).'
+  sp.set('description', desc)
+  return '/?' + sp.toString() + '#submit-project'
+}
+
 export default function Calculator() {
   const [projectId, setProjectId] = useState('')
   const [scopeId, setScopeId] = useState('')
@@ -159,7 +202,7 @@ export default function Calculator() {
                 <p style={{ fontWeight: 600, fontSize: '14px', color: '#1C2B1A', margin: '0 0 3px' }}>Ready to get a real quote?</p>
                 <p style={{ fontSize: '13px', color: 'rgba(28,43,26,0.55)', margin: 0 }}>Post your project — we match you with local Vermont contractors for your trade and area.</p>
               </div>
-              <Link href="/#submit-project" style={{ padding: '10px 20px', backgroundColor: '#C8732A', color: '#FAF7F2', fontWeight: 600, fontSize: '14px', borderRadius: '2px', textDecoration: 'none' }}>Post Your Project →</Link>
+              <Link href={calcQparams(project, scope, locId, LOCS[locId]?.label ?? '', low, high, contingency)} style={{ padding: '10px 20px', backgroundColor: '#C8732A', color: '#FAF7F2', fontWeight: 600, fontSize: '14px', borderRadius: '2px', textDecoration: 'none' }}>Post Your Project →</Link>
             </div>
             <p style={{ fontSize: '12px', fontFamily: 'monospace', color: 'rgba(28,43,26,0.4)', lineHeight: 1.7, padding: '14px 16px', backgroundColor: 'rgba(28,43,26,0.04)', borderRadius: '2px' }}>
               Estimates based on typical Vermont project costs as of 2026. Actual costs depend on site conditions, material choices, and contractor availability. Always get multiple quotes before committing.
@@ -187,4 +230,4 @@ export default function Calculator() {
       </div>
     </div>
   )
-}
+      }

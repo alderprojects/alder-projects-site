@@ -1,9 +1,9 @@
 export default function HowItWorks() {
   const steps = [
-    {n:'01',t:'Describe Your Project',b:'Tell us the scope, location, and timeline. Under 5 minutes. No account required.'},
-    {n:'02',t:'We Review It',b:'A real person reviews every submission. We match it to local contractors who are right for your work.'},
-    {n:'03',t:'Get Connected',b:"We connect you with matched Vermont contractors. You'll hear from us by email within 1–2 business days."},
-    {n:'04',t:'Build with Confidence',b:'Choose your contractor, sign a contract, and get started — with someone local who knows Vermont work.'},
+    {n:'01',t:'Tell Us What You Need',b:'Five minutes. No account. Just what you need done, where, and roughly when.'},
+    {n:'02',t:'We Read It',b:'Someone actually reads it — not a bot. We pick a few contractors who do this kind of work in your town.'},
+    {n:'03',t:'We Reach Out',b:"Couple days later you'll hear from 2–3 Vermonters. Not 17. Not none. A few real ones."},
+    {n:'04',t:'Pick One',b:'Talk to them. Get bids. Pick one. They know Vermont work — frost lines, mud season, all of it.'},
   ]
   return (
     <section id="how-it-works" className="py-28 bg-[#FAF7F2]">

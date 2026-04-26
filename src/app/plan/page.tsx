@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import Nav from '@/components/Nav'
 import Link from 'next/link'
 import PlanForm from './PlanForm'
 
@@ -24,17 +25,8 @@ const links = [
 export default function PlanPage() {
   return (
     <div style={{ minHeight:'100vh', backgroundColor:'#FAF7F2' }}>
-      <header style={{ backgroundColor:'#0D1A0B', padding:'16px 24px', display:'flex', alignItems:'center', justifyContent:'space-between', borderBottom:'1px solid rgba(122,155,111,0.12)' }}>
-        <Link href="/" style={{ display:'flex', alignItems:'center', gap:'10px', textDecoration:'none' }}>
-          <svg width="26" height="26" viewBox="0 0 32 32" fill="none">
-            <path d="M16 2L4 28H10L13 21H19L22 28H28L16 2Z" fill="#7A9B6F" />
-            <path d="M14.5 16L16 12L17.5 16H14.5Z" fill="#C8732A" />
-          </svg>
-          <span style={{ fontFamily:"'Playfair Display',Georgia,serif", fontSize:'18px', fontWeight:600, color:'#F5EFE0' }}>Alder Projects</span>
-        </Link>
-        <Link href="/" style={{ fontSize:'12px', color:'rgba(245,239,224,0.4)', fontFamily:'monospace', textDecoration:'none' }}>&larr; Back to home</Link>
-      </header>
-      <div style={{ backgroundColor:'#0D1A0B', padding:'clamp(48px,8vw,80px) 24px', borderBottom:'1px solid rgba(122,155,111,0.12)' }}>
+      <Nav />
+      <div style={{ backgroundColor:'#0D1A0B', padding:'clamp(96px,10vw,128px) 24px clamp(48px,8vw,80px)', borderBottom:'1px solid rgba(122,155,111,0.12)' }}>
         <div style={{ maxWidth:'580px', margin:'0 auto', textAlign:'center' }}>
           <span style={{ fontSize:'10px', fontFamily:'monospace', letterSpacing:'0.14em', textTransform:'uppercase', color:'#7A9B6F' }}>Start Planning</span>
           <h1 style={{ fontFamily:"'Playfair Display',Georgia,serif", fontSize:'clamp(1.8rem,4vw,2.6rem)', fontWeight:600, color:'#F5EFE0', lineHeight:1.1, marginTop:'10px', marginBottom:'14px' }}>

@@ -1,5 +1,6 @@
 'use client'
 import { useState, useRef, useEffect, useCallback } from 'react'
+import Nav from '@/components/Nav'
 
 interface ActionItem { title: string; priority: string; why: string; nextStep: string; cost: string }
 interface Concern { title: string; whyCheck: string; howToResolve: string; resolvedWhen: string; cost: string }
@@ -261,13 +262,8 @@ export default function Page() {
   return (
     <div className="min-h-screen" style={{ fontFamily: F, background: '#fafaf8' }}>
       <style>{`@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&display=swap');@keyframes spin{to{transform:rotate(360deg)}}@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}@keyframes fadeIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}`}</style>
-      <nav style={{ padding: '16px 24px' }}>
-        <div style={{ maxWidth: 480, margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <a href="/" style={{ fontSize: 14, fontWeight: 600, color: '#1c1917', textDecoration: 'none' }}>Alder Projects</a>
-          <a href="/contractors" style={{ fontSize: 11, fontWeight: 500, letterSpacing: '0.08em', textTransform: 'uppercase' as const, color: '#a8a29e', textDecoration: 'none' }}>For contractors</a>
-        </div>
-      </nav>
-      <main style={{ maxWidth: 480, margin: '0 auto', padding: '0 24px 100px' }}>
+      <Nav />
+      <main style={{ maxWidth: 480, margin: '0 auto', padding: '88px 24px 100px' }}>
         <div style={{ paddingTop: 60, paddingBottom: 32 }}>
           <p style={{ fontSize: 28, fontWeight: 300, color: '#1c1917', lineHeight: 1.3, margin: 0 }}>What does your Vermont<br />property actually need?</p>
           <p style={{ fontSize: 13, color: '#a8a29e', marginTop: 8 }}>Type any address. We&apos;ll find it on Vermont&apos;s official map and tell you what matters.</p>

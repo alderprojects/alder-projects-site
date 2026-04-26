@@ -2,6 +2,7 @@
 import{useEffect}from'react'
 import Nav from'@/components/Nav'
 import Hero from'@/components/Hero'
+import SeasonalReportCard from'@/components/SeasonalReportCard'
 import HowItWorks from'@/components/HowItWorks'
 import ProjectTypes from'@/components/ProjectTypes'
 import HomeFaq from'@/components/HomeFaq'
@@ -13,5 +14,5 @@ export default function Home(){
     document.querySelectorAll('.reveal').forEach(el=>obs.observe(el))
     return()=>obs.disconnect()
   },[])
-  return(<main><Nav/><Hero/><HowItWorks/><ProjectTypes/><HomeFaq/><SubmitProject/><Footer/></main>)
+  return(<main><Nav/><Hero/><SeasonalReportCard/><HowItWorks/><ProjectTypes/><HomeFaq/><SubmitProject/><Footer/></main>)
 }

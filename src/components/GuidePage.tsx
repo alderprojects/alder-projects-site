@@ -1,5 +1,48 @@
 import Link from 'next/link'
 
+// Auto-derive form pre-fill values from the guide H1 so each guide deep-links
+// the project form with the right category/town context.
+const CATEGORY_KEYWORDS: Array<[RegExp, string]> = [
+  [/kitchen/i, 'Kitchen Remodel'],
+  [/bathroom/i, 'Bathroom Renovation'],
+  [/deck|porch/i, 'Deck / Porch'],
+  [/basement/i, 'Basement Finishing'],
+  [/(addition|extension|expansion)/i, 'Room Addition / Expansion'],
+  [/(roof|weatheriz)/i, 'Roofing / Weatherization'],
+  [/(plumb|hvac|heating|septic|heat pump)/i, 'Plumbing / HVAC'],
+  [/electric/i, 'Electrical'],
+  [/paint/i, 'Painting & Interior'],
+  [/(window|general contractor|handyman|permit|seasonal|winteriz|flood|shoreland|lake)/i, 'Other'],
+]
+
+function deriveCategory(h1: string): string {
+  for (const [re, cat] of CATEGORY_KEYWORDS) {
+    if (re.test(h1)) return cat
+  }
+  return ''
+}
+
+const VT_TOWNS = ['Burlington','South Burlington','Stowe','Middlebury','Williston','Essex','Colchester','Winooski','Shelburne','Montpelier','Woodstock','Brattleboro','Rutland','Manchester','Bennington','Barre','Newport','Waitsfield','Morrisville','St. Johnsbury','Hardwick','Charlotte','Chittenden County','Addison County','Lamoille County','Rutland County','Washington County','Windsor County']
+
+function deriveTown(h1: string): string {
+  for (const t of VT_TOWNS) {
+    const re = new RegExp('\\b' + t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b', 'i')
+    if (re.test(h1)) return t
+  }
+  return ''
+}
+
+function buildSubmitUrl(h1: string, source = 'guide-page'): string {
+  const sp = new URLSearchParams()
+  sp.set('source', source)
+  const cat = deriveCategory(h1)
+  const town = deriveTown(h1)
+  if (cat) sp.set('category', cat)
+  if (town) sp.set('town', town)
+  sp.set('description', 'Coming from guide: ' + h1)
+  return '/?' + sp.toString() + '#submit-project'
+}
+
 export type GuideSection = { heading: string; body: string; list?: string[] }
 export type GuideFaq = { q: string; a: string }
 export type GuidePageContent = {
@@ -56,7 +99,7 @@ export default function GuidePage({ content }: { content: GuidePageContent }) {
           <h3 style={{ fontFamily: "'Playfair Display', Georgia, serif", fontSize: '1.4rem', color: '#F5EFE0', fontWeight: 600, margin: '0 0 10px' }}>{content.ctaHeading}</h3>
           <p style={{ fontSize: '14px', color: 'rgba(245,239,224,0.55)', lineHeight: 1.7, margin: '0 0 18px' }}>{content.ctaBody}</p>
           <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
-            <Link href="/#submit-project" style={{ display: 'inline-block', padding: '12px 24px', backgroundColor: '#C8732A', color: '#FAF7F2', fontWeight: 600, fontSize: '14px', borderRadius: '2px', textDecoration: 'none' }}>Post Your Project Request &rarr;</Link>
+            <Link href={buildSubmitUrl(content.h1)} style={{ display: 'inline-block', padding: '12px 24px', backgroundColor: '#C8732A', color: '#FAF7F2', fontWeight: 600, fontSize: '14px', borderRadius: '2px', textDecoration: 'none' }}>Post Your Project Request &rarr;</Link>
             <Link href="/plan" style={{ display: 'inline-block', padding: '12px 24px', border: '1px solid rgba(122,155,111,0.35)', color: 'rgba(245,239,224,0.7)', fontSize: '14px', borderRadius: '2px', textDecoration: 'none' }}>Start Planning First</Link>
           </div>
         </div>
@@ -97,4 +140,4 @@ export default function GuidePage({ content }: { content: GuidePageContent }) {
       </footer>
     </div>
   )
-}
+      }

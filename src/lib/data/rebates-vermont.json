@@ -1,0 +1,141 @@
+{
+  "_meta": {
+    "as_of_date": "2026-04-26",
+    "refresh_cadence": "quarterly",
+    "primary_source": "https://www.efficiencyvermont.com/rebates",
+    "notes": "Federal 25C credit expired Dec 31 2025 (OBBBA). State and utility rebates are now the only stack."
+  },
+  "weatherization": {
+    "evt_standard": {
+      "name": "Efficiency Vermont weatherization rebate",
+      "max_amount": 4000,
+      "coverage_pct": 75,
+      "eligibility": "All Vermont households",
+      "expires": "ongoing (subject to annual funding)",
+      "url": "https://www.efficiencyvermont.com/rebates",
+      "status": "active"
+    },
+    "evt_income_eligible": {
+      "name": "Efficiency Vermont income-eligible weatherization",
+      "max_amount": 9500,
+      "coverage_pct": 90,
+      "eligibility": "Households at or below specified AMI thresholds (varies by county and household size)",
+      "expires": "while funds last through 2026",
+      "url": "https://www.efficiencyvermont.com/rebates",
+      "status": "active"
+    },
+    "diy_rebate": {
+      "name": "Efficiency Vermont DIY weatherization rebate",
+      "max_amount": 100,
+      "eligibility": "All VT households doing DIY weatherstripping/air sealing",
+      "url": "https://www.efficiencyvermont.com/rebates",
+      "status": "active"
+    },
+    "home_repair_program": {
+      "name": "Home Repair Program (for weatherization prep)",
+      "max_amount": 15000,
+      "eligibility": "Low/moderate-income households with a pending weatherization project. Covers roof, plumbing, foundation, asbestos/vermiculite/mold remediation needed before weatherization.",
+      "expires": "subject to ARPA and ongoing funding",
+      "status": "active"
+    },
+    "wrap_loan": {
+      "name": "Weatherization Repayment Assistance Program (WRAP) loan",
+      "max_amount": 25000,
+      "eligibility": "Pay through utility bill; low/mod-income borrow interest-free with 5-year term",
+      "status": "active"
+    }
+  },
+  "heat_pump": {
+    "evt_ductless": {
+      "name": "EVT ductless mini-split rebate",
+      "max_amount": 475,
+      "unit": "per indoor head",
+      "eligibility": "All VT households with EVT-network installer",
+      "stackable_with": [
+        "gmp_income_bonus",
+        "vppsa_income_bonus"
+      ],
+      "status": "active"
+    },
+    "evt_ducted": {
+      "name": "EVT ducted heat pump rebate",
+      "max_amount": 2200,
+      "eligibility": "All VT households with EVT-network installer",
+      "stackable_with": [
+        "gmp_income_bonus",
+        "vppsa_income_bonus"
+      ],
+      "status": "active"
+    },
+    "gmp_income_bonus": {
+      "name": "GMP heat pump income bonus",
+      "max_amount": 2000,
+      "unit": "per condenser",
+      "eligibility": "GMP customers at or below 80% AMI",
+      "stackable_with": [
+        "evt_ductless",
+        "evt_ducted"
+      ],
+      "status": "active"
+    },
+    "vppsa_income_bonus": {
+      "name": "VPPSA heat pump income bonus",
+      "max_amount": 1000,
+      "eligibility": "VPPSA-member-utility customers at or below 80% AMI",
+      "stackable_with": [
+        "evt_ductless",
+        "evt_ducted"
+      ],
+      "status": "active"
+    },
+    "bed_bonus": null
+  },
+  "federal": {
+    "section_25c": {
+      "name": "Federal 25C Energy Efficient Home Improvement Credit",
+      "max_amount": null,
+      "eligibility": "EXPIRED",
+      "expires": "Dec 31, 2025",
+      "status": "expired"
+    }
+  },
+  "ami_thresholds_2026": {
+    "_notes": "80% AMI thresholds used for income-eligibility on most VT energy programs. Source: HUD 2026 income limits.",
+    "chittenden_county": {
+      "household_1": 75250,
+      "household_2": 86000,
+      "household_3": 96750,
+      "household_4": 107450
+    },
+    "lamoille_county": {
+      "household_1": 70000,
+      "household_2": 80000,
+      "household_3": 90000,
+      "household_4": 100000
+    },
+    "washington_county": {
+      "household_1": 67500,
+      "household_2": 77150,
+      "household_3": 86800,
+      "household_4": 96400
+    },
+    "windham_county": {
+      "household_1": 65000,
+      "household_2": 74300,
+      "household_3": 83600,
+      "household_4": 92850
+    },
+    "rutland_county": {
+      "household_1": 60500,
+      "household_2": 69150,
+      "household_3": 77800,
+      "household_4": 86400
+    },
+    "orleans_county": {
+      "household_1": 58000,
+      "household_2": 66300,
+      "household_3": 74600,
+      "household_4": 82850
+    }
+  }
+}

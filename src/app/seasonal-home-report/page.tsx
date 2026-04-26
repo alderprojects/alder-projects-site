@@ -1,6 +1,9 @@
 'use client'
-import { useState, useRef, useEffect, useCallback } from 'react'
+import { useState, useRef, useEffect, useCallback, Suspense } from 'react'
+import { useSearchParams } from 'next/navigation'
 import Nav from '@/components/Nav'
+
+export type PropertyMode = 'owner' | 'buyer' | 'unknown'
 
 interface ActionItem { title: string; priority: string; why: string; nextStep: string; cost: string }
 interface Concern { title: string; whyCheck: string; howToResolve: string; resolvedWhen: string; cost: string }
@@ -64,7 +67,7 @@ function formatSuggestion(text: string): string {
   return `${street}, ${town}`
 }
 
-export default function Page() {
+export function PropertyReportInner({ mode }: { mode: PropertyMode }) {
   const [addr, setAddr] = useState('')
   const [r, setR] = useState<Report | null>(null)
   const [loading, setLoading] = useState(false)
@@ -466,5 +469,21 @@ export default function Page() {
         )}
       </main>
     </div>
+  )
+}
+
+
+function PageInner() {
+  const sp = useSearchParams()
+  const m = sp?.get('mode')
+  const mode: PropertyMode = m === 'owner' || m === 'buyer' ? m : 'unknown'
+  return <PropertyReportInner mode={mode} />
+}
+
+export default function Page() {
+  return (
+    <Suspense fallback={null}>
+      <PageInner />
+    </Suspense>
   )
 }

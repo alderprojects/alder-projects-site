@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Nav from '@/components/Nav'
 
 // Map H1 text to form CATEGORY values for pre-filling the project form.
 const CATEGORY_KEYWORDS: Array<[RegExp, string]> = [
@@ -61,19 +62,7 @@ export default function SeoPage({ content }: { content: SeoPageContent }) {
   return (
     <main style={{ backgroundColor: '#FAF7F2', minHeight: '100vh' }}>
 
-      {/* Nav strip */}
-      <div style={{ backgroundColor: '#1C2B1A', padding: '14px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: '8px', textDecoration: 'none' }}>
-          <svg width="22" height="22" viewBox="0 0 32 32" fill="none">
-            <path d="M16 2L4 28H10L13 21H19L22 28H28L16 2Z" fill="#7A9B6F"/>
-            <path d="M14.5 16L16 12L17.5 16H14.5Z" fill="#C8732A"/>
-          </svg>
-          <span style={{ fontFamily: "'Playfair Display', Georgia, serif", fontSize: '16px', fontWeight: 600, color: '#F5EFE0' }}>Alder Projects</span>
-        </Link>
-        <Link href="/#submit-project" style={{ padding: '8px 18px', backgroundColor: '#C8732A', color: '#FAF7F2', fontSize: '13px', fontWeight: 600, borderRadius: '2px', textDecoration: 'none', fontFamily: "'DM Sans', system-ui, sans-serif" }}>
-          Post a Project
-        </Link>
-      </div>
+      <Nav />
 
       {/* Hero — with optional photo */}
       <div style={{ backgroundColor: '#1C2B1A', position: 'relative', overflow: 'hidden', borderBottom: '1px solid rgba(122,155,111,0.15)' }}>
@@ -88,7 +77,7 @@ export default function SeoPage({ content }: { content: SeoPageContent }) {
             <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(90deg, rgba(13,26,11,0.95) 0%, rgba(13,26,11,0.7) 100%)', zIndex: 1 }} />
           </>
         )}
-        <div style={{ position: 'relative', zIndex: 2, maxWidth: '720px', margin: '0 auto', padding: 'clamp(40px,6vw,72px) 24px' }}>
+        <div style={{ position: 'relative', zIndex: 2, maxWidth: '720px', margin: '0 auto', padding: 'clamp(96px,10vw,128px) 24px clamp(40px,6vw,72px)' }}>
           <h1 style={{ fontFamily: "'Playfair Display', Georgia, serif", fontSize: 'clamp(1.8rem,4vw,2.8rem)', fontWeight: 600, color: '#F5EFE0', lineHeight: 1.1, marginBottom: '16px' }}>
             {content.h1}
           </h1>

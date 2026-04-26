@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import Nav from '@/components/Nav'
 import Link from 'next/link'
 export const metadata: Metadata = {
   title: 'Vermont Home Renovation Guides | Alder Projects',
@@ -50,14 +51,8 @@ function Section({title,subtitle,guides,accent}:{title:string;subtitle:string;gu
 export default function Page(){
   return (
     <div style={{minHeight:'100vh',backgroundColor:'#FAF7F2'}}>
-      <header style={{backgroundColor:'#0D1A0B',padding:'14px 24px',display:'flex',alignItems:'center',justifyContent:'space-between',borderBottom:'1px solid rgba(122,155,111,0.12)'}}>
-        <Link href="/" style={{display:'flex',alignItems:'center',gap:'8px',textDecoration:'none'}}>
-          <svg width="22" height="22" viewBox="0 0 32 32" fill="none"><path d="M16 2L4 28H10L13 21H19L22 28H28L16 2Z" fill="#7A9B6F"/><path d="M14.5 16L16 12L17.5 16H14.5Z" fill="#C8732A"/></svg>
-          <span style={{fontFamily:"'Playfair Display',Georgia,serif",fontSize:'16px',fontWeight:600,color:'#F5EFE0'}}>Alder Projects</span>
-        </Link>
-        <Link href="/#submit-project" style={{padding:'7px 16px',backgroundColor:'#C8732A',color:'#FAF7F2',fontSize:'12px',fontWeight:600,borderRadius:'2px',textDecoration:'none'}}>Post a Project</Link>
-      </header>
-      <div style={{backgroundColor:'#1C2B1A',padding:'clamp(40px,6vw,64px) 24px',borderBottom:'1px solid rgba(122,155,111,0.1)'}}>
+      <Nav />
+      <div style={{backgroundColor:'#1C2B1A',padding:'clamp(96px,10vw,120px) 24px clamp(40px,6vw,64px)',borderBottom:'1px solid rgba(122,155,111,0.1)'}}>
         <div style={{maxWidth:'720px',margin:'0 auto'}}>
           <span style={{fontSize:'10px',fontFamily:'monospace',letterSpacing:'0.12em',textTransform:'uppercase',color:'#7A9B6F',display:'block',marginBottom:'12px'}}>Vermont Renovation Guides</span>
           <h1 style={{fontFamily:"'Playfair Display',Georgia,serif",fontSize:'clamp(1.8rem,4vw,2.6rem)',fontWeight:600,color:'#F5EFE0',lineHeight:1.1,marginBottom:'14px'}}>What Vermont homeowners need to know.</h1>

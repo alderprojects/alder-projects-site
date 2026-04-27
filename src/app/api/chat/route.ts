@@ -3,131 +3,99 @@ import { NextResponse } from 'next/server'
 export const runtime = 'nodejs'
 export const maxDuration = 30
 
-const SYSTEM_PROMPT = `You are a knowledgeable Vermont local helping homeowners and buyers think through their property decisions. You sound like a 50-year-old Vermont general contractor: plain, direct, specific. No hype, no jargon, no marketing voice. You write the way Vermonters actually talk.
+// Heat pump + weatherization + Vermont property awareness for v1.
+// All numbers below are 2026 figures sourced from Efficiency Vermont,
+// GMP, VPPSA, and the federal OBBBA timeline. Update quarterly.
+const SYSTEM_PROMPT = `You are a knowledgeable Vermont local helping homeowners think through heat pump, weatherization, and Vermont property decisions. You sound like a 50-year-old Vermont general contractor: plain, direct, specific. No hype, no jargon, no marketing voice. You write the way Vermonters actually talk.
 
-WHO YOU HELP
-- Vermont homeowners thinking about renovation, repair, or upgrades
-- Buyers researching a Vermont property they're considering
-- Owners trying to understand what their property is, what it costs to maintain, what rebates apply, what the regulatory layers mean
+YOUR SCOPE
+You can help with:
+- Heat pumps (cold-climate ductless and ducted) in Vermont
+- Weatherization (air sealing, insulation, the order of operations)
+- Vermont state, utility, and federal rebates that apply to the above
+- Choosing between heat pump and furnace replacement
+- The connection between weatherization and heat pump sizing
+- Property-specific questions when the user mentions a Vermont address (flood zones, shoreland rules, septic, zoning, ADU feasibility)
 
-WHAT YOU KNOW WELL (give specific Vermont numbers when asked)
+If someone asks about a kitchen, bathroom, deck, roof, or other renovation project cost, say something like: "For project costs by trade and town, our cost calculator at /calculator has Vermont-specific ranges. For other questions about your property, I can help — just give me an address." Then stop.
 
-Renovation costs in Vermont (mid-range typical Burlington pricing):
-- Kitchen remodel: $50,000-$85,000 mid-range, $25,000-$45,000 surface refresh, $90,000-$150,000 full gut
-- Bathroom remodel: $15,000-$25,000 standard, $6,500-$12,000 cosmetic, $28,000-$45,000 full gut
-- Deck: $8,000-$15,000 small composite, $15,000-$32,000 mid-size, $30,000-$65,000 large/multi-level
-- Roofing: $9,000-$20,000 asphalt, $16,000-$38,000 metal standing seam
-- Painting: $4,500-$9,500 interior, $8,000-$18,000 interior+exterior whole house
-- Window replacement: $5,500-$14,000 for 6-12 windows, $12,000-$30,000 whole house
-- Basement finishing: $18,000-$32,000 partial, $35,000-$70,000 full with bedroom/bath
-- Home addition: $70,000-$130,000 small, $110,000-$220,000 primary suite, $200,000-$425,000 major
+VERMONT REBATE STACK (as of October 2026 — these numbers ALWAYS WIN over any other source)
 
-Regional adjustments off Burlington:
-- Stowe / Lamoille: ~20% higher (second-home market, contractor scarcity in ski season)
-- Rural / small town: ~10-15% lower
-- Chittenden suburbs: roughly equal to Burlington
+Weatherization (do this BEFORE the heat pump):
+- Efficiency Vermont standard rebate: 75% of project covered, up to $4,000. Available to all VT households.
+- Efficiency Vermont income-eligible rebate: 90% of project covered, up to $9,500. Income limits vary by county and household size. Chittenden County 80% AMI for household of 3 is around $96,750.
+- Home Repair Program: up to $15,000 for low/moderate income households for repairs that have to happen before weatherization can proceed (roof, electrical, mold).
+- DIY weatherization rebate: $100 cash back on weatherstripping/air sealing materials. Anyone can claim.
 
-Vermont rebate stack (heat pumps + weatherization, 2026):
-- EVT weatherization standard: 75% of project, up to $4,000. Anyone qualifies.
-- EVT weatherization income-eligible: 90% of project, up to $9,500. Income limits vary; Chittenden 80% AMI for household of 3 is around $96,750.
-- Home Repair Program: up to $15,000 for low/mod-income for repairs needed before weatherization.
-- DIY weatherization rebate: $100 for weatherstripping/air sealing materials.
-- EVT ductless mini-split heat pump: $475 per indoor head.
+Heat pumps:
+- EVT ductless mini-split: $475 per indoor head.
 - EVT ducted heat pump: $2,200 per system.
-- GMP income bonus: extra $2,000 per condenser at or below 80% AMI.
-- VPPSA income bonus: extra $1,000 at or below 80% AMI.
+- GMP income bonus: extra $2,000 per condenser for GMP customers at or below 80% AMI.
+- VPPSA income bonus: extra $1,000 for VPPSA-member-utility customers at or below 80% AMI.
 - BED (Burlington Electric): no current bonus stack.
-- Federal Section 25C: EXPIRED Dec 31, 2025 under OBBBA. State + utility is the only stack now.
 
-Vermont property essentials buyers ask about:
-- SPIR (Seller's Property Information Report): standardized VT disclosure form sellers fill out for buyers.
-- Act 181 (since June 2024): mandatory flood disclosure for sellers.
-- Septic permits: most VT towns require them. Verify before buying.
-- Lead paint: 87% of Burlington housing is pre-1978. Federal RRP rules apply for any disturbance over 6 sq ft interior.
-- Asbestos: common in pre-1980 VT homes (vinyl flooring, plaster, pipe wrap). Test if disturbing.
-- Property tax: Vermont education tax went up about 7% statewide for FY2027. The August bill is when most homeowners feel it.
-- Homestead Declaration (HS-122): due April 15 every year. File or pay non-homestead rate.
-- Reappraisal cycles: vary by town. Ask the town clerk when the last one was and when the next one is.
+Federal:
+- Section 25C (federal energy efficient home improvement credit): EXPIRED December 31, 2025 under OBBBA. No replacement coming. State and utility rebates are the only stack now.
+- IMPORTANT: If property context data mentions Federal 25C as active, that data is stale. Always tell the user 25C expired Dec 31, 2025.
 
-Utility map (rough):
+UTILITY MAP (rough)
 - BED = Burlington Electric (Burlington only)
-- GMP = Green Mountain Power (most of VT, default if user does not specify)
-- VPPSA member utilities = small-town utilities like Lamoille FCE (Stowe), Hardwick, Northfield, Swanton
-- VGS = Vermont Gas Systems (natural gas, parts of Chittenden + Franklin)
+- GMP = Green Mountain Power (most of the state, default assume GMP if user doesn't specify)
+- VPPSA member utilities = Stowe (Lamoille FCE), Hardwick, Northfield, Swanton, etc. — small towns
+- VGS = Vermont Gas Systems (natural gas, only some Chittenden + Franklin towns)
 
-Heating fuel reality:
-- 35% of VT homes use heating oil ($3.69/gal recent)
-- 20% propane ($3.74/gal)
-- 19% natural gas (where VGS reaches)
-- 13% electric, 11% wood, rest mixed
-- Oil-heated VT home typically burns 800 gal/year = ~$3,000/year
+REAL VERMONT NUMBERS
+- Heating oil price: ~$3.69/gallon (35% of VT homes use oil)
+- Propane: ~$3.74/gallon (20% of VT homes)
+- Typical oil-heated VT home: ~800 gal/year = $3,000/yr fuel cost
+- Heat pump install (ducted, full house): $15,000-$25,000 before rebates
+- Heat pump install (ductless, single zone): $4,500-$8,000 per zone before rebates
+- Comprehensive weatherization (whole house): $8,000-$15,000 before rebates
 
-Seasonal context (be aware of where we are in the calendar):
-- April: Homestead Declaration deadline (15th). Mud season.
-- May-June: Reappraisal letters arrive in some towns. Spring listings active.
-- July-August: Property tax bills land. Closing season peaks.
-- September-December: Button Up Vermont campaign kicks off Oct 1. Heating prep.
-- January-February: Heating bill shock. Ice dam emergencies (~25% of VT winter insurance claims).
-- Late March-early May: Mud season (dirt roads close in many towns).
+THE ORDER MATTERS
+Always tell users to weatherize before installing a heat pump. A tighter house needs a smaller, cheaper heat pump and saves more on bills. Weatherize first is the single most important sequencing message.
 
-THE ORDER MATTERS (energy projects)
-For heat pump shoppers: weatherize FIRST, then size the heat pump. A tighter house needs a smaller, cheaper heat pump and saves more on bills.
+USING ADDRESS CONTEXT
+If the user mentions a Vermont address and the system has retrieved property data for them, you'll see an ADDRESS CONTEXT block below. When that block is present:
+- Weave the context naturally into your answer ("since you're in Burlington and a GMP customer...")
+- Use the town/county/utility/water source/zoning to give specific advice, not generic
+- Mention concerns from the property scan when they're relevant to the user's question
+- DO NOT say "I ran a property scan" or "based on the scan" — just answer with the context informed
+- DO NOT invent property facts not in the context block
+- If the user asks something the address context doesn't cover (e.g., kitchen costs), use your normal scope rules
 
 VOICE RULES
-- Plain language. Not 'Investment of $4,200' — just 'It costs $4,200'.
-- Specific numbers when asked. Acknowledge ranges when honest.
-- Acknowledge what you do not know. Vermont has edge cases.
-- No emojis. No exclamation points. No 'great question'.
-- If a homeowner sounds confused or stressed about cost, slow down.
-- When you mention a rebate, say what the user actually has to do to claim it.
-- When you give a cost range, briefly explain what pushes high/low for that user's situation.
-
-WHAT YOU SAY YOU DO NOT KNOW
-- Specific contractors by name. Don't recommend any specific company.
-- Exact savings on the user's bill — too many variables. Give range with caveat.
-- Rebate eligibility certainty. Say 'you'd likely qualify, but the installer confirms when they file.'
-- Rebate amounts in months other than 2026.
-
-LINKING TO TOOLS
-When relevant, point users to:
-- /calculator — Vermont cost ranges by trade and town with cited sources
-- /seasonal-home-report — property scan (parcel data, flood, septic, shoreland, environmental)
-- /guides — written walkthroughs on specific topics
+- Plain language. "It costs $4,200" not "Investment of $4,200."
+- Specific numbers, not ranges where you can avoid it.
+- Acknowledge what you don't know. Vermont is full of edge cases (off-grid homes, propane-only towns, oil-only neighborhoods).
+- No emojis. No exclamation points. No "great question!"
+- If a homeowner sounds confused or stressed about cost, slow down. Don't pile on information.
+- When you mention a rebate, say what the user actually has to do to claim it (typically: hire an EVT-network contractor who handles the paperwork).
 
 INTENT TRIGGERS — when to offer to connect with a contractor
-The user has shown buying intent if any of these:
-- They've asked 3+ specific questions about their actual project
-- They use phrases like 'when can I start', 'who do you recommend', 'can someone come look', 'ready to get bids'
+The user has shown buying intent if any of these are true:
+- They've asked 3+ specific questions about their actual project (their house, their utility, their timeline)
+- They use phrases like "when can I start", "who do you recommend", "can someone come look", "ready to get bids"
 - They've named a budget AND a timeline AND a town
 
-When intent triggers, offer this naturally: 'Sounds like you have a real project shaping up. Want me to put you in front of a Vermont contractor who works on this kind of job? They will see what we just talked about — you will not have to repeat yourself.'
+When intent triggers, offer this naturally: "Sounds like you've got a real project shaping up. Want me to put you in front of a Vermont installer who handles the rebate paperwork? They'll see what we just talked about — you won't have to repeat yourself."
 
-If they say yes, ask for: name, email, ZIP code, and confirm timeline. Don't ask for phone unless they offer it.
+If they say yes, ask for: name, email, ZIP code, and confirm timeline. That's it. Don't ask for phone unless they offer it.
 
 REFUSAL & SAFETY
-- Don't make up rebate numbers, permit fees, or cost ranges. If you don't know, say so.
+- Don't make up rebate numbers. If you don't know, say so.
 - Don't recommend specific contractor companies by name.
-- For legal questions (zoning grievances, tax appeals), point them to the town clerk or a lawyer.
-- For anything outside Vermont property/renovation, gently redirect.
+- Don't quote exact savings on the user's bill — too many variables. Say "you'd typically see X-Y% off your heating bill" with a range.
+- Don't promise rebate eligibility. Say "you'd likely qualify, but the installer confirms when they file."
 `
 
 type Message = { role: 'user' | 'assistant'; content: string }
-
-type PropertyContext = {
-  address?: string
-  town?: string
-  zip?: string
-  parcel?: Record<string, unknown>
-  flags?: string[]
-  rawScanSummary?: string
-}
 
 type ChatRequest = {
   messages: Message[]
   context?: {
     referrer?: string
     calculatorState?: Record<string, unknown>
-    propertyContext?: PropertyContext
   }
 }
 
@@ -139,39 +107,156 @@ type LeadCapture = {
   transcript: Message[]
   summary: string
   source: string
-  propertyContext?: PropertyContext
+}
+
+type SeasonalReport = {
+  summary?: string
+  snapshot?: {
+    address?: string
+    town?: string
+    county?: string
+    facts?: Array<{ label: string; value: string }>
+  }
+  concerns?: Array<{ title: string; whyCheck?: string; howToResolve?: string; cost?: string; resolvedWhen?: string }>
+  actions?: Array<{ title: string; why?: string; cost?: string; priority?: string; nextStep?: string }>
+  seasonal?: Array<{ action: string; timing?: string; why?: string }>
+  programs?: Array<{ name: string; why?: string; value?: string; caveat?: string; url?: string }>
 }
 
 const ANTHROPIC_API_URL = 'https://api.anthropic.com/v1/messages'
 const MODEL = 'claude-sonnet-4-5-20250929'
 
-function buildSystemPrompt(context?: ChatRequest['context']) {
-  let prompt = SYSTEM_PROMPT
-  if (context?.referrer) {
-    prompt += `\n\nThe user came from: ${context.referrer}`
+// ---------- Address detection + property context ----------
+
+// Cache property lookups per request lifetime to avoid repeat hits.
+// (Vercel's serverless model means this resets per cold start, which is fine.)
+const propertyCache = new Map<string, SeasonalReport | null>()
+
+function extractVermontAddress(text: string): string | null {
+  if (!text) return null
+  // Strategy: look for either a clear "<num> <street> ... VT" pattern,
+  // or "<num> <street>, <town>" where town is in our VT town list (rough heuristic).
+  // Keep it permissive — false positives are cheap (API returns nothing harmful).
+
+  // Pattern 1: house number + street + comma + word + (VT or Vermont) optional zip
+  const fullPattern = /(d{1,5})s+([A-Za-z][A-Za-z0-9 .'-]{2,60})s*,s*([A-Za-z][A-Za-z .'-]{2,40})(?:s*,?s*(?:VT|Vermont))?/i
+  const m = text.match(fullPattern)
+  if (m) {
+    // Reconstruct a clean address string
+    const num = m[1].trim()
+    const street = m[2].trim()
+    const town = m[3].trim()
+    return `${num} ${street}, ${town}, VT`
   }
-  if (context?.calculatorState) {
-    prompt += `\n\nCalculator state from the user's session: ${JSON.stringify(context.calculatorState)}`
+
+  // Pattern 2: just "<street>, <town>, VT" (no house number) — looser
+  const noNumPattern = /([A-Za-z][A-Za-z0-9 .'-]{4,60})s*,s*([A-Za-z][A-Za-z .'-]{2,40})s*,s*(?:VT|Vermont)/i
+  const m2 = text.match(noNumPattern)
+  if (m2) {
+    const street = m2[1].trim()
+    const town = m2[2].trim()
+    return `${street}, ${town}, VT`
   }
-  if (context?.propertyContext) {
-    const pc = context.propertyContext
-    prompt += `\n\nTHE USER IS LOOKING AT A SPECIFIC VERMONT PROPERTY. Here is what we know about it from the parcel scan:\n`
-    if (pc.address) prompt += `Address: ${pc.address}\n`
-    if (pc.town) prompt += `Town: ${pc.town}\n`
-    if (pc.zip) prompt += `ZIP: ${pc.zip}\n`
-    if (pc.flags && pc.flags.length > 0) prompt += `Flags from scan: ${pc.flags.join(', ')}\n`
-    if (pc.parcel) prompt += `Parcel data: ${JSON.stringify(pc.parcel)}\n`
-    if (pc.rawScanSummary) prompt += `\nFull scan summary:\n${pc.rawScanSummary}\n`
-    prompt += `\nWhen the user asks questions, assume they are asking about THIS property unless they say otherwise. Reference the specific data above when relevant — flood zone, septic, lot size, town zoning rules, etc.`
-  }
-  return prompt
+
+  return null
 }
 
-async function callClaude(messages: Message[], context?: ChatRequest['context']) {
+async function fetchPropertyContext(address: string, originUrl: string): Promise<SeasonalReport | null> {
+  if (propertyCache.has(address)) return propertyCache.get(address) || null
+  try {
+    // Build absolute URL to the seasonal-report endpoint.
+    // originUrl is the request's host (https://alderprojects.com).
+    const url = new URL('/api/seasonal-report', originUrl).toString()
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ address }),
+      signal: AbortSignal.timeout(8000),
+    })
+    if (!res.ok) {
+      propertyCache.set(address, null)
+      return null
+    }
+    const data = (await res.json()) as SeasonalReport
+    if (!data || !data.snapshot) {
+      propertyCache.set(address, null)
+      return null
+    }
+    propertyCache.set(address, data)
+    return data
+  } catch (e) {
+    propertyCache.set(address, null)
+    return null
+  }
+}
+
+function formatPropertyContext(report: SeasonalReport): string {
+  const parts: string[] = ['ADDRESS CONTEXT']
+
+  if (report.snapshot) {
+    parts.push(`The user has mentioned a property at: ${report.snapshot.address || 'unknown'}`)
+    if (report.snapshot.town) parts.push(`Town: ${report.snapshot.town}`)
+    if (report.snapshot.county) parts.push(`County: ${report.snapshot.county}`)
+    if (Array.isArray(report.snapshot.facts)) {
+      for (const f of report.snapshot.facts) {
+        if (f.label && f.label !== 'Town' && f.label !== 'County') {
+          parts.push(`${f.label}: ${f.value}`)
+        }
+      }
+    }
+  }
+
+  if (report.summary) {
+    parts.push('', `Summary: ${report.summary}`)
+  }
+
+  if (Array.isArray(report.concerns) && report.concerns.length > 0) {
+    parts.push('', 'Concerns flagged for this property:')
+    for (const c of report.concerns.slice(0, 5)) {
+      const bits = [c.title]
+      if (c.whyCheck) bits.push(c.whyCheck)
+      if (c.howToResolve) bits.push(`Resolution: ${c.howToResolve}`)
+      if (c.cost) bits.push(`Cost: ${c.cost}`)
+      parts.push(`- ${bits.join(' — ')}`)
+    }
+  }
+
+  if (Array.isArray(report.actions) && report.actions.length > 0) {
+    parts.push('', 'Recommended next actions for this property:')
+    for (const a of report.actions.slice(0, 5)) {
+      const bits = [a.title]
+      if (a.priority) bits.push(`(${a.priority})`)
+      if (a.cost) bits.push(`Cost: ${a.cost}`)
+      if (a.why) bits.push(a.why)
+      parts.push(`- ${bits.join(' — ')}`)
+    }
+  }
+
+  if (Array.isArray(report.seasonal) && report.seasonal.length > 0) {
+    parts.push('', 'Seasonal items for this property:')
+    for (const s of report.seasonal.slice(0, 4)) {
+      parts.push(`- ${s.action}${s.timing ? ' (' + s.timing + ')' : ''}${s.why ? ' — ' + s.why : ''}`)
+    }
+  }
+
+  parts.push(
+    '',
+    'IMPORTANT: Use this property context naturally. Do not say "I ran a scan." Just answer with this context informed. If property programs data conflicts with your authoritative VERMONT REBATE STACK above, your stack ALWAYS wins (the seasonal-report data may be stale on rebate amounts).'
+  )
+
+  return parts.join('\n')
+}
+
+// ---------- Claude call ----------
+
+async function callClaude(
+  messages: Message[],
+  systemPromptOverride?: string
+) {
   const apiKey = process.env.ANTHROPIC_API_KEY
   if (!apiKey) throw new Error('ANTHROPIC_API_KEY not configured')
 
-  const systemPrompt = buildSystemPrompt(context)
+  const systemPrompt = systemPromptOverride || SYSTEM_PROMPT
 
   const res = await fetch(ANTHROPIC_API_URL, {
     method: 'POST',
@@ -198,10 +283,7 @@ async function callClaude(messages: Message[], context?: ChatRequest['context'])
   return text as string
 }
 
-async function summarizeTranscript(transcript: Message[], propertyContext?: PropertyContext) {
-  const propBlock = propertyContext
-    ? `\nPROPERTY CONTEXT (from scan):\n${JSON.stringify(propertyContext, null, 2)}\n`
-    : ''
+async function summarizeTranscript(transcript: Message[]) {
   const summaryPrompt = `Summarize this Vermont homeowner conversation as a contractor lead briefing. Format:
 
 Property location:
@@ -214,7 +296,7 @@ Specific questions homeowner asked:
 Notes (anything that helps the contractor):
 
 Be concise. Use bullets. No marketing language. Just the facts the contractor needs.
-${propBlock}
+
 CONVERSATION:
 ${transcript.map(m => `${m.role === 'user' ? 'Homeowner' : 'Assistant'}: ${m.content}`).join('\n\n')}`
 
@@ -239,7 +321,6 @@ async function postLeadToWebhook(lead: LeadCapture) {
       timeline: lead.timeline || '',
       summary: lead.summary,
       transcript: lead.transcript.map(m => `${m.role}: ${m.content}`).join('\n---\n'),
-      propertyContext: lead.propertyContext ? JSON.stringify(lead.propertyContext) : '',
       source: lead.source || 'chat',
       submittedAt: new Date().toISOString(),
     }),
@@ -248,16 +329,18 @@ async function postLeadToWebhook(lead: LeadCapture) {
   return { ok: res.ok, status: res.status }
 }
 
+// ---------- POST handler ----------
+
 export async function POST(req: Request) {
   try {
     const body = await req.json()
 
     if (body?.action === 'capture_lead') {
-      const { name, email, zip, timeline, transcript, source, propertyContext } = body
+      const { name, email, zip, timeline, transcript, source } = body
       if (!email || !Array.isArray(transcript) || transcript.length === 0) {
         return NextResponse.json({ error: 'email and transcript required' }, { status: 400 })
       }
-      const summary = await summarizeTranscript(transcript, propertyContext)
+      const summary = await summarizeTranscript(transcript)
       const result = await postLeadToWebhook({
         name: name || 'Unknown',
         email,
@@ -266,7 +349,6 @@ export async function POST(req: Request) {
         transcript,
         summary,
         source: source || 'chat',
-        propertyContext,
       })
       return NextResponse.json({ ok: true, summary, routed: result.ok })
     }
@@ -279,8 +361,36 @@ export async function POST(req: Request) {
     const MAX_TURNS = 30
     const trimmed = messages.length > MAX_TURNS ? messages.slice(-MAX_TURNS) : messages
 
-    const reply = await callClaude(trimmed, context)
-    return NextResponse.json({ reply })
+    // Address detection: scan the most recent user message AND the conversation
+    // history (in case address was mentioned earlier and is still relevant).
+    let propertyContext: SeasonalReport | null = null
+    let detectedAddress: string | null = null
+    const recentText = trimmed
+      .filter(m => m.role === 'user')
+      .slice(-3) // last 3 user messages
+      .map(m => m.content)
+      .join(' ')
+    detectedAddress = extractVermontAddress(recentText)
+
+    if (detectedAddress) {
+      const origin = new URL(req.url).origin
+      propertyContext = await fetchPropertyContext(detectedAddress, origin)
+    }
+
+    // Build the system prompt for this turn
+    let turnSystemPrompt = SYSTEM_PROMPT
+    if (context?.referrer) {
+      turnSystemPrompt += `\n\nThe user came from: ${context.referrer}`
+    }
+    if (context?.calculatorState) {
+      turnSystemPrompt += `\n\nCalculator state from the user's session: ${JSON.stringify(context.calculatorState)}`
+    }
+    if (propertyContext) {
+      turnSystemPrompt += `\n\n${formatPropertyContext(propertyContext)}`
+    }
+
+    const reply = await callClaude(trimmed, turnSystemPrompt)
+    return NextResponse.json({ reply, addressDetected: detectedAddress })
   } catch (err) {
     const msg = err instanceof Error ? err.message : 'unknown error'
     console.error('chat route error:', msg)

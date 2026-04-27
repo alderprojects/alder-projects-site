@@ -2,6 +2,7 @@
 import { useState, useRef, useEffect, useCallback, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Nav from '@/components/Nav'
+import ChatWidget from '@/components/ChatWidget'
 
 export type PropertyMode = 'owner' | 'buyer' | 'unknown'
 
@@ -468,6 +469,32 @@ export function PropertyReportInner({ mode }: { mode: PropertyMode }) {
             {r.dataLinks?.map(dl => (<a key={dl.label} href={dl.url} target="_blank" rel="noopener noreferrer" style={{ fontSize: 10, color: '#c4c0b8', textDecoration: 'none' }}>{dl.label} →</a>))}
             <span style={{ fontSize: 9, color: '#d6d3d1' }}>Not advice. © 2026 Alder Projects</span>
           </div>
+        )}
+        {r && !loading && (
+          <section style={{ marginTop: 32, marginBottom: 32 }}>
+            <div style={{ marginBottom: 12 }}>
+              <h2 style={{ fontFamily: 'Playfair Display, serif', fontSize: 22, color: '#1a1a1a', margin: 0 }}>
+                Ask the assistant about this property
+              </h2>
+              <p style={{ fontFamily: 'DM Sans, system-ui, sans-serif', fontSize: 14, color: '#5a554a', margin: '6px 0 0' }}>
+                The assistant has the scan results above as context. Ask a question and you'll get an answer specific to this address.
+              </p>
+            </div>
+            <ChatWidget
+              source={`property_scan_${mode}`}
+              variant="inline"
+              greeting={`I've got the scan results for ${addr || 'this property'} loaded. Ask whatever you want — flood, septic, zoning, what to fix first, what it would cost, what to ask the seller, anything.`}
+              context={{
+                propertyContext: {
+                  address: addr,
+                  flags: r?.flags || [],
+                  parcel: r?.parcel || undefined,
+                  rawScanSummary: r?.summary || undefined,
+                },
+                mode,
+              }}
+            />
+          </section>
         )}
         {!r && !loading && !err && (
           <div style={{ textAlign: 'center', padding: '80px 0' }}>

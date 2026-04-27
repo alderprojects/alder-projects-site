@@ -83,7 +83,7 @@ export const HANDYMAN_JOBS: HandymanJob[] = [
     diyVsHire: 'hire_advised',
     costRange: { low: 200, high: 400, unit: 'per visit' },
     whatsIncluded: 'Brushing flue, removing creosote, inspecting cap and crown, checking for cracks, basic safety report. Level 2 inspection (camera scope) +$150-300 for property purchase or after chimney fire.',
-    vtSpecificNotes: 'VT wood-burning is heavy use — most VT chimneys need annual sweep at minimum. CSIA-certified sweeps required for insurance compliance after chimney fire. Pellet stove vents (PVC pipe) different process — many sweeps don''t handle, ask first.',
+    vtSpecificNotes: 'VT wood-burning is heavy use — most VT chimneys need annual sweep at minimum. CSIA-certified sweeps required for insurance compliance after chimney fire. Pellet stove vents (PVC pipe) different process — many sweeps don\'t handle, ask first.',
     warningSigns: 'Smoke backing up into house, black tar-like creosote falling from damper, distinctive sweet/petrochemical smell from chimney area, visible cracks in mortar joints.',
   },
 
@@ -113,7 +113,7 @@ export const HANDYMAN_JOBS: HandymanJob[] = [
     diyVsHire: 'hire_required',
     costRange: { low: 200, high: 1500, unit: 'inspection / removal' },
     whatsIncluded: 'Visual inspection of tank, fill/vent line, supply lines, oil filter, and burner. Tank ultrasonic thickness test (extra $150-200) recommended for 20+ year tanks.',
-    vtSpecificNotes: 'Buried oil tanks are a major VT homeowner liability — leaks trigger DEC cleanup ($5,000-50,000+). Many VT insurance policies now require buried tank removal. Replacement above-ground 275-gal tank: $1,500-2,500. Switching to heat pump? Decommissioning oil system properly (drain, abandon-in-place certification) costs $300-800. Don''t just leave tank unused and forget it.',
+    vtSpecificNotes: 'Buried oil tanks are a major VT homeowner liability — leaks trigger DEC cleanup ($5,000-50,000+). Many VT insurance policies now require buried tank removal. Replacement above-ground 275-gal tank: $1,500-2,500. Switching to heat pump? Decommissioning oil system properly (drain, abandon-in-place certification) costs $300-800. Don\'t just leave tank unused and forget it.',
     warningSigns: 'Oil smell in basement, dark stains on tank exterior, weeping at tank seams, oil spots on basement floor, tank visibly bowed or rusted at bottom.',
   },
 

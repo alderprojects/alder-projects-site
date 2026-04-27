@@ -515,7 +515,6 @@ export async function POST(req: Request) {
     const vettingKeywords = ['contractor', 'hire', 'bid', 'quote', 'estimate', 'reference', 'license', 'insurance', 'permit', 'vetting', 'check', 'reputable', 'reliable', 'scam', 'rip off', 'how do i find', 'how to find', 'who should i', 'who do i call']
     if (vettingKeywords.some(k => recentUserText.includes(k))) {
       turnSystemPrompt += `\n\n=== CONTRACTOR VETTING (VT-specific) ===\n\n${vettingSummaryForPrompt()}`
-    }`
     }
 
     if (context?.referrer) {

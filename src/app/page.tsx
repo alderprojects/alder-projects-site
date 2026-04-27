@@ -6,7 +6,6 @@ import SeasonalReportCard from'@/components/SeasonalReportCard'
 import HowItWorks from'@/components/HowItWorks'
 import ProjectTypes from'@/components/ProjectTypes'
 import HomeFaq from'@/components/HomeFaq'
-import SubmitProject from'@/components/SubmitProject'
 import Footer from'@/components/Footer'
 export default function Home(){
   useEffect(()=>{
@@ -14,5 +13,5 @@ export default function Home(){
     document.querySelectorAll('.reveal').forEach(el=>obs.observe(el))
     return()=>obs.disconnect()
   },[])
-  return(<main><Nav/><Hero/><SeasonalReportCard/><HowItWorks/><ProjectTypes/><HomeFaq/><SubmitProject/><Footer/></main>)
+  return(<main><Nav/><Hero/><SeasonalReportCard/><HowItWorks/><ProjectTypes/><HomeFaq/><Footer/></main>)
 }

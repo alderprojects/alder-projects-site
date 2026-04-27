@@ -4,6 +4,7 @@ import { rebatesSummaryForPrompt } from '@/data/rebates'
 import { calendarSummaryForPrompt } from '@/data/calendar'
 import { zoningSummaryForPrompt } from '@/data/zoning'
 import { handymanSummaryForPrompt } from '@/data/handyman'
+import { vettingSummaryForPrompt } from '@/data/contractor-vetting'
 
 export const runtime = 'nodejs'
 export const maxDuration = 30
@@ -507,7 +508,14 @@ export async function POST(req: Request) {
     // Inject handyman data when the conversation mentions any maintenance/seasonal topic
     const handymanKeywords = ['gutter', 'septic', 'chimney', 'plow', 'snow', 'oil tank', 'well water', 'dryer vent', 'tree', 'maintenance', 'fall', 'winter', 'spring', 'seasonal', 'diy', 'do it myself', 'should i hire']
     if (handymanKeywords.some(k => recentUserText.includes(k))) {
-      turnSystemPrompt += `\n\n=== HANDYMAN & SEASONAL ===\n\n${handymanSummaryForPrompt()}`
+      turnSystemPrompt += `\n\n=== HANDYMAN & SEASONAL ===\n\n${handymanSummaryForPrompt()}
+
+    // Inject contractor vetting guidance when the conversation is about hiring,
+    // bids, contracts, or finding/evaluating a contractor.
+    const vettingKeywords = ['contractor', 'hire', 'bid', 'quote', 'estimate', 'reference', 'license', 'insurance', 'permit', 'vetting', 'check', 'reputable', 'reliable', 'scam', 'rip off', 'how do i find', 'how to find', 'who should i', 'who do i call']
+    if (vettingKeywords.some(k => recentUserText.includes(k))) {
+      turnSystemPrompt += `\n\n=== CONTRACTOR VETTING (VT-specific) ===\n\n${vettingSummaryForPrompt()}`
+    }`
     }
 
     if (context?.referrer) {
@@ -557,4 +565,4 @@ export async function POST(req: Request) {
     console.error('chat route error:', msg)
     return NextResponse.json({ error: 'chat unavailable', detail: msg.substring(0, 200) }, { status: 500 })
   }
-                                                        }
+  }

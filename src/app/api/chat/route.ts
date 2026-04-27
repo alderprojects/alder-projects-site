@@ -82,7 +82,6 @@ type Message = { role: 'user' | 'assistant'; content: string }
 
 type ChatRequest = {
   messages: Message[]
-  // Optional context the client may pass (referrer page, calculator inputs, etc.)
   context?: {
     referrer?: string
     calculatorState?: Record<string, unknown>
@@ -160,9 +159,9 @@ ${transcript.map(m => `${m.role === 'user' ? 'Homeowner' : 'Assistant'}: ${m.con
 }
 
 async function postLeadToWebhook(lead: LeadCapture) {
-  const webhook = process.env.SHEETS_WEBHOOK_URL
+  const webhook = process.env.GOOGLE_SHEETS_WEBHOOK_URL
   if (!webhook) {
-    console.error('SHEETS_WEBHOOK_URL not configured — lead not routed')
+    console.error('GOOGLE_SHEETS_WEBHOOK_URL not configured — lead not routed')
     return { ok: false, reason: 'webhook not configured' }
   }
 
@@ -189,7 +188,6 @@ export async function POST(req: Request) {
   try {
     const body = await req.json()
 
-    // Lead capture path: client posts { action: 'capture_lead', ...lead }
     if (body?.action === 'capture_lead') {
       const { name, email, zip, timeline, transcript, source } = body
       if (!email || !Array.isArray(transcript) || transcript.length === 0) {
@@ -208,13 +206,11 @@ export async function POST(req: Request) {
       return NextResponse.json({ ok: true, summary, routed: result.ok })
     }
 
-    // Chat path: client posts { messages, context? }
     const { messages, context } = body as ChatRequest
     if (!Array.isArray(messages) || messages.length === 0) {
       return NextResponse.json({ error: 'messages required' }, { status: 400 })
     }
 
-    // Cap conversation length defensively
     const MAX_TURNS = 30
     const trimmed = messages.length > MAX_TURNS ? messages.slice(-MAX_TURNS) : messages
 

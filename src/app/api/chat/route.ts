@@ -1,4 +1,9 @@
 import { NextResponse } from 'next/server'
+import { projectsSummaryForPrompt } from '@/data/projects'
+import { rebatesSummaryForPrompt } from '@/data/rebates'
+import { calendarSummaryForPrompt } from '@/data/calendar'
+import { zoningSummaryForPrompt } from '@/data/zoning'
+import { handymanSummaryForPrompt } from '@/data/handyman'
 
 export const runtime = 'nodejs'
 export const maxDuration = 30
@@ -9,15 +14,19 @@ export const maxDuration = 30
 const SYSTEM_PROMPT = `You are a knowledgeable Vermont local helping homeowners think through heat pump, weatherization, and Vermont property decisions. You sound like a 50-year-old Vermont general contractor: plain, direct, specific. No hype, no jargon, no marketing voice. You write the way Vermonters actually talk.
 
 YOUR SCOPE
-You can help with:
-- Heat pumps (cold-climate ductless and ducted) in Vermont
-- Weatherization (air sealing, insulation, the order of operations)
-- Vermont state, utility, and federal rebates that apply to the above
-- Choosing between heat pump and furnace replacement
-- The connection between weatherization and heat pump sizing
-- Property-specific questions when the user mentions a Vermont address (flood zones, shoreland rules, septic, zoning, ADU feasibility)
+You are a Vermont homeowner reference. You can help with:
+- Renovation project costs by town (kitchens, bathrooms, decks, additions, basements, roofing, siding, windows, HVAC) — with VT-specific ranges, NOT national averages
+- Heat pumps (cold-climate ductless and ducted) and weatherization
+- Vermont state, utility, and federal rebates and tax credits
+- ADU rules and zoning by town (post-Act 47 statewide framework + town-specific gotchas)
+- Annual maintenance jobs (gutters, septic, chimney, snow plowing, oil tank, well water, dryer vent, tree work) — honest DIY-vs-hire framing
+- Seasonal timing (when to do what, when permits are easiest, when contractors are booked)
+- Property tax cycle (Homestead Declaration, reappraisal, tax bills)
+- Property-specific questions when the user mentions a Vermont address
 
-If someone asks about a kitchen, bathroom, deck, roof, or other renovation project cost, say something like: "For project costs by trade and town, our cost calculator at /calculator has Vermont-specific ranges. For other questions about your property, I can help — just give me an address." Then stop.
+You ANSWER questions in conversation. You do not redirect to the calculator or other pages unless the user explicitly wants to "calculate" something themselves. If they ask "what does a kitchen remodel cost in Stowe", you give them the number range from your data, plus what's-included and what-pushes-it-high — same as a 50-year-old VT GC would over coffee.
+
+For things genuinely outside this scope (legal advice, tax filing specifics, medical, contractor disputes, things requiring a specific licensed professional), say so plainly and direct them to the right kind of pro.
 
 VERMONT REBATE STACK (as of October 2026 — these numbers ALWAYS WIN over any other source)
 
@@ -469,6 +478,38 @@ export async function POST(req: Request) {
 
     // Build the system prompt for this turn
     let turnSystemPrompt = SYSTEM_PROMPT
+
+    // Always inject the rebate stack and seasonal calendar — those are the
+    // most-referenced data sets and worth the tokens on every turn.
+    turnSystemPrompt += `\n\n=== REBATE DATA ===\n\n${rebatesSummaryForPrompt()}`
+    turnSystemPrompt += `\n\n=== SEASONAL CALENDAR ===\n\n${calendarSummaryForPrompt(new Date())}`
+
+    // Inject project costs whenever the conversation mentions a renovation
+    // category. Cheap heuristic on recent user messages.
+    const recentUserText = trimmed
+      .filter(m => m.role === 'user')
+      .slice(-3)
+      .map(m => m.content)
+      .join(' ')
+      .toLowerCase()
+    const renovationKeywords = ['kitchen', 'bathroom', 'bath ', 'deck', 'addition', 'basement', 'roof', 'siding', 'window', 'hvac', 'furnace', 'remodel', 'renovat', 'cost', 'budget', 'price', 'estimate', 'quote']
+    if (renovationKeywords.some(k => recentUserText.includes(k))) {
+      turnSystemPrompt += `\n\n=== PROJECT COSTS (VT-specific) ===\n\n${projectsSummaryForPrompt()}`
+    }
+
+    // Inject ADU/zoning data when the conversation mentions ADU/zoning topics
+    // OR whenever a town is identified (cheap context).
+    const zoningKeywords = ['adu', 'accessory', 'in-law', 'mother-in-law', 'zoning', 'permit', 'setback', 'short-term rental', 'airbnb', 'add a unit', 'rental unit', 'separate unit']
+    if (zoningKeywords.some(k => recentUserText.includes(k)) || detectedAddress?.town) {
+      turnSystemPrompt += `\n\n=== ADU & ZONING ===\n\n${zoningSummaryForPrompt(detectedAddress?.town)}`
+    }
+
+    // Inject handyman data when the conversation mentions any maintenance/seasonal topic
+    const handymanKeywords = ['gutter', 'septic', 'chimney', 'plow', 'snow', 'oil tank', 'well water', 'dryer vent', 'tree', 'maintenance', 'fall', 'winter', 'spring', 'seasonal', 'diy', 'do it myself', 'should i hire']
+    if (handymanKeywords.some(k => recentUserText.includes(k))) {
+      turnSystemPrompt += `\n\n=== HANDYMAN & SEASONAL ===\n\n${handymanSummaryForPrompt()}`
+    }
+
     if (context?.referrer) {
       turnSystemPrompt += `\n\nThe user came from: ${context.referrer}`
     }
@@ -516,4 +557,4 @@ export async function POST(req: Request) {
     console.error('chat route error:', msg)
     return NextResponse.json({ error: 'chat unavailable', detail: msg.substring(0, 200) }, { status: 500 })
   }
-}
+                                                        }

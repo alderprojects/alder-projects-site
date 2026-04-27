@@ -22,21 +22,21 @@ export default function Hero() {
         <div>
           <div style={{display:'inline-flex',alignItems:'center',gap:'8px',padding:'5px 12px',border:'1px solid rgba(122,155,111,0.4)',borderRadius:'999px',marginBottom:'28px'}}>
             <span style={{width:'7px',height:'7px',borderRadius:'50%',backgroundColor:'#7A9B6F',flexShrink:0}} />
-            <span style={{fontSize:'11px',fontFamily:'monospace',letterSpacing:'0.12em',textTransform:'uppercase',color:'#7A9B6F'}}>Not Angi. Not HomeAdvisor.</span>
+            <span style={{fontSize:'11px',fontFamily:'monospace',letterSpacing:'0.12em',textTransform:'uppercase',color:'#7A9B6F'}}>Vermont Homeowner Assistant</span>
           </div>
           <h1 ref={headRef} style={{fontFamily:"'Playfair Display',Georgia,serif",fontWeight:600,fontSize:'clamp(2.2rem,4.5vw,3.4rem)',lineHeight:1.08,letterSpacing:'-0.02em',color:'#F5EFE0',marginBottom:'20px'}}>
             Find a Vermont<br/>
             contractor who'll<br/>
-            <em style={{color:'#C8732A',fontStyle:'normal'}}>actually show up.</em>
+            <em style={{color:'#C8732A',fontStyle:'normal'}}>actually answer.</em>
           </h1>
           <p style={{fontSize:'17px',fontWeight:300,lineHeight:1.75,color:'rgba(245,239,224,0.65)',maxWidth:'420px',marginBottom:'36px'}}>
-            Tell us what you need done. We'll find 2–3 local Vermonters who do that work, aren't booked out till next summer, and call you back.
+            Ask whatever you want about heat pumps, weatherization, rebates, or what your project might cost in Vermont. The assistant gives you Vermont-specific numbers, not national averages.
           </p>
           <div style={{display:'flex',flexWrap:'wrap',gap:'12px',marginBottom:'28px'}}>
-            <a href="#submit-project" style={{display:'inline-block',padding:'14px 28px',backgroundColor:'#C8732A',color:'#FAF7F2',fontWeight:600,fontSize:'14px',borderRadius:'3px',textDecoration:'none'}}>Tell us what you need &rarr;</a>
-            <a href="/plan" style={{display:'inline-block',padding:'14px 28px',border:'1px solid rgba(122,155,111,0.45)',color:'rgba(245,239,224,0.8)',fontWeight:500,fontSize:'14px',borderRadius:'3px',textDecoration:'none'}}>Or just see what it costs</a>
+            <a href="/chat" style={{display:'inline-block',padding:'14px 28px',backgroundColor:'#C8732A',color:'#FAF7F2',fontWeight:600,fontSize:'14px',borderRadius:'3px',textDecoration:'none'}}>Tell us what you need &rarr;</a>
+            <a href="/calculator" style={{display:'inline-block',padding:'14px 28px',border:'1px solid rgba(122,155,111,0.45)',color:'rgba(245,239,224,0.8)',fontWeight:500,fontSize:'14px',borderRadius:'3px',textDecoration:'none'}}>Or just see what it costs</a>
           </div>
-          <p style={{fontSize:'11px',fontFamily:'monospace',letterSpacing:'0.06em',color:'rgba(245,239,224,0.22)'}}>Vermont contractors only &middot; No spam &middot; No flood of calls</p>
+          <p style={{fontSize:'11px',fontFamily:'monospace',letterSpacing:'0.06em',color:'rgba(245,239,224,0.22)'}}>Real Vermont numbers &middot; Cited sources &middot; No marketing fluff</p>
         </div>
         <div style={{backgroundColor:'rgba(8,16,6,0.72)',border:'1px solid rgba(122,155,111,0.18)',borderRadius:'4px',padding:'22px',backdropFilter:'blur(12px)'}}>
           <p style={{fontSize:'10px',fontFamily:'monospace',letterSpacing:'0.12em',textTransform:'uppercase',color:'#7A9B6F',marginBottom:'14px'}}>Popular Vermont Towns</p>
@@ -46,7 +46,7 @@ export default function Hero() {
             ))}
           </div>
           <div style={{display:'flex',marginTop:'18px',paddingTop:'16px',borderTop:'1px solid rgba(122,155,111,0.12)'}}>
-            {[{n:'VT',l:'Statewide'},{n:'Free',l:'To Post'},{n:'Local',l:'Contractors'}].map((s,i) => (
+            {[{n:'VT',l:'Statewide'},{n:'Free',l:'Always'},{n:'Real',l:'VT Numbers'}].map((s,i) => (
               <div key={s.l} style={{flex:1,textAlign:'center',borderRight:i<2?'1px solid rgba(122,155,111,0.12)':'none',padding:'0 8px'}}>
                 <div style={{fontFamily:"'Playfair Display',Georgia,serif",fontWeight:700,fontSize:'20px',color:'#C8732A'}}>{s.n}</div>
                 <div style={{fontSize:'10px',fontFamily:'monospace',color:'rgba(245,239,224,0.35)',marginTop:'2px',letterSpacing:'0.06em'}}>{s.l}</div>

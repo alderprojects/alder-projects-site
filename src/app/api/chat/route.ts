@@ -508,7 +508,8 @@ export async function POST(req: Request) {
     // Inject handyman data when the conversation mentions any maintenance/seasonal topic
     const handymanKeywords = ['gutter', 'septic', 'chimney', 'plow', 'snow', 'oil tank', 'well water', 'dryer vent', 'tree', 'maintenance', 'fall', 'winter', 'spring', 'seasonal', 'diy', 'do it myself', 'should i hire']
     if (handymanKeywords.some(k => recentUserText.includes(k))) {
-      turnSystemPrompt += `\n\n=== HANDYMAN & SEASONAL ===\n\n${handymanSummaryForPrompt()}
+      turnSystemPrompt += `\n\n=== HANDYMAN & SEASONAL ===\n\n${handymanSummaryForPrompt()}`
+    }
 
     // Inject contractor vetting guidance when the conversation is about hiring,
     // bids, contracts, or finding/evaluating a contractor.
@@ -564,4 +565,4 @@ export async function POST(req: Request) {
     console.error('chat route error:', msg)
     return NextResponse.json({ error: 'chat unavailable', detail: msg.substring(0, 200) }, { status: 500 })
   }
-  }
+                                                                                }

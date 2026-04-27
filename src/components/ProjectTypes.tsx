@@ -17,12 +17,12 @@ export default function ProjectTypes() {
     <section id="project-types" style={{padding:'clamp(56px,8vw,96px) 24px',backgroundColor:'#F5EFE0'}}>
       <div style={{maxWidth:'1152px',margin:'0 auto'}}>
         <div style={{marginBottom:'48px'}}>
-          <span style={{fontSize:'11px',fontFamily:'monospace',textTransform:'uppercase',letterSpacing:'0.1em',color:'#C8732A'}}>What We Match</span>
+          <span style={{fontSize:'11px',fontFamily:'monospace',textTransform:'uppercase',letterSpacing:'0.1em',color:'#C8732A'}}>Browse by project</span>
           <h2 style={{fontFamily:"'Playfair Display',Georgia,serif",fontSize:'clamp(1.8rem,4vw,3rem)',fontWeight:600,color:'#1C2B1A',lineHeight:1.1,marginTop:'10px'}}>
             Every kind of<br/><em style={{fontStyle:'normal',color:'#C8732A'}}>Vermont renovation.</em>
           </h2>
           <p style={{color:'rgba(28,43,26,0.5)',fontSize:'16px',marginTop:'12px',maxWidth:'520px',lineHeight:1.6}}>
-            Click any project type to get started. Not sure yet? Use the guides and cost calculator.
+            Pick any project below for guides and cost ranges. Or just ask the assistant about your specific situation.
           </p>
         </div>
         <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(260px,1fr))',gap:'20px'}}>
@@ -31,7 +31,7 @@ export default function ProjectTypes() {
               onMouseEnter={e=>{(e.currentTarget as HTMLElement).style.transform='translateY(-4px)';(e.currentTarget as HTMLElement).style.boxShadow='0 12px 32px rgba(28,43,26,0.12)'}}
               onMouseLeave={e=>{(e.currentTarget as HTMLElement).style.transform='none';(e.currentTarget as HTMLElement).style.boxShadow='none'}}
             >
-              <a href="#submit-project" style={{textDecoration:'none',display:'block'}}>
+              <a href="/chat" style={{textDecoration:'none',display:'block'}}>
                 <div style={{height:'170px',overflow:'hidden',position:'relative',backgroundColor:'#e8e0d4'}}>
                   <img src={p.img} alt={p.t} style={{width:'100%',height:'100%',objectFit:'cover'}} loading="lazy"/>
                   {p.tag && (
@@ -56,12 +56,11 @@ export default function ProjectTypes() {
           ))}
         </div>
         <div style={{marginTop:'40px',textAlign:'center'}}>
-          <a href="#submit-project" style={{display:'inline-block',padding:'14px 32px',backgroundColor:'#1C2B1A',color:'#F5EFE0',fontWeight:600,fontSize:'14px',borderRadius:'2px',textDecoration:'none'}}>
-            Post Any Project Free &rarr;
+          <a href="/chat" style={{display:'inline-block',padding:'14px 32px',backgroundColor:'#1C2B1A',color:'#F5EFE0',fontWeight:600,fontSize:'14px',borderRadius:'2px',textDecoration:'none'}}>
+            Ask the assistant about your project &rarr;
           </a>
         </div>
       </div>
     </section>
   )
 }
-

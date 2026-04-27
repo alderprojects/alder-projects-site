@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef, useEffect, FormEvent } from 'react'
+import { useState, useRef, useEffect } from 'react'
 
 type Message = { role: 'user' | 'assistant'; content: string }
 
@@ -12,7 +12,7 @@ type Props = {
 }
 
 const DEFAULT_GREETING =
-  "Ask me anything about Vermont property, renovation costs, rebates, or what to do next. I'll give you Vermont-specific numbers, not national averages."
+  "Ask me anything about Vermont property, renovation costs, rebates, or what to do about your house. I'll give you Vermont-specific numbers, not national averages."
 
 export default function ChatWidget({
   source = 'unknown',
@@ -26,25 +26,12 @@ export default function ChatWidget({
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [showLeadForm, setShowLeadForm] = useState(false)
-  const [leadSubmitted, setLeadSubmitted] = useState(false)
-  const [lead, setLead] = useState({ name: '', email: '', zip: '', timeline: '' })
 
   const scrollRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' })
   }, [messages, loading])
-
-  useEffect(() => {
-    if (showLeadForm || leadSubmitted) return
-    const userTurns = messages.filter(m => m.role === 'user').length
-    const lastAssistant = [...messages].reverse().find(m => m.role === 'assistant')?.content || ''
-    const offered = /installer|contractor|put you in front|handle the rebate paperwork|connect/i.test(lastAssistant)
-    if (userTurns >= 3 && offered) {
-      setShowLeadForm(true)
-    }
-  }, [messages, showLeadForm, leadSubmitted])
 
   async function sendMessage(text: string) {
     if (!text.trim()) return
@@ -65,40 +52,6 @@ export default function ChatWidget({
       setMessages(prev => [...prev, reply])
     } catch (e) {
       setError('Something went sideways. Try again in a moment.')
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  async function submitLead(e: FormEvent) {
-    e.preventDefault()
-    if (!lead.email) return
-    setLoading(true)
-    try {
-      const res = await fetch('/api/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'capture_lead',
-          ...lead,
-          transcript: messages,
-          source,
-          propertyContext: context?.propertyContext,
-        }),
-      })
-      if (!res.ok) throw new Error('lead routing failed')
-      setLeadSubmitted(true)
-      setShowLeadForm(false)
-      setMessages(prev => [
-        ...prev,
-        {
-          role: 'assistant',
-          content:
-            "Got it. We'll review your situation and someone will reach out within one business day. In the meantime, ask me anything else.",
-        },
-      ])
-    } catch (e) {
-      setError('Could not send that through. Try again or email hello@alderprojects.com directly.')
     } finally {
       setLoading(false)
     }
@@ -146,105 +99,7 @@ export default function ChatWidget({
         {error && (
           <div className="text-sm text-red-700 px-2">{error}</div>
         )}
-
-        {showLeadForm && !leadSubmitted && (
-          <form
-            onSubmit={submitLead}
-            className="mt-4 p-4 rounded-lg space-y-3"
-            style={{ backgroundColor: '#f5f1e8', border: '1px solid #d4cfc4' }}
-          >
-            <div className="text-sm font-medium" style={{ color: '#2c4a3e' }}>
-              Connect with a Vermont contractor
-            </div>
-            <div className="text-xs" style={{ color: '#5a554a' }}>
-              We'll send a Vermont contractor a summary of what we discussed. They'll reach
-              out within one business day.
-            </div>
-            <input
-              type="text"
-              required
-              placeholder="Your name"
-              value={lead.name}
-              onChange={e => setLead({ ...lead, name: e.target.value })}
-              className="w-full px-3 py-2 text-sm rounded border"
-              style={{ borderColor: '#d4cfc4', backgroundColor: '#fff' }}
-            />
-            <input
-              type="email"
-              required
-              placeholder="Email"
-              value={lead.email}
-              onChange={e => setLead({ ...lead, email: e.target.value })}
-              className="w-full px-3 py-2 text-sm rounded border"
-              style={{ borderColor: '#d4cfc4', backgroundColor: '#fff' }}
-            />
-            <input
-              type="text"
-              placeholder="ZIP code"
-              value={lead.zip}
-              onChange={e => setLead({ ...lead, zip: e.target.value })}
-              className="w-full px-3 py-2 text-sm rounded border"
-              style={{ borderColor: '#d4cfc4', backgroundColor: '#fff' }}
-            />
-            <input
-              type="text"
-              placeholder="When are you hoping to start?"
-              value={lead.timeline}
-              onChange={e => setLead({ ...lead, timeline: e.target.value })}
-              className="w-full px-3 py-2 text-sm rounded border"
-              style={{ borderColor: '#d4cfc4', backgroundColor: '#fff' }}
-            />
-            <div className="flex gap-2">
-              <button
-                type="submit"
-                disabled={loading || !lead.email}
-                className="px-4 py-2 text-sm rounded font-medium"
-                style={{ backgroundColor: '#2c4a3e', color: '#fff' }}
-              >
-                Send my info
-              </button>
-              <button
-                type="button"
-                onClick={() => setShowLeadForm(false)}
-                className="px-4 py-2 text-sm rounded"
-                style={{ color: '#5a554a' }}
-              >
-                Not yet
-              </button>
-            </div>
-          </form>
-        )}
       </div>
-
-      {!showLeadForm && !leadSubmitted && (
-        <div
-          className="px-3 py-2 border-t flex items-center justify-between gap-2"
-          style={{ borderColor: '#e5e0d4', backgroundColor: '#f5f1e8' }}
-        >
-          <span
-            className="text-xs"
-            style={{
-              fontFamily: 'DM Sans, system-ui, sans-serif',
-              color: '#5a554a',
-              flex: 1,
-            }}
-          >
-            Ready to talk to a Vermont installer?
-          </span>
-          <button
-            type="button"
-            onClick={() => setShowLeadForm(true)}
-            className="px-3 py-1.5 text-xs rounded font-medium"
-            style={{
-              backgroundColor: '#2c4a3e',
-              color: '#fff',
-              whiteSpace: 'nowrap',
-            }}
-          >
-            Connect me
-          </button>
-        </div>
-      )}
 
       <form
         onSubmit={e => {

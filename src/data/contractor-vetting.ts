@@ -33,19 +33,19 @@ export const VETTING_STEPS: VettingStep[] = [
   {
     id: 'registration-check',
     name: 'Verify Residential Contractor Registration with VT AG',
-    description: 'Vermont requires anyone doing residential construction work of $3,500+ to register with the Attorney General\'s Consumer Assistance Program.',
+    description: "Vermont requires anyone doing residential construction work of $3,500+ to register with the Attorney General's Consumer Assistance Program.",
     vtRationale: 'Registration is the closest VT has to a license. It is FREE for the contractor. Anyone refusing to register or working unregistered on a $3,500+ job is breaking VT law and waiving most of your consumer protections in advance.',
     howTo: [
-      'Search the VT AG\'s registry at ago.vermont.gov/cap (look for "contractor registration")',
+      "Search the VT AG's registry at ago.vermont.gov/cap (look for \"contractor registration\")",
       'Confirm the legal business name matches what is on their bid/contract',
-      'Note any complaints listed against them in the AG\'s database',
-      'For projects under $3,500, registration isn\'t required — but reputable contractors register anyway',
+      "Note any complaints listed against them in the AG's database",
+      "For projects under $3,500, registration isn't required — but reputable contractors register anyway",
     ],
     redFlags: [
       'Not registered for any project over $3,500',
       'Multiple complaints in AG database',
       'Business operating under a different name than what is registered',
-      'Tells you registration "isn\'t a real thing" or "doesn\'t apply to them"',
+      "Tells you registration \"isn't a real thing\" or \"doesn't apply to them\"",
     ],
     effort: 'low',
     criticalFor: ['any project over $3,500', 'any project with significant deposit'],
@@ -54,7 +54,7 @@ export const VETTING_STEPS: VettingStep[] = [
     id: 'insurance-verification',
     name: 'Get a current Certificate of Insurance — directly from their insurer',
     description: 'Verify both general liability AND workers comp insurance is in force, with you (the homeowner) listed as a Certificate Holder.',
-    vtRationale: 'If a contractor falls off your roof and they don\'t have workers comp, YOUR homeowners policy gets sued. VT homeowners policies typically exclude on-the-job injury claims for uninsured contractors. This is the single biggest financial risk you can avoid.',
+    vtRationale: "If a contractor falls off your roof and they don't have workers comp, YOUR homeowners policy gets sued. VT homeowners policies typically exclude on-the-job injury claims for uninsured contractors. This is the single biggest financial risk you can avoid.",
     howTo: [
       'Ask for a Certificate of Insurance (COI), not just "proof of insurance"',
       'The COI must be issued BY THE INSURER, not the contractor — fakes are common',
@@ -65,11 +65,11 @@ export const VETTING_STEPS: VettingStep[] = [
     ],
     redFlags: [
       'Hesitates to provide COI or sends a screenshot/photo',
-      'Provides COI but won\'t add you as Certificate Holder',
+      "Provides COI but won't add you as Certificate Holder",
       'Workers comp coverage shows only the owner-operator (no sub coverage)',
       'Policy expired or expires mid-project',
       'Tells you "I have insurance through my LLC" without specifics',
-      'Says VT doesn\'t require workers comp for solo operators (technically true, but a solo operator who falls is your problem)',
+      "Says VT doesn't require workers comp for solo operators (technically true, but a solo operator who falls is your problem)",
     ],
     effort: 'low',
     criticalFor: ['any roof work', 'any tree work', 'any project with subcontractors', 'any project on a multi-story home'],
@@ -82,7 +82,7 @@ export const VETTING_STEPS: VettingStep[] = [
     howTo: [
       'Ask for THREE references — most contractors offer one or two; three forces them to actually have done the work',
       'Specifically request: completed within the past 12 months, similar scope, similar town',
-      'Call (don\'t email) — voice tone reveals everything',
+      "Call (don't email) — voice tone reveals everything",
       'Ask: did they finish on time? On budget? Did they communicate? Would you hire them again?',
       'Ask the killer question: was there ANYTHING that surprised you, in good or bad ways?',
     ],
@@ -100,7 +100,7 @@ export const VETTING_STEPS: VettingStep[] = [
     id: 'site-visit-existing',
     name: 'Drive by an active or recent jobsite',
     description: 'Visit a site where the contractor is currently working or recently finished, ideally unannounced.',
-    vtRationale: 'In Vermont, contractors\' active jobsites tell you everything. Drive past on a Tuesday afternoon. Is the site organized? Are tools out and being used? Is debris contained? Does the contractor\'s crew look like one team or a rotating cast of subs you have never met? Vermont is small enough that you can usually find a current jobsite within 20 minutes of your house.',
+    vtRationale: "In Vermont, contractors' active jobsites tell you everything. Drive past on a Tuesday afternoon. Is the site organized? Are tools out and being used? Is debris contained? Does the contractor's crew look like one team or a rotating cast of subs you have never met? Vermont is small enough that you can usually find a current jobsite within 20 minutes of your house.",
     howTo: [
       'Ask the contractor for the address of an active jobsite (most are happy to brag)',
       'Drive by during work hours, just observe from the road',
@@ -108,19 +108,19 @@ export const VETTING_STEPS: VettingStep[] = [
       'If invited inside, ask the homeowner the killer question above',
     ],
     redFlags: [
-      'Won\'t share any active jobsite addresses',
+      "Won't share any active jobsite addresses",
       'Site is chaotic, debris everywhere, no clear organization',
       'No marked vehicles — many flippers and fly-by-nights work in unmarked vans',
       'Different unfamiliar workers each visit — heavy sub use without disclosure',
     ],
     effort: 'medium',
-    criticalFor: ['any major project', 'any contractor you don\'t already have a referral for'],
+    criticalFor: ['any major project', "any contractor you don't already have a referral for"],
   },
   {
     id: 'written-contract',
     name: 'Insist on a written contract with specific Vermont protections',
     description: 'Get a real written contract before any work begins or money changes hands. Verbal agreements and "handshake deals" leave you with no recourse.',
-    vtRationale: 'Vermont law (9 V.S.A. § 4006) requires a written contract for residential work over $1,000 if it includes specific items: scope of work, total price, completion date, deposit terms, and the homeowner\'s 3-day right to cancel. A contract missing these is unenforceable AGAINST you, but the contractor still cashes your deposit.',
+    vtRationale: "Vermont law (9 V.S.A. § 4006) requires a written contract for residential work over $1,000 if it includes specific items: scope of work, total price, completion date, deposit terms, and the homeowner's 3-day right to cancel. A contract missing these is unenforceable AGAINST you, but the contractor still cashes your deposit.",
     howTo: [
       'Verify the contract names: legal business name, AG registration number, license numbers for trade work, and physical VT address',
       'Verify scope of work is detailed enough that you would not argue about it later',
@@ -143,13 +143,13 @@ export const VETTING_STEPS: VettingStep[] = [
   },
   {
     id: 'mechanic-lien-awareness',
-    name: 'Understand how VT mechanic\'s liens work',
-    description: 'In Vermont, a contractor or supplier you never directly hired can file a lien on YOUR house if your contractor doesn\'t pay them.',
-    vtRationale: 'Mechanic\'s lien law in VT (9 V.S.A. Chapter 51) lets subcontractors and material suppliers attach a lien to your property if their general contractor stiffs them on payment. You could pay your GC in full, the GC walks away, the lumberyard never gets paid, and now you have a lien on your house. The defense is simple but most homeowners don\'t do it.',
+    name: "Understand how VT mechanic's liens work",
+    description: "In Vermont, a contractor or supplier you never directly hired can file a lien on YOUR house if your contractor doesn't pay them.",
+    vtRationale: "Mechanic's lien law in VT (9 V.S.A. Chapter 51) lets subcontractors and material suppliers attach a lien to your property if their general contractor stiffs them on payment. You could pay your GC in full, the GC walks away, the lumberyard never gets paid, and now you have a lien on your house. The defense is simple but most homeowners don't do it.",
     howTo: [
       'For projects over $10,000, request a list of all subcontractors and material suppliers BEFORE work starts',
       'For final payment, require lien waivers from the GC AND from each named sub/supplier',
-      'A lien waiver is a one-page document the sub signs saying they\'ve been paid',
+      "A lien waiver is a one-page document the sub signs saying they've been paid",
       'For larger projects, consider escrowing final payment until all waivers are received',
       'Liens must be filed within 180 days of the last work — final waiver collection is your protection',
     ],
@@ -166,7 +166,7 @@ export const VETTING_STEPS: VettingStep[] = [
     id: 'permit-pulling',
     name: 'Confirm WHO is pulling the permits',
     description: 'For permitted work, the contractor should pull the permit in their name — not yours.',
-    vtRationale: 'In Vermont, the person whose name is on the building permit is responsible for code compliance. If you pull the permit (often called an "owner-builder permit"), you\'re legally on the hook for everything — including the contractor\'s mistakes. Some contractors push owner-pulled permits to dodge liability. This is a giant red flag.',
+    vtRationale: "In Vermont, the person whose name is on the building permit is responsible for code compliance. If you pull the permit (often called an \"owner-builder permit\"), you're legally on the hook for everything — including the contractor's mistakes. Some contractors push owner-pulled permits to dodge liability. This is a giant red flag.",
     howTo: [
       'Ask early: "who is pulling the permit?"',
       'Answer should be: "I am, in my name" or "my electrical sub will, in his name"',
@@ -175,9 +175,9 @@ export const VETTING_STEPS: VettingStep[] = [
     ],
     redFlags: [
       'Contractor wants YOU to pull the permit',
-      '"Don\'t worry about permits, no one will check"',
+      "\"Don't worry about permits, no one will check\"",
       '"I can do this without a permit if you want to save money"',
-      'Won\'t identify which trades need permits',
+      "Won't identify which trades need permits",
     ],
     effort: 'low',
     criticalFor: ['any work that requires a permit (most structural, electrical, plumbing, gas)'],
@@ -186,20 +186,20 @@ export const VETTING_STEPS: VettingStep[] = [
     id: 'red-flag-pricing',
     name: 'Understand normal VT pricing — and when a quote is suspicious',
     description: 'Get three written bids and understand why the cheapest is usually a trap.',
-    vtRationale: 'Vermont is a small construction market with tight contractor schedules. Real VT contractors rarely undercut local pricing significantly — they don\'t need to. A quote 30%+ below the others usually means: missing scope, lowball bait-and-switch, or a non-local contractor underestimating VT-specific costs (mud season, building code, materials shipping). Sometimes the LOW bid is the dangerous one.',
+    vtRationale: "Vermont is a small construction market with tight contractor schedules. Real VT contractors rarely undercut local pricing significantly — they don't need to. A quote 30%+ below the others usually means: missing scope, lowball bait-and-switch, or a non-local contractor underestimating VT-specific costs (mud season, building code, materials shipping). Sometimes the LOW bid is the dangerous one.",
     howTo: [
       'Get THREE bids on the same scope of work',
       'Compare scope, not just price — make sure each bid covers the same things',
       'For renovations: expect 10-20% spread between honest bids',
       'For new construction: expect 5-15% spread',
-      'A bid 30%+ below the others is suspicious; ask the bidder what they\'re NOT including',
+      "A bid 30%+ below the others is suspicious; ask the bidder what they're NOT including",
     ],
     redFlags: [
       'Single bidder claiming "only one in the area" — VT has plenty of contractors, this is a manipulation',
       'Lowest bid is dramatically lower (likely missing scope)',
       'Highest bid is dramatically higher with no good reason (overhead from non-VT firm, or padding for difficult clients)',
       'Bid structure that hides materials in "labor" or vice versa',
-      'Quote that pretends to include rebate paperwork but doesn\'t specify which rebates',
+      "Quote that pretends to include rebate paperwork but doesn't specify which rebates",
     ],
     effort: 'medium',
     criticalFor: ['any project over $5,000'],
@@ -229,7 +229,7 @@ export function vettingSummaryForPrompt(): string {
   lines.push('')
   lines.push('UNIQUE VT REALITIES:')
   lines.push('- Vermont does NOT license general contractors at the state level. There is no GC license to look up.')
-  lines.push('- VT DOES require contractor registration with the AG\'s Consumer Assistance Program for residential work $3,500+.')
+  lines.push("- VT DOES require contractor registration with the AG's Consumer Assistance Program for residential work $3,500+.")
   lines.push('- Trades (electrical, plumbing, LP gas) ARE licensed by the state.')
   lines.push('- Real signal of a good VT contractor: referrals + verified insurance + written contract with milestones.')
   lines.push('')

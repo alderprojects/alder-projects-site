@@ -501,8 +501,8 @@ export async function POST(req: Request) {
     // Inject ADU/zoning data when the conversation mentions ADU/zoning topics
     // OR whenever a town is identified (cheap context).
     const zoningKeywords = ['adu', 'accessory', 'in-law', 'mother-in-law', 'zoning', 'permit', 'setback', 'short-term rental', 'airbnb', 'add a unit', 'rental unit', 'separate unit']
-    if (zoningKeywords.some(k => recentUserText.includes(k)) || detectedAddress?.town) {
-      turnSystemPrompt += `\n\n=== ADU & ZONING ===\n\n${zoningSummaryForPrompt(detectedAddress?.town)}`
+    if (zoningKeywords.some(k => recentUserText.includes(k)) || detectedAddress) {
+      turnSystemPrompt += `\n\n=== ADU & ZONING ===\n\n${zoningSummaryForPrompt()}`
     }
 
     // Inject handyman data when the conversation mentions any maintenance/seasonal topic
@@ -565,4 +565,4 @@ export async function POST(req: Request) {
     console.error('chat route error:', msg)
     return NextResponse.json({ error: 'chat unavailable', detail: msg.substring(0, 200) }, { status: 500 })
   }
-                                                                                }
+  }

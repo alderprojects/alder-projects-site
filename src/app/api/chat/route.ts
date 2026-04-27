@@ -314,9 +314,9 @@ async function postLeadToWebhook(lead: LeadCapture) {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      // Routing field — Apps Script switches on this
+      // Routing field
       type: 'chat_lead',
-      // LeadsDB schema fields (PascalCase to match sheet columns)
+      // PascalCase keys (LeadsDB sheet column names)
       LeadID: `CHAT-${Date.now()}`,
       SubmittedAt: new Date().toISOString(),
       LeadStatus: 'new',
@@ -328,7 +328,22 @@ async function postLeadToWebhook(lead: LeadCapture) {
       Category: 'Heat pump / weatherization',
       Description: lead.transcript.map(m => `${m.role}: ${m.content}`).join('\n---\n'),
       LeadBriefJSON: lead.summary,
-      // Passthrough metadata
+      // Lowercase mirror keys (in case Apps Script reads these)
+      leadId: `CHAT-${Date.now()}`,
+      submittedAt: new Date().toISOString(),
+      leadStatus: 'new',
+      homeownerName: lead.name,
+      name: lead.name,
+      email: lead.email,
+      phone: '',
+      zipCode: lead.zip || '',
+      zip: lead.zip || '',
+      timeline: lead.timeline || '',
+      category: 'Heat pump / weatherization',
+      description: lead.transcript.map(m => `${m.role}: ${m.content}`).join('\n---\n'),
+      transcript: lead.transcript.map(m => `${m.role}: ${m.content}`).join('\n---\n'),
+      leadBriefJSON: lead.summary,
+      summary: lead.summary,
       source: lead.source || 'chat',
     }),
   })

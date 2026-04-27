@@ -72,15 +72,32 @@ VOICE RULES
 - If a homeowner sounds confused or stressed about cost, slow down. Don't pile on information.
 - When you mention a rebate, say what the user actually has to do to claim it (typically: hire an EVT-network contractor who handles the paperwork).
 
-INTENT TRIGGERS — when to offer to connect with a contractor
+INTENT TRIGGERS — when to ask for contact info in the conversation
 The user has shown buying intent if any of these are true:
 - They've asked 3+ specific questions about their actual project (their house, their utility, their timeline)
 - They use phrases like "when can I start", "who do you recommend", "can someone come look", "ready to get bids"
 - They've named a budget AND a timeline AND a town
 
-When intent triggers, offer this naturally: "Sounds like you've got a real project shaping up. Want me to put you in front of a Vermont installer who handles the rebate paperwork? They'll see what we just talked about — you won't have to repeat yourself."
+When intent triggers, ask for name + email INLINE in the conversation. Use phrasing like:
+"Sounds like you've got a real project shaping up. Want me to send what we just talked about to a Vermont installer who handles the rebate paperwork? Drop your name and email and I'll loop them in within a business day."
 
-If they say yes, ask for: name, email, ZIP code, and confirm timeline. That's it. Don't ask for phone unless they offer it.
+DO NOT direct the user to a separate form, button, or page. The conversation IS the intake. Ask in plain text and they'll reply in plain text.
+
+When the user gives you a name + email in their next message:
+- Acknowledge naturally and warmly: "Got it, [first name]. They'll be in touch within a business day. Anything else you want to figure out in the meantime?"
+- DO NOT say "I've captured your information," "Submitting now," or any system-y language.
+- Stay in conversation mode. The user is welcome to keep asking questions after the handoff.
+
+If the user gives you ONLY an email (no name):
+- Acknowledge it: "Got it. Anything else you'd want the installer to know before they reach out?"
+- Don't badger them for a name. The lead is captured either way.
+
+If the user gives you ONLY a name (no email):
+- Ask once, casually: "What email's the best way to reach you?"
+- Don't repeat if they don't want to share.
+
+If the user declines or stays vague:
+- No problem. Keep answering their questions. Don't push.
 
 REFUSAL & SAFETY
 - Don't make up rebate numbers. If you don't know, say so.
@@ -245,6 +262,57 @@ function formatPropertyContext(report: SeasonalReport): string {
   )
 
   return parts.join('\n')
+}
+
+// ---------- Contact info detection (auto-capture) ----------
+
+const EMAIL_REGEX = /\b([A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,})\b/
+
+function extractEmail(text: string): string | null {
+  if (!text) return null
+  const m = text.match(EMAIL_REGEX)
+  return m ? m[1].toLowerCase() : null
+}
+
+// Try to pull a plausible name from a message that also contains an email.
+// Heuristics: TitleCase first+last (e.g., "Jane Doe"), or "I'm <Name>", or
+// "<Name>, <email>". Conservative — false positives are worse than misses
+// (we'd rather capture with empty name than capture the wrong name).
+function extractName(text: string, email: string): string | null {
+  if (!text) return null
+
+  // Strip the email from the text first so its local-part doesn't get matched as a name
+  const withoutEmail = text.replace(email, '').replace(/<[^>]*>/g, '')
+
+  // Pattern 1: "I'm Jane Doe" / "I am Jane Doe" / "this is Jane Doe" / "name's Jane"
+  const introPattern = /(?:I'?m|I am|this is|name'?s|call me)\s+([A-Z][a-z]+(?:[\s'-][A-Z][a-z]+)?)/
+  const m1 = withoutEmail.match(introPattern)
+  if (m1) return m1[1].trim()
+
+  // Pattern 2: TitleCase FirstName LastName not preceded by other words
+  // (avoid "the Jane Doe place" matching)
+  const namePattern = /(?:^|[\s,—-])([A-Z][a-z]{1,15}(?:[\s'-][A-Z][a-z]{1,20})+)(?:[\s,—-]|$)/
+  const m2 = withoutEmail.match(namePattern)
+  if (m2) return m2[1].trim()
+
+  // Pattern 3: Single TitleCase word right next to email (like "Jane <email>")
+  const adjPattern = /(?:^|[\s,—-])([A-Z][a-z]{2,20})[\s,—-]+$/
+  const m3 = withoutEmail.match(adjPattern)
+  if (m3) return m3[1].trim()
+
+  return null
+}
+
+// Has the assistant offered an installer connection in any prior turn?
+// Used as the gate so we don't auto-capture from random emails earlier in chat.
+function offerWasMade(messages: Message[]): boolean {
+  return messages.some(
+    m =>
+      m.role === 'assistant' &&
+      /(installer|put you in front|loop them in|send what we just talked about|put a vermont installer|connect.*contractor|connect.*installer)/i.test(
+        m.content
+      )
+  )
 }
 
 // ---------- Claude call ----------
@@ -412,7 +480,37 @@ export async function POST(req: Request) {
     }
 
     const reply = await callClaude(trimmed, turnSystemPrompt)
-    return NextResponse.json({ reply, addressDetected: detectedAddress })
+
+    // Auto-capture: if the user's most recent message contains an email AND
+    // the conversation has prior installer-offer context, capture the lead silently.
+    let leadCaptured = false
+    try {
+      const lastUserMsg = trimmed.filter(m => m.role === 'user').pop()
+      if (lastUserMsg && offerWasMade(trimmed)) {
+        const email = extractEmail(lastUserMsg.content)
+        if (email) {
+          const name = extractName(lastUserMsg.content, email) || ''
+          // Build full transcript including the assistant reply we just generated
+          const fullTranscript: Message[] = [...trimmed, { role: 'assistant', content: reply }]
+          const summary = await summarizeTranscript(fullTranscript)
+          await postLeadToWebhook({
+            name: name || '(name not given)',
+            email,
+            zip: '',
+            timeline: '',
+            transcript: fullTranscript,
+            summary,
+            source: 'chat_auto_capture',
+          })
+          leadCaptured = true
+        }
+      }
+    } catch (captureErr) {
+      // Don't break the chat reply if capture fails — log and continue
+      console.error('auto-capture error:', captureErr instanceof Error ? captureErr.message : captureErr)
+    }
+
+    return NextResponse.json({ reply, addressDetected: detectedAddress, leadCaptured })
   } catch (err) {
     const msg = err instanceof Error ? err.message : 'unknown error'
     console.error('chat route error:', msg)

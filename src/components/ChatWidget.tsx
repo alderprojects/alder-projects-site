@@ -216,6 +216,36 @@ export default function ChatWidget({
         )}
       </div>
 
+      {!showLeadForm && !leadSubmitted && (
+        <div
+          className="px-3 py-2 border-t flex items-center justify-between gap-2"
+          style={{ borderColor: '#e5e0d4', backgroundColor: '#f5f1e8' }}
+        >
+          <span
+            className="text-xs"
+            style={{
+              fontFamily: 'DM Sans, system-ui, sans-serif',
+              color: '#5a554a',
+              flex: 1,
+            }}
+          >
+            Ready to talk to a Vermont installer?
+          </span>
+          <button
+            type="button"
+            onClick={() => setShowLeadForm(true)}
+            className="px-3 py-1.5 text-xs rounded font-medium"
+            style={{
+              backgroundColor: '#2c4a3e',
+              color: '#fff',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            Connect me
+          </button>
+        </div>
+      )}
+
       <form
         onSubmit={e => {
           e.preventDefault()

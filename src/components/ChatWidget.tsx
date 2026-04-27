@@ -5,18 +5,14 @@ import { useState, useRef, useEffect, FormEvent } from 'react'
 type Message = { role: 'user' | 'assistant'; content: string }
 
 type Props = {
-  // Where the widget is embedded (used in lead routing + system prompt context)
   source?: string
-  // First message to seed the conversation, e.g. opening line on calculator results page
   greeting?: string
-  // Optional context to pass to the API (referrer, calculator state, etc.)
   context?: Record<string, unknown>
-  // Display variant: 'inline' for embedded blocks, 'page' for full-page chat
   variant?: 'inline' | 'page'
 }
 
 const DEFAULT_GREETING =
-  "Ask me anything about Vermont heat pumps, weatherization, or rebates. I'll give you Vermont-specific numbers, not national averages."
+  "Ask me anything about Vermont property, renovation costs, rebates, or what to do next. I'll give you Vermont-specific numbers, not national averages."
 
 export default function ChatWidget({
   source = 'unknown',
@@ -40,13 +36,11 @@ export default function ChatWidget({
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' })
   }, [messages, loading])
 
-  // Heuristic: trigger lead capture offer after 3+ user turns OR when assistant
-  // explicitly mentions connecting to a contractor.
   useEffect(() => {
     if (showLeadForm || leadSubmitted) return
     const userTurns = messages.filter(m => m.role === 'user').length
     const lastAssistant = [...messages].reverse().find(m => m.role === 'assistant')?.content || ''
-    const offered = /installer|contractor|put you in front|handle the rebate paperwork/i.test(lastAssistant)
+    const offered = /installer|contractor|put you in front|handle the rebate paperwork|connect/i.test(lastAssistant)
     if (userTurns >= 3 && offered) {
       setShowLeadForm(true)
     }
@@ -89,6 +83,7 @@ export default function ChatWidget({
           ...lead,
           transcript: messages,
           source,
+          propertyContext: context?.propertyContext,
         }),
       })
       if (!res.ok) throw new Error('lead routing failed')
@@ -159,7 +154,7 @@ export default function ChatWidget({
             style={{ backgroundColor: '#f5f1e8', border: '1px solid #d4cfc4' }}
           >
             <div className="text-sm font-medium" style={{ color: '#2c4a3e' }}>
-              Connect with a Vermont installer
+              Connect with a Vermont contractor
             </div>
             <div className="text-xs" style={{ color: '#5a554a' }}>
               We'll send a Vermont contractor a summary of what we discussed. They'll reach
@@ -233,7 +228,7 @@ export default function ChatWidget({
           type="text"
           value={input}
           onChange={e => setInput(e.target.value)}
-          placeholder="Ask about heat pumps, weatherization, rebates…"
+          placeholder="Ask about Vermont property, costs, rebates…"
           disabled={loading}
           className="flex-1 px-3 py-2 text-sm rounded border"
           style={{ borderColor: '#d4cfc4', backgroundColor: '#fff' }}

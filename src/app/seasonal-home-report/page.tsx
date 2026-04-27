@@ -487,9 +487,9 @@ export function PropertyReportInner({ mode }: { mode: PropertyMode }) {
               context={{
                 propertyContext: {
                   address: addr,
-                  flags: r?.flags || [],
-                  parcel: r?.parcel || undefined,
-                  rawScanSummary: r?.summary || undefined,
+                  summary: r?.summary,
+                  concerns: r?.concerns,
+                  facts: r?.snapshot?.facts,
                 },
                 mode,
               }}

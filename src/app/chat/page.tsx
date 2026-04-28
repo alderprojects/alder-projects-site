@@ -3,9 +3,9 @@ import Nav from '@/components/Nav'
 import ChatWidget from '@/components/ChatWidget'
 
 export const metadata: Metadata = {
-  title: 'Vermont heat pump and weatherization assistant — Alder Projects',
+  title: 'Ask a Vermont Local — Renovation Costs, Rebates, ADUs · Alder Projects',
   description:
-    'Ask a Vermont local about heat pumps, weatherization, and the rebate stack. Real Vermont numbers, not national averages.',
+    'Free chat for Vermont homeowners. Renovation costs by town, the 2026 rebate stack, ADU rules, septic timing, contractor vetting. Real VT numbers, not national averages.',
   alternates: { canonical: 'https://alderprojects.com/chat' },
 }
 
@@ -23,7 +23,7 @@ export default function ChatPage() {
               color: '#1a1a1a',
             }}
           >
-            Vermont heat pump and weatherization assistant
+            Vermont Homeowner Assistant
           </h1>
           <p
             className="text-base"

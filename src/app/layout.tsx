@@ -3,12 +3,11 @@ import { GoogleAnalytics } from '@next/third-parties/google'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'Alder Projects \u2014 Vermont Home Renovation',
-  description: 'Describe your Vermont renovation project and get connected with local contractors who match your scope, location, and timeline. Serving all 14 Vermont counties.',
-  keywords: ['Vermont contractors','Vermont home renovation','Vermont remodeling','Vermont general contractor','find contractor Vermont','Burlington VT contractor','kitchen remodel Vermont'],
+  title: 'Alder Projects \u2014 Vermont Homeowner Reference',
+  description: 'Ask any Vermont homeowner question \u2014 heat pump rebates, kitchen costs, ADU rules, when to schedule a contractor. Real Vermont numbers from a local who knows the work.',
   openGraph: {
-    title: 'Alder Projects \u2014 Vermont Home Renovation',
-    description: 'Describe your project. We connect you with local Vermont contractors who are the right fit.',
+    title: 'Alder Projects \u2014 Vermont Homeowner Reference',
+    description: 'Real Vermont renovation numbers, rebate stack, ADU rules, and contractor vetting \u2014 straight from a Vermont local. Free, no signup.',
     url: 'https://alderprojects.com',
     siteName: 'Alder Projects',
     locale: 'en_US',
@@ -16,8 +15,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Alder Projects \u2014 Vermont Home Renovation',
-    description: 'Describe your project. Get connected with local Vermont contractors.',
+    title: 'Alder Projects \u2014 Vermont Homeowner Reference',
+    description: 'Free chat for Vermont homeowners. Real renovation numbers, the 2026 rebate stack, ADU rules, and contractor vetting.',
   },
   alternates: { canonical: 'https://alderprojects.com' },
 }

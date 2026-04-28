@@ -6,6 +6,84 @@ import { zoningSummaryForPrompt } from '@/data/zoning'
 import { handymanSummaryForPrompt } from '@/data/handyman'
 import { vettingSummaryForPrompt } from '@/data/contractor-vetting'
 
+// ---------- Rate limiting (in-memory) ----------
+// Per-IP rate limits to prevent bot abuse and runaway API costs.
+// In-memory storage means limits reset on serverless cold starts — acceptable
+// for now; upgrade to Vercel KV when the product earns it.
+
+type RateBucket = { count: number; windowStart: number }
+const RATE_LIMIT_HOUR_MAX = 12  // messages per hour per IP
+const RATE_LIMIT_DAY_MAX = 30   // messages per day per IP
+const HOUR_MS = 60 * 60 * 1000
+const DAY_MS = 24 * HOUR_MS
+
+const hourlyBuckets = new Map<string, RateBucket>()
+const dailyBuckets = new Map<string, RateBucket>()
+
+function getClientIp(req: Request): string {
+  // Vercel/Cloudflare standard headers
+  const xff = req.headers.get('x-forwarded-for')
+  if (xff) return xff.split(',')[0].trim()
+  const realIp = req.headers.get('x-real-ip')
+  if (realIp) return realIp
+  return 'unknown'
+}
+
+function checkRateLimit(ip: string): { allowed: boolean; reason?: string; retryAfterSec?: number } {
+  const now = Date.now()
+
+  // Hourly bucket
+  const h = hourlyBuckets.get(ip)
+  if (!h || now - h.windowStart > HOUR_MS) {
+    hourlyBuckets.set(ip, { count: 1, windowStart: now })
+  } else {
+    h.count++
+    if (h.count > RATE_LIMIT_HOUR_MAX) {
+      const retryAfterSec = Math.ceil((h.windowStart + HOUR_MS - now) / 1000)
+      return {
+        allowed: false,
+        reason: 'You have hit the hourly chat limit. Try again in about an hour, or grab the briefing if you want everything in one shot.',
+        retryAfterSec,
+      }
+    }
+  }
+
+  // Daily bucket
+  const d = dailyBuckets.get(ip)
+  if (!d || now - d.windowStart > DAY_MS) {
+    dailyBuckets.set(ip, { count: 1, windowStart: now })
+  } else {
+    d.count++
+    if (d.count > RATE_LIMIT_DAY_MAX) {
+      const retryAfterSec = Math.ceil((d.windowStart + DAY_MS - now) / 1000)
+      return {
+        allowed: false,
+        reason: 'You have hit the daily chat limit. Try again tomorrow, or grab the briefing if you want a full Vermont property write-up now.',
+        retryAfterSec,
+      }
+    }
+  }
+
+  // Periodic cleanup — keep buckets from growing unbounded
+  if (hourlyBuckets.size > 5000) {
+    for (const [k, v] of hourlyBuckets) {
+      if (now - v.windowStart > HOUR_MS) hourlyBuckets.delete(k)
+    }
+  }
+  if (dailyBuckets.size > 5000) {
+    for (const [k, v] of dailyBuckets) {
+      if (now - v.windowStart > DAY_MS) dailyBuckets.delete(k)
+    }
+  }
+
+  return { allowed: true }
+}
+
+// ---------- Conversation length safety cap ----------
+const SOFT_WARN_AT = 25  // chat softly mentions briefing
+const HARD_CAP_AT = 40   // refuse new Anthropic call
+
+
 export const runtime = 'nodejs'
 export const maxDuration = 30
 
@@ -433,6 +511,20 @@ async function postLeadToWebhook(lead: LeadCapture) {
 
 export async function POST(req: Request) {
   try {
+    // Rate-limit check — applies to ALL POSTs (chat + capture_lead).
+    // Prevents bots from racking up Anthropic costs even via the lead webhook.
+    const clientIp = getClientIp(req)
+    const rate = checkRateLimit(clientIp)
+    if (!rate.allowed) {
+      return NextResponse.json(
+        { error: rate.reason },
+        {
+          status: 429,
+          headers: rate.retryAfterSec ? { 'Retry-After': String(rate.retryAfterSec) } : {},
+        }
+      )
+    }
+
     const body = await req.json()
 
     if (body?.action === 'capture_lead') {
@@ -457,6 +549,22 @@ export async function POST(req: Request) {
     if (!Array.isArray(messages) || messages.length === 0) {
       return NextResponse.json({ error: 'messages required' }, { status: 400 })
     }
+
+    // Hard cap on per-conversation length. A single conversation thread that
+    // crosses HARD_CAP_AT messages is either abuse or someone who needs the
+    // briefing more than another chat reply.
+    if (messages.length >= HARD_CAP_AT) {
+      return NextResponse.json({
+        reply: "We've covered a ton of ground in this conversation — way more than most folks need. The Vermont property briefing pulls everything together (rebate playbook, sequence, contractor checklist, calendar, year ahead) in one PDF for your specific address. That's the right next step. Refresh the page if you want to start a new conversation about something different.",
+        capped: true,
+      })
+    }
+
+    // Soft warn — model sees a system-level note appended to the system prompt
+    // suggesting the briefing handoff. Doesn't block the call.
+    const conversationDepthHint = messages.length >= SOFT_WARN_AT
+      ? `\n\nCONVERSATION DEPTH NOTE: This conversation has reached ${messages.length} messages. The user has gotten significant value already. In your next reply, naturally suggest the Vermont property briefing as the consolidated next step ("we've covered a lot — want me to put it all in a briefing?"), then answer their current question concisely. Do not lecture or moralize.`
+      : ''
 
     const MAX_TURNS = 30
     const trimmed = messages.length > MAX_TURNS ? messages.slice(-MAX_TURNS) : messages
@@ -527,6 +635,9 @@ export async function POST(req: Request) {
     if (propertyContext) {
       turnSystemPrompt += `\n\n${formatPropertyContext(propertyContext)}`
     }
+
+    // Append conversation-depth hint if we hit the soft-warn threshold above.
+    turnSystemPrompt += conversationDepthHint
 
     const reply = await callClaude(trimmed, turnSystemPrompt)
 

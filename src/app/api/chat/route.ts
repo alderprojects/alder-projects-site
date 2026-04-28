@@ -93,14 +93,14 @@ function checkRateLimit(ip: string): { allowed: boolean; reason?: string; retryA
 
   // Periodic cleanup — keep buckets from growing unbounded
   if (hourlyBuckets.size > 5000) {
-    for (const [k, v] of hourlyBuckets) {
+    hourlyBuckets.forEach((v, k) => {
       if (now - v.windowStart > HOUR_MS) hourlyBuckets.delete(k)
-    }
+    })
   }
   if (dailyBuckets.size > 5000) {
-    for (const [k, v] of dailyBuckets) {
+    dailyBuckets.forEach((v, k) => {
       if (now - v.windowStart > DAY_MS) dailyBuckets.delete(k)
-    }
+    })
   }
 
   return { allowed: true }

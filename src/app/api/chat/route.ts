@@ -29,6 +29,33 @@ function getClientIp(req: Request): string {
   return 'unknown'
 }
 
+// hCaptcha verification — checks the token on the first user message of a session.
+// Fail-open if HCAPTCHA_SECRET not configured (avoids breaking dev/preview).
+async function verifyCaptcha(token: string, ip: string): Promise<boolean> {
+  if (!token) return false
+  const secret = process.env.HCAPTCHA_SECRET
+  if (!secret) {
+    console.warn('HCAPTCHA_SECRET not configured — captcha verification skipped')
+    return true
+  }
+  try {
+    const params = new URLSearchParams()
+    params.append('secret', secret)
+    params.append('response', token)
+    params.append('remoteip', ip)
+    const res = await fetch('https://api.hcaptcha.com/siteverify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: params,
+    })
+    const data = await res.json()
+    return !!data.success
+  } catch (err) {
+    console.error('captcha verify failed:', err)
+    return false
+  }
+}
+
 function checkRateLimit(ip: string): { allowed: boolean; reason?: string; retryAfterSec?: number } {
   const now = Date.now()
 
@@ -548,6 +575,22 @@ export async function POST(req: Request) {
     const { messages, context } = body as ChatRequest
     if (!Array.isArray(messages) || messages.length === 0) {
       return NextResponse.json({ error: 'messages required' }, { status: 400 })
+    }
+
+    // Captcha check — only on the very first user message of a conversation.
+    // After that, the rate limiter and conversation cap take over.
+    const userMessageCount = messages.filter((m: { role: string }) => m.role === 'user').length
+    if (userMessageCount === 1) {
+      const captchaOk = await verifyCaptcha(body.captchaToken || '', clientIp)
+      if (!captchaOk) {
+        return NextResponse.json(
+          {
+            reply: "Could not verify you are a human visitor. Refresh the page and try again — the verification runs invisibly in the background.",
+            captchaFailed: true,
+          },
+          { status: 403 }
+        )
+      }
     }
 
     // Hard cap on per-conversation length. A single conversation thread that

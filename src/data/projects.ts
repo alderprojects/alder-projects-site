@@ -21,6 +21,7 @@ export type Trade =
   | 'electrical_panel'
   | 'plumbing'
   | 'hvac'
+  | 'adu'
 
 export type Scope = 'budget' | 'mid' | 'high'
 
@@ -50,6 +51,8 @@ export type ProjectCost = {
   // VT-specific notes
   vtNotes: string
   permitFee: { low: number; high: number; note: string }
+  // Optional source citations for cost data (e.g. industry reports, EVT averages, contractor surveys)
+  sources?: string[]
 }
 
 // ---------------------------------------------------------------------------
@@ -520,6 +523,62 @@ export const PROJECT_COSTS: ProjectCost[] = [
     vtNotes: "For 100+ year old VT homes (Victorians, farmhouses), expect $1,500-5,000 in carpentry repair beyond the paint quote. Get a separate carpentry estimate before signing the paint contract. Premium exterior paint costs $80-110/gallon vs $40-50 for contractor-grade, but cuts the next repaint window from 7 years to 12-15.",
     permitFee: { low: 0, high: 0, note: "No permit required for residential exterior painting in VT. Local historic district may require approval for color change — check with town." },
   },
+  // ─── ADU (accessory dwelling unit) ──────────────────────
+  {
+    trade: 'adu',
+    scope: 'budget',
+    description: 'Basement or garage conversion to legal dwelling unit',
+    whatsIn: 'Egress windows or door, fire separation, kitchen + bath, electrical, heating, permits, finishes',
+    whatsNot: 'New foundation, structural roof work, exterior expansion, separate utility services',
+    pushesHigh: 'Septic upgrade triggered, sprinklers required, full bath addition vs half bath, hardwood + tile vs LVP',
+    costs: {
+      burlington_metro: { low: 75000, mid: 105000, high: 145000 },
+      chittenden_outer: { low: 70000, mid: 95000, high: 130000 },
+      vt_small_metro: { low: 65000, mid: 85000, high: 115000 },
+      rural_vt: { low: 60000, mid: 80000, high: 105000 },
+      resort_premium: { low: 90000, mid: 125000, high: 175000 },
+    },
+    vtNotes: 'Vermont Act 47 (2024) made ADUs by-right statewide for single-family lots, but local bylaws still apply for setbacks, parking, and owner-occupancy. Burlington and Stowe layer additional requirements. Most VT towns now allow basement conversions without zoning variance. Septic capacity is the most common surprise cost — check your septic design before assuming.',
+    permitFee: { low: 350, high: 1200, note: 'Building permit + zoning permit + possibly septic permit. Burlington and S Burlington run higher; rural towns lower.' },
+    sources: ['Vermont Act 47 (2024 ADU reform); Vermont Housing Finance Agency reports on ADU conversion costs; Builder Magazine VT regional pricing 2024'],
+  },
+  {
+    trade: 'adu',
+    scope: 'mid',
+    description: 'Attached ADU addition (above garage, side addition, or in-law suite)',
+    whatsIn: 'New framing, foundation if needed, full kitchen + bath, separate entry, heating + electrical, permits',
+    whatsNot: 'Site work beyond foundation, separate utility hookups, detached structures',
+    pushesHigh: 'Above-garage requires structural reinforcement, separate HVAC zone vs shared with main, custom kitchen vs stock cabinets',
+    costs: {
+      burlington_metro: { low: 130000, mid: 175000, high: 240000 },
+      chittenden_outer: { low: 120000, mid: 160000, high: 215000 },
+      vt_small_metro: { low: 110000, mid: 145000, high: 195000 },
+      rural_vt: { low: 100000, mid: 135000, high: 180000 },
+      resort_premium: { low: 155000, mid: 210000, high: 295000 },
+    },
+    vtNotes: 'Above-garage is the most common Vermont attached ADU. Typically 600-900 sq ft. Watch for setback compliance — if your existing garage is at the lot line, you cannot build up without a variance in most towns. Heat pump zone is standard, separate from main house.',
+    permitFee: { low: 800, high: 2500, note: 'Building permit + zoning permit + possibly variance fee + septic if bedroom count increases.' },
+    sources: ['Vermont Act 47; Vermont Housing Finance Agency ADU cost surveys; Remodeling Magazine 2025 Cost vs Value Report (Northeast region) — addition pricing'],
+  },
+  {
+    trade: 'adu',
+    scope: 'high',
+    description: 'Detached ADU — new freestanding unit (cottage, garage with apartment, tiny home permanent)',
+    whatsIn: 'Foundation, framing, roof, full mechanical, separate utility connections, permits, site work, finished space',
+    whatsNot: 'Major site grading, well/septic upgrades to main system, separate driveway',
+    pushesHigh: 'Separate well/septic vs shared with main, premium finishes, high-performance envelope (Pretty Good House or Passive House targeting), full architect involvement vs designer',
+    costs: {
+      burlington_metro: { low: 195000, mid: 265000, high: 380000 },
+      chittenden_outer: { low: 180000, mid: 245000, high: 350000 },
+      vt_small_metro: { low: 165000, mid: 225000, high: 320000 },
+      rural_vt: { low: 150000, mid: 205000, high: 290000 },
+      resort_premium: { low: 235000, mid: 320000, high: 475000 },
+    },
+    vtNotes: 'Detached ADUs in Vermont typically 600-1000 sq ft to keep within Act 47 size caps. Below 800 sq ft is the sweet spot for both zoning compliance (most towns) and cost-per-sq-ft economics. Site work and utility extensions are the most variable line items — a 200ft sewer line extension can add $30k. Septic capacity must be confirmed before design.',
+    permitFee: { low: 1500, high: 4500, note: 'Full new-construction permits including building, zoning, possibly variance, septic design review, and town highway access if applicable.' },
+    sources: ['Vermont Act 47 (2024); RSMeans 2024-2025 residential construction data, Northeast region; Vermont Housing Finance Agency — recent ADU pilot project cost data'],
+  },
+
 ]
 
 // ---------------------------------------------------------------------------
@@ -607,7 +666,10 @@ export function projectsSummaryForPrompt(): string {
       lines.push(`  In: ${s.whatsIn}`)
       lines.push(`  Pushes high: ${s.pushesHigh}`)
       lines.push(`  VT note: ${s.vtNotes}`)
-      lines.push(`  Permit: $${s.permitFee.low}-${s.permitFee.high}. ${s.permitFee.note}`)
+      lines.push(`  Permit: ${s.permitFee.low}-${s.permitFee.high}. ${s.permitFee.note}`)
+      if (s.sources && s.sources.length > 0) {
+        lines.push(`  Sources: ${s.sources.join("; ")}`)
+      }
       lines.push('')
     }
   }

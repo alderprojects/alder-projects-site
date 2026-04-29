@@ -5,6 +5,7 @@ import { calendarSummaryForPrompt } from '@/data/calendar'
 import { zoningSummaryForPrompt } from '@/data/zoning'
 import { handymanSummaryForPrompt } from '@/data/handyman'
 import { vettingSummaryForPrompt } from '@/data/contractor-vetting'
+import { sequencesSummaryForPrompt } from '@/data/sequences'
 
 // ---------- Rate limiting (in-memory) ----------
 // Per-IP rate limits to prevent bot abuse and runaway API costs.
@@ -664,7 +665,7 @@ export async function POST(req: Request) {
     // bids, contracts, or finding/evaluating a contractor.
     const vettingKeywords = ['contractor', 'hire', 'bid', 'quote', 'estimate', 'reference', 'license', 'insurance', 'permit', 'vetting', 'check', 'reputable', 'reliable', 'scam', 'rip off', 'how do i find', 'how to find', 'who should i', 'who do i call']
     if (vettingKeywords.some(k => recentUserText.includes(k))) {
-      turnSystemPrompt += `\n\n=== CONTRACTOR VETTING (VT-specific) ===\n\n${vettingSummaryForPrompt()}`
+      turnSystemPrompt += `\n\n=== CONTRACTOR VETTING (VT-specific) ===\n\n${vettingSummaryForPrompt()}\n\n=== PROJECT SEQUENCES ===\n\n${sequencesSummaryForPrompt()}\n\n=== VERMONT CALENDAR ===\n\n${calendarSummaryForPrompt()}`
     }
 
     if (context?.referrer) {

@@ -583,13 +583,11 @@ export async function POST(req: Request) {
     if (userMessageCount === 1) {
       const captchaOk = await verifyCaptcha(body.captchaToken || '', clientIp)
       if (!captchaOk) {
-        return NextResponse.json(
-          {
-            reply: "Could not verify you are a human visitor. Refresh the page and try again — the verification runs invisibly in the background.",
-            captchaFailed: true,
-          },
-          { status: 403 }
-        )
+        // Fail-open: log the captcha rejection but let the request through.
+        // Rate limit (Layer 1) and conversation cap (Layer 3) still protect.
+        // hCaptcha invisible mode over-rejects on cold sites, blocking real users.
+        // Treat captcha as a soft signal rather than a hard gate.
+        console.warn('captcha verification failed for ip', clientIp, '— allowing through; rate limit will still apply')
       }
     }
 

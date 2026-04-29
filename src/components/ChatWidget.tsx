@@ -51,7 +51,6 @@ export default function ChatWidget({
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' })
   }, [messages, loading])
 
-  // Initialize hCaptcha invisibly when script is ready
   useEffect(() => {
     if (!hcaptchaReady || !window.hcaptcha || !captchaContainerRef.current || !sitekey) return
     if (widgetIdRef.current) return
@@ -68,17 +67,17 @@ export default function ChatWidget({
     }
   }, [hcaptchaReady, sitekey])
 
-  async function getCaptchaTokenIfNeeded(userMessageCount: number): Promise<string> {
-    // Only need a token on the first user message
+  async function getCaptchaTokenIfNeeded(): Promise<string> {
+    const userMessageCount = messages.filter(m => m.role === 'user').length
     if (userMessageCount > 0) return ''
-    if (!sitekey) return '' // no captcha configured (dev/preview)
+    if (!sitekey) return ''
     if (!window.hcaptcha || !widgetIdRef.current) return ''
     if (captchaToken) return captchaToken
     return new Promise(resolve => {
       const start = Date.now()
       const poll = () => {
         if (captchaToken) return resolve(captchaToken)
-        if (Date.now() - start > 8000) return resolve('') // timeout, send anyway and let server fail-open if not configured
+        if (Date.now() - start > 8000) return resolve('')
         setTimeout(poll, 200)
       }
       try {
@@ -99,10 +98,7 @@ export default function ChatWidget({
     setError(null)
 
     try {
-      // userMessageCount BEFORE this send
-      const userMessageCountBefore = messages.filter(m => m.role === 'user').length
-      const token = await getCaptchaTokenIfNeeded(userMessageCountBefore)
-
+      const token = await getCaptchaTokenIfNeeded()
       const res = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -115,20 +111,14 @@ export default function ChatWidget({
 
       if (res.status === 429) {
         const data = await res.json().catch(() => ({}))
-        const reply: Message = {
-          role: 'assistant',
-          content: data.error || data.reply || "You have hit a rate limit. Take a break and come back later.",
-        }
+        const reply: Message = { role: 'assistant', content: data.reply || "You've hit a rate limit. Take a break and come back later." }
         setMessages(prev => [...prev, reply])
         return
       }
 
       if (res.status === 403) {
         const data = await res.json().catch(() => ({}))
-        const reply: Message = {
-          role: 'assistant',
-          content: data.reply || "Could not verify you. Refresh and try again.",
-        }
+        const reply: Message = { role: 'assistant', content: data.reply || "Could not verify you. Refresh and try again." }
         setMessages(prev => [...prev, reply])
         return
       }
@@ -225,7 +215,6 @@ export default function ChatWidget({
           </button>
         </form>
 
-        {/* Invisible hCaptcha container */}
         <div ref={captchaContainerRef} />
       </div>
     </>

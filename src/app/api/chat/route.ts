@@ -1,3 +1,79 @@
+// ---------- Bot protection (rate limit + captcha + conversation cap) ----------
+
+const RATE_LIMIT_HOUR = 12     // messages per IP per hour
+const RATE_LIMIT_DAY = 30      // messages per IP per day
+const CONV_HARD_CAP = 40       // refuse new turn past this length
+
+type RateBucket = { hourCount: number; dayCount: number; hourReset: number; dayReset: number }
+const rateBuckets = new Map<string, RateBucket>()
+
+function checkRateLimit(ip: string): { allowed: boolean; reason?: string; retryAfterSec?: number } {
+  const now = Date.now()
+  const HOUR_MS = 60 * 60 * 1000
+  const DAY_MS = 24 * HOUR_MS
+
+  let bucket = rateBuckets.get(ip)
+  if (!bucket) {
+    bucket = { hourCount: 0, dayCount: 0, hourReset: now + HOUR_MS, dayReset: now + DAY_MS }
+    rateBuckets.set(ip, bucket)
+  }
+
+  if (now >= bucket.hourReset) {
+    bucket.hourCount = 0
+    bucket.hourReset = now + HOUR_MS
+  }
+  if (now >= bucket.dayReset) {
+    bucket.dayCount = 0
+    bucket.dayReset = now + DAY_MS
+  }
+
+  if (bucket.hourCount >= RATE_LIMIT_HOUR) {
+    return { allowed: false, reason: 'hourly_limit', retryAfterSec: Math.ceil((bucket.hourReset - now) / 1000) }
+  }
+  if (bucket.dayCount >= RATE_LIMIT_DAY) {
+    return { allowed: false, reason: 'daily_limit', retryAfterSec: Math.ceil((bucket.dayReset - now) / 1000) }
+  }
+
+  bucket.hourCount++
+  bucket.dayCount++
+  return { allowed: true }
+}
+
+async function verifyCaptcha(token: string, ip: string): Promise<boolean> {
+  if (!token) return false
+  const secret = process.env.HCAPTCHA_SECRET
+  if (!secret) {
+    console.error('HCAPTCHA_SECRET not configured — captcha verification disabled')
+    return true // fail-open if not configured
+  }
+  try {
+    const params = new URLSearchParams()
+    params.append('secret', secret)
+    params.append('response', token)
+    params.append('remoteip', ip)
+    const res = await fetch('https://api.hcaptcha.com/siteverify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: params,
+    })
+    const data = await res.json()
+    return !!data.success
+  } catch (err) {
+    console.error('captcha verify failed:', err)
+    return false
+  }
+}
+
+function getClientIp(req: Request): string {
+  const forwarded = req.headers.get('x-forwarded-for')
+  if (forwarded) return forwarded.split(',')[0].trim()
+  const real = req.headers.get('x-real-ip')
+  if (real) return real
+  return 'unknown'
+}
+
+// ---------- End bot protection block ----------
+
 import { NextResponse } from 'next/server'
 import { projectsSummaryForPrompt } from '@/data/projects'
 import { rebatesSummaryForPrompt } from '@/data/rebates'
@@ -538,6 +614,45 @@ async function postLeadToWebhook(lead: LeadCapture) {
 
 export async function POST(req: Request) {
   try {
+    // Bot protection — runs before anything else
+    const ip = getClientIp(req)
+
+    const rate = checkRateLimit(ip)
+    if (!rate.allowed) {
+      return NextResponse.json(
+        {
+          reply: rate.reason === 'hourly_limit'
+            ? "You've hit the hourly chat limit. Take a break and come back in a bit, or grab a Vermont Property Briefing for the full playbook."
+            : "You've hit the daily chat limit. Come back tomorrow, or grab a Vermont Property Briefing for everything we'd cover.",
+          rateLimited: true,
+        },
+        { status: 429, headers: { 'Retry-After': String(rate.retryAfterSec || 3600) } }
+      )
+    }
+
+    // First-message captcha check
+    const _peekBody = await req.clone().json().catch(() => ({}))
+    const _userMsgCount = Array.isArray(_peekBody.messages) ? _peekBody.messages.filter((m: any) => m.role === 'user').length : 0
+    const _isFirstMessage = _userMsgCount === 1
+    if (_isFirstMessage && _peekBody.captchaToken) {
+      const captchaOk = await verifyCaptcha(_peekBody.captchaToken, ip)
+      if (!captchaOk) {
+        return NextResponse.json(
+          { reply: "Could not verify that you're human. Refresh the page and try again.", captchaFailed: true },
+          { status: 403 }
+        )
+      }
+    }
+
+    // Conversation length cap
+    if (_userMsgCount >= CONV_HARD_CAP) {
+      return NextResponse.json({
+        reply: "We've covered a ton in this conversation. To keep helping you well, the next step is the Vermont Property Briefing — it'll have everything we discussed plus the playbook for actually capturing the rebates and getting the work done. Want me to put it together?",
+        conversationCapped: true,
+      })
+    }
+
+
     // Rate-limit check — applies to ALL POSTs (chat + capture_lead).
     // Prevents bots from racking up Anthropic costs even via the lead webhook.
     const clientIp = getClientIp(req)
@@ -719,4 +834,4 @@ export async function POST(req: Request) {
     console.error('chat route error:', msg)
     return NextResponse.json({ error: 'chat unavailable', detail: msg.substring(0, 200) }, { status: 500 })
   }
-  }
+      }

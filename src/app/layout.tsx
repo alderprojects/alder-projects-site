@@ -19,6 +19,9 @@ export const metadata: Metadata = {
     description: 'Free chat for Vermont homeowners. Real renovation numbers, the 2026 rebate stack, ADU rules, and contractor vetting.',
   },
   alternates: { canonical: 'https://alderprojects.com' },
+  other: {
+    'impact-site-verification': '33104b35-32c8-475b-8c74-edc1681c46f2',
+  },
 }
 
 // GA Measurement ID is intentionally hardcoded so it ships regardless of env var state.

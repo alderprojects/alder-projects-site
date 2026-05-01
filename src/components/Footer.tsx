@@ -22,6 +22,9 @@ export default function Footer() {
         <div className="border-t border-[#7A9B6F]/10 pt-8">
           <p className="text-[#F5EFE0]/25 text-xs font-mono">&copy; {new Date().getFullYear()} Alder Projects LLC &middot; Vermont, USA</p>
         </div>
+      <div style={{ marginTop: 32, paddingTop: 16, borderTop: '1px solid rgba(245, 239, 224, 0.1)', textAlign: 'center' }}>
+        <a href="/disclosure" className="text-[#F5EFE0]/30 text-xs font-mono hover:text-[#7A9B6F] transition-colors">How we make money</a>
+      </div>
       </div>
     </footer>
   )

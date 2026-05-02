@@ -490,8 +490,17 @@ function SectionHero({ data }: { data: Profile }) {
 // ---- Costs --------------------------------------------------------------
 
 function fmtUSD(n: number): string {
-  if (n >= 1000) return `$${(n / 1000).toFixed(n >= 10000 ? 0 : 1)}k`
-  return `$${n.toLocaleString()}`
+  if (n >= 1000) return `${(n / 1000).toFixed(n >= 10000 ? 0 : 1)}k`
+  return `${n.toLocaleString()}`
+}
+
+function unitSfx(unit?: string): string {
+  switch (unit) {
+    case 'sqft': return '/sqft'
+    case 'each': return ' each'
+    case 'project': return ''
+    default: return ''
+  }
 }
 
 function scopeLabel(s: 'budget' | 'mid' | 'high'): string {
@@ -539,14 +548,14 @@ function SectionCosts({ data }: { data: Profile }) {
                       {scopeLabel(s.scope)}
                     </p>
                     <p style={{ fontSize: 13, fontFamily: FM, color: C.accent, margin: 0, fontWeight: 600 }}>
-                      {fmtUSD(s.cost.low)}–{fmtUSD(s.cost.high)}
+                      {fmtUSD(s.cost.low)}–{fmtUSD(s.cost.high)}{unitSfx(s.cost.unit)}
                     </p>
                   </div>
                   <p style={{ fontSize: 12, fontFamily: FB, color: C.inkSoft, margin: 0, lineHeight: 1.5 }}>
                     {s.description}
                   </p>
                   <p style={{ fontSize: 11, fontFamily: FM, color: C.inkFaint, margin: '6px 0 0' }}>
-                    Median {fmtUSD(s.cost.median)} · permit ${s.permitFee.low}–${s.permitFee.high}
+                    Median {fmtUSD(s.cost.median)}{unitSfx(s.cost.unit)} · permit ${s.permitFee.low}–${s.permitFee.high}
                   </p>
                 </div>
               ))}

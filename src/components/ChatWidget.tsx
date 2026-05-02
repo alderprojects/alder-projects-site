@@ -15,6 +15,10 @@ type Props = {
   // skip that round trip for property-page conversations.
   propertyProfile?: Record<string, unknown>
   variant?: 'inline' | 'page'
+  // Optional initial prompt — when set on mount, the widget auto-sends it
+  // as if the user typed it themselves. Used by PropertyChat to relay
+  // questions submitted from PropertyHero's chat input.
+  initialPrompt?: string
 }
 
 const DEFAULT_GREETING =
@@ -37,6 +41,7 @@ export default function ChatWidget({
   context,
   propertyProfile,
   variant = 'inline',
+  initialPrompt,
 }: Props) {
   const [messages, setMessages] = useState<Message[]>([
     { role: 'assistant', content: greeting },
@@ -46,6 +51,9 @@ export default function ChatWidget({
   const [error, setError] = useState<string | null>(null)
   const [captchaToken, setCaptchaToken] = useState<string>('')
   const [hcaptchaReady, setHcaptchaReady] = useState(false)
+  // Track which initialPrompt we have already auto-sent so that the
+  // effect does not re-fire if a parent re-renders with the same value.
+  const sentInitialRef = useRef<string | null>(null)
 
   const scrollRef = useRef<HTMLDivElement>(null)
   const captchaContainerRef = useRef<HTMLDivElement>(null)
@@ -72,6 +80,18 @@ export default function ChatWidget({
       console.error('hCaptcha init failed', e)
     }
   }, [hcaptchaReady, sitekey])
+
+  // Auto-send initialPrompt on mount or when the prop changes. Tracks the
+  // last sent value so a re-render with the same prompt does not double-send.
+  useEffect(() => {
+    if (!initialPrompt) return
+    if (sentInitialRef.current === initialPrompt) return
+    sentInitialRef.current = initialPrompt
+    const timer = setTimeout(() => sendMessage(initialPrompt), 50)
+    return () => clearTimeout(timer)
+    // sendMessage is a stable function declaration (hoisted); safe to omit.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialPrompt])
 
   async function getCaptchaTokenIfNeeded(): Promise<string> {
     const userMessageCount = messages.filter(m => m.role === 'user').length

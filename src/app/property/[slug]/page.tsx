@@ -3,9 +3,9 @@ import Link from 'next/link'
 import { headers } from 'next/headers'
 import Nav from '@/components/Nav'
 import Footer from '@/components/Footer'
-import ChatWidget from '@/components/ChatWidget'
 import PropertyGisOverlay from '@/components/PropertyGisOverlay'
 import PropertyHero from '@/components/PropertyHero'
+import PropertyChat from '@/components/PropertyChat'
 import RankedModuleStream, { computeSignalsFromParams } from '@/components/RankedModuleStream'
 import { rankModules } from '@/lib/property-ranker'
 import { MODULES, type PropertyProfile } from '@/lib/property-modules'
@@ -149,7 +149,7 @@ export default async function PropertyPage({
         </article>
 
         <aside className="property-aside" style={{ position: 'sticky', top: 88, alignSelf: 'start' }}>
-          <ChatPanel data={data} />
+          <PropertyChat profile={data} />
         </aside>
       </main>
 
@@ -378,53 +378,3 @@ function AddressStrip({ address }: { address: string }) {
   )
 }
 
-// Address-aware welcome line for the chat. Will be replaced by PropertyChat
-// in commit 6, which adds sticky/floating behaviour on top.
-function ChatPanel({ data }: { data: PropertyProfile }) {
-  const tierLabel = bucketLabel(data.bucket)
-  const greeting = `I have ${data.address} loaded — that's ${tierLabel.toLowerCase()}, on ${data.utility}. What do you want to know?`
-  return (
-    <div style={{ backgroundColor: C.card, border: `1px solid ${C.cardLine}`, borderRadius: 6, overflow: 'hidden' }}>
-      <div style={{ padding: '16px 18px', borderBottom: `1px solid ${C.cardLine}`, backgroundColor: C.bg }}>
-        <p
-          style={{
-            fontSize: 10,
-            fontFamily: FM,
-            letterSpacing: '0.12em',
-            textTransform: 'uppercase',
-            color: C.inkFaint,
-            marginBottom: 4,
-          }}
-        >
-          Ask about this property
-        </p>
-        <p style={{ fontSize: 13, fontFamily: FB, color: C.ink, lineHeight: 1.5, margin: 0 }}>
-          The assistant has the profile loaded as context. Ask anything specific to this house.
-        </p>
-      </div>
-      <ChatWidget
-        source={`property_profile_${data.slug}`}
-        variant="inline"
-        propertyProfile={data.chatContext}
-        greeting={greeting}
-      />
-    </div>
-  )
-}
-
-function bucketLabel(b: string): string {
-  switch (b) {
-    case 'burlington_metro':
-      return 'Burlington metro'
-    case 'chittenden_other':
-      return 'Chittenden county (outside metro)'
-    case 'resort_premium':
-      return 'Resort / second-home market'
-    case 'small_city':
-      return 'Small Vermont city'
-    case 'rural':
-      return 'Rural Vermont'
-    default:
-      return b
-  }
-}

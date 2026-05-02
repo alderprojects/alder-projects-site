@@ -3,15 +3,8 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { MODULES } from '@/lib/property-modules'
-import type {
-  PropertyProfile,
-  VisitorSignals,
-  TopLevelIntent,
-  IntentMode,
-  TopicId,
-  Scope,
-} from '@/lib/property-modules'
-import { classifyIntentMode, rankModules, detectRefundRisk } from '@/lib/property-ranker'
+import type { PropertyProfile, VisitorSignals } from '@/lib/property-modules'
+import { computeSignalsFromParams, rankModules } from '@/lib/property-ranker'
 
 // The page renders a stream of property modules ranked by the visitor's
 // signal vector. The server pre-renders this with whatever signals come
@@ -23,64 +16,6 @@ import { classifyIntentMode, rankModules, detectRefundRisk } from '@/lib/propert
 // client boundary serialization.
 
 const TOP_N = 6
-
-const TOP_LEVEL_INTENTS: TopLevelIntent[] = ['buying', 'owner', 'looking', 'researching']
-const INTENT_MODES: IntentMode[] = ['decide', 'do', 'understand', 'lookup', 'handle']
-const SCOPES: Scope[] = ['diy', 'mid', 'big', 'na']
-const TOPIC_VALUES = new Set<TopicId>([
-  'heat_pump',
-  'kitchen',
-  'bath',
-  'solar_battery',
-  'outdoor',
-  'addition_adu',
-  'weatherization',
-  'rebate_strat',
-  'property_tax',
-  'flood_zone',
-  'rebate_eligibility',
-  'contractor_vetting',
-  'general_orientation',
-  'mud_season',
-  'well_septic',
-])
-
-function asIntent(s: string | null | undefined): TopLevelIntent {
-  return s && TOP_LEVEL_INTENTS.includes(s as TopLevelIntent) ? (s as TopLevelIntent) : 'researching'
-}
-function asMode(s: string | null | undefined): IntentMode | null {
-  return s && INTENT_MODES.includes(s as IntentMode) ? (s as IntentMode) : null
-}
-function asScope(s: string | null | undefined): Scope {
-  return s && SCOPES.includes(s as Scope) ? (s as Scope) : 'na'
-}
-function asTopic(s: string | null | undefined): TopicId | null {
-  return s && TOPIC_VALUES.has(s as TopicId) ? (s as TopicId) : null
-}
-
-export function computeSignalsFromParams(
-  params: { intent?: string; topic?: string; mode?: string; scope?: string; from?: string },
-  profile: PropertyProfile,
-  sessionDepth = 0
-): VisitorSignals {
-  const intent = asIntent(params.intent)
-  const topic = asTopic(params.topic)
-  const mode = asMode(params.mode) ?? classifyIntentMode(intent, topic)
-  const scope = asScope(params.scope)
-  const cameFromArticleSlug = params.from ?? null
-  const refundRiskFlag = detectRefundRisk({ topLevelIntent: intent, cameFromArticleSlug })
-  return {
-    topLevelIntent: intent,
-    intentMode: mode,
-    topic,
-    scope,
-    townTier: profile.bucket,
-    utilityServiceArea: profile.utility,
-    refundRiskFlag,
-    sessionDepth,
-    cameFromArticleSlug,
-  }
-}
 
 const C = {
   bg: '#FAF7F2',

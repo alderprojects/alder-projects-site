@@ -15,6 +15,8 @@
 import type {
   IntentMode,
   PropertyModule,
+  PropertyProfile,
+  Scope,
   TopLevelIntent,
   TopicId,
   VisitorSignals,
@@ -151,4 +153,70 @@ export function classifyIntentMode(
 
   // general_orientation, mud_season for non-owners, anything unmapped:
   return 'understand'
+}
+
+// ---------- Signal extraction from URL params --------------------------
+//
+// Lives here (rather than in the client RankedModuleStream) so the server
+// page can call it during SSR. Next.js does not allow a server component
+// to invoke a function exported from a 'use client' module — those become
+// Client References at the boundary. Putting it in property-ranker.ts
+// (no 'use client') keeps it callable from both sides.
+
+const TOP_LEVEL_INTENTS: TopLevelIntent[] = ['buying', 'owner', 'looking', 'researching']
+const INTENT_MODES: IntentMode[] = ['decide', 'do', 'understand', 'lookup', 'handle']
+const SCOPES: Scope[] = ['diy', 'mid', 'big', 'na']
+const TOPIC_VALUES = new Set<TopicId>([
+  'heat_pump',
+  'kitchen',
+  'bath',
+  'solar_battery',
+  'outdoor',
+  'addition_adu',
+  'weatherization',
+  'rebate_strat',
+  'property_tax',
+  'flood_zone',
+  'rebate_eligibility',
+  'contractor_vetting',
+  'general_orientation',
+  'mud_season',
+  'well_septic',
+])
+
+function asIntent(s: string | null | undefined): TopLevelIntent {
+  return s && TOP_LEVEL_INTENTS.includes(s as TopLevelIntent) ? (s as TopLevelIntent) : 'researching'
+}
+function asMode(s: string | null | undefined): IntentMode | null {
+  return s && INTENT_MODES.includes(s as IntentMode) ? (s as IntentMode) : null
+}
+function asScope(s: string | null | undefined): Scope {
+  return s && SCOPES.includes(s as Scope) ? (s as Scope) : 'na'
+}
+function asTopic(s: string | null | undefined): TopicId | null {
+  return s && TOPIC_VALUES.has(s as TopicId) ? (s as TopicId) : null
+}
+
+export function computeSignalsFromParams(
+  params: { intent?: string; topic?: string; mode?: string; scope?: string; from?: string },
+  profile: PropertyProfile,
+  sessionDepth = 0
+): VisitorSignals {
+  const intent = asIntent(params.intent)
+  const topic = asTopic(params.topic)
+  const mode = asMode(params.mode) ?? classifyIntentMode(intent, topic)
+  const scope = asScope(params.scope)
+  const cameFromArticleSlug = params.from ?? null
+  const refundRiskFlag = detectRefundRisk({ topLevelIntent: intent, cameFromArticleSlug })
+  return {
+    topLevelIntent: intent,
+    intentMode: mode,
+    topic,
+    scope,
+    townTier: profile.bucket,
+    utilityServiceArea: profile.utility,
+    refundRiskFlag,
+    sessionDepth,
+    cameFromArticleSlug,
+  }
 }

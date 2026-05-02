@@ -10,10 +10,9 @@
 // PropertyProfile (matches /api/property's response). All renders are
 // pure — they never mutate signals or kick off side effects.
 
-'use client'
-
-import { useState, type ReactNode, type CSSProperties } from 'react'
+import type { ReactNode, CSSProperties } from 'react'
 import type { TownBucket } from '@/data/projects'
+import EmailCaptureCard from '@/components/EmailCaptureCard'
 
 // ---------- Visitor signal vector --------------------------------------
 
@@ -1217,138 +1216,6 @@ function topicLabelFor(t: TopicId | null): string {
     well_septic: 'a well or septic job',
   }
   return map[t]
-}
-
-// Email capture card — used by both contractor_bid and email_capture.
-// POSTs to the existing /api/chat capture_lead action, which routes to
-// the same lead webhook the chat uses for installer handoff.
-function EmailCaptureCard({
-  kind,
-  profile,
-  topic,
-}: {
-  kind: 'contractor' | 'buyer'
-  profile: PropertyProfile
-  topic: TopicId | null
-}) {
-  const [email, setEmail] = useState('')
-  const [name, setName] = useState('')
-  const [status, setStatus] = useState<'idle' | 'sending' | 'ok' | 'error'>('idle')
-
-  const isContractor = kind === 'contractor'
-  const headline = isContractor
-    ? `Ready for bids on ${profile.town}?`
-    : `Send me this ${profile.town} profile`
-  const sub = isContractor
-    ? `Drop your name and email and a Vermont contractor who handles ${topicLabelFor(topic)} will reach out within a business day.`
-    : `Save the profile and we will email you reminders when you hit a closing milestone — no spam, just the property facts that move.`
-  const buttonText = isContractor ? 'Send to a Vermont contractor →' : 'Send me the profile →'
-
-  async function submit(e: React.FormEvent) {
-    e.preventDefault()
-    if (!email.trim()) return
-    setStatus('sending')
-    const transcript = [
-      {
-        role: 'user' as const,
-        content: isContractor
-          ? `I want bids for ${topicLabelFor(topic)} on ${profile.address}.`
-          : `Send me the property profile for ${profile.address}.`,
-      },
-      {
-        role: 'assistant' as const,
-        content: `Property: ${profile.address}. Tier: ${profile.bucket}. Utility: ${profile.utility}. Topic: ${topicLabelFor(topic)}.`,
-      },
-    ]
-    try {
-      const res = await fetch('/api/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'capture_lead',
-          name: name.trim() || '(name not given)',
-          email: email.trim(),
-          transcript,
-          source: isContractor ? 'property_profile_contractor_bid' : 'property_profile_email_capture',
-        }),
-      })
-      setStatus(res.ok ? 'ok' : 'error')
-    } catch {
-      setStatus('error')
-    }
-  }
-
-  if (status === 'ok') {
-    return (
-      <Card kicker={isContractor ? 'Sent' : 'Saved'} title="Got it">
-        <p style={{ fontSize: 13, fontFamily: FB, color: C.ink, lineHeight: 1.55, margin: 0 }}>
-          {isContractor
-            ? `A Vermont contractor will reach out within a business day. Anything else you want to figure out in the meantime? The chat is right there.`
-            : `The profile is on its way. Reply to that email if you want anything tweaked.`}
-        </p>
-      </Card>
-    )
-  }
-
-  return (
-    <Card kicker={isContractor ? 'Get bids' : 'Save profile'} title={headline}>
-      <p style={{ fontSize: 13, fontFamily: FB, color: C.inkSoft, lineHeight: 1.55, margin: '0 0 12px' }}>
-        {sub}
-      </p>
-      <form onSubmit={submit} style={{ display: 'grid', gap: 8 }}>
-        <input
-          type="text"
-          value={name}
-          onChange={e => setName(e.target.value)}
-          placeholder="Name (optional)"
-          aria-label="Your name"
-          style={inputStyle}
-        />
-        <input
-          type="email"
-          value={email}
-          onChange={e => setEmail(e.target.value)}
-          placeholder="Email"
-          aria-label="Your email"
-          required
-          style={inputStyle}
-        />
-        <button
-          type="submit"
-          disabled={status === 'sending' || !email.trim()}
-          style={{
-            padding: '10px 16px',
-            border: 'none',
-            backgroundColor: status === 'sending' ? 'rgba(200,115,42,0.5)' : C.accent,
-            color: '#FAF7F2',
-            borderRadius: 4,
-            fontFamily: FB,
-            fontSize: 13,
-            fontWeight: 600,
-            cursor: status === 'sending' ? 'wait' : 'pointer',
-          }}
-        >
-          {status === 'sending' ? 'Sending…' : buttonText}
-        </button>
-        {status === 'error' && (
-          <p style={{ fontSize: 12, fontFamily: FB, color: '#dc2626', margin: 0 }}>
-            Could not send. Try again in a moment, or just message the chat instead.
-          </p>
-        )}
-      </form>
-    </Card>
-  )
-}
-
-const inputStyle: CSSProperties = {
-  padding: '10px 12px',
-  border: `1px solid ${C.cardLine}`,
-  borderRadius: 4,
-  fontSize: 13,
-  fontFamily: FB,
-  color: C.ink,
-  background: '#fff',
-  outline: 'none',
 }
 
 // ---------- Catalog -------------------------------------------------

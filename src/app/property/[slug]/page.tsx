@@ -6,9 +6,9 @@ import Footer from '@/components/Footer'
 import PropertyGisOverlay from '@/components/PropertyGisOverlay'
 import PropertyHero from '@/components/PropertyHero'
 import PropertyChat from '@/components/PropertyChat'
-import RankedModuleStream, { computeSignalsFromParams } from '@/components/RankedModuleStream'
-import { rankModules } from '@/lib/property-ranker'
-import { MODULES, type PropertyProfile } from '@/lib/property-modules'
+import RankedModuleStream from '@/components/RankedModuleStream'
+import { computeSignalsFromParams } from '@/lib/property-ranker'
+import type { PropertyProfile } from '@/lib/property-modules'
 
 // Per-address pages are noindex by decision. They are working surfaces for
 // a homeowner, not SEO entry points; the SEO entry points are the town and
@@ -110,11 +110,6 @@ export default async function PropertyPage({
     },
     data
   )
-  // Pre-compute so SSR HTML matches client first render exactly. Not
-  // strictly needed (RankedModuleStream re-runs the same calc) but keeps
-  // the server pass cheap and predictable.
-  void rankModules(MODULES, initialSignals)
-
   return (
     <div style={{ minHeight: '100vh', backgroundColor: C.bg }}>
       <Nav />

@@ -227,6 +227,54 @@ export function computeSignalsFromParams(
   }
 }
 
+// ---------- Render floor ----------------------------------------------
+//
+// shouldRenderInline decides whether a module shows up in the main flow
+// or stays hidden behind the "Show everything else" disclosure. Two
+// gates:
+//
+// 1. Hard intent-based filters — kill content types that do not fit the
+//    intent at all (researchers do not need execution sequences;
+//    buyers do not need cost-by-trade modules; owners without a topic
+//    do not need cost or sequence detail).
+// 2. Score floor — anything ranking below 15 is hidden by default.
+//
+// Universal modules (relevanceFactors.isUniversal) bypass both gates
+// because the catalog already curated them as always-on (the rebate
+// dollar headline and the in-season calendar are the two universals).
+
+const RENDER_SCORE_FLOOR = 15
+
+export function shouldRenderInline(module: PropertyModule, signals: VisitorSignals): boolean {
+  const intent = signals.topLevelIntent
+  const ctype = module.contentType
+  const isUniversal = module.relevanceFactors.isUniversal
+
+  if (isUniversal) return true
+
+  if (intent === 'researching' && (ctype === 'cost' || ctype === 'cta' || ctype === 'vetting' || ctype === 'sequence')) {
+    return false
+  }
+  if (intent === 'buying' && ctype === 'cost') {
+    return false
+  }
+  if (intent === 'owner' && !signals.topic && (ctype === 'cost' || ctype === 'sequence')) {
+    return false
+  }
+  // Owner with a topic: cost and sequence modules only render when they
+  // actually match that topic. The score floor alone leaves all 14 cost
+  // modules above water for an engaged owner because intent + mode +
+  // scope contributions dominate. The page becomes a wall of unrelated
+  // cost cards. Topic-matching keeps the main flow tight to what the
+  // visitor asked about; the rest sit in the disclosure.
+  if (intent === 'owner' && signals.topic && (ctype === 'cost' || ctype === 'sequence')) {
+    const w = module.relevanceFactors.topicMatch[signals.topic] ?? 0
+    if (w === 0) return false
+  }
+
+  return scoreModule(module, signals) >= RENDER_SCORE_FLOOR
+}
+
 // ---------- Scope inference -------------------------------------------
 //
 // Scope used to be a click signal (DIY / Mid / Big tier). The polish

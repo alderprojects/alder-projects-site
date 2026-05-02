@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { MODULES } from '@/lib/property-modules'
 import type { PropertyModule, PropertyProfile, VisitorSignals } from '@/lib/property-modules'
-import { computeSignalsFromParams, rankModules } from '@/lib/property-ranker'
+import { computeSignalsFromParams, rankModules, shouldRenderInline } from '@/lib/property-ranker'
 import {
   pickInlineCta,
   OwnerSummaryFooterCta,
@@ -19,8 +19,6 @@ import {
 // The MODULES catalog is imported here, not passed as a prop, because
 // each module carries a render function that cannot cross the server →
 // client boundary serialization.
-
-const TOP_N = 6
 
 const C = {
   bg: '#FAF7F2',
@@ -68,8 +66,10 @@ export default function RankedModuleStream({ profile, initialSignals }: Props) {
   // inline CTAs inside content modules (see InlineCta.pickInlineCta).
   const filtered = useMemo(() => MODULES.filter(m => m.contentType !== 'cta'), [])
   const ranked = useMemo(() => rankModules(filtered, signals), [signals, filtered])
-  const top = ranked.slice(0, TOP_N)
-  const rest = ranked.slice(TOP_N)
+  // Render-floor split: passing modules get the main flow; failing ones
+  // go inside the "Show everything else" disclosure.
+  const top = ranked.filter(m => shouldRenderInline(m, signals))
+  const rest = ranked.filter(m => !shouldRenderInline(m, signals))
 
   // The picker mutates a Set so we cap each CTA-shape at one instance
   // per render pass. Each render of RankedModuleStream gets a fresh set.

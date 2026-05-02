@@ -307,11 +307,20 @@ WHAT NOT TO DO:
 
 type Message = { role: 'user' | 'assistant'; content: string }
 
+type PageState = {
+  sectionsViewed?: string[]
+  modulesExpanded?: string[]
+  scopeClicked?: string | null
+  ctaHovered?: string | null
+}
+
 type ChatRequest = {
   messages: Message[]
   context?: {
     referrer?: string
     calculatorState?: Record<string, unknown>
+    propertyProfile?: Record<string, unknown>
+    pageState?: PageState
   }
 }
 
@@ -759,6 +768,24 @@ export async function POST(req: Request) {
     }
     if (propertyContext) {
       turnSystemPrompt += `\n\n${formatPropertyContext(propertyContext)}`
+    }
+
+    // Page-state awareness: when the chat sits next to the property page,
+    // the page reports which modules the visitor has scrolled past, which
+    // they expanded, which scope tier they picked, and which CTA they
+    // hovered. Inject this so the model can avoid recapping content the
+    // visitor has already seen.
+    if (context?.pageState) {
+      const ps = context.pageState
+      const lines: string[] = ['', 'PAGE STATE — what the visitor has engaged with on the property page:']
+      if (ps.sectionsViewed?.length) lines.push(`Sections scrolled past: ${ps.sectionsViewed.join(', ')}`)
+      if (ps.modulesExpanded?.length) lines.push(`Modules expanded: ${ps.modulesExpanded.join(', ')}`)
+      if (ps.scopeClicked) lines.push(`Picked scope tier: ${ps.scopeClicked}`)
+      if (ps.ctaHovered) lines.push(`Hovering CTA: ${ps.ctaHovered}`)
+      lines.push(
+        'Use this to avoid repeating what the visitor has already seen. If they ask about a topic the page covers and they have already viewed that module, dig deeper or pivot to next steps rather than re-explain the basics.'
+      )
+      turnSystemPrompt += '\n' + lines.join('\n')
     }
 
     // Append conversation-depth hint if we hit the soft-warn threshold above.

@@ -1,8 +1,20 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
+import { useSearchParams } from 'next/navigation'
 import ChatWidget from './ChatWidget'
-import type { PropertyProfile } from '@/lib/property-modules'
+import type { PropertyProfile, Scope } from '@/lib/property-modules'
+
+// pageState is what the visitor has done on the page so far. We pass it
+// to ChatWidget which forwards it as context.pageState to /api/chat.
+// The chat route injects it into the system prompt so the model can
+// avoid repeating what the visitor already saw.
+type PageState = {
+  sectionsViewed: string[]
+  modulesExpanded: string[]
+  scopeClicked: Scope | null
+  ctaHovered: string | null
+}
 
 // PropertyChat is the chat copilot wrapper for the property page.
 //
@@ -61,9 +73,106 @@ export default function PropertyChat({ profile }: Props) {
   const [mobileOpen, setMobileOpen] = useState(false)
   const [pulse, setPulse] = useState(false)
   const interactedRef = useRef(false)
+  const searchParams = useSearchParams()
+
+  const [pageState, setPageState] = useState<PageState>({
+    sectionsViewed: [],
+    modulesExpanded: [],
+    scopeClicked: null,
+    ctaHovered: null,
+  })
 
   const tier = bucketLabel(profile.bucket)
   const greeting = `I have ${profile.address} loaded — that's ${tier.toLowerCase()}, on ${profile.utility}. What do you want to know?`
+
+  // Sync scope from URL.
+  useEffect(() => {
+    const scope = (searchParams?.get('scope') as Scope | null) ?? null
+    setPageState(prev => (prev.scopeClicked === scope ? prev : { ...prev, scopeClicked: scope }))
+  }, [searchParams])
+
+  // Track which module cards have scrolled into view. Re-attaches when
+  // URL params change (since the ranked stream may have shuffled).
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    const observer = new IntersectionObserver(
+      entries => {
+        const newlyViewed: string[] = []
+        for (const entry of entries) {
+          if (!entry.isIntersecting) continue
+          const id = entry.target.getAttribute('data-module-id')
+          if (id) newlyViewed.push(id)
+        }
+        if (newlyViewed.length === 0) return
+        setPageState(prev => {
+          const set = new Set(prev.sectionsViewed)
+          for (const id of newlyViewed) set.add(id)
+          if (set.size === prev.sectionsViewed.length) return prev
+          return { ...prev, sectionsViewed: Array.from(set) }
+        })
+      },
+      { threshold: 0.4 }
+    )
+    // Slight delay so the ranked stream finishes its first paint before we observe.
+    const timer = setTimeout(() => {
+      document.querySelectorAll('[data-module-id]').forEach(el => observer.observe(el))
+    }, 200)
+    return () => {
+      clearTimeout(timer)
+      observer.disconnect()
+    }
+  }, [searchParams])
+
+  // Track module disclosures (the "Show everything else" details + any
+  // sequence details). The toggle event does not bubble, so attach
+  // directly to each candidate.
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    const onToggle = (e: Event) => {
+      const target = e.currentTarget as HTMLDetailsElement
+      const id = target.getAttribute('data-module-id') ?? target.getAttribute('data-disclosure-id')
+      if (!id || !target.open) return
+      setPageState(prev =>
+        prev.modulesExpanded.includes(id)
+          ? prev
+          : { ...prev, modulesExpanded: [...prev.modulesExpanded, id] }
+      )
+    }
+    const timer = setTimeout(() => {
+      document.querySelectorAll<HTMLDetailsElement>('details[data-module-id], details[data-disclosure-id]').forEach(el => {
+        el.addEventListener('toggle', onToggle)
+      })
+    }, 250)
+    return () => {
+      clearTimeout(timer)
+      document.querySelectorAll<HTMLDetailsElement>('details[data-module-id], details[data-disclosure-id]').forEach(el => {
+        el.removeEventListener('toggle', onToggle)
+      })
+    }
+  }, [searchParams])
+
+  // CTA hover via event delegation on the document.
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    const onOver = (e: Event) => {
+      const target = (e.target as HTMLElement).closest('[data-module-id^="cta_"]')
+      if (!target) return
+      const id = target.getAttribute('data-module-id')
+      if (!id) return
+      setPageState(prev => (prev.ctaHovered === id ? prev : { ...prev, ctaHovered: id }))
+    }
+    const onOut = (e: Event) => {
+      const target = (e.target as HTMLElement).closest('[data-module-id^="cta_"]')
+      if (!target) return
+      setPageState(prev => (prev.ctaHovered ? { ...prev, ctaHovered: null } : prev))
+    }
+    document.addEventListener('mouseover', onOver)
+    document.addEventListener('mouseout', onOut)
+    return () => {
+      document.removeEventListener('mouseover', onOver)
+      document.removeEventListener('mouseout', onOut)
+    }
+  }, [])
 
   // Hero-input prompts arrive via CustomEvent. Pull from sessionStorage on
   // mount in case the event fired before this component hydrated.
@@ -151,6 +260,7 @@ export default function PropertyChat({ profile }: Props) {
           propertyProfile={profile.chatContext}
           greeting={greeting}
           initialPrompt={pendingPrompt}
+          pageState={pageState as unknown as Record<string, unknown>}
         />
       </div>
 

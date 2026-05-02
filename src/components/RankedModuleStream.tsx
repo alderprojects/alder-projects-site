@@ -72,6 +72,7 @@ export default function RankedModuleStream({ profile, initialSignals }: Props) {
       ))}
       {rest.length > 0 && (
         <details
+          data-disclosure-id="show_everything_else"
           style={{
             marginTop: 8,
             border: `1px solid ${C.cardLine}`,

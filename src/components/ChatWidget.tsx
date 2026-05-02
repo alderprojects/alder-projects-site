@@ -19,6 +19,11 @@ type Props = {
   // as if the user typed it themselves. Used by PropertyChat to relay
   // questions submitted from PropertyHero's chat input.
   initialPrompt?: string
+  // Snapshot of what the visitor has engaged with on the property page —
+  // sectionsViewed, modulesExpanded, scopeClicked, ctaHovered. Forwarded
+  // to /api/chat as context.pageState so the model can avoid repeating
+  // what the visitor has already seen.
+  pageState?: Record<string, unknown>
 }
 
 const DEFAULT_GREETING =
@@ -42,6 +47,7 @@ export default function ChatWidget({
   propertyProfile,
   variant = 'inline',
   initialPrompt,
+  pageState,
 }: Props) {
   const [messages, setMessages] = useState<Message[]>([
     { role: 'assistant', content: greeting },
@@ -129,6 +135,7 @@ export default function ChatWidget({
         ...context,
         referrer: source,
         ...(propertyProfile ? { propertyProfile } : {}),
+        ...(pageState ? { pageState } : {}),
       }
       const res = await fetch('/api/chat', {
         method: 'POST',

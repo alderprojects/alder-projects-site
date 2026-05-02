@@ -128,6 +128,9 @@ export default function PropertyChat({ profile }: Props) {
     }
   }, [])
 
+  // Read the page-level framing toggle from the URL.
+  const framing = (searchParams?.get('for') as 'me' | 'buyer' | 'contractor' | null) ?? 'me'
+
   function toggleNewcomer() {
     setNewcomer(prev => {
       const next = !prev
@@ -352,7 +355,7 @@ export default function PropertyChat({ profile }: Props) {
           initialPrompt={pendingPrompt}
           pageState={pageState as unknown as Record<string, unknown>}
           onActions={applyActions}
-          context={{ newcomer }}
+          context={{ newcomer, framing }}
         />
       </div>
 

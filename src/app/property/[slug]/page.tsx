@@ -6,6 +6,7 @@ import Footer from '@/components/Footer'
 import PropertyGisOverlay from '@/components/PropertyGisOverlay'
 import PropertyHero from '@/components/PropertyHero'
 import PropertyChat from '@/components/PropertyChat'
+import PropertyFraming from '@/components/PropertyFraming'
 import RankedModuleStream from '@/components/RankedModuleStream'
 import { computeSignalsFromParams } from '@/lib/property-ranker'
 import type { PropertyProfile } from '@/lib/property-modules'
@@ -130,6 +131,7 @@ export default async function PropertyPage({
         <article style={{ minWidth: 0, display: 'grid', gap: 24 }}>
           {/* Universal: hero summary always shows. */}
           <HeroSummary data={data} />
+          <PropertyFraming />
 
           {/* Live FEMA + ANR Atlas overlay — universal, fetches client-side. */}
           <PropertyGisOverlay address={data.address} />

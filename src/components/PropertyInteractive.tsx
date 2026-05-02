@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import PropertyHero from './PropertyHero'
 import RankedModuleStream from './RankedModuleStream'
+import VermontBasicsSection from './VermontBasicsSection'
 import type {
   PropertyProfile,
   TopicId,
@@ -95,10 +96,20 @@ export default function PropertyInteractive({ profile, initialSignals }: Props) 
     setTopic(next)
   }, [])
 
+  // Researcher branch: skip the ranked module stream entirely. Vermont
+  // basics is its own curated experience — six topic cards + a bottom
+  // "try another address" link. No costs, no contractor CTAs, no
+  // affiliate items.
+  const isResearching = intent === 'researching'
+
   return (
     <>
       <PropertyHero profile={profile} intent={intent} topic={topic} onPickIntent={onPickIntent} onPickTopic={onPickTopic} />
-      <RankedModuleStream profile={profile} signals={signals} />
+      {isResearching ? (
+        <VermontBasicsSection />
+      ) : (
+        <RankedModuleStream profile={profile} signals={signals} />
+      )}
     </>
   )
 }

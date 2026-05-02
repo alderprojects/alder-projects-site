@@ -245,39 +245,44 @@ export default function PropertyHero({ profile, intent, topic, onPickIntent, onP
             </div>
           )}
 
-          <div>
-            <p
-              style={{
-                fontSize: 11,
-                fontFamily: FM,
-                color: C.inkFaint,
-                letterSpacing: '0.08em',
-                textTransform: 'uppercase',
-                margin: '4px 0 10px',
-              }}
-            >
-              {intent === 'owner' ? 'Or a question' : 'Pick a question'}
-            </p>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-              {QUESTION_CHIPS.map(q => {
-                const selected = topic === q.id
-                return (
-                  <button
-                    key={q.id}
-                    type="button"
-                    data-tile
-                    tabIndex={-1}
-                    aria-label={q.label}
-                    aria-pressed={selected}
-                    onClick={() => pickTopic(q.id)}
-                    style={chipStyle(selected)}
-                  >
-                    {q.label}
-                  </button>
-                )
-              })}
+          {/* Question chips — owner gets them as a secondary path; buyer
+              gets them as the primary picker. Researcher skips them
+              entirely (Vermont basics cards below replace this). */}
+          {intent !== 'researching' && (
+            <div>
+              <p
+                style={{
+                  fontSize: 11,
+                  fontFamily: FM,
+                  color: C.inkFaint,
+                  letterSpacing: '0.08em',
+                  textTransform: 'uppercase',
+                  margin: '4px 0 10px',
+                }}
+              >
+                {intent === 'owner' ? 'Or a question' : 'Pick a question'}
+              </p>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                {QUESTION_CHIPS.map(q => {
+                  const selected = topic === q.id
+                  return (
+                    <button
+                      key={q.id}
+                      type="button"
+                      data-tile
+                      tabIndex={-1}
+                      aria-label={q.label}
+                      aria-pressed={selected}
+                      onClick={() => pickTopic(q.id)}
+                      style={chipStyle(selected)}
+                    >
+                      {q.label}
+                    </button>
+                  )
+                })}
+              </div>
             </div>
-          </div>
+          )}
         </div>
       )}
     </section>

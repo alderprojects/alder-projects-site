@@ -17,9 +17,21 @@ type Props = {
 }
 
 const TOP_LEVEL: { id: TopLevelIntent; label: string; sub: string }[] = [
-  { id: 'buying', label: 'The deal with this property', sub: 'I am looking at this place' },
-  { id: 'owner', label: 'Help with my place', sub: 'I own this property' },
-  { id: 'researching', label: 'Information about Vermont', sub: 'I just want to learn' },
+  {
+    id: 'buying',
+    label: 'Sizing up this property',
+    sub: 'Pre-purchase or just-bought. Costs to expect, regulatory surprises, rebates that come with it.',
+  },
+  {
+    id: 'owner',
+    label: 'Working on my place',
+    sub: "You own it, you've got something in mind — heat pump, kitchen, ADU, rebate strategy.",
+  },
+  {
+    id: 'researching',
+    label: 'Vermont basics',
+    sub: 'Just learning. Property tax, mud season, EVT, Act 47 — how this state works.',
+  },
 ]
 
 const PROJECT_TILES: { id: TopicId; label: string; sub: string }[] = [
@@ -117,7 +129,7 @@ export default function PropertyHero({ profile, intent, topic, onPickIntent, onP
             margin: '0 0 24px',
           }}
         >
-          What do you want from {profile.town}?
+          What brought you here?
         </h2>
       )}
 
@@ -155,9 +167,9 @@ export default function PropertyHero({ profile, intent, topic, onPickIntent, onP
                 transition: 'background-color 150ms ease, border-color 150ms ease',
               }}
             >
-              <p style={{ fontSize: intent ? 13 : 15, fontWeight: 600, margin: 0 }}>{opt.label}</p>
+              <p style={{ fontSize: intent ? 13 : 17, fontWeight: 600, margin: 0, lineHeight: 1.25 }}>{opt.label}</p>
               {!intent && (
-                <p style={{ fontSize: 12, color: C.inkSoft, margin: '4px 0 0' }}>{opt.sub}</p>
+                <p style={{ fontSize: 13, color: C.inkSoft, margin: '6px 0 0', lineHeight: 1.45 }}>{opt.sub}</p>
               )}
             </button>
           )

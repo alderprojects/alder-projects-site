@@ -7,8 +7,12 @@
 // "Some links earn a small commission if you buy. That's how a free
 // Vermont site stays free. We only recommend what we'd buy ourselves."
 
+import type { State } from './_types'
+import { DEFAULT_STATE } from './_types'
+
 export type HandymanJob = {
   id: string
+  state: State
   category: 'gutters' | 'septic' | 'tree' | 'chimney' | 'snow' | 'oil_tank' | 'water' | 'dryer_vent' | 'pest' | 'foundation'
   title: string
   whenToDo: string
@@ -32,6 +36,7 @@ export const HANDYMAN_JOBS: HandymanJob[] = [
   // ─── GUTTER CLEANING ────────────────────────────────────────────────────
   {
     id: 'gutter_cleaning',
+    state: 'VT',
     category: 'gutters',
     title: 'Gutter cleaning + leader inspection',
     whenToDo: 'Twice yearly: late spring (after pollen drop) and mid-fall (after most leaves down). VT homes with mature maples may need 3x/year.',
@@ -48,6 +53,7 @@ export const HANDYMAN_JOBS: HandymanJob[] = [
   // ─── SEPTIC PUMPING ─────────────────────────────────────────────────────
   {
     id: 'septic_pumping',
+    state: 'VT',
     category: 'septic',
     title: 'Septic tank pumping',
     whenToDo: 'Every 3-5 years for typical household. More often (2-3 years) if disposal is heavily used, household >4 people, or system is older.',
@@ -62,6 +68,7 @@ export const HANDYMAN_JOBS: HandymanJob[] = [
   // ─── TREE REMOVAL ───────────────────────────────────────────────────────
   {
     id: 'tree_removal',
+    state: 'VT',
     category: 'tree',
     title: 'Tree removal — single mature tree near structures',
     whenToDo: 'Year-round but winter is often best (frozen ground = less yard damage). Avoid leafless windy weather windows.',
@@ -76,6 +83,7 @@ export const HANDYMAN_JOBS: HandymanJob[] = [
   // ─── CHIMNEY SWEEP ──────────────────────────────────────────────────────
   {
     id: 'chimney_sweep',
+    state: 'VT',
     category: 'chimney',
     title: 'Chimney sweep + Level 1 inspection',
     whenToDo: 'Annually if wood-burning. Every 2-3 years for occasional use. ALWAYS before a winter season after recent purchase or renovation.',
@@ -90,6 +98,7 @@ export const HANDYMAN_JOBS: HandymanJob[] = [
   // ─── SNOW PLOWING ───────────────────────────────────────────────────────
   {
     id: 'snow_plowing',
+    state: 'VT',
     category: 'snow',
     title: 'Driveway snow plowing contract',
     whenToDo: 'Sign contract by November 1 — most plow operators full by Nov 15. Mid-season signups pay 30-50% premium.',
@@ -106,6 +115,7 @@ export const HANDYMAN_JOBS: HandymanJob[] = [
   // ─── OIL TANK INSPECTION ────────────────────────────────────────────────
   {
     id: 'oil_tank_inspection',
+    state: 'VT',
     category: 'oil_tank',
     title: 'Oil tank inspection (or removal)',
     whenToDo: 'Inspection every 2-3 years for tanks 15+ years old. Removal at 25+ years even if no visible problem — VT insurance requirements tightening.',
@@ -120,6 +130,7 @@ export const HANDYMAN_JOBS: HandymanJob[] = [
   // ─── WELL WATER TESTING ─────────────────────────────────────────────────
   {
     id: 'well_water_testing',
+    state: 'VT',
     category: 'water',
     title: 'Private well water testing',
     whenToDo: 'Annually for basic bacteria + nitrate. Every 3-5 years for full panel including arsenic, uranium, radon-in-water. Always test after pump replacement, flooding, or septic repair.',
@@ -136,6 +147,7 @@ export const HANDYMAN_JOBS: HandymanJob[] = [
   // ─── DRYER VENT CLEANING ────────────────────────────────────────────────
   {
     id: 'dryer_vent',
+    state: 'VT',
     category: 'dryer_vent',
     title: 'Dryer vent cleaning',
     whenToDo: 'Annually if heavy use, every 2 years light use. Always after extended pause (vacant property), and after birds nesting (spring).',
@@ -157,14 +169,23 @@ export const HANDYMAN_JOBS: HandymanJob[] = [
 export const AFFILIATE_DISCLOSURE = `Some links on this page earn us a small commission if you buy through them. That's how a free Vermont site stays free. We only recommend products we'd buy ourselves — typically things you can find at Aubuchon Hardware, Home Depot, or your local lumber yard.`
 
 // ---------------------------------------------------------------------------
+// STATE-AWARE ACCESSOR
+// ---------------------------------------------------------------------------
+
+// Returns handyman jobs for the requested state. Today every entry is VT.
+export function getHandymanJobsForState(state: State): HandymanJob[] {
+  return HANDYMAN_JOBS.filter(j => j.state === state)
+}
+
+// ---------------------------------------------------------------------------
 // COMPACT SUMMARY for chat system prompt
 // ---------------------------------------------------------------------------
 
-export function handymanSummaryForPrompt(): string {
+export function handymanSummaryForPrompt(state: State = DEFAULT_STATE): string {
   const lines: string[] = ['VERMONT HANDYMAN + MAINTENANCE REFERENCE (top recurring jobs)']
   lines.push('Use this as background for Vermont homeowner maintenance questions. Always recommend hiring vs DIY based on the diyVsHire flag.')
   lines.push('')
-  for (const j of HANDYMAN_JOBS) {
+  for (const j of getHandymanJobsForState(state)) {
     lines.push(`### ${j.title}`)
     lines.push(`- Cost: $${j.costRange.low}-${j.costRange.high} ${j.costRange.unit}`)
     lines.push(`- DIY suitability: ${j.diyVsHire}`)

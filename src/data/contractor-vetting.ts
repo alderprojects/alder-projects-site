@@ -12,8 +12,12 @@
 //     verification + a real written contract. License lookup theater
 //     does not work here the way it does elsewhere.
 
+import type { State } from './_types'
+import { DEFAULT_STATE } from './_types'
+
 export type VettingStep = {
   id: string
+  state: State
   name: string
   // What this is, plainly
   description: string
@@ -32,6 +36,7 @@ export type VettingStep = {
 export const VETTING_STEPS: VettingStep[] = [
   {
     id: 'registration-check',
+    state: 'VT',
     name: 'Verify Residential Contractor Registration with VT AG',
     description: "Vermont requires anyone doing residential construction work of $3,500+ to register with the Attorney General's Consumer Assistance Program.",
     vtRationale: 'Registration is the closest VT has to a license. It is FREE for the contractor. Anyone refusing to register or working unregistered on a $3,500+ job is breaking VT law and waiving most of your consumer protections in advance.',
@@ -52,6 +57,7 @@ export const VETTING_STEPS: VettingStep[] = [
   },
   {
     id: 'insurance-verification',
+    state: 'VT',
     name: 'Get a current Certificate of Insurance — directly from their insurer',
     description: 'Verify both general liability AND workers comp insurance is in force, with you (the homeowner) listed as a Certificate Holder.',
     vtRationale: "If a contractor falls off your roof and they don't have workers comp, YOUR homeowners policy gets sued. VT homeowners policies typically exclude on-the-job injury claims for uninsured contractors. This is the single biggest financial risk you can avoid.",
@@ -76,6 +82,7 @@ export const VETTING_STEPS: VettingStep[] = [
   },
   {
     id: 'three-references',
+    state: 'VT',
     name: 'Call three real references from the past 12 months',
     description: 'Ask for and actually call three recent clients with similar-scope projects in similar VT towns.',
     vtRationale: 'In Vermont, referrals matter more than online reviews. The contractor pool is small, the communities are small, and a contractor who has burned even one homeowner has a reputation problem. Talking to three recent clients gives you signal that 50 Google reviews cannot.',
@@ -98,6 +105,7 @@ export const VETTING_STEPS: VettingStep[] = [
   },
   {
     id: 'site-visit-existing',
+    state: 'VT',
     name: 'Drive by an active or recent jobsite',
     description: 'Visit a site where the contractor is currently working or recently finished, ideally unannounced.',
     vtRationale: "In Vermont, contractors' active jobsites tell you everything. Drive past on a Tuesday afternoon. Is the site organized? Are tools out and being used? Is debris contained? Does the contractor's crew look like one team or a rotating cast of subs you have never met? Vermont is small enough that you can usually find a current jobsite within 20 minutes of your house.",
@@ -118,6 +126,7 @@ export const VETTING_STEPS: VettingStep[] = [
   },
   {
     id: 'written-contract',
+    state: 'VT',
     name: 'Insist on a written contract with specific Vermont protections',
     description: 'Get a real written contract before any work begins or money changes hands. Verbal agreements and "handshake deals" leave you with no recourse.',
     vtRationale: "Vermont law (9 V.S.A. § 4006) requires a written contract for residential work over $1,000 if it includes specific items: scope of work, total price, completion date, deposit terms, and the homeowner's 3-day right to cancel. A contract missing these is unenforceable AGAINST you, but the contractor still cashes your deposit.",
@@ -143,6 +152,7 @@ export const VETTING_STEPS: VettingStep[] = [
   },
   {
     id: 'mechanic-lien-awareness',
+    state: 'VT',
     name: "Understand how VT mechanic's liens work",
     description: "In Vermont, a contractor or supplier you never directly hired can file a lien on YOUR house if your contractor doesn't pay them.",
     vtRationale: "Mechanic's lien law in VT (9 V.S.A. Chapter 51) lets subcontractors and material suppliers attach a lien to your property if their general contractor stiffs them on payment. You could pay your GC in full, the GC walks away, the lumberyard never gets paid, and now you have a lien on your house. The defense is simple but most homeowners don't do it.",
@@ -164,6 +174,7 @@ export const VETTING_STEPS: VettingStep[] = [
   },
   {
     id: 'permit-pulling',
+    state: 'VT',
     name: 'Confirm WHO is pulling the permits',
     description: 'For permitted work, the contractor should pull the permit in their name — not yours.',
     vtRationale: "In Vermont, the person whose name is on the building permit is responsible for code compliance. If you pull the permit (often called an \"owner-builder permit\"), you're legally on the hook for everything — including the contractor's mistakes. Some contractors push owner-pulled permits to dodge liability. This is a giant red flag.",
@@ -184,6 +195,7 @@ export const VETTING_STEPS: VettingStep[] = [
   },
   {
     id: 'red-flag-pricing',
+    state: 'VT',
     name: 'Understand normal VT pricing — and when a quote is suspicious',
     description: 'Get three written bids and understand why the cheapest is usually a trap.',
     vtRationale: "Vermont is a small construction market with tight contractor schedules. Real VT contractors rarely undercut local pricing significantly — they don't need to. A quote 30%+ below the others usually means: missing scope, lowball bait-and-switch, or a non-local contractor underestimating VT-specific costs (mud season, building code, materials shipping). Sometimes the LOW bid is the dangerous one.",
@@ -208,6 +220,12 @@ export const VETTING_STEPS: VettingStep[] = [
 
 // ---------- Helpers ----------
 
+// Returns vetting steps for the requested state. Today every step is VT
+// (rules cite VT-specific statutes and the AG registry).
+export function getVettingStepsForState(state: State): VettingStep[] {
+  return VETTING_STEPS.filter(s => s.state === state)
+}
+
 export function vettingStep(id: string): VettingStep | null {
   return VETTING_STEPS.find(s => s.id === id) || null
 }
@@ -222,8 +240,10 @@ export function vettingForBudget(budget: number): VettingStep[] {
   })
 }
 
-// Compact summary for system-prompt injection
-export function vettingSummaryForPrompt(): string {
+// Compact summary for system-prompt injection.
+// State param accepted for forward compatibility; today only VT data exists,
+// and the copy below is VT-specific so the function does not vary by state yet.
+export function vettingSummaryForPrompt(_state: State = DEFAULT_STATE): string {
   const lines: string[] = []
   lines.push('VT CONTRACTOR VETTING — KEY FACTS')
   lines.push('')

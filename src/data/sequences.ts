@@ -12,6 +12,9 @@
 // order-of-operations guidance instead of generating it fresh each time.
 // ---------------------------------------------------------------------------
 
+import type { State } from './_types'
+import { DEFAULT_STATE } from './_types'
+
 export type SequenceStep = {
   step: number
   title: string
@@ -25,6 +28,7 @@ export type SequenceStep = {
 
 export type ProjectSequence = {
   id: string
+  state: State
   title: string
   scenario: string
   triggers: string[]
@@ -39,6 +43,7 @@ export type ProjectSequence = {
 export const PROJECT_SEQUENCES: ProjectSequence[] = [
   {
     id: 'oil_to_heat_pump',
+    state: 'VT',
     title: 'Switching from oil heat to heat pumps',
     scenario: 'Vermont homeowner with an oil furnace wants to switch to heat pumps. Most common Vermont retrofit path.',
     triggers: ['switching from oil', 'oil furnace replacement', 'heat pump conversion', 'getting rid of oil', 'oil to electric', 'oil furnace dying'],
@@ -102,6 +107,7 @@ export const PROJECT_SEQUENCES: ProjectSequence[] = [
   },
   {
     id: 'full_electrification',
+    state: 'VT',
     title: 'Full home electrification: weatherize, heat pump, heat pump water heater',
     scenario: 'Vermont homeowner doing the full retrofit in one coordinated push. Going all-electric.',
     triggers: ['going all electric', 'full electrification', 'getting off fossil fuels', 'heat pump and water heater', 'whole home retrofit'],
@@ -165,6 +171,7 @@ export const PROJECT_SEQUENCES: ProjectSequence[] = [
   },
   {
     id: 'solar_storage',
+    state: 'VT',
     title: 'Adding solar plus battery storage in Vermont',
     scenario: 'Vermont homeowner adding rooftop solar with battery backup. Either alongside or after electrification.',
     triggers: ['solar panels', 'rooftop solar', 'battery backup', 'solar plus storage', 'going solar'],
@@ -228,6 +235,7 @@ export const PROJECT_SEQUENCES: ProjectSequence[] = [
   },
   {
     id: 'adu_build',
+    state: 'VT',
     title: 'Building an ADU on existing property',
     scenario: 'Vermont homeowner adding an ADU — basement conversion, garage conversion, addition, or detached structure.',
     triggers: ['building an ADU', 'accessory dwelling unit', 'in-law apartment', 'rental unit on my property', 'basement apartment', 'guest house'],
@@ -291,6 +299,7 @@ export const PROJECT_SEQUENCES: ProjectSequence[] = [
   },
   {
     id: 'roof_then_solar',
+    state: 'VT',
     title: 'Re-roofing then adding solar',
     scenario: 'Vermont homeowner whose roof is at end of life and is also considering solar. Critical to do these in order.',
     triggers: ['old roof and solar', 'reroof and solar', 'should I do roof or solar first', 'roof under solar', 'roof replacement'],
@@ -334,6 +343,7 @@ export const PROJECT_SEQUENCES: ProjectSequence[] = [
   },
   {
     id: 'kitchen_bath_combined',
+    state: 'VT',
     title: 'Kitchen and bathroom renovation in one project',
     scenario: 'Vermont homeowner doing both a kitchen and at least one bathroom in a coordinated push. Common pattern after home purchase or as a major refresh.',
     triggers: ['kitchen and bathroom remodel', 'whole home refresh', 'doing kitchen and bath', 'renovating after purchase', 'major renovation'],
@@ -407,6 +417,11 @@ export const PROJECT_SEQUENCES: ProjectSequence[] = [
   },
 ]
 
+// Returns sequences for the requested state. Today every entry is VT.
+export function getSequencesForState(state: State): ProjectSequence[] {
+  return PROJECT_SEQUENCES.filter(s => s.state === state)
+}
+
 export function sequenceById(id: string): ProjectSequence | null {
   return PROJECT_SEQUENCES.find(s => s.id === id) || null
 }
@@ -418,12 +433,12 @@ export function sequencesForQuery(query: string): ProjectSequence[] {
   )
 }
 
-export function sequencesSummaryForPrompt(): string {
+export function sequencesSummaryForPrompt(state: State = DEFAULT_STATE): string {
   const lines: string[] = []
   lines.push('VERMONT PROJECT SEQUENCES (order of operations):')
   lines.push('')
 
-  for (const seq of PROJECT_SEQUENCES) {
+  for (const seq of getSequencesForState(state)) {
     lines.push(`## ${seq.title}`)
     lines.push(`Scenario: ${seq.scenario}`)
     lines.push(`Why this order: ${seq.rationale}`)

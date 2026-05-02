@@ -1,26 +1,19 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
-import { usePathname, useRouter, useSearchParams } from 'next/navigation'
+import { useRef } from 'react'
 import type { PropertyProfile, TopicId, TopLevelIntent } from '@/lib/property-modules'
-import { classifyIntentMode } from '@/lib/property-ranker'
 
 // Two-click hero. The visitor's first click picks one of three top-level
-// intents; the second click (a project tile, a question chip, or the
-// chat input) sets the topic and implicitly the intent mode. We never
-// ask a second explicit question — the second signal is the topic.
-//
-// Signals are written to URL params (?intent=...&topic=...) so the
-// page is shareable and the SSR'd ranker has them on the next render.
-// They are also mirrored to sessionStorage under 'alder.propertySignals'
-// for cross-session persistence within the tab.
-//
-// Chat-input prompts are stashed in sessionStorage under
-// 'alder.chatPendingPrompt' and broadcast via an 'alder:chatPrompt'
-// CustomEvent so PropertyChat (commit 6) can pick them up.
+// intents; the second click (a project tile or a question chip) sets the
+// topic. Both signals are lifted state — owned by PropertyInteractive
+// above — so clicks never trigger route changes and never reset scroll.
 
 type Props = {
   profile: PropertyProfile
+  intent: TopLevelIntent | null
+  topic: TopicId | null
+  onPickIntent: (next: TopLevelIntent) => void
+  onPickTopic: (next: TopicId | null) => void
 }
 
 const TOP_LEVEL: { id: TopLevelIntent; label: string; sub: string }[] = [
@@ -58,79 +51,21 @@ const C = {
   inkFaint: 'rgba(28,43,26,0.45)',
   card: '#ffffff',
   cardLine: 'rgba(28,43,26,0.1)',
-  cardLineStrong: 'rgba(28,43,26,0.18)',
   accent: '#C8732A',
   accentSoft: 'rgba(200,115,42,0.12)',
-  green: '#1C2B1A',
-  greenInk: '#F5EFE0',
-  pillBg: 'rgba(122,155,111,0.12)',
+  bg2: '#FAF7F2',
 }
 const FD = "'Playfair Display', Georgia, serif"
 const FB = "'DM Sans', system-ui, sans-serif"
 const FM = 'monospace'
 
-export default function PropertyHero({ profile }: Props) {
-  const router = useRouter()
-  const pathname = usePathname()
-  const searchParams = useSearchParams()
-
-  const urlIntent = searchParams?.get('intent') as TopLevelIntent | null
-  const urlTopic = searchParams?.get('topic') as TopicId | null
-  const [intent, setIntent] = useState<TopLevelIntent | null>(urlIntent ?? null)
-
+export default function PropertyHero({ profile, intent, topic, onPickIntent, onPickTopic }: Props) {
   const tileGroupRef = useRef<HTMLDivElement>(null)
-
-  // Hydrate from sessionStorage on first mount if URL is bare. URL wins
-  // when present so shareable links never get overwritten by stale storage.
-  useEffect(() => {
-    if (urlIntent || urlTopic) return
-    try {
-      const raw = sessionStorage.getItem('alder.propertySignals')
-      if (!raw) return
-      const stored = JSON.parse(raw) as { intent?: TopLevelIntent; topic?: TopicId }
-      if (stored?.intent) setIntent(stored.intent)
-    } catch {
-      /* ignore */
-    }
-    // Only on first mount.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-
-  function persistAndRoute(next: { intent: TopLevelIntent; topic: TopicId | null }) {
-    const params = new URLSearchParams(searchParams?.toString() ?? '')
-    params.set('intent', next.intent)
-    if (next.topic) {
-      params.set('topic', next.topic)
-      params.set('mode', classifyIntentMode(next.intent, next.topic))
-    } else {
-      params.delete('topic')
-      params.set('mode', classifyIntentMode(next.intent, null))
-    }
-    // Strip any legacy scope param — scope is now inferred, not asked.
-    params.delete('scope')
-    try {
-      sessionStorage.setItem(
-        'alder.propertySignals',
-        JSON.stringify({ intent: next.intent, topic: next.topic })
-      )
-    } catch {
-      /* ignore */
-    }
-    router.push(`${pathname}?${params.toString()}`)
-  }
-
-  function pickIntent(id: TopLevelIntent) {
-    setIntent(id)
-    persistAndRoute({ intent: id, topic: null })
-  }
 
   function pickTopic(id: TopicId | typeof SUMMARY_TILE_ID) {
     if (!intent) return
-    if (id === SUMMARY_TILE_ID) {
-      persistAndRoute({ intent, topic: null })
-      return
-    }
-    persistAndRoute({ intent, topic: id })
+    if (id === SUMMARY_TILE_ID) onPickTopic(null)
+    else onPickTopic(id)
   }
 
   // Roving-tabindex arrow-key nav across tiles/chips for keyboard users.
@@ -186,7 +121,6 @@ export default function PropertyHero({ profile }: Props) {
         </h2>
       )}
 
-      {/* Top-level intent buttons — always present, but compact after first click. */}
       <div
         role="radiogroup"
         aria-label="What kind of visitor are you"
@@ -208,7 +142,7 @@ export default function PropertyHero({ profile }: Props) {
               role="radio"
               aria-checked={selected}
               aria-label={`${opt.label}. ${opt.sub}`}
-              onClick={() => pickIntent(opt.id)}
+              onClick={() => onPickIntent(opt.id)}
               style={{
                 textAlign: 'left',
                 padding: intent ? '10px 14px' : '18px 20px',
@@ -230,9 +164,6 @@ export default function PropertyHero({ profile }: Props) {
         })}
       </div>
 
-      {/* Mixed picker — appears after intent is chosen. Branched by intent:
-          owners get project tiles; buyers and researchers see only question
-          chips (the questions that matter pre-purchase or in the abstract). */}
       {intent && (
         <div
           ref={tileGroupRef}
@@ -245,65 +176,63 @@ export default function PropertyHero({ profile }: Props) {
             marginTop: 4,
           }}
         >
-          {/* Project tiles — owner only. */}
           {intent === 'owner' && (
-          <div>
-            <p
-              style={{
-                fontSize: 11,
-                fontFamily: FM,
-                color: C.inkFaint,
-                letterSpacing: '0.08em',
-                textTransform: 'uppercase',
-                margin: '16px 0 10px',
-              }}
-            >
-              Pick a project
-            </p>
-            <div
-              style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
-                gap: 10,
-              }}
-            >
-              {PROJECT_TILES.map((t, i) => {
-                const selected = urlTopic === t.id
-                return (
-                  <button
-                    key={t.id}
-                    type="button"
-                    data-tile
-                    tabIndex={i === 0 ? 0 : -1}
-                    aria-label={`${t.label}. ${t.sub}`}
-                    aria-pressed={selected}
-                    onClick={() => pickTopic(t.id)}
-                    style={tileStyle(selected)}
-                  >
-                    <p style={{ fontSize: 13, fontWeight: 600, margin: 0, color: C.ink }}>{t.label}</p>
-                    <p style={{ fontSize: 11, color: C.inkSoft, margin: '4px 0 0' }}>{t.sub}</p>
-                  </button>
-                )
-              })}
-              <button
-                type="button"
-                data-tile
-                tabIndex={-1}
-                aria-label="Just want a summary — show curated three of everything"
-                onClick={() => pickTopic(SUMMARY_TILE_ID)}
+            <div>
+              <p
                 style={{
-                  ...tileStyle(false),
-                  borderStyle: 'dashed',
+                  fontSize: 11,
+                  fontFamily: FM,
+                  color: C.inkFaint,
+                  letterSpacing: '0.08em',
+                  textTransform: 'uppercase',
+                  margin: '16px 0 10px',
                 }}
               >
-                <p style={{ fontSize: 13, fontWeight: 600, margin: 0, color: C.ink }}>Just want a summary</p>
-                <p style={{ fontSize: 11, color: C.inkSoft, margin: '4px 0 0' }}>Three of everything, curated</p>
-              </button>
+                Pick a project
+              </p>
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
+                  gap: 10,
+                }}
+              >
+                {PROJECT_TILES.map((t, i) => {
+                  const selected = topic === t.id
+                  return (
+                    <button
+                      key={t.id}
+                      type="button"
+                      data-tile
+                      tabIndex={i === 0 ? 0 : -1}
+                      aria-label={`${t.label}. ${t.sub}`}
+                      aria-pressed={selected}
+                      onClick={() => pickTopic(t.id)}
+                      style={tileStyle(selected)}
+                    >
+                      <p style={{ fontSize: 13, fontWeight: 600, margin: 0, color: C.ink }}>{t.label}</p>
+                      <p style={{ fontSize: 11, color: C.inkSoft, margin: '4px 0 0' }}>{t.sub}</p>
+                    </button>
+                  )
+                })}
+                <button
+                  type="button"
+                  data-tile
+                  tabIndex={-1}
+                  aria-label="Just want a summary — show curated three of everything"
+                  onClick={() => pickTopic(SUMMARY_TILE_ID)}
+                  style={{
+                    ...tileStyle(false),
+                    borderStyle: 'dashed',
+                  }}
+                >
+                  <p style={{ fontSize: 13, fontWeight: 600, margin: 0, color: C.ink }}>Just want a summary</p>
+                  <p style={{ fontSize: 11, color: C.inkSoft, margin: '4px 0 0' }}>Three of everything, curated</p>
+                </button>
+              </div>
             </div>
-          </div>
           )}
 
-          {/* Question chips */}
           <div>
             <p
               style={{
@@ -319,7 +248,7 @@ export default function PropertyHero({ profile }: Props) {
             </p>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
               {QUESTION_CHIPS.map(q => {
-                const selected = urlTopic === q.id
+                const selected = topic === q.id
                 return (
                   <button
                     key={q.id}
@@ -337,7 +266,6 @@ export default function PropertyHero({ profile }: Props) {
               })}
             </div>
           </div>
-
         </div>
       )}
     </section>

@@ -1,10 +1,9 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
-import { useSearchParams } from 'next/navigation'
+import { useMemo } from 'react'
 import { MODULES } from '@/lib/property-modules'
 import type { PropertyModule, PropertyProfile, VisitorSignals } from '@/lib/property-modules'
-import { computeSignalsFromParams, rankModules, shouldRenderInline } from '@/lib/property-ranker'
+import { rankModules, shouldRenderInline } from '@/lib/property-ranker'
 import {
   pickInlineCta,
   OwnerSummaryFooterCta,
@@ -12,13 +11,11 @@ import {
 } from './InlineCta'
 
 // The page renders a stream of property modules ranked by the visitor's
-// signal vector. The server pre-renders this with whatever signals come
-// from URL params (so non-JS users and crawlers get a sensible top-N).
-// On hydration the component re-reads URL + sessionStorage and re-ranks.
-//
-// The MODULES catalog is imported here, not passed as a prop, because
-// each module carries a render function that cannot cross the server →
-// client boundary serialization.
+// signal vector. signals are owned by PropertyInteractive above — this
+// component is a pure presentation layer that re-runs the ranker
+// whenever signals change. The MODULES catalog is imported here (not
+// passed as a prop) because each module carries a render function that
+// cannot cross the server → client boundary serialization.
 
 const C = {
   bg: '#FAF7F2',
@@ -33,35 +30,10 @@ const FM = 'monospace'
 
 type Props = {
   profile: PropertyProfile
-  initialSignals: VisitorSignals
+  signals: VisitorSignals
 }
 
-export default function RankedModuleStream({ profile, initialSignals }: Props) {
-  const searchParams = useSearchParams()
-  const [signals, setSignals] = useState<VisitorSignals>(initialSignals)
-
-  // Re-derive signals whenever URL params change. Also pull in any
-  // sessionStorage hints that were not already in the URL (in v1 there
-  // are none, but the storage is the future home of newcomer / framing
-  // toggles in v2).
-  useEffect(() => {
-    if (!searchParams) return
-    const next = computeSignalsFromParams(
-      {
-        intent: searchParams.get('intent') ?? undefined,
-        topic: searchParams.get('topic') ?? undefined,
-        mode: searchParams.get('mode') ?? undefined,
-        scope: searchParams.get('scope') ?? undefined,
-        from: searchParams.get('from') ?? undefined,
-      },
-      profile,
-      signals.sessionDepth + 1
-    )
-    setSignals(prev => (shallowEqualSignals(prev, next) ? prev : next))
-    // signals.sessionDepth deliberately omitted to avoid loop; depth bumps once per param change.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchParams, profile])
-
+export default function RankedModuleStream({ profile, signals }: Props) {
   // Suppress the V1 standalone-billboard CTA modules — replaced by
   // inline CTAs inside content modules (see InlineCta.pickInlineCta).
   const filtered = useMemo(() => MODULES.filter(m => m.contentType !== 'cta'), [])
@@ -138,15 +110,3 @@ export default function RankedModuleStream({ profile, initialSignals }: Props) {
   )
 }
 
-function shallowEqualSignals(a: VisitorSignals, b: VisitorSignals): boolean {
-  return (
-    a.topLevelIntent === b.topLevelIntent &&
-    a.intentMode === b.intentMode &&
-    a.topic === b.topic &&
-    a.scope === b.scope &&
-    a.townTier === b.townTier &&
-    a.utilityServiceArea === b.utilityServiceArea &&
-    a.refundRiskFlag === b.refundRiskFlag &&
-    a.cameFromArticleSlug === b.cameFromArticleSlug
-  )
-}

@@ -4,10 +4,9 @@ import { headers } from 'next/headers'
 import Nav from '@/components/Nav'
 import Footer from '@/components/Footer'
 import PropertyGisOverlay from '@/components/PropertyGisOverlay'
-import PropertyHero from '@/components/PropertyHero'
 import PropertyChat from '@/components/PropertyChat'
 import PropertyFraming from '@/components/PropertyFraming'
-import RankedModuleStream from '@/components/RankedModuleStream'
+import PropertyInteractive from '@/components/PropertyInteractive'
 import { computeSignalsFromParams } from '@/lib/property-ranker'
 import type { PropertyProfile } from '@/lib/property-modules'
 
@@ -136,11 +135,10 @@ export default async function PropertyPage({
           {/* Live FEMA + ANR Atlas overlay — universal, fetches client-side. */}
           <PropertyGisOverlay address={data.address} />
 
-          {/* Two-click intent hero. Sets URL params; the stream re-ranks. */}
-          <PropertyHero profile={data} />
-
-          {/* Ranked module stream — top-N + show-everything-else disclosure. */}
-          <RankedModuleStream profile={data} initialSignals={initialSignals} />
+          {/* Two-click intent hero + ranked module stream, with state lifted
+              to a single client wrapper so clicks never trigger route changes
+              (no scroll-to-top). URL is mirrored via history.replaceState. */}
+          <PropertyInteractive profile={data} initialSignals={initialSignals} />
 
           {data.dataLinks.length > 0 && <Sources data={data} />}
         </article>

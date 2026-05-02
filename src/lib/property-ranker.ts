@@ -205,9 +205,15 @@ export function computeSignalsFromParams(
   const intent = asIntent(params.intent)
   const topic = asTopic(params.topic)
   const mode = asMode(params.mode) ?? classifyIntentMode(intent, topic)
-  const scope = asScope(params.scope)
   const cameFromArticleSlug = params.from ?? null
   const refundRiskFlag = detectRefundRisk({ topLevelIntent: intent, cameFromArticleSlug })
+  // Scope is inferred from {topic, townTier, intent}. The legacy ?scope=
+  // URL param is ignored — scope is no longer a user-facing input.
+  const scope = inferScope({
+    topic,
+    townTier: profile.bucket,
+    topLevelIntent: intent,
+  })
   return {
     topLevelIntent: intent,
     intentMode: mode,
@@ -219,4 +225,36 @@ export function computeSignalsFromParams(
     sessionDepth,
     cameFromArticleSlug,
   }
+}
+
+// ---------- Scope inference -------------------------------------------
+//
+// Scope used to be a click signal (DIY / Mid / Big tier). The polish
+// pass collapsed it into a derived value: scope is computed from the
+// topic, the property's town tier, and the visitor's top-level intent.
+// Visitors can still expand cost-tier accordions to read budget / mid /
+// high details — those are reading affordances, not scope-setters.
+
+const INFER_SCOPE_PROJECT_TOPICS: ReadonlySet<TopicId> = new Set<TopicId>([
+  'kitchen',
+  'bath',
+  'heat_pump',
+  'solar_battery',
+  'outdoor',
+  'addition_adu',
+  'weatherization',
+  'rebate_strat',
+])
+
+export function inferScope(signals: {
+  topic: TopicId | null
+  townTier: VisitorSignals['townTier']
+  topLevelIntent?: TopLevelIntent
+}): Scope {
+  if (!signals.topic) return 'na'
+  if (!INFER_SCOPE_PROJECT_TOPICS.has(signals.topic)) return 'na'
+  if (signals.townTier === 'resort_premium' || signals.townTier === 'burlington_metro') return 'big'
+  if (signals.topic === 'addition_adu' || signals.topic === 'kitchen') return 'big'
+  if (signals.topic === 'weatherization' || signals.topic === 'rebate_strat') return 'mid'
+  return 'mid'
 }

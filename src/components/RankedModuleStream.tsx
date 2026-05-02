@@ -3,8 +3,13 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { MODULES } from '@/lib/property-modules'
-import type { PropertyProfile, VisitorSignals } from '@/lib/property-modules'
+import type { PropertyModule, PropertyProfile, VisitorSignals } from '@/lib/property-modules'
 import { computeSignalsFromParams, rankModules } from '@/lib/property-ranker'
+import {
+  pickInlineCta,
+  OwnerSummaryFooterCta,
+  ResearcherFooterCta,
+} from './InlineCta'
 
 // The page renders a stream of property modules ranked by the visitor's
 // signal vector. The server pre-renders this with whatever signals come
@@ -59,17 +64,39 @@ export default function RankedModuleStream({ profile, initialSignals }: Props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams, profile])
 
-  const ranked = useMemo(() => rankModules(MODULES, signals), [signals])
+  // Suppress the V1 standalone-billboard CTA modules — replaced by
+  // inline CTAs inside content modules (see InlineCta.pickInlineCta).
+  const filtered = useMemo(() => MODULES.filter(m => m.contentType !== 'cta'), [])
+  const ranked = useMemo(() => rankModules(filtered, signals), [signals, filtered])
   const top = ranked.slice(0, TOP_N)
   const rest = ranked.slice(TOP_N)
 
+  // The picker mutates a Set so we cap each CTA-shape at one instance
+  // per render pass. Each render of RankedModuleStream gets a fresh set.
+  const picked = new Set<string>()
+
+  function renderModuleCard(m: PropertyModule) {
+    const cta = pickInlineCta(m, profile, signals, picked)
+    return (
+      <div key={m.moduleId} data-module-id={m.moduleId}>
+        {m.render(profile, signals)}
+        {cta}
+      </div>
+    )
+  }
+
+  const isOwnerSummary = signals.topLevelIntent === 'owner' && !signals.topic
+  const isResearcher = signals.topLevelIntent === 'researching'
+
   return (
     <div style={{ display: 'grid', gap: 16 }}>
-      {top.map(m => (
-        <div key={m.moduleId} data-module-id={m.moduleId}>
-          {m.render(profile, signals)}
-        </div>
-      ))}
+      {top.map(renderModuleCard)}
+
+      {/* State-level CTAs — every state has at least one revenue path,
+          even when no module-level CTA fires. */}
+      {isOwnerSummary && <OwnerSummaryFooterCta />}
+      {isResearcher && <ResearcherFooterCta />}
+
       {rest.length > 0 && (
         <details
           data-disclosure-id="show_everything_else"

@@ -51,6 +51,13 @@ const C = {
 const FB = "'DM Sans', system-ui, sans-serif"
 const FM = 'monospace'
 
+// Minimal CSS.escape polyfill for the moduleId selector. The catalog
+// only emits ASCII-safe ids (snake_case), but harden it anyway.
+function cssEscape(s: string): string {
+  if (typeof CSS !== 'undefined' && typeof CSS.escape === 'function') return CSS.escape(s)
+  return s.replace(/[^a-zA-Z0-9_-]/g, ch => `\\${ch}`)
+}
+
 function bucketLabel(b: string): string {
   switch (b) {
     case 'burlington_metro':
@@ -219,6 +226,33 @@ export default function PropertyChat({ profile }: Props) {
     setPulse(false)
   }
 
+  // Apply chat-driven page actions. Currently supports expand_section
+  // (scroll into view + open ancestor disclosure) and elevate_topic
+  // (push topic into the URL so the ranker re-runs).
+  function applyActions(actions: { type: string; [k: string]: unknown }[]) {
+    for (const action of actions) {
+      if (action.type === 'expand_section' && typeof action.moduleId === 'string') {
+        const node = document.querySelector(`[data-module-id="${cssEscape(action.moduleId)}"]`)
+        if (!node) continue
+        const ancestorDetails = node.closest('details')
+        if (ancestorDetails && !ancestorDetails.open) ancestorDetails.open = true
+        const innerDetails = node.querySelector('details')
+        if (innerDetails && !innerDetails.open) innerDetails.open = true
+        node.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      } else if (action.type === 'elevate_topic' && typeof action.topic === 'string') {
+        const params = new URLSearchParams(window.location.search)
+        params.set('topic', action.topic)
+        // router.push from useRouter would be nicer but we don't have it
+        // in this component scope; history API works for the same effect
+        // and the ranked stream observes URL changes via useSearchParams.
+        const next = `${window.location.pathname}?${params.toString()}`
+        window.history.pushState({}, '', next)
+        // Notify subscribers (Next.js router included).
+        window.dispatchEvent(new PopStateEvent('popstate'))
+      }
+    }
+  }
+
   return (
     <>
       <div
@@ -261,6 +295,7 @@ export default function PropertyChat({ profile }: Props) {
           greeting={greeting}
           initialPrompt={pendingPrompt}
           pageState={pageState as unknown as Record<string, unknown>}
+          onActions={applyActions}
         />
       </div>
 

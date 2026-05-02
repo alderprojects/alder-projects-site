@@ -24,6 +24,10 @@ type Props = {
   // to /api/chat as context.pageState so the model can avoid repeating
   // what the visitor has already seen.
   pageState?: Record<string, unknown>
+  // Callback fired when /api/chat returns structured page actions
+  // (expand_section / elevate_topic). PropertyChat uses this to drive
+  // scroll / disclosure / re-rank on the property page.
+  onActions?: (actions: { type: string; [k: string]: unknown }[]) => void
 }
 
 const DEFAULT_GREETING =
@@ -48,6 +52,7 @@ export default function ChatWidget({
   variant = 'inline',
   initialPrompt,
   pageState,
+  onActions,
 }: Props) {
   const [messages, setMessages] = useState<Message[]>([
     { role: 'assistant', content: greeting },
@@ -165,6 +170,9 @@ export default function ChatWidget({
       const data = await res.json()
       const reply: Message = { role: 'assistant', content: data.reply || '(no response)' }
       setMessages(prev => [...prev, reply])
+      if (Array.isArray(data.actions) && data.actions.length > 0 && onActions) {
+        onActions(data.actions)
+      }
     } catch (e) {
       setError('Something went sideways. Try again in a moment.')
     } finally {

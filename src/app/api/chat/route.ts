@@ -523,6 +523,36 @@ function offerWasMade(messages: Message[]): boolean {
   )
 }
 
+// ---------- Page action extraction --------------------------------------
+
+type PageAction =
+  | { type: 'expand_section'; moduleId: string }
+  | { type: 'elevate_topic'; topic: string }
+
+const ACTION_MARKER_RE = /<<<ACTIONS>>>([\s\S]*?)<<<END>>>/
+
+function extractActions(rawReply: string): { reply: string; actions: PageAction[] } {
+  const m = rawReply.match(ACTION_MARKER_RE)
+  if (!m) return { reply: rawReply, actions: [] }
+  const cleaned = rawReply.replace(ACTION_MARKER_RE, '').trim()
+  let actions: PageAction[] = []
+  try {
+    const parsed = JSON.parse(m[1])
+    if (Array.isArray(parsed?.actions)) {
+      actions = parsed.actions.filter((a: unknown): a is PageAction => {
+        if (!a || typeof a !== 'object') return false
+        const t = (a as { type?: unknown }).type
+        if (t === 'expand_section') return typeof (a as { moduleId?: unknown }).moduleId === 'string'
+        if (t === 'elevate_topic') return typeof (a as { topic?: unknown }).topic === 'string'
+        return false
+      })
+    }
+  } catch {
+    // Marker present but JSON unparseable — discard actions, keep cleaned text.
+  }
+  return { reply: cleaned, actions }
+}
+
 // ---------- Claude call ----------
 
 async function callClaude(
@@ -786,12 +816,26 @@ export async function POST(req: Request) {
         'Use this to avoid repeating what the visitor has already seen. If they ask about a topic the page covers and they have already viewed that module, dig deeper or pivot to next steps rather than re-explain the basics.'
       )
       turnSystemPrompt += '\n' + lines.join('\n')
+
+      // Page-action protocol — only injected on the property page (where
+      // pageState is present). Marker-based emit because tool-use would
+      // double the API surface for one feature.
+      turnSystemPrompt += `\n
+PAGE ACTIONS — when the conversation would benefit from showing the visitor a specific section of the property page, you MAY append actions in this exact format at the very end of your reply:
+<<<ACTIONS>>>{"actions":[{"type":"expand_section","moduleId":"rebate_stack_detail"}]}<<<END>>>
+
+Supported actions:
+- expand_section: scroll to and open a module. Common moduleIds: rebate_dollar_headline, rebate_stack_detail, regulatory_flags, zoning_summary, calendar_in_season, vetting_checklist, contractor_sanity_check, rebate_eligibility_check, flood_regulatory_deep_dive, sequence_oil_to_heat_pump, sequence_kitchen_bath_combined, sequence_roof_then_solar, cost_kitchen, cost_bathroom, cost_hvac, cost_addition, cta_handyman, cta_contractor_bid, cta_email_capture, general_orientation, property_tax_lookup.
+- elevate_topic: re-rank the page to favor a topic. topic must be one of: heat_pump, kitchen, bath, solar_battery, outdoor, addition_adu, weatherization, rebate_strat, property_tax, flood_zone, rebate_eligibility, contractor_vetting, general_orientation, mud_season, well_septic.
+
+The text BEFORE <<<ACTIONS>>> is shown to the user. The action JSON is parsed and applied silently — never mention the markers in your reply text. Use actions sparingly: at most one per reply, and only when the section meaningfully advances the conversation.`
     }
 
     // Append conversation-depth hint if we hit the soft-warn threshold above.
     turnSystemPrompt += conversationDepthHint
 
-    const reply = await callClaude(trimmed, turnSystemPrompt)
+    const rawReply = await callClaude(trimmed, turnSystemPrompt)
+    const { reply, actions } = extractActions(rawReply)
 
     // Auto-capture: if the user's most recent message contains an email AND
     // the conversation has prior installer-offer context, capture the lead silently.
@@ -822,7 +866,7 @@ export async function POST(req: Request) {
       console.error('auto-capture error:', captureErr instanceof Error ? captureErr.message : captureErr)
     }
 
-    return NextResponse.json({ reply, addressDetected: detectedAddress, leadCaptured })
+    return NextResponse.json({ reply, addressDetected: detectedAddress, leadCaptured, actions })
   } catch (err) {
     const msg = err instanceof Error ? err.message : 'unknown error'
     console.error('chat route error:', msg)

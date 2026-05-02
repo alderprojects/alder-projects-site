@@ -10,7 +10,9 @@
 // PropertyProfile (matches /api/property's response). All renders are
 // pure — they never mutate signals or kick off side effects.
 
-import type { ReactNode, CSSProperties } from 'react'
+'use client'
+
+import { useState, type ReactNode, type CSSProperties } from 'react'
 import type { TownBucket } from '@/data/projects'
 
 // ---------- Visitor signal vector --------------------------------------
@@ -966,6 +968,389 @@ const generalOrientation: PropertyModule = {
   ),
 }
 
+// ---------- CTA modules ---------------------------------------------
+//
+// Tier-aware CTAs. Escalation is handled through the relevance vector:
+// a CTA with scopeMatch.na = 0 / scopeMatch.big = 10 only floats up
+// once the visitor commits to a scope tier. Heavy CTAs
+// (contractor_bid) are also gated on a topic being chosen, so they
+// never show on first paint.
+
+const AMAZON_TAG = 'alderprojects-20'
+function az(query: string): string {
+  return `https://www.amazon.com/s?k=${encodeURIComponent(query)}&tag=${AMAZON_TAG}`
+}
+
+function dispatchChatPrompt(text: string) {
+  if (typeof window === 'undefined') return
+  try {
+    sessionStorage.setItem('alder.chatPendingPrompt', text)
+  } catch {
+    /* ignore */
+  }
+  window.dispatchEvent(new CustomEvent('alder:chatPrompt', { detail: { text } }))
+}
+
+const ctaDiyAmazon: PropertyModule = {
+  moduleId: 'cta_diy_amazon',
+  title: 'DIY tools and supplies',
+  contentType: 'cta',
+  relevanceFactors: {
+    intentMatch: { buying: 2, owner: 6, looking: 3, researching: 2 },
+    modeMatch: { decide: 4, do: 7, understand: 2, lookup: 3, handle: 4 },
+    topicMatch: {
+      weatherization: 8,
+      heat_pump: 4,
+      kitchen: 3,
+      bath: 3,
+      outdoor: 5,
+      mud_season: 6,
+    },
+    scopeMatch: { diy: 9, mid: 2, big: 0, na: 0 },
+    townTierMatch: {},
+    isUniversal: false,
+  },
+  revenueWeight: 2,
+  ctaType: 'diy_amazon',
+  refundRiskCompatible: true,
+  render: (_profile, signals) => {
+    const topic = signals.topic ?? 'weatherization'
+    const items = diyKitFor(topic)
+    return (
+      <Card kicker="DIY" title="The kit if you are doing this yourself">
+        <p style={{ fontSize: 12, fontFamily: FB, color: C.inkSoft, lineHeight: 1.55, margin: '0 0 10px' }}>
+          Same prices as everywhere — affiliate links keep the tool free. We only link to things we would buy.
+        </p>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+          {items.map(it => (
+            <a
+              key={it.label}
+              href={it.url}
+              target="_blank"
+              rel="noopener noreferrer sponsored"
+              style={{
+                fontSize: 11,
+                fontFamily: FB,
+                color: C.accent,
+                textDecoration: 'none',
+                padding: '4px 10px',
+                border: `1px solid ${C.cardLine}`,
+                borderRadius: 6,
+              }}
+            >
+              {it.label} →
+            </a>
+          ))}
+        </div>
+      </Card>
+    )
+  },
+}
+
+function diyKitFor(topic: TopicId): { label: string; url: string }[] {
+  // Curated kit per topic — 4-6 items each. Generic fallback for topics
+  // without a specific DIY angle.
+  const generic = [
+    { label: 'Stud finder', url: az('stud finder magnetic') },
+    { label: 'Cordless drill', url: az('cordless drill set') },
+    { label: 'Painters tape', url: az('painters tape blue') },
+  ]
+  const map: Partial<Record<TopicId, { label: string; url: string }[]>> = {
+    weatherization: [
+      { label: 'Caulk + gun', url: az('silicone caulk gun kit') },
+      { label: 'Foam sealant', url: az('great stuff foam sealant') },
+      { label: 'Weatherstripping', url: az('door weatherstripping kit') },
+      { label: 'Pipe insulation', url: az('pipe insulation foam outdoor') },
+      { label: 'Window film', url: az('insulating window film kit') },
+      { label: 'Smart leak sensors', url: az('wifi water leak sensor freeze alert') },
+    ],
+    heat_pump: [
+      { label: 'Smart thermostat', url: az('smart thermostat wifi remote') },
+      { label: 'Mini-split filter set', url: az('mini split filter universal') },
+    ],
+    outdoor: [
+      { label: 'Pressure-treated screws', url: az('exterior deck screws') },
+      { label: 'Composite deck cleaner', url: az('composite deck cleaner') },
+      { label: 'Joist hangers', url: az('galvanized joist hangers') },
+    ],
+    mud_season: [
+      { label: 'Boot dryer', url: az('boot dryer') },
+      { label: 'Crushed stone bags', url: az('crushed stone gravel bag') },
+      { label: 'Roof rake', url: az('roof rake snow removal') },
+    ],
+    kitchen: [
+      { label: 'Cabinet hardware', url: az('cabinet pulls brushed nickel') },
+      { label: 'Iron-on edge banding', url: az('iron on edge banding') },
+    ],
+    bath: [
+      { label: 'Caulk + gun', url: az('silicone caulk gun kit bathroom') },
+      { label: 'Grout pen', url: az('grout pen white') },
+    ],
+  }
+  return map[topic] ?? generic
+}
+
+const ctaHandyman: PropertyModule = {
+  moduleId: 'cta_handyman',
+  title: 'Find a Vermont handyman',
+  contentType: 'cta',
+  relevanceFactors: {
+    intentMatch: { buying: 2, owner: 8, looking: 3, researching: 2 },
+    modeMatch: { decide: 5, do: 8, understand: 3, lookup: 4, handle: 7 },
+    topicMatch: {
+      weatherization: 6,
+      heat_pump: 4,
+      mud_season: 7,
+      well_septic: 6,
+      outdoor: 6,
+      kitchen: 4,
+      bath: 4,
+    },
+    scopeMatch: { diy: 1, mid: 9, big: 4, na: 0 },
+    townTierMatch: {},
+    isUniversal: false,
+  },
+  revenueWeight: 4,
+  ctaType: 'handyman',
+  refundRiskCompatible: true,
+  render: (profile, signals) => {
+    const topicLabel = topicLabelFor(signals.topic)
+    return (
+      <Card kicker="Hire it out" title="Find a Vermont handyman">
+        <p style={{ fontSize: 13, fontFamily: FB, color: C.inkSoft, lineHeight: 1.55, margin: '0 0 12px' }}>
+          Mid-tier work where a handyman beats a full GC on price and lead time.
+          Most of these jobs are a one-day visit in {profile.town}.
+        </p>
+        <button
+          type="button"
+          onClick={() =>
+            dispatchChatPrompt(`I need a handyman in ${profile.town} for ${topicLabel}.`)
+          }
+          style={{
+            padding: '10px 18px',
+            border: 'none',
+            backgroundColor: C.accent,
+            color: '#FAF7F2',
+            borderRadius: 4,
+            fontFamily: FB,
+            fontSize: 13,
+            fontWeight: 600,
+            cursor: 'pointer',
+          }}
+        >
+          Find a Vermont handyman →
+        </button>
+      </Card>
+    )
+  },
+}
+
+const ctaContractorBid: PropertyModule = {
+  moduleId: 'cta_contractor_bid',
+  title: 'Get contractor bids',
+  contentType: 'cta',
+  relevanceFactors: {
+    intentMatch: { buying: 0, owner: 9, looking: 4, researching: 2 },
+    modeMatch: { decide: 7, do: 9, understand: 3, lookup: 4, handle: 4 },
+    topicMatch: {
+      heat_pump: 8,
+      kitchen: 9,
+      bath: 8,
+      addition_adu: 9,
+      solar_battery: 7,
+      outdoor: 7,
+    },
+    // Escalation: scope=na suppresses heavily; scope=big pushes to top.
+    scopeMatch: { diy: 0, mid: 6, big: 10, na: -2 },
+    townTierMatch: {},
+    isUniversal: false,
+  },
+  revenueWeight: 10,
+  ctaType: 'contractor_bid',
+  refundRiskCompatible: false,
+  render: (profile, signals) => (
+    <EmailCaptureCard
+      kind="contractor"
+      profile={profile}
+      topic={signals.topic}
+    />
+  ),
+}
+
+const ctaEmailCapture: PropertyModule = {
+  moduleId: 'cta_email_capture',
+  title: 'Send me this profile',
+  contentType: 'cta',
+  relevanceFactors: {
+    intentMatch: { buying: 9, owner: 4, looking: 5, researching: 4 },
+    modeMatch: { decide: 7, do: 4, understand: 6, lookup: 7, handle: 3 },
+    topicMatch: {},
+    scopeMatch: { diy: 5, mid: 5, big: 5, na: 6 },
+    townTierMatch: {},
+    isUniversal: false,
+  },
+  revenueWeight: 8,
+  ctaType: 'email_capture',
+  refundRiskCompatible: true,
+  render: (profile, signals) => (
+    <EmailCaptureCard kind="buyer" profile={profile} topic={signals.topic} />
+  ),
+}
+
+function topicLabelFor(t: TopicId | null): string {
+  if (!t) return 'a small project'
+  const map: Record<TopicId, string> = {
+    heat_pump: 'a heat pump install',
+    kitchen: 'a kitchen project',
+    bath: 'a bathroom project',
+    solar_battery: 'a solar + battery install',
+    outdoor: 'a deck or outdoor project',
+    addition_adu: 'an addition or ADU',
+    weatherization: 'weatherization work',
+    rebate_strat: 'planning the rebate stack',
+    property_tax: 'property tax help',
+    flood_zone: 'flood / shoreland questions',
+    rebate_eligibility: 'rebate eligibility',
+    contractor_vetting: 'vetting a contractor',
+    general_orientation: 'general orientation',
+    mud_season: 'mud-season prep',
+    well_septic: 'a well or septic job',
+  }
+  return map[t]
+}
+
+// Email capture card — used by both contractor_bid and email_capture.
+// POSTs to the existing /api/chat capture_lead action, which routes to
+// the same lead webhook the chat uses for installer handoff.
+function EmailCaptureCard({
+  kind,
+  profile,
+  topic,
+}: {
+  kind: 'contractor' | 'buyer'
+  profile: PropertyProfile
+  topic: TopicId | null
+}) {
+  const [email, setEmail] = useState('')
+  const [name, setName] = useState('')
+  const [status, setStatus] = useState<'idle' | 'sending' | 'ok' | 'error'>('idle')
+
+  const isContractor = kind === 'contractor'
+  const headline = isContractor
+    ? `Ready for bids on ${profile.town}?`
+    : `Send me this ${profile.town} profile`
+  const sub = isContractor
+    ? `Drop your name and email and a Vermont contractor who handles ${topicLabelFor(topic)} will reach out within a business day.`
+    : `Save the profile and we will email you reminders when you hit a closing milestone — no spam, just the property facts that move.`
+  const buttonText = isContractor ? 'Send to a Vermont contractor →' : 'Send me the profile →'
+
+  async function submit(e: React.FormEvent) {
+    e.preventDefault()
+    if (!email.trim()) return
+    setStatus('sending')
+    const transcript = [
+      {
+        role: 'user' as const,
+        content: isContractor
+          ? `I want bids for ${topicLabelFor(topic)} on ${profile.address}.`
+          : `Send me the property profile for ${profile.address}.`,
+      },
+      {
+        role: 'assistant' as const,
+        content: `Property: ${profile.address}. Tier: ${profile.bucket}. Utility: ${profile.utility}. Topic: ${topicLabelFor(topic)}.`,
+      },
+    ]
+    try {
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'capture_lead',
+          name: name.trim() || '(name not given)',
+          email: email.trim(),
+          transcript,
+          source: isContractor ? 'property_profile_contractor_bid' : 'property_profile_email_capture',
+        }),
+      })
+      setStatus(res.ok ? 'ok' : 'error')
+    } catch {
+      setStatus('error')
+    }
+  }
+
+  if (status === 'ok') {
+    return (
+      <Card kicker={isContractor ? 'Sent' : 'Saved'} title="Got it">
+        <p style={{ fontSize: 13, fontFamily: FB, color: C.ink, lineHeight: 1.55, margin: 0 }}>
+          {isContractor
+            ? `A Vermont contractor will reach out within a business day. Anything else you want to figure out in the meantime? The chat is right there.`
+            : `The profile is on its way. Reply to that email if you want anything tweaked.`}
+        </p>
+      </Card>
+    )
+  }
+
+  return (
+    <Card kicker={isContractor ? 'Get bids' : 'Save profile'} title={headline}>
+      <p style={{ fontSize: 13, fontFamily: FB, color: C.inkSoft, lineHeight: 1.55, margin: '0 0 12px' }}>
+        {sub}
+      </p>
+      <form onSubmit={submit} style={{ display: 'grid', gap: 8 }}>
+        <input
+          type="text"
+          value={name}
+          onChange={e => setName(e.target.value)}
+          placeholder="Name (optional)"
+          aria-label="Your name"
+          style={inputStyle}
+        />
+        <input
+          type="email"
+          value={email}
+          onChange={e => setEmail(e.target.value)}
+          placeholder="Email"
+          aria-label="Your email"
+          required
+          style={inputStyle}
+        />
+        <button
+          type="submit"
+          disabled={status === 'sending' || !email.trim()}
+          style={{
+            padding: '10px 16px',
+            border: 'none',
+            backgroundColor: status === 'sending' ? 'rgba(200,115,42,0.5)' : C.accent,
+            color: '#FAF7F2',
+            borderRadius: 4,
+            fontFamily: FB,
+            fontSize: 13,
+            fontWeight: 600,
+            cursor: status === 'sending' ? 'wait' : 'pointer',
+          }}
+        >
+          {status === 'sending' ? 'Sending…' : buttonText}
+        </button>
+        {status === 'error' && (
+          <p style={{ fontSize: 12, fontFamily: FB, color: '#dc2626', margin: 0 }}>
+            Could not send. Try again in a moment, or just message the chat instead.
+          </p>
+        )}
+      </form>
+    </Card>
+  )
+}
+
+const inputStyle: CSSProperties = {
+  padding: '10px 12px',
+  border: `1px solid ${C.cardLine}`,
+  borderRadius: 4,
+  fontSize: 13,
+  fontFamily: FB,
+  color: C.ink,
+  background: '#fff',
+  outline: 'none',
+}
+
 // ---------- Catalog -------------------------------------------------
 
 export const MODULES: PropertyModule[] = [
@@ -982,4 +1367,8 @@ export const MODULES: PropertyModule[] = [
   contractorSanityCheck,
   propertyTaxLookup,
   generalOrientation,
+  ctaDiyAmazon,
+  ctaHandyman,
+  ctaContractorBid,
+  ctaEmailCapture,
 ]

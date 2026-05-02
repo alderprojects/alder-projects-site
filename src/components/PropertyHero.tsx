@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
-import type { PropertyProfile, TopicId, TopLevelIntent } from '@/lib/property-modules'
+import type { PropertyProfile, Scope, TopicId, TopLevelIntent } from '@/lib/property-modules'
 import { classifyIntentMode } from '@/lib/property-ranker'
 
 // Two-click hero. The visitor's first click picks one of three top-level
@@ -76,6 +76,7 @@ export default function PropertyHero({ profile }: Props) {
 
   const urlIntent = searchParams?.get('intent') as TopLevelIntent | null
   const urlTopic = searchParams?.get('topic') as TopicId | null
+  const urlScope = searchParams?.get('scope') as Scope | null
   const [intent, setIntent] = useState<TopLevelIntent | null>(urlIntent ?? null)
   const [chatInput, setChatInput] = useState('')
 
@@ -97,7 +98,7 @@ export default function PropertyHero({ profile }: Props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  function persistAndRoute(next: { intent: TopLevelIntent; topic: TopicId | null }) {
+  function persistAndRoute(next: { intent: TopLevelIntent; topic: TopicId | null; scope?: Scope }) {
     const params = new URLSearchParams(searchParams?.toString() ?? '')
     params.set('intent', next.intent)
     if (next.topic) {
@@ -107,10 +108,12 @@ export default function PropertyHero({ profile }: Props) {
       params.delete('topic')
       params.set('mode', classifyIntentMode(next.intent, null))
     }
+    if (next.scope && next.scope !== 'na') params.set('scope', next.scope)
+    else if (next.scope === 'na') params.delete('scope')
     try {
       sessionStorage.setItem(
         'alder.propertySignals',
-        JSON.stringify({ intent: next.intent, topic: next.topic })
+        JSON.stringify({ intent: next.intent, topic: next.topic, scope: next.scope })
       )
     } catch {
       /* ignore */
@@ -126,10 +129,15 @@ export default function PropertyHero({ profile }: Props) {
   function pickTopic(id: TopicId | typeof SUMMARY_TILE_ID) {
     if (!intent) return
     if (id === SUMMARY_TILE_ID) {
-      persistAndRoute({ intent, topic: null })
+      persistAndRoute({ intent, topic: null, scope: urlScope ?? undefined })
       return
     }
-    persistAndRoute({ intent, topic: id })
+    persistAndRoute({ intent, topic: id, scope: urlScope ?? undefined })
+  }
+
+  function pickScope(scope: Scope) {
+    if (!intent) return
+    persistAndRoute({ intent, topic: urlTopic ?? null, scope })
   }
 
   function submitChat(e: React.FormEvent) {
@@ -310,6 +318,51 @@ export default function PropertyHero({ profile }: Props) {
                 <p style={{ fontSize: 13, fontWeight: 600, margin: 0, color: C.ink }}>Just want a summary</p>
                 <p style={{ fontSize: 11, color: C.inkSoft, margin: '4px 0 0' }}>Three of everything, curated</p>
               </button>
+            </div>
+          </div>
+
+          {/* Scope tier — feeds the CTA escalation rule. */}
+          <div>
+            <p
+              style={{
+                fontSize: 11,
+                fontFamily: FM,
+                color: C.inkFaint,
+                letterSpacing: '0.08em',
+                textTransform: 'uppercase',
+                margin: '4px 0 10px',
+              }}
+            >
+              Scope you are thinking about
+            </p>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+              {(
+                [
+                  { id: 'diy' as const, label: 'DIY', sub: 'Do it myself' },
+                  { id: 'mid' as const, label: 'Mid', sub: 'Hire a handyman' },
+                  { id: 'big' as const, label: 'Big', sub: 'Full contractor' },
+                  { id: 'na' as const, label: 'Not sure yet', sub: '' },
+                ]
+              ).map(s => {
+                const selected = (urlScope ?? 'na') === s.id
+                return (
+                  <button
+                    key={s.id}
+                    type="button"
+                    data-tile
+                    tabIndex={-1}
+                    aria-label={`${s.label}${s.sub ? '. ' + s.sub : ''}`}
+                    aria-pressed={selected}
+                    onClick={() => pickScope(s.id)}
+                    style={chipStyle(selected)}
+                  >
+                    {s.label}
+                    {s.sub && (
+                      <span style={{ color: C.inkFaint, fontWeight: 400, marginLeft: 6 }}>{s.sub}</span>
+                    )}
+                  </button>
+                )
+              })}
             </div>
           </div>
 

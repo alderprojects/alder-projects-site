@@ -529,32 +529,101 @@ function sequenceModule(seqId: string, primaryTopic: TopicId | null, secondaryTo
       const seq = profile.sequences.items.find(s => s.id === seqId)
       if (!seq) return null
       return (
-        <Card kicker="Order of operations" title={seq.title}>
-          <p style={{ fontSize: 12, fontFamily: FB, color: C.inkSoft, lineHeight: 1.55, margin: '0 0 6px' }}>
+        <Card kicker="What this looks like" title={seq.title}>
+          <p style={{ fontSize: 13, fontFamily: FB, color: C.inkSoft, lineHeight: 1.55, margin: '0 0 14px' }}>
             {seq.scenario}
           </p>
-          <p style={{ fontSize: 12, fontFamily: FB, color: C.ink, margin: '0 0 14px' }}>
-            <strong style={{ color: C.accent }}>Stacked rebates:</strong> {seq.totalRebateStack}
-          </p>
-          <ol style={{ listStyle: 'none', padding: 0, margin: 0, display: 'grid', gap: 10 }}>
+
+          {/* Milestone view — arrow + step title + duration only. Reads
+              like a "what to expect" overview rather than a DIY task list.
+              Full step-by-step (what / why / trap / rebates) lives in the
+              disclosure below. */}
+          <ol style={{ listStyle: 'none', padding: 0, margin: '0 0 14px', display: 'grid', gap: 8 }}>
             {seq.steps.map(s => (
-              <li key={s.step} style={{ display: 'grid', gridTemplateColumns: '32px minmax(0, 1fr)', gap: 12, paddingTop: 8, borderTop: `1px solid ${C.cardLine}` }}>
-                <span style={{ fontSize: 13, fontFamily: FM, color: C.inkFaint, fontWeight: 600 }}>
-                  {String(s.step).padStart(2, '0')}
+              <li
+                key={s.step}
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: '20px minmax(0, 1fr) auto',
+                  gap: 10,
+                  alignItems: 'baseline',
+                  fontFamily: FB,
+                }}
+              >
+                <span style={{ fontSize: 14, color: C.accent, fontWeight: 600 }}>→</span>
+                <span style={{ fontSize: 13, color: C.ink, fontWeight: 500 }}>{s.title}</span>
+                <span style={{ fontSize: 11, fontFamily: FM, color: C.inkFaint, whiteSpace: 'nowrap' }}>
+                  {s.duration}
                 </span>
-                <div style={{ minWidth: 0 }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8, flexWrap: 'wrap' }}>
-                    <p style={{ fontSize: 13, fontFamily: FB, fontWeight: 600, color: C.ink, margin: 0 }}>{s.title}</p>
-                    <span style={{ fontSize: 11, fontFamily: FM, color: C.inkFaint }}>{s.duration}</span>
-                  </div>
-                  <p style={{ fontSize: 12, fontFamily: FB, color: C.inkSoft, margin: '4px 0 0', lineHeight: 1.5 }}>{s.what}</p>
-                  <p style={{ fontSize: 11, fontFamily: FB, color: C.inkFaint, margin: '4px 0 0', fontStyle: 'italic' }}>
-                    Trap: {s.trap}
-                  </p>
-                </div>
               </li>
             ))}
           </ol>
+
+          <div
+            style={{
+              display: 'grid',
+              gap: 4,
+              marginBottom: 14,
+              paddingTop: 12,
+              borderTop: `1px solid ${C.cardLine}`,
+            }}
+          >
+            <p style={{ fontSize: 12, fontFamily: FB, color: C.ink, margin: 0 }}>
+              <strong>Total cost after rebates:</strong> {seq.totalCostMidVT}
+            </p>
+            <p style={{ fontSize: 12, fontFamily: FB, color: C.ink, margin: 0 }}>
+              <strong style={{ color: C.accent }}>Stacked rebates:</strong> {seq.totalRebateStack}
+            </p>
+          </div>
+
+          <details style={{ marginTop: 4 }}>
+            <summary
+              style={{
+                cursor: 'pointer',
+                listStyle: 'none',
+                fontSize: 12,
+                fontFamily: FM,
+                color: C.accent,
+                fontWeight: 600,
+                letterSpacing: '0.06em',
+                textTransform: 'uppercase',
+              }}
+            >
+              Want the full step-by-step? Show me the details →
+            </summary>
+            <ol style={{ listStyle: 'none', padding: 0, margin: '12px 0 0', display: 'grid', gap: 10 }}>
+              {seq.steps.map(s => (
+                <li
+                  key={s.step}
+                  style={{
+                    display: 'grid',
+                    gridTemplateColumns: '32px minmax(0, 1fr)',
+                    gap: 12,
+                    paddingTop: 8,
+                    borderTop: `1px solid ${C.cardLine}`,
+                  }}
+                >
+                  <span style={{ fontSize: 13, fontFamily: FM, color: C.inkFaint, fontWeight: 600 }}>
+                    {String(s.step).padStart(2, '0')}
+                  </span>
+                  <div style={{ minWidth: 0 }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8, flexWrap: 'wrap' }}>
+                      <p style={{ fontSize: 13, fontFamily: FB, fontWeight: 600, color: C.ink, margin: 0 }}>
+                        {s.title}
+                      </p>
+                      <span style={{ fontSize: 11, fontFamily: FM, color: C.inkFaint }}>{s.duration}</span>
+                    </div>
+                    <p style={{ fontSize: 12, fontFamily: FB, color: C.inkSoft, margin: '4px 0 0', lineHeight: 1.5 }}>
+                      {s.what}
+                    </p>
+                    <p style={{ fontSize: 11, fontFamily: FB, color: C.inkFaint, margin: '4px 0 0', fontStyle: 'italic' }}>
+                      Trap: {s.trap}
+                    </p>
+                  </div>
+                </li>
+              ))}
+            </ol>
+          </details>
         </Card>
       )
     },

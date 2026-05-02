@@ -9,6 +9,11 @@ type Props = {
   source?: string
   greeting?: string
   context?: Record<string, unknown>
+  // Optional pre-loaded property profile. When set, the widget passes it to
+  // /api/chat as context.propertyProfile. The chat route already detects
+  // addresses and looks them up itself; sending the profile up front lets it
+  // skip that round trip for property-page conversations.
+  propertyProfile?: Record<string, unknown>
   variant?: 'inline' | 'page'
 }
 
@@ -30,6 +35,7 @@ export default function ChatWidget({
   source = 'unknown',
   greeting = DEFAULT_GREETING,
   context,
+  propertyProfile,
   variant = 'inline',
 }: Props) {
   const [messages, setMessages] = useState<Message[]>([
@@ -99,12 +105,17 @@ export default function ChatWidget({
 
     try {
       const token = await getCaptchaTokenIfNeeded()
+      const mergedContext = {
+        ...context,
+        referrer: source,
+        ...(propertyProfile ? { propertyProfile } : {}),
+      }
       const res = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           messages: next,
-          context: { ...context, referrer: source },
+          context: mergedContext,
           captchaToken: token,
         }),
       })

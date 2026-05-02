@@ -6,6 +6,9 @@
 // 2026 figures. Verify with town zoning office before final design —
 // town zoning bylaws update on rolling basis.
 
+import type { State } from './_types'
+import { DEFAULT_STATE } from './_types'
+
 export type ZoningCategory =
   | 'residential_single_family'
   | 'residential_multi_family'
@@ -26,6 +29,7 @@ export type ADURules = {
 
 export type TownZoning = {
   town: string
+  state: State
   county: string
   populationApprox: number
   // Average residential lot setbacks (front/side/rear in feet)
@@ -53,6 +57,7 @@ export const TOWN_ZONING: TownZoning[] = [
   // ─── Burlington ─────────────────────────────────────────────────────────
   {
     town: 'Burlington',
+    state: 'VT',
     county: 'Chittenden',
     populationApprox: 44743,
     setbacks: { front: 15, side: 8, rear: 25 },
@@ -75,6 +80,7 @@ export const TOWN_ZONING: TownZoning[] = [
   // ─── South Burlington ───────────────────────────────────────────────────
   {
     town: 'South Burlington',
+    state: 'VT',
     county: 'Chittenden',
     populationApprox: 20292,
     setbacks: { front: 30, side: 10, rear: 30 },
@@ -97,6 +103,7 @@ export const TOWN_ZONING: TownZoning[] = [
   // ─── Essex ──────────────────────────────────────────────────────────────
   {
     town: 'Essex',
+    state: 'VT',
     county: 'Chittenden',
     populationApprox: 22094,
     setbacks: { front: 35, side: 15, rear: 35 },
@@ -119,6 +126,7 @@ export const TOWN_ZONING: TownZoning[] = [
   // ─── Williston ──────────────────────────────────────────────────────────
   {
     town: 'Williston',
+    state: 'VT',
     county: 'Chittenden',
     populationApprox: 10117,
     setbacks: { front: 50, side: 25, rear: 35 },
@@ -141,6 +149,7 @@ export const TOWN_ZONING: TownZoning[] = [
   // ─── Colchester ─────────────────────────────────────────────────────────
   {
     town: 'Colchester',
+    state: 'VT',
     county: 'Chittenden',
     populationApprox: 17524,
     setbacks: { front: 30, side: 15, rear: 30 },
@@ -163,6 +172,7 @@ export const TOWN_ZONING: TownZoning[] = [
   // ─── Stowe ──────────────────────────────────────────────────────────────
   {
     town: 'Stowe',
+    state: 'VT',
     county: 'Lamoille',
     populationApprox: 5360,
     setbacks: { front: 50, side: 25, rear: 50 },
@@ -185,6 +195,7 @@ export const TOWN_ZONING: TownZoning[] = [
   // ─── Middlebury ─────────────────────────────────────────────────────────
   {
     town: 'Middlebury',
+    state: 'VT',
     county: 'Addison',
     populationApprox: 9152,
     setbacks: { front: 30, side: 12, rear: 25 },
@@ -207,6 +218,7 @@ export const TOWN_ZONING: TownZoning[] = [
   // ─── Montpelier ─────────────────────────────────────────────────────────
   {
     town: 'Montpelier',
+    state: 'VT',
     county: 'Washington',
     populationApprox: 8074,
     setbacks: { front: 20, side: 10, rear: 20 },
@@ -229,6 +241,7 @@ export const TOWN_ZONING: TownZoning[] = [
   // ─── Brattleboro ────────────────────────────────────────────────────────
   {
     town: 'Brattleboro',
+    state: 'VT',
     county: 'Windham',
     populationApprox: 12184,
     setbacks: { front: 25, side: 8, rear: 20 },
@@ -251,6 +264,7 @@ export const TOWN_ZONING: TownZoning[] = [
   // ─── Rutland ────────────────────────────────────────────────────────────
   {
     town: 'Rutland City',
+    state: 'VT',
     county: 'Rutland',
     populationApprox: 15807,
     setbacks: { front: 25, side: 10, rear: 25 },
@@ -273,6 +287,7 @@ export const TOWN_ZONING: TownZoning[] = [
   // ─── Manchester ─────────────────────────────────────────────────────────
   {
     town: 'Manchester',
+    state: 'VT',
     county: 'Bennington',
     populationApprox: 4380,
     setbacks: { front: 50, side: 25, rear: 35 },
@@ -295,6 +310,7 @@ export const TOWN_ZONING: TownZoning[] = [
   // ─── Woodstock ──────────────────────────────────────────────────────────
   {
     town: 'Woodstock',
+    state: 'VT',
     county: 'Windsor',
     populationApprox: 3286,
     setbacks: { front: 50, side: 25, rear: 50 },
@@ -370,15 +386,25 @@ Permits common to all towns:
 `
 
 // ---------------------------------------------------------------------------
+// STATE-AWARE ACCESSOR
+// ---------------------------------------------------------------------------
+
+// Returns town zoning entries for the requested state. Today every entry
+// is VT.
+export function getZoningForState(state: State): TownZoning[] {
+  return TOWN_ZONING.filter(tz => tz.state === state)
+}
+
+// ---------------------------------------------------------------------------
 // COMPACT SUMMARY for chat system prompt
 // ---------------------------------------------------------------------------
 
-export function zoningSummaryForPrompt(): string {
+export function zoningSummaryForPrompt(state: State = DEFAULT_STATE): string {
   const lines: string[] = ['VERMONT ZONING + PERMIT REFERENCE (top 12 towns)']
   lines.push(VT_STATEWIDE_ZONING_NOTES.trim())
   lines.push('')
   lines.push('PER-TOWN HIGHLIGHTS:')
-  for (const tz of TOWN_ZONING) {
+  for (const tz of getZoningForState(state)) {
     lines.push(`### ${tz.town} (${tz.county} County, ~${tz.populationApprox.toLocaleString()})`)
     lines.push(`Setbacks: ${tz.setbacks.front}/${tz.setbacks.side}/${tz.setbacks.rear} (front/side/rear). Lot coverage cap ${Math.round(tz.maxLotCoverage * 100)}%. Height ${tz.maxBuildingHeight}ft.`)
     lines.push(`ADU: max ${tz.adu.maxSizeSqFt} sqft, owner-occupy ${tz.adu.ownerOccupancyRequired ? 'YES' : 'no'}, parking: ${tz.adu.parkingRequirement}.`)

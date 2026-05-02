@@ -6,6 +6,9 @@
 // EIA RSMeans VT regional adjustment factors, and EVT contractor network data.
 // Update annually around January.
 
+import type { State } from './_types'
+import { DEFAULT_STATE } from './_types'
+
 export type Trade =
   | 'kitchen'
   | 'bathroom'
@@ -41,6 +44,7 @@ export type CostRange = {
 
 export type ProjectCost = {
   trade: Trade
+  state: State
   scope: Scope
   description: string
   whatsIn: string
@@ -63,6 +67,7 @@ export const PROJECT_COSTS: ProjectCost[] = [
   // ─── KITCHENS ────────────────────────────────────────────────────────────
   {
     trade: 'kitchen',
+    state: 'VT',
     scope: 'budget',
     description: 'Cosmetic refresh — paint, hardware, refinish cabinets, lighting upgrade, no layout changes',
     whatsIn: 'Cabinet refacing or repaint, new pulls, countertop replacement (laminate or low-end stone), new sink/faucet, lighting, basic appliance swap',
@@ -80,6 +85,7 @@ export const PROJECT_COSTS: ProjectCost[] = [
   },
   {
     trade: 'kitchen',
+    state: 'VT',
     scope: 'mid',
     description: 'Standard remodel — new cabinets, counters, appliances, possible minor layout tweaks',
     whatsIn: 'New stock or semi-custom cabinets, quartz or granite counters, mid-range appliances, new flooring, new sink/faucet, new lighting, possible relocation of one fixture',
@@ -97,6 +103,7 @@ export const PROJECT_COSTS: ProjectCost[] = [
   },
   {
     trade: 'kitchen',
+    state: 'VT',
     scope: 'high',
     description: 'Gut remodel — full layout change, possibly removing walls, premium finishes',
     whatsIn: 'Custom cabinets, high-end stone or specialty counters, professional-grade appliances, possible structural wall removal, new windows, premium flooring, possible new electrical service',
@@ -116,6 +123,7 @@ export const PROJECT_COSTS: ProjectCost[] = [
   // ─── BATHROOMS ───────────────────────────────────────────────────────────
   {
     trade: 'bathroom',
+    state: 'VT',
     scope: 'budget',
     description: 'Cosmetic update — vanity, fixtures, paint, possibly new toilet',
     whatsIn: 'New vanity and top, new toilet, new mirror/lighting, new faucet, paint, possibly new flooring (vinyl or basic tile)',
@@ -133,6 +141,7 @@ export const PROJECT_COSTS: ProjectCost[] = [
   },
   {
     trade: 'bathroom',
+    state: 'VT',
     scope: 'mid',
     description: 'Full remodel — new tile, shower, vanity, fixtures, possibly new layout',
     whatsIn: 'Tile shower with door, new tub or just shower, new vanity with stone top, new toilet, tile floor, new lighting/exhaust, new fixtures throughout',
@@ -150,6 +159,7 @@ export const PROJECT_COSTS: ProjectCost[] = [
   },
   {
     trade: 'bathroom',
+    state: 'VT',
     scope: 'high',
     description: 'Premium spa-grade or expansion bath — moved walls, premium materials, custom touches',
     whatsIn: 'Heated floors, frameless glass, custom tile work, double vanity, soaking tub plus separate shower, premium fixtures (Kohler/Toto), possibly added square footage',
@@ -169,6 +179,7 @@ export const PROJECT_COSTS: ProjectCost[] = [
   // ─── DECKS ───────────────────────────────────────────────────────────────
   {
     trade: 'deck',
+    state: 'VT',
     scope: 'budget',
     description: 'Pressure-treated deck, basic rails, ground level',
     whatsIn: 'PT framing and decking, basic 4x4 PT railings, footings to frost line (4ft in VT), simple stairs',
@@ -186,6 +197,7 @@ export const PROJECT_COSTS: ProjectCost[] = [
   },
   {
     trade: 'deck',
+    state: 'VT',
     scope: 'mid',
     description: 'Composite deck with quality railings, possibly multi-level',
     whatsIn: 'Trex/Azek composite decking, aluminum or cable railings, lighting, possibly built-in benches, multi-level option',
@@ -203,6 +215,7 @@ export const PROJECT_COSTS: ProjectCost[] = [
   },
   {
     trade: 'deck',
+    state: 'VT',
     scope: 'high',
     description: 'Screened porch or 3-season room with full structure',
     whatsIn: 'Full roof structure, screened or 3-season walls, premium decking, electrical for fans/lighting, possibly heating, premium finishes',
@@ -222,6 +235,7 @@ export const PROJECT_COSTS: ProjectCost[] = [
   // ─── ADDITION ────────────────────────────────────────────────────────────
   {
     trade: 'addition',
+    state: 'VT',
     scope: 'budget',
     description: 'Bump-out (under 100 sqft) — extending a single room',
     whatsIn: 'Foundation, framing, roof tied in, exterior finish to match, basic interior, electrical extension',
@@ -239,6 +253,7 @@ export const PROJECT_COSTS: ProjectCost[] = [
   },
   {
     trade: 'addition',
+    state: 'VT',
     scope: 'mid',
     description: 'Real room addition (100-400 sqft) — bedroom, family room, mudroom, etc.',
     whatsIn: 'Full foundation, framing, roof, exterior, drywall, flooring, electrical, possible plumbing, integrated with existing house',
@@ -256,6 +271,7 @@ export const PROJECT_COSTS: ProjectCost[] = [
   },
   {
     trade: 'addition',
+    state: 'VT',
     scope: 'high',
     description: 'Full ADU or in-law suite (500-900 sqft) — kitchen, bath, bedroom, separate entry',
     whatsIn: 'Full foundation, complete dwelling unit, kitchen, bathroom, bedroom, possibly separate utilities, ADU code compliance',
@@ -275,6 +291,7 @@ export const PROJECT_COSTS: ProjectCost[] = [
   // ─── BASEMENT FINISHING ──────────────────────────────────────────────────
   {
     trade: 'basement',
+    state: 'VT',
     scope: 'budget',
     description: 'Basic finished space — drywall, flooring, ceiling, basic lighting',
     whatsIn: 'Framing, insulation, drywall, drop ceiling or drywall ceiling, flooring (LVP), basic electrical, paint',
@@ -292,6 +309,7 @@ export const PROJECT_COSTS: ProjectCost[] = [
   },
   {
     trade: 'basement',
+    state: 'VT',
     scope: 'mid',
     description: 'Full finished basement with bathroom and one designated room',
     whatsIn: 'All budget items plus a 3/4 bath, family room, possibly office or guest room with proper egress',
@@ -311,6 +329,7 @@ export const PROJECT_COSTS: ProjectCost[] = [
   // ─── ROOFING ─────────────────────────────────────────────────────────────
   {
     trade: 'roofing',
+    state: 'VT',
     scope: 'budget',
     description: 'Architectural asphalt shingle replacement on simple roof',
     whatsIn: 'Tear-off existing one layer, ice/water shield to 6ft from eaves, synthetic underlayment, 30-year architectural shingles, ridge vents, drip edge, basic flashing replacement',
@@ -328,6 +347,7 @@ export const PROJECT_COSTS: ProjectCost[] = [
   },
   {
     trade: 'roofing',
+    state: 'VT',
     scope: 'mid',
     description: 'Standing seam metal roof — steel or aluminum',
     whatsIn: 'Tear-off, ice/water shield, full underlayment, 24/26ga standing seam metal panels, snow guards above doors, custom flashings, ridge vent, drip edge',
@@ -347,6 +367,7 @@ export const PROJECT_COSTS: ProjectCost[] = [
   // ─── SIDING ──────────────────────────────────────────────────────────────
   {
     trade: 'siding',
+    state: 'VT',
     scope: 'mid',
     description: 'Vinyl or fiber cement (Hardie) siding replacement',
     whatsIn: 'Tear-off, house wrap, new siding, trim, basic flashing, painted soffit/fascia',
@@ -366,6 +387,7 @@ export const PROJECT_COSTS: ProjectCost[] = [
   // ─── WINDOW REPLACEMENT ─────────────────────────────────────────────────
   {
     trade: 'window',
+    state: 'VT',
     scope: 'mid',
     description: 'Vinyl/fiberglass replacement window, full-frame',
     whatsIn: 'Mid-grade replacement window (Andersen 100, Marvin Essential, Pella), proper flashing, interior trim restoration',
@@ -385,6 +407,7 @@ export const PROJECT_COSTS: ProjectCost[] = [
   // ─── HEAT PUMP — NEW INSTALL ────────────────────────────────────────────
   {
     trade: 'hvac',
+    state: 'VT',
     scope: 'mid',
     description: 'Cold-climate heat pump install — single zone ductless',
     whatsIn: 'Mitsubishi/Fujitsu cold-climate single zone (1 outdoor + 1 indoor), refrigerant lines, electrical hookup, condenser pad, basic install',
@@ -402,6 +425,7 @@ export const PROJECT_COSTS: ProjectCost[] = [
   },
   {
     trade: 'hvac',
+    state: 'VT',
     scope: 'high',
     description: 'Whole-house ducted heat pump (3-5 ton) — full ductwork system',
     whatsIn: 'Cold-climate ducted unit (Mitsubishi PVA, Daikin Fit), full ductwork, return air, blower, refrigerant lines, electrical, thermostat, condensate management',
@@ -421,6 +445,7 @@ export const PROJECT_COSTS: ProjectCost[] = [
   // ─── PAINTING (INTERIOR) ─────────────────────────────────────────────────────────────
   {
     trade: "painting_interior",
+    state: "VT",
     scope: "budget",
     description: "Spot/partial — 1-2 rooms, walls only, light prep, contractor-grade paint",
     whatsIn: "Walls of 1-2 rooms (bedroom, hallway, etc.), basic patching/sanding, two coats of standard contractor-grade paint, masking and basic protection",
@@ -438,6 +463,7 @@ export const PROJECT_COSTS: ProjectCost[] = [
   },
   {
     trade: "painting_interior",
+    state: "VT",
     scope: "mid",
     description: "Full interior — 3-4 bedroom home, walls and ceilings, basic trim, light prep",
     whatsIn: "Walls and ceilings throughout home, light prep (patching, sanding), two coats contractor-grade paint, basic trim painted same color as walls or left as-is, standard masking",
@@ -455,6 +481,7 @@ export const PROJECT_COSTS: ProjectCost[] = [
   },
   {
     trade: "painting_interior",
+    state: "VT",
     scope: "high",
     description: "Full interior with all trim painted, premium paint, custom finishes, heavy prep",
     whatsIn: "Walls + ceilings + all trim painted in distinct colors, premium paint (Benjamin Moore Aura/Regal Select, Sherwin Williams Emerald, etc.), heavy prep including any plaster repair, accent walls, careful finish work",
@@ -474,6 +501,7 @@ export const PROJECT_COSTS: ProjectCost[] = [
   // ─── PAINTING (EXTERIOR) ────────────────────────────────────────────────────────────
   {
     trade: "painting_exterior",
+    state: "VT",
     scope: "budget",
     description: "Touch-up + recoat of recently painted home, single color, light prep",
     whatsIn: "Pressure wash, scrape and prime any peeling/bare spots, one coat exterior paint over previously painted surfaces in good condition, single body color, basic trim touch-up",
@@ -491,6 +519,7 @@ export const PROJECT_COSTS: ProjectCost[] = [
   },
   {
     trade: "painting_exterior",
+    state: "VT",
     scope: "mid",
     description: "Full exterior repaint — single-color body, two coats, normal prep",
     whatsIn: "Pressure wash, scrape and prime bare/peeling areas, two coats body paint, trim painted same or different color, single accent (door/shutters), standard masking and ground protection",
@@ -508,6 +537,7 @@ export const PROJECT_COSTS: ProjectCost[] = [
   },
   {
     trade: "painting_exterior",
+    state: "VT",
     scope: "high",
     description: "Full exterior with carpentry repair, premium paint, multiple colors, heavy prep",
     whatsIn: "Full prep including pressure wash, scrape, prime bare and bleeding wood, replace rotted clapboards/trim/sills, two coats premium exterior paint (Benjamin Moore Aura Exterior, Sherwin Williams Duration), three-color scheme (body/trim/accent), shutters and porch ceiling included",
@@ -526,6 +556,7 @@ export const PROJECT_COSTS: ProjectCost[] = [
   // ─── ADU (accessory dwelling unit) ──────────────────────
   {
     trade: 'adu',
+    state: 'VT',
     scope: 'budget',
     description: 'Basement or garage conversion to legal dwelling unit',
     whatsIn: 'Egress windows or door, fire separation, kitchen + bath, electrical, heating, permits, finishes',
@@ -544,6 +575,7 @@ export const PROJECT_COSTS: ProjectCost[] = [
   },
   {
     trade: 'adu',
+    state: 'VT',
     scope: 'mid',
     description: 'Attached ADU addition (above garage, side addition, or in-law suite)',
     whatsIn: 'New framing, foundation if needed, full kitchen + bath, separate entry, heating + electrical, permits',
@@ -562,6 +594,7 @@ export const PROJECT_COSTS: ProjectCost[] = [
   },
   {
     trade: 'adu',
+    state: 'VT',
     scope: 'high',
     description: 'Detached ADU — new freestanding unit (cottage, garage with apartment, tiny home permanent)',
     whatsIn: 'Foundation, framing, roof, full mechanical, separate utility connections, permits, site work, finished space',
@@ -637,10 +670,20 @@ export function bucketForTown(town: string | undefined): TownBucket {
 }
 
 // ---------------------------------------------------------------------------
+// STATE-AWARE ACCESSOR
+// ---------------------------------------------------------------------------
+
+// Returns project costs for the requested state. Today every entry is VT;
+// town buckets remain VT-specific until NH/ME/MA expansion adds their own.
+export function getProjectCostsForState(state: State): ProjectCost[] {
+  return PROJECT_COSTS.filter(p => p.state === state)
+}
+
+// ---------------------------------------------------------------------------
 // SUMMARIZE for chat system prompt — compact per-trade summary
 // ---------------------------------------------------------------------------
 
-export function projectsSummaryForPrompt(): string {
+export function projectsSummaryForPrompt(state: State = DEFAULT_STATE): string {
   const lines: string[] = ['VERMONT RENOVATION COSTS (2026 figures)']
   lines.push('Cost ranges below are pre-rebate, pre-tax. Add 15% contingency for old VT houses.')
   lines.push('Town buckets: burlington_metro = Burlington/S Burlington/Essex/Williston/Colchester. resort_premium = Stowe/Manchester/Woodstock/Killington/Warren/Waitsfield. small_city = Montpelier/Rutland/Brattleboro/Bennington/Barre/St Johnsbury/Newport/Middlebury. rural = everywhere else (most of state). Resort premium is ~15-25% above rural; Burlington metro is ~10-20% above rural.')
@@ -648,7 +691,7 @@ export function projectsSummaryForPrompt(): string {
 
   // Group by trade
   const byTrade: Record<string, ProjectCost[]> = {}
-  for (const p of PROJECT_COSTS) {
+  for (const p of getProjectCostsForState(state)) {
     if (!byTrade[p.trade]) byTrade[p.trade] = []
     byTrade[p.trade].push(p)
   }

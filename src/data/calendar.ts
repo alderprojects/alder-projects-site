@@ -2,11 +2,15 @@
 // What matters when, by month — for chat to give time-aware advice.
 // Stable data — review annually for date shifts (deadline changes etc).
 
+import type { State } from './_types'
+import { DEFAULT_STATE } from './_types'
+
 export type CalendarEntry = {
   startMonth: number   // 1-12
   startDay: number     // 1-31
   endMonth: number
   endDay: number
+  state: State
   category: 'tax' | 'permit' | 'maintenance' | 'contractor_market' | 'weather' | 'rebate_window' | 'buying' | 'selling'
   importance: 'critical' | 'high' | 'medium' | 'low'
   title: string
@@ -22,6 +26,7 @@ export const VT_CALENDAR: CalendarEntry[] = [
   // ─── JANUARY ────────────────────────────────────────────────────────────
   {
     startMonth: 1, startDay: 1, endMonth: 2, endDay: 28,
+    state: 'VT',
     category: 'weather',
     importance: 'critical',
     title: 'Ice dam season',
@@ -30,6 +35,7 @@ export const VT_CALENDAR: CalendarEntry[] = [
   },
   {
     startMonth: 1, startDay: 1, endMonth: 1, endDay: 31,
+    state: 'VT',
     category: 'tax',
     importance: 'high',
     title: 'Heating bill shock — fuel cost reckoning',
@@ -40,6 +46,7 @@ export const VT_CALENDAR: CalendarEntry[] = [
   // ─── FEBRUARY ───────────────────────────────────────────────────────────
   {
     startMonth: 2, startDay: 1, endMonth: 2, endDay: 28,
+    state: 'VT',
     category: 'contractor_market',
     importance: 'high',
     title: 'Best month to schedule spring contractors',
@@ -50,6 +57,7 @@ export const VT_CALENDAR: CalendarEntry[] = [
   // ─── MARCH ──────────────────────────────────────────────────────────────
   {
     startMonth: 3, startDay: 1, endMonth: 5, endDay: 15,
+    state: 'VT',
     category: 'weather',
     importance: 'high',
     title: 'Mud season',
@@ -58,6 +66,7 @@ export const VT_CALENDAR: CalendarEntry[] = [
   },
   {
     startMonth: 3, startDay: 15, endMonth: 4, endDay: 15,
+    state: 'VT',
     category: 'tax',
     importance: 'critical',
     title: 'Vermont Homestead Declaration deadline (Form HS-122)',
@@ -68,6 +77,7 @@ export const VT_CALENDAR: CalendarEntry[] = [
   // ─── APRIL ──────────────────────────────────────────────────────────────
   {
     startMonth: 4, startDay: 1, endMonth: 4, endDay: 30,
+    state: 'VT',
     category: 'buying',
     importance: 'high',
     title: 'Spring real estate market opens',
@@ -76,6 +86,7 @@ export const VT_CALENDAR: CalendarEntry[] = [
   },
   {
     startMonth: 4, startDay: 15, endMonth: 4, endDay: 15,
+    state: 'VT',
     category: 'tax',
     importance: 'critical',
     title: 'Federal AND state tax filing deadline',
@@ -86,6 +97,7 @@ export const VT_CALENDAR: CalendarEntry[] = [
   // ─── MAY ────────────────────────────────────────────────────────────────
   {
     startMonth: 5, startDay: 1, endMonth: 5, endDay: 31,
+    state: 'VT',
     category: 'tax',
     importance: 'high',
     title: 'Town reappraisal letters arrive (in reappraisal years)',
@@ -94,6 +106,7 @@ export const VT_CALENDAR: CalendarEntry[] = [
   },
   {
     startMonth: 5, startDay: 15, endMonth: 6, endDay: 30,
+    state: 'VT',
     category: 'maintenance',
     importance: 'medium',
     title: 'Annual home maintenance window opens',
@@ -104,6 +117,7 @@ export const VT_CALENDAR: CalendarEntry[] = [
   // ─── JUNE ───────────────────────────────────────────────────────────────
   {
     startMonth: 6, startDay: 1, endMonth: 6, endDay: 30,
+    state: 'VT',
     category: 'tax',
     importance: 'high',
     title: 'VT property tax credit determination letters',
@@ -114,6 +128,7 @@ export const VT_CALENDAR: CalendarEntry[] = [
   // ─── JULY ───────────────────────────────────────────────────────────────
   {
     startMonth: 7, startDay: 1, endMonth: 7, endDay: 31,
+    state: 'VT',
     category: 'buying',
     importance: 'medium',
     title: 'Real estate closing peak',
@@ -124,6 +139,7 @@ export const VT_CALENDAR: CalendarEntry[] = [
   // ─── AUGUST ─────────────────────────────────────────────────────────────
   {
     startMonth: 8, startDay: 1, endMonth: 9, endDay: 30,
+    state: 'VT',
     category: 'tax',
     importance: 'critical',
     title: 'Annual property tax bills land',
@@ -134,6 +150,7 @@ export const VT_CALENDAR: CalendarEntry[] = [
   // ─── SEPTEMBER ──────────────────────────────────────────────────────────
   {
     startMonth: 9, startDay: 15, endMonth: 11, endDay: 15,
+    state: 'VT',
     category: 'maintenance',
     importance: 'high',
     title: 'Fall winterization window',
@@ -144,6 +161,7 @@ export const VT_CALENDAR: CalendarEntry[] = [
   // ─── OCTOBER ────────────────────────────────────────────────────────────
   {
     startMonth: 10, startDay: 1, endMonth: 10, endDay: 31,
+    state: 'VT',
     category: 'rebate_window',
     importance: 'high',
     title: 'Button Up Vermont campaign launches',
@@ -154,6 +172,7 @@ export const VT_CALENDAR: CalendarEntry[] = [
   // ─── NOVEMBER ───────────────────────────────────────────────────────────
   {
     startMonth: 11, startDay: 1, endMonth: 11, endDay: 30,
+    state: 'VT',
     category: 'maintenance',
     importance: 'high',
     title: 'Last chance for outdoor work',
@@ -164,6 +183,7 @@ export const VT_CALENDAR: CalendarEntry[] = [
   // ─── DECEMBER ───────────────────────────────────────────────────────────
   {
     startMonth: 12, startDay: 1, endMonth: 12, endDay: 31,
+    state: 'VT',
     category: 'tax',
     importance: 'high',
     title: 'Tax Commissioner property projection letter',
@@ -172,6 +192,7 @@ export const VT_CALENDAR: CalendarEntry[] = [
   },
   {
     startMonth: 12, startDay: 25, endMonth: 12, endDay: 31,
+    state: 'federal',
     category: 'rebate_window',
     importance: 'critical',
     title: 'Federal energy credit deadlines (END OF YEAR)',
@@ -181,12 +202,23 @@ export const VT_CALENDAR: CalendarEntry[] = [
 ]
 
 // ---------------------------------------------------------------------------
+// STATE-AWARE ACCESSOR
+// ---------------------------------------------------------------------------
+
+// Returns calendar entries for the requested state, plus federal entries.
+// Calling with 'federal' returns ONLY federal entries.
+export function getCalendarEntriesForState(state: State): CalendarEntry[] {
+  if (state === 'federal') return VT_CALENDAR.filter(e => e.state === 'federal')
+  return VT_CALENDAR.filter(e => e.state === state || e.state === 'federal')
+}
+
+// ---------------------------------------------------------------------------
 // CURRENT-MONTH CONTEXT FOR CHAT PROMPT
 // ---------------------------------------------------------------------------
 
 // Returns calendar entries that are active or imminent (within next 45 days).
 // Used to inject month-aware context into the chat system prompt.
-export function activeCalendarItems(now: Date): CalendarEntry[] {
+export function activeCalendarItems(now: Date, state: State = DEFAULT_STATE): CalendarEntry[] {
   const m = now.getMonth() + 1  // 1-12
   const d = now.getDate()
 
@@ -199,7 +231,7 @@ export function activeCalendarItems(now: Date): CalendarEntry[] {
   }
 
   const todayDay = dayOfYear(m, d)
-  return VT_CALENDAR.filter(e => {
+  return getCalendarEntriesForState(state).filter(e => {
     const startDoY = dayOfYear(e.startMonth, e.startDay)
     const endDoY = dayOfYear(e.endMonth, e.endDay)
     // Currently in window
@@ -217,8 +249,8 @@ export function activeCalendarItems(now: Date): CalendarEntry[] {
   })
 }
 
-export function calendarSummaryForPrompt(now: Date = new Date()): string {
-  const active = activeCalendarItems(now)
+export function calendarSummaryForPrompt(now: Date = new Date(), state: State = DEFAULT_STATE): string {
+  const active = activeCalendarItems(now, state)
   if (active.length === 0) {
     return `SEASONAL CONTEXT: Today is ${now.toDateString()}. No major Vermont homeowner deadlines in the immediate window.`
   }

@@ -20,10 +20,14 @@
 // - irs.gov/forms-pubs/about-form-5695 (federal 25D)
 // ---------------------------------------------------------------------------
 
+import type { State } from './_types'
+import { DEFAULT_STATE } from './_types'
+
 export type ConfidenceLevel = 'CONFIDENCE_HIGH' | 'CONFIDENCE_MEDIUM' | 'CONFIDENCE_LOW'
 
 export type RebatePlaybook = {
   programId: string
+  state: State
   name: string
   oneLineValue: string
 
@@ -80,6 +84,7 @@ export type RebatePlaybook = {
 export const REBATE_PLAYBOOKS: RebatePlaybook[] = [
   {
     programId: 'evt_weatherization_standard',
+    state: 'VT',
     name: 'EVT Home Performance with Energy Star — standard tier',
     oneLineValue: 'Up to $4,000 back on weatherization (75% of cost)',
 
@@ -146,6 +151,7 @@ export const REBATE_PLAYBOOKS: RebatePlaybook[] = [
   },
   {
     programId: 'evt_weatherization_income',
+    state: 'VT',
     name: 'EVT Home Performance — income-qualified tier (HEAT)',
     oneLineValue: 'Up to $9,500 back on weatherization (90% of cost) if at or below 80% AMI',
 
@@ -212,6 +218,7 @@ export const REBATE_PLAYBOOKS: RebatePlaybook[] = [
   },
   {
     programId: 'evt_ducted_heatpump',
+    state: 'VT',
     name: 'EVT Cold Climate Heat Pump rebate — ducted',
     oneLineValue: 'Up to ~$2,200 on a NEEP-listed cold-climate ducted heat pump',
 
@@ -276,6 +283,7 @@ export const REBATE_PLAYBOOKS: RebatePlaybook[] = [
   },
   {
     programId: 'federal_25d_solar',
+    state: 'federal',
     name: 'Federal Residential Clean Energy Credit (Section 25D)',
     oneLineValue: '30% federal tax credit on solar, battery storage, geothermal, and small wind. No cap. Through 2032.',
 
@@ -341,6 +349,7 @@ export const REBATE_PLAYBOOKS: RebatePlaybook[] = [
   },
   {
     programId: 'evt_panel_upgrade',
+    state: 'VT',
     name: 'EVT Electrical Panel Upgrade rebate',
     oneLineValue: '~$500 rebate on panel upgrades that enable electrification (heat pump, EV charger, HPWH)',
 
@@ -403,6 +412,13 @@ export const REBATE_PLAYBOOKS: RebatePlaybook[] = [
   },
 ]
 
+// Returns playbooks for the requested state, plus federal entries.
+// Calling with 'federal' returns ONLY federal entries.
+export function getRebatePlaybooksForState(state: State): RebatePlaybook[] {
+  if (state === 'federal') return REBATE_PLAYBOOKS.filter(p => p.state === 'federal')
+  return REBATE_PLAYBOOKS.filter(p => p.state === state || p.state === 'federal')
+}
+
 export function playbookByProgramId(id: string): RebatePlaybook | null {
   return REBATE_PLAYBOOKS.find(p => p.programId === id) || null
 }
@@ -446,14 +462,14 @@ export function lowConfidenceFields(): { programId: string; field: string; level
   return out
 }
 
-export function rebatePlaybookSummaryForPrompt(): string {
+export function rebatePlaybookSummaryForPrompt(state: State = DEFAULT_STATE): string {
   const lines: string[] = []
   lines.push('REBATE PLAYBOOK STRUCTURE (for the paid briefing):')
   lines.push('')
   lines.push('For each rebate, the briefing tells the homeowner: the form name and link, who files it (homeowner vs installer vs utility), the deadline, the documentation required, the eligibility checkpoints, the disqualifying trap, expected time to receive payment, and which contractors qualify.')
   lines.push('')
   lines.push('Top 5 priority playbooks built:')
-  for (const p of REBATE_PLAYBOOKS) {
+  for (const p of getRebatePlaybooksForState(state)) {
     lines.push(`  - ${p.name}: ${p.oneLineValue}`)
   }
   lines.push('')

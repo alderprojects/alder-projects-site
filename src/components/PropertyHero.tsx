@@ -77,7 +77,6 @@ export default function PropertyHero({ profile }: Props) {
   const urlIntent = searchParams?.get('intent') as TopLevelIntent | null
   const urlTopic = searchParams?.get('topic') as TopicId | null
   const [intent, setIntent] = useState<TopLevelIntent | null>(urlIntent ?? null)
-  const [chatInput, setChatInput] = useState('')
 
   const tileGroupRef = useRef<HTMLDivElement>(null)
 
@@ -132,21 +131,6 @@ export default function PropertyHero({ profile }: Props) {
       return
     }
     persistAndRoute({ intent, topic: id })
-  }
-
-  function submitChat(e: React.FormEvent) {
-    e.preventDefault()
-    const text = chatInput.trim()
-    if (!text) return
-    try {
-      sessionStorage.setItem('alder.chatPendingPrompt', text)
-    } catch {
-      /* ignore */
-    }
-    if (typeof window !== 'undefined') {
-      window.dispatchEvent(new CustomEvent('alder:chatPrompt', { detail: { text } }))
-    }
-    setChatInput('')
   }
 
   // Roving-tabindex arrow-key nav across tiles/chips for keyboard users.
@@ -354,66 +338,6 @@ export default function PropertyHero({ profile }: Props) {
             </div>
           </div>
 
-          {/* Chat input */}
-          <form onSubmit={submitChat} style={{ marginTop: 4 }}>
-            <p
-              style={{
-                fontSize: 11,
-                fontFamily: FM,
-                color: C.inkFaint,
-                letterSpacing: '0.08em',
-                textTransform: 'uppercase',
-                margin: '0 0 10px',
-              }}
-            >
-              Or just ask
-            </p>
-            <div
-              style={{
-                display: 'flex',
-                gap: 0,
-                border: `1px solid ${C.cardLineStrong}`,
-                borderRadius: 4,
-                overflow: 'hidden',
-                backgroundColor: C.bg,
-              }}
-            >
-              <input
-                type="text"
-                value={chatInput}
-                onChange={e => setChatInput(e.target.value)}
-                placeholder="Or just ask. I have this property loaded."
-                aria-label="Ask the assistant about this property"
-                style={{
-                  flex: 1,
-                  padding: '12px 14px',
-                  border: 'none',
-                  background: 'transparent',
-                  fontSize: 14,
-                  color: C.ink,
-                  outline: 'none',
-                  fontFamily: FB,
-                }}
-              />
-              <button
-                type="submit"
-                disabled={!chatInput.trim()}
-                style={{
-                  padding: '0 18px',
-                  border: 'none',
-                  backgroundColor: chatInput.trim() ? C.accent : 'rgba(200,115,42,0.4)',
-                  color: '#FAF7F2',
-                  fontSize: 12,
-                  fontWeight: 600,
-                  fontFamily: FB,
-                  letterSpacing: '0.04em',
-                  cursor: chatInput.trim() ? 'pointer' : 'not-allowed',
-                }}
-              >
-                Ask →
-              </button>
-            </div>
-          </form>
         </div>
       )}
     </section>

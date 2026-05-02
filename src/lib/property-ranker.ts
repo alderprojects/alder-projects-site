@@ -255,7 +255,12 @@ export function shouldRenderInline(module: PropertyModule, signals: VisitorSigna
   if (intent === 'researching' && (ctype === 'cost' || ctype === 'cta' || ctype === 'vetting' || ctype === 'sequence')) {
     return false
   }
-  if (intent === 'buying' && ctype === 'cost') {
+  // Buyers do not need cost-by-trade detail, the DIY-style sequence
+  // playbook, or the contractor vetting checklist surfaced inline.
+  // Those live in the disclosure for the visitor who wants them. The
+  // inline render is regulatory + rebate + a few info modules — keeps
+  // the buying state body text under the 8k inline target.
+  if (intent === 'buying' && (ctype === 'cost' || ctype === 'sequence' || ctype === 'vetting')) {
     return false
   }
   if (intent === 'owner' && !signals.topic && (ctype === 'cost' || ctype === 'sequence')) {

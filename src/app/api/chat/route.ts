@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import type { State } from '@/data/_types'
 import { projectsSummaryForPrompt } from '@/data/projects'
 import { rebatesSummaryForPrompt } from '@/data/rebates'
 import { calendarSummaryForPrompt } from '@/data/calendar'
@@ -6,6 +7,10 @@ import { zoningSummaryForPrompt } from '@/data/zoning'
 import { handymanSummaryForPrompt } from '@/data/handyman'
 import { vettingSummaryForPrompt } from '@/data/contractor-vetting'
 import { sequencesSummaryForPrompt } from '@/data/sequences'
+
+// Site is Vermont-only today. Data is state-tagged so NH/ME/MA can be
+// added later; until then every accessor is called with this constant.
+const STATE: State = 'VT'
 
 // ---------- Rate limiting (in-memory) ----------
 // Per-IP rate limits to prevent bot abuse and runaway API costs.
@@ -710,8 +715,8 @@ export async function POST(req: Request) {
 
     // Always inject the rebate stack and seasonal calendar — those are the
     // most-referenced data sets and worth the tokens on every turn.
-    turnSystemPrompt += `\n\n=== REBATE DATA ===\n\n${rebatesSummaryForPrompt()}`
-    turnSystemPrompt += `\n\n=== SEASONAL CALENDAR ===\n\n${calendarSummaryForPrompt(new Date())}`
+    turnSystemPrompt += `\n\n=== REBATE DATA ===\n\n${rebatesSummaryForPrompt(STATE)}`
+    turnSystemPrompt += `\n\n=== SEASONAL CALENDAR ===\n\n${calendarSummaryForPrompt(new Date(), STATE)}`
 
     // Inject project costs whenever the conversation mentions a renovation
     // category. Cheap heuristic on recent user messages.
@@ -723,27 +728,27 @@ export async function POST(req: Request) {
       .toLowerCase()
     const renovationKeywords = ['kitchen', 'bathroom', 'bath ', 'deck', 'addition', 'basement', 'roof', 'siding', 'window', 'hvac', 'furnace', 'remodel', 'renovat', 'cost', 'budget', 'price', 'estimate', 'quote']
     if (renovationKeywords.some(k => recentUserText.includes(k))) {
-      turnSystemPrompt += `\n\n=== PROJECT COSTS (VT-specific) ===\n\n${projectsSummaryForPrompt()}`
+      turnSystemPrompt += `\n\n=== PROJECT COSTS (VT-specific) ===\n\n${projectsSummaryForPrompt(STATE)}`
     }
 
     // Inject ADU/zoning data when the conversation mentions ADU/zoning topics
     // OR whenever a town is identified (cheap context).
     const zoningKeywords = ['adu', 'accessory', 'in-law', 'mother-in-law', 'zoning', 'permit', 'setback', 'short-term rental', 'airbnb', 'add a unit', 'rental unit', 'separate unit']
     if (zoningKeywords.some(k => recentUserText.includes(k)) || detectedAddress) {
-      turnSystemPrompt += `\n\n=== ADU & ZONING ===\n\n${zoningSummaryForPrompt()}`
+      turnSystemPrompt += `\n\n=== ADU & ZONING ===\n\n${zoningSummaryForPrompt(STATE)}`
     }
 
     // Inject handyman data when the conversation mentions any maintenance/seasonal topic
     const handymanKeywords = ['gutter', 'septic', 'chimney', 'plow', 'snow', 'oil tank', 'well water', 'dryer vent', 'tree', 'maintenance', 'fall', 'winter', 'spring', 'seasonal', 'diy', 'do it myself', 'should i hire']
     if (handymanKeywords.some(k => recentUserText.includes(k))) {
-      turnSystemPrompt += `\n\n=== HANDYMAN & SEASONAL ===\n\n${handymanSummaryForPrompt()}`
+      turnSystemPrompt += `\n\n=== HANDYMAN & SEASONAL ===\n\n${handymanSummaryForPrompt(STATE)}`
     }
 
     // Inject contractor vetting guidance when the conversation is about hiring,
     // bids, contracts, or finding/evaluating a contractor.
     const vettingKeywords = ['contractor', 'hire', 'bid', 'quote', 'estimate', 'reference', 'license', 'insurance', 'permit', 'vetting', 'check', 'reputable', 'reliable', 'scam', 'rip off', 'how do i find', 'how to find', 'who should i', 'who do i call']
     if (vettingKeywords.some(k => recentUserText.includes(k))) {
-      turnSystemPrompt += `\n\n=== CONTRACTOR VETTING (VT-specific) ===\n\n${vettingSummaryForPrompt()}\n\n=== PROJECT SEQUENCES ===\n\n${sequencesSummaryForPrompt()}\n\n=== VERMONT CALENDAR ===\n\n${calendarSummaryForPrompt()}`
+      turnSystemPrompt += `\n\n=== CONTRACTOR VETTING (VT-specific) ===\n\n${vettingSummaryForPrompt(STATE)}\n\n=== PROJECT SEQUENCES ===\n\n${sequencesSummaryForPrompt(STATE)}\n\n=== VERMONT CALENDAR ===\n\n${calendarSummaryForPrompt(new Date(), STATE)}`
     }
 
     if (context?.referrer) {

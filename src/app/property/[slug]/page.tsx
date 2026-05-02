@@ -4,6 +4,7 @@ import { headers } from 'next/headers'
 import Nav from '@/components/Nav'
 import Footer from '@/components/Footer'
 import ChatWidget from '@/components/ChatWidget'
+import PropertyGisOverlay from '@/components/PropertyGisOverlay'
 
 // Per-address pages are noindex by decision. They are working surfaces for
 // a homeowner, not SEO entry points; the SEO entry points are the town and
@@ -731,6 +732,7 @@ function SectionRegulators({ data }: { data: Profile }) {
   const z = data.regulators.zoning
   return (
     <SectionShell kicker="Section 4" title="What the regulators say" intro={data.regulators.intro}>
+      <PropertyGisOverlay address={data.address} />
       {z && (
         <div
           style={{

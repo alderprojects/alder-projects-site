@@ -8,19 +8,26 @@ import type {
   TopicId,
   VisitorSignals,
 } from '@/lib/property-modules'
+import {
+  getInlineKitForContext,
+  inferSeason,
+  isFloodProperty,
+  isLakeProperty,
+  type KitContext,
+} from '@/lib/property-affiliates'
+import type { AffiliateItem } from '@/data/affiliates'
 
-// Inline CTAs that get appended to each rendered property module by
-// RankedModuleStream. Replaces the V1 standalone-billboard CTA modules
-// (cta_handyman / cta_contractor_bid / cta_diy_amazon / cta_email_capture)
-// which interrupted reading flow. Per Track C polish spec: every page
-// state must surface at least one revenue path inline.
+// Inline CTAs + situational affiliate kits, attached to module renders
+// by RankedModuleStream. Replaces the V1 standalone billboards plus the
+// hardcoded mini-kits from polish v2 — all kits now route through the
+// AFFILIATE_CATALOG via property-affiliates.getInlineKitForContext.
 //
-// pickInlineCta(module, profile, signals) returns the CTA appropriate
-// to that combination, or null if the module should not get one.
-//
-// State-level (not module-level) CTAs — the researcher footer link and
-// the owner+summary footer link — are exposed as separate components
-// so RankedModuleStream can mount them once at the bottom of the stream.
+// Hard rules enforced here:
+//   - Researching intent gets ZERO affiliate items anywhere.
+//   - Inline kits are small horizontal text-button rows, never
+//     full-width boxes.
+//   - Each module gets at most ONE CTA + ONE kit per render pass
+//     (tracked via the `picked` set).
 
 const C = {
   ink: '#1C2B1A',
@@ -71,9 +78,6 @@ const LINK_STYLE: CSSProperties = {
   display: 'inline-block',
 }
 
-// Local re-implementation of dispatchChatPrompt so this file does not
-// import from property-modules.tsx (which is the catalog and locked
-// down for the polish pass). PropertyChat listens for both signals.
 function dispatchChatPrompt(text: string) {
   if (typeof window === 'undefined') return
   try {
@@ -108,25 +112,40 @@ function AddressPromptCta({ text }: { text?: string }) {
   )
 }
 
-function BuyerInspectionKitInline() {
-  const items = [
-    { label: 'Moisture meter', q: 'pinless moisture meter' },
-    { label: 'Outlet tester', q: 'gfci outlet tester' },
-    { label: 'CO detector', q: 'carbon monoxide detector battery' },
-    { label: 'Flashlight', q: 'led tactical flashlight inspection' },
-  ]
+// Generic affiliate kit row — small, never full-width box. The heading
+// label tells the visitor what frame the items belong in
+// (e.g., "DIY tools that help here", "Gear for mud season",
+// "Lake property essentials"). One disclosure line under the row.
+function KitInline({ heading, items }: { heading: string; items: AffiliateItem[] }) {
+  if (items.length === 0) return null
   return (
-    <div style={{ ...ROW_STYLE, alignItems: 'flex-start', flexDirection: 'column' }}>
-      <p style={{ ...TEXT_STYLE, flex: 'unset' }}>
-        <strong>Pre-purchase inspection prep — what to bring:</strong>
+    <div
+      style={{
+        marginTop: 10,
+        paddingTop: 10,
+        borderTop: `1px dashed ${C.cardLine}`,
+      }}
+    >
+      <p
+        style={{
+          fontSize: 11,
+          fontFamily: FM,
+          letterSpacing: '0.08em',
+          textTransform: 'uppercase',
+          color: C.inkFaint,
+          margin: '0 0 8px',
+        }}
+      >
+        ── {heading} ──
       </p>
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
         {items.map(it => (
           <a
-            key={it.label}
-            href={`https://www.amazon.com/s?k=${encodeURIComponent(it.q)}&tag=alderprojects-20`}
+            key={it.id}
+            href={it.url}
             target="_blank"
             rel="noopener noreferrer sponsored"
+            title={it.shortNote}
             style={{
               fontSize: 11,
               fontFamily: FB,
@@ -137,49 +156,13 @@ function BuyerInspectionKitInline() {
               borderRadius: 6,
             }}
           >
-            {it.label} →
+            {it.display} →
           </a>
         ))}
       </div>
-    </div>
-  )
-}
-
-function DiyWeatherizationKitInline() {
-  const items = [
-    { label: 'Caulk + gun', q: 'silicone caulk gun kit' },
-    { label: 'Foam sealant', q: 'great stuff foam sealant' },
-    { label: 'Weatherstripping', q: 'door weatherstripping kit' },
-    { label: 'Pipe insulation', q: 'pipe insulation foam outdoor' },
-    { label: 'Window film', q: 'insulating window film kit' },
-  ]
-  return (
-    <div style={{ ...ROW_STYLE, alignItems: 'flex-start', flexDirection: 'column' }}>
-      <p style={{ ...TEXT_STYLE, flex: 'unset' }}>
-        <strong>Doing it yourself? Here is the kit.</strong>{' '}
-        Affiliate links — same prices everywhere, helps keep the tool free.
+      <p style={{ fontSize: 10, fontFamily: FM, color: C.inkFaint, margin: '8px 0 0' }}>
+        We use these on Vermont projects. Affiliate links keep this free.
       </p>
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-        {items.map(it => (
-          <a
-            key={it.label}
-            href={`https://www.amazon.com/s?k=${encodeURIComponent(it.q)}&tag=alderprojects-20`}
-            target="_blank"
-            rel="noopener noreferrer sponsored"
-            style={{
-              fontSize: 11,
-              fontFamily: FB,
-              color: C.accent,
-              textDecoration: 'none',
-              padding: '4px 10px',
-              border: `1px solid ${C.cardLine}`,
-              borderRadius: 6,
-            }}
-          >
-            {it.label} →
-          </a>
-        ))}
-      </div>
     </div>
   )
 }
@@ -212,7 +195,17 @@ export function ResearcherFooterCta() {
   )
 }
 
-export function OwnerSummaryFooterCta() {
+// Owner+summary footer: chat prompt + first-year-as-owner toolkit
+// (because the summary view does not surface a topic-tied module that
+// would otherwise carry the kit).
+export function OwnerSummaryFooterCta({
+  profile,
+  signals,
+}: {
+  profile: PropertyProfile
+  signals: VisitorSignals
+}) {
+  const items = getInlineKitForContext(signals, profile, 'summary', new Date())
   return (
     <div
       style={{
@@ -221,34 +214,39 @@ export function OwnerSummaryFooterCta() {
         backgroundColor: C.card,
         border: `1px solid ${C.cardLine}`,
         borderRadius: 6,
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        gap: 12,
-        flexWrap: 'wrap',
       }}
     >
-      <p style={{ ...TEXT_STYLE, color: C.ink }}>
-        Got a specific project in mind? Tell the chat — I will personalize this.
-      </p>
-      <button
-        type="button"
-        onClick={() =>
-          dispatchChatPrompt(
-            'Help me pick the right next project for my property — here is what I am thinking.'
-          )
-        }
-        style={BUTTON_STYLE}
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          gap: 12,
+          flexWrap: 'wrap',
+        }}
       >
-        Open the chat →
-      </button>
+        <p style={{ ...TEXT_STYLE, color: C.ink }}>
+          Got a specific project in mind? Tell the chat — I will personalize this.
+        </p>
+        <button
+          type="button"
+          onClick={() =>
+            dispatchChatPrompt(
+              'Help me pick the right next project for my property — here is what I am thinking.'
+            )
+          }
+          style={BUTTON_STYLE}
+        >
+          Open the chat →
+        </button>
+      </div>
+      {items.length > 0 && <KitInline heading="First-year Vermont homeowner toolkit" items={items} />}
     </div>
   )
 }
 
-// ---------- Module-level CTA picker -----------------------------------
+// ---------- Topic prompt / label helpers ------------------------------
 
-// Map a TopicId to a human label used in chat prompts.
 function topicLabel(t: TopicId | null): string {
   if (!t) return 'a project'
   const map: Record<TopicId, string> = {
@@ -271,10 +269,6 @@ function topicLabel(t: TopicId | null): string {
   return map[t]
 }
 
-// Map a TopicId to the canonical cost-module trade key. Used so the
-// "Get N bids" CTA only fires on the cost module that matches the
-// visitor's chosen topic, not on every cost module that happened to
-// rank above the floor.
 function tradeForTopic(t: TopicId | null): string | null {
   if (!t) return null
   const map: Partial<Record<TopicId, string>> = {
@@ -283,14 +277,46 @@ function tradeForTopic(t: TopicId | null): string | null {
     outdoor: 'deck',
     addition_adu: 'addition',
     heat_pump: 'hvac',
-    solar_battery: 'solar', // not a real trade key — falls through to no match
+    solar_battery: 'solar',
     weatherization: 'window',
   }
   return map[t] ?? null
 }
 
-// Track which CTAs have already fired in this render pass — avoids
-// stacking three "get bids" buttons on three cost modules in a row.
+// Heading copy per kit context. Pulled into a helper so the catalog
+// labels and the inline-render labels stay in sync.
+function kitHeadingFor(context: KitContext, topic: TopicId | null, season?: string): string {
+  if (context === 'pre_purchase') return 'Pre-purchase inspection prep'
+  if (context === 'lake_property') return 'Lake property essentials'
+  if (context === 'flood_property') return 'Storm prep gear'
+  if (context === 'calendar_module') {
+    const seasonLabel: Record<string, string> = {
+      mud: 'mud season',
+      spring_blackfly: 'spring blackfly season',
+      lake_opening: 'lake opening',
+      lake_operations: 'lake season',
+      lake_closing: 'lake closing',
+      fall_leaf: 'fall leaf season',
+      pre_winter: 'pre-winter',
+      deep_winter: 'deep winter',
+      lake: 'lake season',
+    }
+    return `Gear that helps for ${seasonLabel[season ?? ''] ?? 'this season'}`
+  }
+  if (context === 'summary') return 'First-year Vermont homeowner toolkit'
+  // topic_module
+  if (topic === 'weatherization') return 'DIY weatherization kit'
+  if (topic === 'heat_pump') return 'Heat-pump season prep'
+  if (topic === 'kitchen') return 'Kitchen DIY upgrades'
+  if (topic === 'bath') return 'Bath DIY upgrades'
+  if (topic === 'outdoor') return 'Deck DIY tools'
+  if (topic === 'solar_battery') return 'Pre-solar energy monitoring'
+  if (topic === 'rebate_strat') return 'DIY rebate-eligible materials'
+  return 'DIY tools that help here'
+}
+
+// ---------- Module-level CTA + kit picker -----------------------------
+
 type Picked = Set<string>
 
 export function pickInlineCta(
@@ -306,7 +332,7 @@ export function pickInlineCta(
   const moduleId = module.moduleId
   const ctype = module.contentType
 
-  // ---------- Researcher: every info module gets the address prompt
+  // ---------- Researcher: address-prompt only, ZERO affiliates
   if (intent === 'researching') {
     if (ctype === 'info' || ctype === 'regulatory' || ctype === 'rebate' || ctype === 'calendar') {
       return <AddressPromptCta />
@@ -314,29 +340,77 @@ export function pickInlineCta(
     return null
   }
 
-  // ---------- Buyer
-  if (intent === 'buying') {
-    if (moduleId === 'flood_regulatory_deep_dive' || moduleId === 'regulatory_flags') {
-      if (picked.has('buyer_inspection')) return null
-      picked.add('buyer_inspection')
-      return (
-        <>
+  // ---------- Calendar module — append seasonal kit (one per page).
+  if (ctype === 'calendar' && !picked.has('seasonal_kit')) {
+    picked.add('seasonal_kit')
+    const items = getInlineKitForContext(signals, profile, 'calendar_module')
+    if (items.length > 0) {
+      const date = new Date()
+      const lake = isLakeProperty(profile)
+      let seasonKey: string = inferSeason(date)
+      if (lake && (seasonKey === 'lake' || seasonKey === 'spring_blackfly' || seasonKey === 'fall_leaf')) {
+        const month = date.getMonth() + 1
+        if (month >= 5 && month <= 6) seasonKey = 'lake_opening'
+        else if (month === 7 || month === 8) seasonKey = 'lake_operations'
+        else if (month === 9 || month === 10) seasonKey = 'lake_closing'
+      }
+      return <KitInline heading={kitHeadingFor('calendar_module', topic, seasonKey)} items={items} />
+    }
+    return null
+  }
+
+  // ---------- Regulatory module — lake essentials (lake property) and
+  // storm prep (flood property). Both can fire — they cover different
+  // categories of items, and the spec caps at one kit per page anyway
+  // through the `picked` set keys.
+  if (ctype === 'regulatory') {
+    const out: ReactNode[] = []
+    if (intent === 'buying' && !picked.has('pre_purchase_kit')) {
+      picked.add('pre_purchase_kit')
+      const items = getInlineKitForContext(signals, profile, 'pre_purchase')
+      if (items.length > 0) out.push(<KitInline key="pp" heading={kitHeadingFor('pre_purchase', topic)} items={items} />)
+    }
+    if (isLakeProperty(profile) && !picked.has('lake_kit')) {
+      picked.add('lake_kit')
+      const items = getInlineKitForContext(signals, profile, 'lake_property')
+      if (items.length > 0) out.push(<KitInline key="lake" heading={kitHeadingFor('lake_property', topic)} items={items} />)
+    }
+    if (isFloodProperty(profile) && !picked.has('flood_kit')) {
+      picked.add('flood_kit')
+      const items = getInlineKitForContext(signals, profile, 'flood_property')
+      if (items.length > 0) out.push(<KitInline key="flood" heading={kitHeadingFor('flood_property', topic)} items={items} />)
+    }
+    if (intent === 'buying' && (moduleId === 'flood_regulatory_deep_dive' || moduleId === 'regulatory_flags')) {
+      if (!picked.has('buyer_inspection')) {
+        picked.add('buyer_inspection')
+        out.push(
           <ChatPromptCta
+            key="cta"
             text="Considering an offer on this property?"
             prompt={`I am considering an offer on ${profile.address}. What should I flag in the inspection?`}
             label="Ask the chat what to flag"
           />
-          <BuyerInspectionKitInline />
-        </>
-      )
+        )
+      }
     }
+    return out.length > 0 ? <>{out}</> : null
+  }
+
+  // ---------- Buyer rebate / sequence / other
+  if (intent === 'buying') {
     if (ctype === 'rebate' && !picked.has('buyer_email')) {
       picked.add('buyer_email')
-      return (
-        <div style={{ marginTop: 10, paddingTop: 10, borderTop: `1px dashed ${C.cardLine}` }}>
+      const out: ReactNode[] = [
+        <div key="email" style={{ marginTop: 10, paddingTop: 10, borderTop: `1px dashed ${C.cardLine}` }}>
           <EmailCaptureCard kind="buyer" profile={profile} topic={topic} />
-        </div>
-      )
+        </div>,
+      ]
+      // First-year-as-owner toolkit at the bottom of the inherited rebate stack.
+      const items = getInlineKitForContext(signals, profile, 'topic_module')
+      if (items.length > 0) {
+        out.push(<KitInline key="kit" heading="First-year-as-owner toolkit" items={items.slice(0, 7)} />)
+      }
+      return <>{out}</>
     }
     if (ctype === 'sequence' && !picked.has('buyer_bids')) {
       picked.add('buyer_bids')
@@ -351,7 +425,7 @@ export function pickInlineCta(
     return null
   }
 
-  // ---------- Owner with no topic (the "summary" path)
+  // ---------- Owner with no topic — handled by OwnerSummaryFooterCta
   if (intent === 'owner' && !topic) {
     if (moduleId === 'calendar_in_season' && !picked.has('owner_summary_cal')) {
       picked.add('owner_summary_cal')
@@ -366,20 +440,31 @@ export function pickInlineCta(
     return null
   }
 
-  // ---------- Owner with a topic: scope-tier CTAs
+  // ---------- Owner with a topic: scope-tier CTAs + topic-module kit
   if (intent === 'owner') {
     const matchTrade = tradeForTopic(topic)
+    const isTopicMatchedCost = ctype === 'cost' && matchTrade && moduleId === `cost_${matchTrade}`
 
+    // Scope BIG branch — contractor lead CTAs + a topic-module kit on
+    // weatherization/heat_pump (where DIY scope and big scope overlap
+    // for prep).
     if (scope === 'big') {
-      if (ctype === 'cost' && matchTrade && moduleId === `cost_${matchTrade}` && !picked.has('owner_big_cost')) {
+      if (isTopicMatchedCost && !picked.has('owner_big_cost')) {
         picked.add('owner_big_cost')
-        return (
+        const out: ReactNode[] = [
           <ChatPromptCta
+            key="cta"
             text="Ready for real numbers? We will line up three Vermont contractors."
             prompt={`I want bids on ${topicLabel(topic)} in ${town}. Here is what I have in mind: ...`}
             label="Get 3 Vermont bids — start in chat"
-          />
-        )
+          />,
+        ]
+        if ((topic === 'heat_pump' || topic === 'weatherization') && !picked.has('topic_kit')) {
+          picked.add('topic_kit')
+          const items = getInlineKitForContext(signals, profile, 'topic_module')
+          if (items.length > 0) out.push(<KitInline key="kit" heading={kitHeadingFor('topic_module', topic)} items={items} />)
+        }
+        return <>{out}</>
       }
       if (ctype === 'sequence' && !picked.has('owner_big_seq')) {
         picked.add('owner_big_seq')
@@ -404,16 +489,25 @@ export function pickInlineCta(
       return null
     }
 
+    // Scope MID branch — handyman + rebate-help. Topic kit also fires
+    // here, attached to the matching cost module.
     if (scope === 'mid') {
-      if (ctype === 'cost' && matchTrade && moduleId === `cost_${matchTrade}` && !picked.has('owner_mid_cost')) {
+      if (isTopicMatchedCost && !picked.has('owner_mid_cost')) {
         picked.add('owner_mid_cost')
-        return (
+        const out: ReactNode[] = [
           <ChatPromptCta
+            key="cta"
             text={`This is handyman territory in ${town}.`}
             prompt={`I need a handyman in ${town} for ${topicLabel(topic)}. Tell me what to look for.`}
             label="Tell the chat what you need"
-          />
-        )
+          />,
+        ]
+        if (!picked.has('topic_kit')) {
+          picked.add('topic_kit')
+          const items = getInlineKitForContext(signals, profile, 'topic_module')
+          if (items.length > 0) out.push(<KitInline key="kit" heading={kitHeadingFor('topic_module', topic)} items={items} />)
+        }
+        return <>{out}</>
       }
       if (ctype === 'rebate' && !picked.has('owner_mid_rebate')) {
         picked.add('owner_mid_rebate')
@@ -425,34 +519,27 @@ export function pickInlineCta(
           />
         )
       }
-      // DIY weatherization kit appears once when topic is weatherization,
-      // attached to the rebate module (closest topical anchor we render).
-      if (
-        topic === 'weatherization' &&
-        ctype === 'rebate' &&
-        !picked.has('owner_mid_diy_kit')
-      ) {
-        picked.add('owner_mid_diy_kit')
-        return <DiyWeatherizationKitInline />
-      }
       return null
     }
 
+    // Scope DIY branch — kit on every applicable module + a "stuck?"
+    // chat hint.
     if (scope === 'diy') {
-      if (topic === 'weatherization' && !picked.has('owner_diy_kit')) {
+      if (isTopicMatchedCost && !picked.has('owner_diy_kit')) {
         picked.add('owner_diy_kit')
-        return <DiyWeatherizationKitInline />
-      }
-      // Generic "stuck? ask the chat" on every module for DIY scope.
-      if (!picked.has(`owner_diy_chat_${moduleId}`)) {
-        picked.add(`owner_diy_chat_${moduleId}`)
-        return (
-          <ChatPromptCta
-            text="Stuck? The chat has the Vermont playbook loaded."
-            prompt={`I am working on ${topicLabel(topic)} myself at ${profile.address}. Stuck on this part: ...`}
-            label="Ask the chat"
-          />
-        )
+        const items = getInlineKitForContext(signals, profile, 'topic_module')
+        if (items.length > 0) {
+          return (
+            <>
+              <KitInline heading={kitHeadingFor('topic_module', topic)} items={items} />
+              <ChatPromptCta
+                text="Stuck? The chat has the Vermont playbook loaded."
+                prompt={`I am working on ${topicLabel(topic)} myself at ${profile.address}. Stuck on this part: ...`}
+                label="Ask the chat"
+              />
+            </>
+          )
+        }
       }
       return null
     }

@@ -66,7 +66,7 @@ export default function RankedModuleStream({ profile, signals }: Props) {
 
       {/* State-level CTAs — every state has at least one revenue path,
           even when no module-level CTA fires. */}
-      {isOwnerSummary && <OwnerSummaryFooterCta />}
+      {isOwnerSummary && <OwnerSummaryFooterCta profile={profile} signals={signals} />}
       {isResearcher && <ResearcherFooterCta />}
 
       {rest.length > 0 && (

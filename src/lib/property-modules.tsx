@@ -415,20 +415,24 @@ const rebateHeadline: PropertyModule = {
           margin: '0 0 10px',
         }}
       >
-        On the table for this property
+        Rebates available at this property
+      </p>
+      <p style={{ fontSize: 13, fontFamily: FB, color: 'rgba(245,239,224,0.75)', lineHeight: 1.55, margin: '0 0 16px' }}>
+        These are the combined rebate dollars you can stack across Efficiency Vermont programs for a
+        comprehensive home retrofit. Actual amount depends on which projects you do.
       </p>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 18, alignItems: 'baseline' }}>
         <div>
-          <p style={{ fontSize: 11, fontFamily: FM, color: 'rgba(245,239,224,0.55)', margin: 0 }}>Standard tier</p>
+          <p style={{ fontSize: 11, fontFamily: FM, color: 'rgba(245,239,224,0.55)', margin: 0 }}>Standard rebate stack</p>
           <p style={{ fontFamily: FD, fontSize: 28, color: C.greenInk, margin: '4px 0 0', fontWeight: 600 }}>
             ${profile.rebates.stack.standardUSD.toLocaleString()}
           </p>
           <p style={{ fontSize: 11, fontFamily: FM, color: 'rgba(245,239,224,0.55)', margin: '4px 0 0' }}>
-            Comprehensive retrofit, all households
+            Available to any household in this town
           </p>
         </div>
         <div>
-          <p style={{ fontSize: 11, fontFamily: FM, color: 'rgba(245,239,224,0.55)', margin: 0 }}>Income-qualified</p>
+          <p style={{ fontSize: 11, fontFamily: FM, color: 'rgba(245,239,224,0.55)', margin: 0 }}>Income-qualified rebate stack</p>
           <p style={{ fontFamily: FD, fontSize: 28, color: C.accent, margin: '4px 0 0', fontWeight: 600 }}>
             ${profile.rebates.stack.incomeQualifiedUSD.toLocaleString()}
           </p>

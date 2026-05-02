@@ -1,59 +1,395 @@
 'use client'
-import { useEffect, useRef } from 'react'
+
+import { useState, useRef, useCallback, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
+
+// Address-first hero. Submitting routes to /property/[slug] with the
+// canonical address carried through as a query param so the SSR'd page
+// works whether the user typed it here, shared the URL, or returned to
+// it later.
+//
+// Autocomplete uses the open VT E911 composite geocoder (VCGI). No key
+// required; we just debounce typing and show the top suggestions.
+
+const SUGGEST = 'https://maps.vcgi.vermont.gov/arcgis/rest/services/EGC_services/GCS_E911_COMPOSITE_SP_v2/GeocodeServer/suggest'
+
+type Suggestion = { text: string; magicKey: string }
+
+function slugify(s: string): string {
+  return s
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 80)
+}
+
+function formatSuggestion(text: string): string {
+  const parts = text.split(',').map(p => p.trim())
+  if (parts.length < 2) return text
+  const titleCase = (s: string) =>
+    s
+      .split(' ')
+      .map(w => (w.length > 0 ? w[0] + w.slice(1).toLowerCase() : ''))
+      .join(' ')
+  return `${titleCase(parts[0])}, ${titleCase(parts[1])}`
+}
+
 export default function Hero() {
-  const headRef = useRef<HTMLHeadingElement>(null)
+  const router = useRouter()
+  const [addr, setAddr] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [suggestions, setSuggestions] = useState<Suggestion[]>([])
+  const [open, setOpen] = useState(false)
+  const [highlight, setHighlight] = useState(-1)
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const inputRef = useRef<HTMLInputElement>(null)
+  const ddRef = useRef<HTMLDivElement>(null)
+
   useEffect(() => {
-    const el = headRef.current
-    if (!el) return
-    el.style.opacity = '0'
-    el.style.transform = 'translateY(16px)'
-    requestAnimationFrame(() => {
-      el.style.transition = 'opacity 0.9s ease, transform 0.9s ease'
-      el.style.opacity = '1'
-      el.style.transform = 'none'
-    })
+    const onClick = (e: MouseEvent) => {
+      if (
+        ddRef.current &&
+        !ddRef.current.contains(e.target as Node) &&
+        inputRef.current &&
+        !inputRef.current.contains(e.target as Node)
+      ) {
+        setOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', onClick)
+    return () => document.removeEventListener('mousedown', onClick)
   }, [])
+
+  const fetchSuggestions = useCallback(async (q: string) => {
+    if (q.trim().length < 2) {
+      setSuggestions([])
+      return
+    }
+    try {
+      const res = await fetch(`${SUGGEST}?text=${encodeURIComponent(q)}&maxSuggestions=8&f=json`, {
+        signal: AbortSignal.timeout(4000),
+      })
+      const d = await res.json()
+      const sugs: Suggestion[] = (d.suggestions || []).map((s: { text: string; magicKey: string }) => ({
+        text: s.text,
+        magicKey: s.magicKey,
+      }))
+      setSuggestions(sugs)
+      setOpen(sugs.length > 0)
+      setHighlight(-1)
+    } catch {
+      setSuggestions([])
+    }
+  }, [])
+
+  function onType(v: string) {
+    setAddr(v)
+    if (debounceRef.current) clearTimeout(debounceRef.current)
+    debounceRef.current = setTimeout(() => fetchSuggestions(v), 200)
+  }
+
+  function go(picked?: string) {
+    const raw = (picked || addr).trim()
+    if (!raw) return
+    const withVT = /,\s*VT\b/i.test(raw) ? raw : `${raw}, VT`
+    setLoading(true)
+    const slug = slugify(withVT)
+    router.push(`/property/${slug}?address=${encodeURIComponent(withVT)}`)
+  }
+
+  function pickSuggestion(s: Suggestion) {
+    const formatted = formatSuggestion(s.text)
+    setAddr(formatted)
+    setOpen(false)
+    go(s.text)
+  }
+
+  function onKeyDown(e: React.KeyboardEvent) {
+    if (!open || suggestions.length === 0) return
+    if (e.key === 'ArrowDown') {
+      e.preventDefault()
+      setHighlight(i => Math.min(i + 1, suggestions.length - 1))
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault()
+      setHighlight(i => Math.max(i - 1, -1))
+    } else if (e.key === 'Enter' && highlight >= 0) {
+      e.preventDefault()
+      pickSuggestion(suggestions[highlight])
+    } else if (e.key === 'Escape') {
+      setOpen(false)
+    }
+  }
+
   return (
-    <section style={{position:'relative',minHeight:'100vh',display:'flex',flexDirection:'column',justifyContent:'center',overflow:'hidden',backgroundColor:'#0D1A0B'}}>
-      <img src="https://images.unsplash.com/photo-1757661543986-6f418adc8cb6?auto=format&fit=crop&w=1920&q=80" alt="" aria-hidden="true" style={{position:'absolute',inset:0,width:'100%',height:'100%',objectFit:'cover',objectPosition:'center',zIndex:0}} />
-      <div style={{position:'absolute',inset:0,zIndex:1,background:'linear-gradient(105deg, rgba(8,18,7,0.9) 0%, rgba(8,18,7,0.72) 50%, rgba(8,18,7,0.4) 100%)'}} />
-      <div style={{position:'absolute',top:0,left:0,width:'3px',height:'100%',background:'linear-gradient(to bottom, #C8732A, rgba(200,115,42,0.1))',zIndex:2}} />
-      <div style={{position:'relative',zIndex:10,maxWidth:'1152px',margin:'0 auto',width:'100%',padding:'clamp(100px,12vw,140px) 24px clamp(60px,8vw,96px)',display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(300px,1fr))',gap:'48px',alignItems:'center'}}>
-        <div>
-          <div style={{display:'inline-flex',alignItems:'center',gap:'8px',padding:'5px 12px',border:'1px solid rgba(122,155,111,0.4)',borderRadius:'999px',marginBottom:'28px'}}>
-            <span style={{width:'7px',height:'7px',borderRadius:'50%',backgroundColor:'#7A9B6F',flexShrink:0}} />
-            <span style={{fontSize:'11px',fontFamily:'monospace',letterSpacing:'0.12em',textTransform:'uppercase',color:'#7A9B6F'}}>Vermont Homeowner Assistant</span>
-          </div>
-          <h1 ref={headRef} style={{fontFamily:"'Playfair Display',Georgia,serif",fontWeight:600,fontSize:'clamp(2.2rem,4.5vw,3.4rem)',lineHeight:1.08,letterSpacing:'-0.02em',color:'#F5EFE0',marginBottom:'20px'}}>
-            Find a Vermont<br/>
-            contractor who'll<br/>
-            <em style={{color:'#C8732A',fontStyle:'normal'}}>actually answer.</em>
-          </h1>
-          <p style={{fontSize:'17px',fontWeight:300,lineHeight:1.75,color:'rgba(245,239,224,0.65)',maxWidth:'420px',marginBottom:'36px'}}>
-            Ask whatever you want about heat pumps, weatherization, rebates, or what your project might cost in Vermont. The assistant gives you Vermont-specific numbers, not national averages.
-          </p>
-          <div style={{display:'flex',flexWrap:'wrap',gap:'12px',marginBottom:'28px'}}>
-            <a href="/chat" style={{display:'inline-block',padding:'14px 28px',backgroundColor:'#C8732A',color:'#FAF7F2',fontWeight:600,fontSize:'14px',borderRadius:'3px',textDecoration:'none'}}>Tell us what you need &rarr;</a>
-            <a href="/calculator" style={{display:'inline-block',padding:'14px 28px',border:'1px solid rgba(122,155,111,0.45)',color:'rgba(245,239,224,0.8)',fontWeight:500,fontSize:'14px',borderRadius:'3px',textDecoration:'none'}}>Or just see what it costs</a>
-          </div>
-          <p style={{fontSize:'11px',fontFamily:'monospace',letterSpacing:'0.06em',color:'rgba(245,239,224,0.22)'}}>Real Vermont numbers &middot; Cited sources &middot; No marketing fluff</p>
+    <section
+      style={{
+        position: 'relative',
+        minHeight: 'calc(100vh - 60px)',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        overflow: 'hidden',
+        backgroundColor: '#0D1A0B',
+      }}
+    >
+      <img
+        src="https://images.unsplash.com/photo-1757661543986-6f418adc8cb6?auto=format&fit=crop&w=1920&q=80"
+        alt=""
+        aria-hidden="true"
+        style={{
+          position: 'absolute',
+          inset: 0,
+          width: '100%',
+          height: '100%',
+          objectFit: 'cover',
+          objectPosition: 'center',
+          zIndex: 0,
+        }}
+      />
+      <div
+        style={{
+          position: 'absolute',
+          inset: 0,
+          zIndex: 1,
+          background:
+            'linear-gradient(105deg, rgba(8,18,7,0.92) 0%, rgba(8,18,7,0.78) 50%, rgba(8,18,7,0.5) 100%)',
+        }}
+      />
+      <div
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          width: '3px',
+          height: '100%',
+          background: 'linear-gradient(to bottom, #C8732A, rgba(200,115,42,0.1))',
+          zIndex: 2,
+        }}
+      />
+
+      <div
+        style={{
+          position: 'relative',
+          zIndex: 10,
+          maxWidth: 920,
+          margin: '0 auto',
+          width: '100%',
+          padding: 'clamp(96px,12vw,140px) 24px clamp(64px,8vw,96px)',
+        }}
+      >
+        <div
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 8,
+            padding: '5px 12px',
+            border: '1px solid rgba(122,155,111,0.4)',
+            borderRadius: 999,
+            marginBottom: 28,
+          }}
+        >
+          <span
+            style={{
+              width: 7,
+              height: 7,
+              borderRadius: '50%',
+              backgroundColor: '#7A9B6F',
+              flexShrink: 0,
+            }}
+          />
+          <span
+            style={{
+              fontSize: 11,
+              fontFamily: 'monospace',
+              letterSpacing: '0.12em',
+              textTransform: 'uppercase',
+              color: '#7A9B6F',
+            }}
+          >
+            Vermont property tool
+          </span>
         </div>
-        <div style={{backgroundColor:'rgba(8,16,6,0.72)',border:'1px solid rgba(122,155,111,0.18)',borderRadius:'4px',padding:'22px',backdropFilter:'blur(12px)'}}>
-          <p style={{fontSize:'10px',fontFamily:'monospace',letterSpacing:'0.12em',textTransform:'uppercase',color:'#7A9B6F',marginBottom:'14px'}}>Popular Vermont Towns</p>
-          <div>
-            {['Burlington','Montpelier','Stowe','Woodstock','Middlebury','Brattleboro','Rutland','Barre','St. Johnsbury','Bennington','Manchester','Waitsfield','Morrisville','Newport','Shelburne','Williston','South Burlington','Essex Junction','Colchester','Winooski'].map(t => (
-              <span key={t} style={{display:'inline-block',margin:'3px',padding:'4px 10px',backgroundColor:'rgba(8,16,6,0.6)',border:'1px solid rgba(122,155,111,0.18)',color:'rgba(245,239,224,0.6)',fontSize:'11px',fontFamily:'monospace',borderRadius:'2px'}}>{t}</span>
-            ))}
+
+        <h1
+          style={{
+            fontFamily: "'Playfair Display', Georgia, serif",
+            fontWeight: 600,
+            fontSize: 'clamp(2.4rem, 5.2vw, 3.8rem)',
+            lineHeight: 1.05,
+            letterSpacing: '-0.02em',
+            color: '#F5EFE0',
+            marginBottom: 18,
+          }}
+        >
+          Type your Vermont address.
+          <br />
+          <em style={{ color: '#C8732A', fontStyle: 'normal' }}>We will tell you what to do.</em>
+        </h1>
+
+        <p
+          style={{
+            fontSize: 17,
+            fontWeight: 300,
+            lineHeight: 1.6,
+            color: 'rgba(245,239,224,0.7)',
+            maxWidth: 560,
+            marginBottom: 32,
+          }}
+        >
+          One profile per property. What it costs, what is on the table for rebates, what the maps say,
+          when to do what, who to hire. Vermont numbers, not national averages.
+        </p>
+
+        <form
+          onSubmit={e => {
+            e.preventDefault()
+            go()
+          }}
+          style={{ position: 'relative', maxWidth: 560 }}
+        >
+          <div
+            style={{
+              display: 'flex',
+              gap: 0,
+              backgroundColor: 'rgba(8,16,6,0.72)',
+              border: '1px solid rgba(122,155,111,0.3)',
+              borderRadius: 4,
+              overflow: 'hidden',
+              backdropFilter: 'blur(8px)',
+            }}
+          >
+            <input
+              ref={inputRef}
+              type="text"
+              value={addr}
+              onChange={e => onType(e.target.value)}
+              onKeyDown={onKeyDown}
+              onFocus={() => {
+                if (suggestions.length > 0) setOpen(true)
+              }}
+              placeholder="123 Mountain Road, Stowe"
+              autoComplete="off"
+              autoCapitalize="words"
+              style={{
+                flex: 1,
+                padding: '16px 20px',
+                border: 'none',
+                background: 'transparent',
+                fontSize: 16,
+                color: '#F5EFE0',
+                outline: 'none',
+                fontFamily: "'DM Sans', system-ui, sans-serif",
+              }}
+            />
+            <button
+              type="submit"
+              disabled={loading || !addr.trim()}
+              style={{
+                padding: '0 24px',
+                border: 'none',
+                backgroundColor: addr.trim() ? '#C8732A' : 'rgba(200,115,42,0.4)',
+                color: '#FAF7F2',
+                fontSize: 13,
+                fontWeight: 600,
+                fontFamily: "'DM Sans', system-ui, sans-serif",
+                letterSpacing: '0.04em',
+                cursor: addr.trim() ? 'pointer' : 'not-allowed',
+                opacity: loading ? 0.7 : 1,
+              }}
+            >
+              {loading ? 'Loading…' : 'See profile →'}
+            </button>
           </div>
-          <div style={{display:'flex',marginTop:'18px',paddingTop:'16px',borderTop:'1px solid rgba(122,155,111,0.12)'}}>
-            {[{n:'VT',l:'Statewide'},{n:'Free',l:'Always'},{n:'Real',l:'VT Numbers'}].map((s,i) => (
-              <div key={s.l} style={{flex:1,textAlign:'center',borderRight:i<2?'1px solid rgba(122,155,111,0.12)':'none',padding:'0 8px'}}>
-                <div style={{fontFamily:"'Playfair Display',Georgia,serif",fontWeight:700,fontSize:'20px',color:'#C8732A'}}>{s.n}</div>
-                <div style={{fontSize:'10px',fontFamily:'monospace',color:'rgba(245,239,224,0.35)',marginTop:'2px',letterSpacing:'0.06em'}}>{s.l}</div>
-              </div>
-            ))}
-          </div>
+          {open && suggestions.length > 0 && (
+            <div
+              ref={ddRef}
+              style={{
+                position: 'absolute',
+                zIndex: 20,
+                left: 0,
+                right: 0,
+                top: 'calc(100% + 4px)',
+                background: 'white',
+                borderRadius: 4,
+                boxShadow: '0 16px 48px rgba(0,0,0,0.18)',
+                overflow: 'hidden',
+              }}
+            >
+              {suggestions.map((s, i) => (
+                <button
+                  key={s.magicKey}
+                  type="button"
+                  onClick={() => pickSuggestion(s)}
+                  onMouseEnter={() => setHighlight(i)}
+                  style={{
+                    display: 'block',
+                    width: '100%',
+                    textAlign: 'left' as const,
+                    padding: '11px 16px',
+                    border: 'none',
+                    background: highlight === i ? '#FAF7F2' : 'transparent',
+                    fontSize: 13,
+                    color: '#1C2B1A',
+                    cursor: 'pointer',
+                    fontFamily: "'DM Sans', system-ui, sans-serif",
+                    borderBottom: i < suggestions.length - 1 ? '1px solid #FAF7F2' : 'none',
+                  }}
+                >
+                  <span style={{ display: 'inline-block', marginRight: 8, color: '#C8732A' }}>→</span>
+                  {formatSuggestion(s.text)}
+                </button>
+              ))}
+            </div>
+          )}
+        </form>
+
+        <div style={{ display: 'flex', gap: 14, marginTop: 18, flexWrap: 'wrap', alignItems: 'center' }}>
+          <span
+            style={{
+              fontSize: 11,
+              fontFamily: 'monospace',
+              color: 'rgba(245,239,224,0.4)',
+              letterSpacing: '0.06em',
+            }}
+          >
+            Or try:
+          </span>
+          {['Burlington', 'Stowe', 'Middlebury', 'Greensboro'].map(t => (
+            <button
+              key={t}
+              onClick={() => {
+                setAddr(`Main Street, ${t}`)
+                go(`Main Street, ${t}, VT`)
+              }}
+              style={{
+                border: 'none',
+                background: 'transparent',
+                fontSize: 12,
+                color: 'rgba(245,239,224,0.6)',
+                cursor: 'pointer',
+                padding: 0,
+                fontFamily: "'DM Sans', system-ui, sans-serif",
+                textDecoration: 'underline',
+                textDecorationColor: 'rgba(245,239,224,0.2)',
+                textUnderlineOffset: 4,
+              }}
+            >
+              {t}
+            </button>
+          ))}
         </div>
+
+        <p
+          style={{
+            fontSize: 11,
+            fontFamily: 'monospace',
+            letterSpacing: '0.06em',
+            color: 'rgba(245,239,224,0.3)',
+            marginTop: 36,
+          }}
+        >
+          Real Vermont data · Free · No account · No spam
+        </p>
       </div>
     </section>
   )

@@ -212,7 +212,13 @@ function HeroSummary({ data }: { data: PropertyProfile }) {
             borderTop: `1px solid ${C.cardLine}`,
           }}
         >
-          {data.hero.facts.map(f => (
+          {/* Filter to Town | County | Cost tier | Utility — drop the
+              80% AMI (HH3) and Market entries so jargon stays out of the
+              hero. Income-tier figures only surface inside the
+              eligibility module after explicit engagement. */}
+          {data.hero.facts
+            .filter(f => f.label !== '80% AMI (HH3)' && f.label !== 'Market')
+            .map(f => (
             <div key={f.label}>
               <p
                 style={{
@@ -230,7 +236,7 @@ function HeroSummary({ data }: { data: PropertyProfile }) {
                 {f.value}
               </p>
             </div>
-          ))}
+            ))}
         </div>
       )}
     </section>

@@ -433,9 +433,7 @@ const rebateHeadline: PropertyModule = {
             ${profile.rebates.stack.incomeQualifiedUSD.toLocaleString()}
           </p>
           <p style={{ fontSize: 11, fontFamily: FM, color: 'rgba(245,239,224,0.55)', margin: '4px 0 0' }}>
-            {profile.ami80HouseholdOf3
-              ? `Household at or below ~$${profile.ami80HouseholdOf3.toLocaleString()} (HH3)`
-              : 'At or below 80% AMI'}
+            If your household income meets state guidelines
           </p>
         </div>
         <div>
@@ -836,15 +834,17 @@ const rebateEligibilityCheck: PropertyModule = {
             {profile.county} County, household of 3
           </p>
           <p style={{ fontSize: 18, fontFamily: FD, color: C.ink, fontWeight: 600, margin: '4px 0 0' }}>
-            {ami ? `Income at or below $${ami.toLocaleString()}` : 'Check the EVT income tables for this county'}
+            {ami
+              ? `Roughly: a 3-person household earning $${ami.toLocaleString()} or less`
+              : 'Check the Efficiency Vermont income tables for this county'}
           </p>
           <p style={{ fontSize: 12, fontFamily: FB, color: C.inkSoft, margin: '4px 0 0' }}>
-            Different household sizes shift the threshold ±$10–20k. The installer confirms when they file —
-            we cannot promise eligibility.
+            Different family sizes shift this number ±$10–20k. The installer confirms eligibility when they
+            file the rebate — we cannot promise it.
           </p>
         </div>
         <p style={{ fontSize: 11, fontFamily: FM, color: C.inkFaint, margin: 0 }}>
-          The exact AMI table updates annually. Source:{' '}
+          The exact income table updates annually. Source:{' '}
           <a href="https://www.efficiencyvermont.com/income-eligible" target="_blank" rel="noopener noreferrer" style={{ color: C.accent }}>
             EVT income-eligible weatherization
           </a>

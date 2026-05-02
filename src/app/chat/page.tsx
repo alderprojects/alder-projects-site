@@ -41,11 +41,11 @@ export default function ChatPage() {
               fontStyle: 'italic',
             }}
           >
-            For kitchen, bathroom, deck, or other renovation cost questions, the{' '}
-            <a href="/calculator" style={{ color: '#2c4a3e', textDecoration: 'underline' }}>
-              cost calculator
+            Have a specific Vermont address?{' '}
+            <a href="/" style={{ color: '#2c4a3e', textDecoration: 'underline' }}>
+              Pull the full property profile
             </a>{' '}
-            has Vermont-specific ranges.
+            — costs, rebates, regulators, calendar, vetting in one place.
           </p>
         </header>
 

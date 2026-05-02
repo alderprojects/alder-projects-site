@@ -4,8 +4,6 @@ import Link from 'next/link'
 import { useState } from 'react'
 
 const PRIMARY_LINKS = [
-  { href: '/calculator', label: 'Calculator' },
-  { href: '/seasonal-home-report', label: 'Property scan' },
   { href: '/guides', label: 'Guides' },
 ]
 

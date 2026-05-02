@@ -190,7 +190,7 @@ export default function PropertyHero({ profile }: Props) {
           marginBottom: 12,
         }}
       >
-        {intent ? 'Pick a topic, type, or ask' : 'Where are you starting from'}
+        {pickerKicker(intent)}
       </p>
 
       {!intent && (
@@ -252,7 +252,9 @@ export default function PropertyHero({ profile }: Props) {
         })}
       </div>
 
-      {/* Mixed picker — appears after intent is chosen. */}
+      {/* Mixed picker — appears after intent is chosen. Branched by intent:
+          owners get project tiles; buyers and researchers see only question
+          chips (the questions that matter pre-purchase or in the abstract). */}
       {intent && (
         <div
           ref={tileGroupRef}
@@ -265,7 +267,8 @@ export default function PropertyHero({ profile }: Props) {
             marginTop: 4,
           }}
         >
-          {/* Project tiles */}
+          {/* Project tiles — owner only. */}
+          {intent === 'owner' && (
           <div>
             <p
               style={{
@@ -320,6 +323,7 @@ export default function PropertyHero({ profile }: Props) {
               </button>
             </div>
           </div>
+          )}
 
           {/* Scope tier — feeds the CTA escalation rule. */}
           <div>
@@ -378,7 +382,7 @@ export default function PropertyHero({ profile }: Props) {
                 margin: '4px 0 10px',
               }}
             >
-              Or a question
+              {intent === 'owner' ? 'Or a question' : 'Pick a question'}
             </p>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
               {QUESTION_CHIPS.map(q => {
@@ -491,4 +495,11 @@ export default function PropertyHero({ profile }: Props) {
       color: C.ink,
     }
   }
+}
+
+function pickerKicker(intent: TopLevelIntent | null): string {
+  if (!intent) return 'Where are you starting from'
+  if (intent === 'owner') return 'Pick a project, a question, or ask'
+  if (intent === 'buying') return 'What do you want to know about this place'
+  return 'What would you like to know'
 }

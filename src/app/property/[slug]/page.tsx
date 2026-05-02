@@ -138,7 +138,11 @@ export default async function PropertyPage({
           {/* Two-click intent hero + ranked module stream, with state lifted
               to a single client wrapper so clicks never trigger route changes
               (no scroll-to-top). URL is mirrored via history.replaceState. */}
-          <PropertyInteractive profile={data} initialSignals={initialSignals} />
+          <PropertyInteractive
+            profile={data}
+            initialSignals={initialSignals}
+            hadExplicitIntent={Boolean(searchParams?.intent)}
+          />
 
           {data.dataLinks.length > 0 && <Sources data={data} />}
         </article>

@@ -283,6 +283,42 @@ function tradeForTopic(t: TopicId | null): string | null {
   return map[t] ?? null
 }
 
+// Anchor module IDs where a topic kit should attach. The anchor is the
+// most-relevant rendered module per topic — usually the matching cost
+// module, falling back to a sequence or rebate module for topics that
+// do not have a dedicated cost trade (solar_battery has no cost_solar;
+// rebate_strat has no cost module at all). Order matters — first match
+// wins, so anchors[0] is preferred when multiple render.
+const TOPIC_KIT_ANCHORS: Partial<Record<TopicId, string[]>> = {
+  heat_pump: ['cost_hvac', 'cost_electrical_panel'],
+  weatherization: ['rebate_stack_detail', 'cost_window'],
+  kitchen: ['cost_kitchen'],
+  bath: ['cost_bathroom'],
+  outdoor: ['cost_deck'],
+  solar_battery: ['sequence_roof_then_solar', 'rebate_stack_detail'],
+  rebate_strat: ['rebate_stack_detail'],
+  // addition_adu intentionally omitted per spec — contractor CTA only.
+}
+
+function maybeAppendTopicKit(
+  out: ReactNode[],
+  module: PropertyModule,
+  profile: PropertyProfile,
+  signals: VisitorSignals,
+  picked: Picked
+): void {
+  if (picked.has('topic_kit')) return
+  if (signals.topLevelIntent !== 'owner') return
+  const topic = signals.topic
+  if (!topic) return
+  const anchors = TOPIC_KIT_ANCHORS[topic]
+  if (!anchors || !anchors.includes(module.moduleId)) return
+  const items = getInlineKitForContext(signals, profile, 'topic_module')
+  if (items.length === 0) return
+  picked.add('topic_kit')
+  out.push(<KitInline key="topic_kit" heading={kitHeadingFor('topic_module', topic)} items={items} />)
+}
+
 // Heading copy per kit context. Pulled into a helper so the catalog
 // labels and the inline-render labels stay in sync.
 function kitHeadingFor(context: KitContext, topic: TopicId | null, season?: string): string {
@@ -445,31 +481,30 @@ export function pickInlineCta(
     const matchTrade = tradeForTopic(topic)
     const isTopicMatchedCost = ctype === 'cost' && matchTrade && moduleId === `cost_${matchTrade}`
 
-    // Scope BIG branch — contractor lead CTAs + a topic-module kit on
-    // weatherization/heat_pump (where DIY scope and big scope overlap
-    // for prep).
+    // Scope-based CTA logic builds an `out` list; topic kit attaches
+    // separately at the end via maybeAppendTopicKit so it covers
+    // anchor modules that the per-scope branches do not address
+    // (e.g. solar_battery has no cost_solar — kit anchors on the
+    // sequence module instead).
+    const out: ReactNode[] = []
+
     if (scope === 'big') {
       if (isTopicMatchedCost && !picked.has('owner_big_cost')) {
         picked.add('owner_big_cost')
-        const out: ReactNode[] = [
+        out.push(
           <ChatPromptCta
             key="cta"
             text="Ready for real numbers? We will line up three Vermont contractors."
             prompt={`I want bids on ${topicLabel(topic)} in ${town}. Here is what I have in mind: ...`}
             label="Get 3 Vermont bids — start in chat"
-          />,
-        ]
-        if ((topic === 'heat_pump' || topic === 'weatherization') && !picked.has('topic_kit')) {
-          picked.add('topic_kit')
-          const items = getInlineKitForContext(signals, profile, 'topic_module')
-          if (items.length > 0) out.push(<KitInline key="kit" heading={kitHeadingFor('topic_module', topic)} items={items} />)
-        }
-        return <>{out}</>
+          />
+        )
       }
       if (ctype === 'sequence' && !picked.has('owner_big_seq')) {
         picked.add('owner_big_seq')
-        return (
+        out.push(
           <ChatPromptCta
+            key="seq"
             text="Send this sequence to a Vermont contractor?"
             prompt={`I want to start the sequence "${module.title}" on ${profile.address}. Help me brief a contractor.`}
             label="Send to a contractor"
@@ -478,71 +513,56 @@ export function pickInlineCta(
       }
       if (ctype === 'vetting' && !picked.has('owner_big_vet')) {
         picked.add('owner_big_vet')
-        return (
+        out.push(
           <ChatPromptCta
+            key="vet"
             text="Want me to introduce you to a vetted Vermont contractor?"
             prompt={`Introduce me to a vetted Vermont contractor for ${topicLabel(topic)} in ${town}.`}
             label="Introduce me to a vetted contractor"
           />
         )
       }
-      return null
-    }
-
-    // Scope MID branch — handyman + rebate-help. Topic kit also fires
-    // here, attached to the matching cost module.
-    if (scope === 'mid') {
+    } else if (scope === 'mid') {
       if (isTopicMatchedCost && !picked.has('owner_mid_cost')) {
         picked.add('owner_mid_cost')
-        const out: ReactNode[] = [
+        out.push(
           <ChatPromptCta
             key="cta"
             text={`This is handyman territory in ${town}.`}
             prompt={`I need a handyman in ${town} for ${topicLabel(topic)}. Tell me what to look for.`}
             label="Tell the chat what you need"
-          />,
-        ]
-        if (!picked.has('topic_kit')) {
-          picked.add('topic_kit')
-          const items = getInlineKitForContext(signals, profile, 'topic_module')
-          if (items.length > 0) out.push(<KitInline key="kit" heading={kitHeadingFor('topic_module', topic)} items={items} />)
-        }
-        return <>{out}</>
+          />
+        )
       }
       if (ctype === 'rebate' && !picked.has('owner_mid_rebate')) {
         picked.add('owner_mid_rebate')
-        return (
+        out.push(
           <ChatPromptCta
+            key="rebate"
             text="Want help filing the rebate paperwork?"
             prompt={`Walk me through filing the rebates for ${topicLabel(topic)} on ${profile.address}.`}
             label="Get help filing — chat"
           />
         )
       }
-      return null
+    } else if (scope === 'diy') {
+      if (isTopicMatchedCost && !picked.has('owner_diy_chat')) {
+        picked.add('owner_diy_chat')
+        out.push(
+          <ChatPromptCta
+            key="cta"
+            text="Stuck? The chat has the Vermont playbook loaded."
+            prompt={`I am working on ${topicLabel(topic)} myself at ${profile.address}. Stuck on this part: ...`}
+            label="Ask the chat"
+          />
+        )
+      }
     }
 
-    // Scope DIY branch — kit on every applicable module + a "stuck?"
-    // chat hint.
-    if (scope === 'diy') {
-      if (isTopicMatchedCost && !picked.has('owner_diy_kit')) {
-        picked.add('owner_diy_kit')
-        const items = getInlineKitForContext(signals, profile, 'topic_module')
-        if (items.length > 0) {
-          return (
-            <>
-              <KitInline heading={kitHeadingFor('topic_module', topic)} items={items} />
-              <ChatPromptCta
-                text="Stuck? The chat has the Vermont playbook loaded."
-                prompt={`I am working on ${topicLabel(topic)} myself at ${profile.address}. Stuck on this part: ...`}
-                label="Ask the chat"
-              />
-            </>
-          )
-        }
-      }
-      return null
-    }
+    // Topic kit attaches to its anchor module regardless of scope.
+    maybeAppendTopicKit(out, module, profile, signals, picked)
+
+    return out.length > 0 ? <>{out}</> : null
   }
 
   return null

@@ -301,6 +301,22 @@ function scopeLabel(s: 'budget' | 'mid' | 'high'): string {
   return s === 'budget' ? 'Budget refresh' : s === 'mid' ? 'Mid-range' : 'High end'
 }
 
+// Render-time scrubber for AMI / HH3 jargon that lives in src/data/*
+// strings (sequences.ts and rebates.ts are on the don't-touch list,
+// so we massage at the render surface). Replaces the technical phrase
+// with plain language while keeping the dollar context.
+function scrubJargon(s: string): string {
+  if (!s) return s
+  return s
+    .replace(/\(\s*80%\s*AMI(?:\s+or\s+below)?\s*\)/gi, '(income-qualified)')
+    .replace(/at\s+or\s+below\s+80%\s+AMI/gi, 'at the income-qualified tier')
+    .replace(/below\s+80%\s+Area\s+Median\s+Income/gi, 'meeting the income-qualified guideline')
+    .replace(/80%\s+Area\s+Median\s+Income/gi, 'income-qualified guideline')
+    .replace(/80%\s+AMI/gi, 'income-qualified tier')
+    .replace(/\(\s*HH3\s*\)/gi, '(3-person household)')
+    .replace(/\bHH3\b/gi, '3-person household')
+}
+
 // ---------- Cost-by-trade module builder -------------------------------
 
 const COST_TRADES: { trade: string; label: string; topic: TopicId | null }[] = [
@@ -490,7 +506,7 @@ const rebateStackDetail: PropertyModule = {
                 <p style={{ fontSize: 12, fontFamily: FM, color: C.accent, fontWeight: 600, margin: 0 }}>{r.amount}</p>
               </div>
               <p style={{ fontSize: 12, fontFamily: FB, color: C.inkSoft, lineHeight: 1.5, margin: '4px 0 0' }}>
-                <strong>Who:</strong> {r.who}
+                <strong>Who:</strong> {scrubJargon(r.who)}
               </p>
               <p style={{ fontSize: 11, fontFamily: FM, color: C.inkFaint, margin: '4px 0 0', fontStyle: 'italic' }}>
                 {r.howToClaim}
@@ -572,7 +588,7 @@ function sequenceModule(seqId: string, primaryTopic: TopicId | null, secondaryTo
               <strong>Total cost after rebates:</strong> {seq.totalCostMidVT}
             </p>
             <p style={{ fontSize: 12, fontFamily: FB, color: C.ink, margin: 0 }}>
-              <strong style={{ color: C.accent }}>Stacked rebates:</strong> {seq.totalRebateStack}
+              <strong style={{ color: C.accent }}>Stacked rebates:</strong> {scrubJargon(seq.totalRebateStack)}
             </p>
           </div>
 

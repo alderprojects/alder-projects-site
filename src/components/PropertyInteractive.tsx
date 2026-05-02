@@ -27,17 +27,17 @@ import { classifyIntentMode, computeSignalsFromParams } from '@/lib/property-ran
 type Props = {
   profile: PropertyProfile
   initialSignals: VisitorSignals
+  // True when the URL explicitly carried ?intent=… so we know to honour
+  // that as the visitor's choice (vs the default-fallback 'researching'
+  // value that computeSignalsFromParams returns when intent is absent).
+  // Without this, an explicit ?intent=researching gets collapsed back
+  // to "no intent picked yet" and the page renders the wrong branch.
+  hadExplicitIntent: boolean
 }
 
-export default function PropertyInteractive({ profile, initialSignals }: Props) {
+export default function PropertyInteractive({ profile, initialSignals, hadExplicitIntent }: Props) {
   const [intent, setIntent] = useState<TopLevelIntent | null>(
-    initialSignals.topLevelIntent === 'researching' && !initialSignals.topic
-      ? // 'researching' is the default when no intent is in the URL —
-        // distinguish "URL had nothing" from "URL had ?intent=researching"
-        // by also checking for any other signal. If there's nothing, hero
-        // shows the picker first.
-        null
-      : initialSignals.topLevelIntent
+    hadExplicitIntent ? initialSignals.topLevelIntent : null
   )
   const [topic, setTopic] = useState<TopicId | null>(initialSignals.topic)
 

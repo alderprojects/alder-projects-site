@@ -14,6 +14,7 @@ type PageState = {
   modulesExpanded: string[]
   scopeClicked: Scope | null
   ctaHovered: string | null
+  currentTopic: string | null
 }
 
 // PropertyChat is the chat copilot wrapper for the property page.
@@ -115,6 +116,7 @@ export default function PropertyChat({ profile }: Props) {
     modulesExpanded: [],
     scopeClicked: null,
     ctaHovered: null,
+    currentTopic: null,
   })
   const [newcomer, setNewcomer] = useState(false)
 
@@ -146,10 +148,14 @@ export default function PropertyChat({ profile }: Props) {
   const tier = bucketLabel(profile.bucket)
   const greeting = `I have ${profile.address} loaded — that's ${tier.toLowerCase()}, on ${profile.utility}. What do you want to know?`
 
-  // Sync scope from URL.
+  // Sync scope and current topic from URL.
   useEffect(() => {
     const scope = (searchParams?.get('scope') as Scope | null) ?? null
-    setPageState(prev => (prev.scopeClicked === scope ? prev : { ...prev, scopeClicked: scope }))
+    const topic = searchParams?.get('topic') ?? null
+    setPageState(prev => {
+      if (prev.scopeClicked === scope && prev.currentTopic === topic) return prev
+      return { ...prev, scopeClicked: scope, currentTopic: topic }
+    })
   }, [searchParams])
 
   // Track which module cards have scrolled into view. Re-attaches when

@@ -312,6 +312,7 @@ type PageState = {
   modulesExpanded?: string[]
   scopeClicked?: string | null
   ctaHovered?: string | null
+  currentTopic?: string | null
 }
 
 type ChatRequest = {
@@ -523,6 +524,64 @@ function offerWasMade(messages: Message[]): boolean {
         m.content
       )
   )
+}
+
+// ---------- Topic detection (for chat→page auto-reflow) ----------------
+
+// Loose phrase → topic map. Order matters: the first phrase whose substring
+// hits in the text wins for that topic. We bias toward specific terms over
+// generic ones (e.g., 'heat pump' before 'rebate' so heat pump beats rebate
+// when both appear).
+const TOPIC_PHRASES: { phrase: string; topic: string }[] = [
+  { phrase: 'heat pump', topic: 'heat_pump' },
+  { phrase: 'mini-split', topic: 'heat_pump' },
+  { phrase: 'minisplit', topic: 'heat_pump' },
+  { phrase: 'kitchen', topic: 'kitchen' },
+  { phrase: 'bathroom', topic: 'bath' },
+  { phrase: 'bath remodel', topic: 'bath' },
+  { phrase: 'solar', topic: 'solar_battery' },
+  { phrase: 'powerwall', topic: 'solar_battery' },
+  { phrase: 'battery storage', topic: 'solar_battery' },
+  { phrase: 'deck', topic: 'outdoor' },
+  { phrase: 'porch', topic: 'outdoor' },
+  { phrase: 'patio', topic: 'outdoor' },
+  { phrase: 'adu', topic: 'addition_adu' },
+  { phrase: 'accessory dwelling', topic: 'addition_adu' },
+  { phrase: 'addition', topic: 'addition_adu' },
+  { phrase: 'in-law unit', topic: 'addition_adu' },
+  { phrase: 'weatherization', topic: 'weatherization' },
+  { phrase: 'air sealing', topic: 'weatherization' },
+  { phrase: 'insulation', topic: 'weatherization' },
+  { phrase: 'mud season', topic: 'mud_season' },
+  { phrase: 'flood zone', topic: 'flood_zone' },
+  { phrase: 'shoreland', topic: 'flood_zone' },
+  { phrase: 'river corridor', topic: 'flood_zone' },
+  { phrase: 'wetland', topic: 'flood_zone' },
+  { phrase: 'septic', topic: 'well_septic' },
+  { phrase: 'well water', topic: 'well_septic' },
+  { phrase: 'property tax', topic: 'property_tax' },
+  { phrase: 'homestead declaration', topic: 'property_tax' },
+  { phrase: 'income-eligible', topic: 'rebate_eligibility' },
+  { phrase: '80% ami', topic: 'rebate_eligibility' },
+  { phrase: 'income tier', topic: 'rebate_eligibility' },
+  { phrase: 'vet a contractor', topic: 'contractor_vetting' },
+  { phrase: 'vetting', topic: 'contractor_vetting' },
+  { phrase: 'rebate stack', topic: 'rebate_strat' },
+  { phrase: 'rebate playbook', topic: 'rebate_strat' },
+]
+
+function detectTopicsInText(text: string): string[] {
+  const lower = text.toLowerCase()
+  const found: string[] = []
+  const seen = new Set<string>()
+  for (const { phrase, topic } of TOPIC_PHRASES) {
+    if (seen.has(topic)) continue
+    if (lower.includes(phrase)) {
+      found.push(topic)
+      seen.add(topic)
+    }
+  }
+  return found
 }
 
 // ---------- Page action extraction --------------------------------------
@@ -849,6 +908,22 @@ The text BEFORE <<<ACTIONS>>> is shown to the user. The action JSON is parsed an
 
     const rawReply = await callClaude(trimmed, turnSystemPrompt)
     const { reply, actions } = extractActions(rawReply)
+
+    // Auto-elevate: if the conversation surfaced a topic that differs
+    // from what the page is currently focused on, append a single
+    // elevate_topic action so the page reflows. Only kicks in on the
+    // property page (when pageState is present) and only when the model
+    // did not already emit its own elevate_topic.
+    if (context?.pageState) {
+      const alreadyElevating = actions.some(a => a.type === 'elevate_topic')
+      if (!alreadyElevating) {
+        const lastUserText = trimmed.filter(m => m.role === 'user').slice(-1)[0]?.content ?? ''
+        const detected = detectTopicsInText(`${lastUserText}\n${reply}`)
+        const current = context.pageState.currentTopic ?? null
+        const next = detected.find(t => t !== current)
+        if (next) actions.push({ type: 'elevate_topic', topic: next })
+      }
+    }
 
     // Auto-capture: if the user's most recent message contains an email AND
     // the conversation has prior installer-offer context, capture the lead silently.

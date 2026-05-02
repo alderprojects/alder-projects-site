@@ -85,7 +85,7 @@ export default function SeoPage({ content }: { content: SeoPageContent }) {
             {content.intro}
           </p>
           <Link href={buildSubmitUrl(content.h1)} style={{ display: 'inline-block', padding: '13px 26px', backgroundColor: '#C8732A', color: '#FAF7F2', fontWeight: 600, fontSize: '14px', borderRadius: '2px', textDecoration: 'none', fontFamily: "'DM Sans', system-ui, sans-serif" }}>
-            {content.ctaText || 'Post Your Project Free →'}
+            {content.ctaText || 'See your full property profile →'}
           </Link>
         </div>
       </div>
@@ -122,7 +122,7 @@ export default function SeoPage({ content }: { content: SeoPageContent }) {
         <div style={{ backgroundColor: '#1C2B1A', borderRadius: '4px', padding: '28px 32px', marginBottom: '40px', display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: '16px' }}>
           <p style={{ fontFamily: "'Playfair Display', Georgia, serif", fontSize: '1.2rem', color: '#F5EFE0', fontWeight: 500, margin: 0 }}>Ready to find a contractor?</p>
           <Link href={buildSubmitUrl(content.h1)} style={{ padding: '12px 24px', backgroundColor: '#C8732A', color: '#FAF7F2', fontWeight: 600, fontSize: '14px', borderRadius: '2px', textDecoration: 'none', flexShrink: 0, fontFamily: "'DM Sans', system-ui, sans-serif" }}>
-            Post Your Project Free →
+            See your full property profile →
           </Link>
         </div>
 

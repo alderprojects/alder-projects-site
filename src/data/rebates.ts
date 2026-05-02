@@ -2,10 +2,14 @@
 // 2026 figures. Update quarterly (EVT changes amounts, GMP/VPPSA bonuses).
 // Federal status pinned to OBBBA (Sept 2025) — 25C expired Dec 31, 2025.
 
+import type { State } from './_types'
+import { DEFAULT_STATE } from './_types'
+
 export type Utility = 'GMP' | 'BED' | 'VPPSA' | 'VGS' | 'WEC' | 'unknown'
 
 export type Rebate = {
   id: string
+  state: State
   category: 'weatherization' | 'heat_pump' | 'water_heater' | 'solar' | 'ev_charger' | 'electrical' | 'oil_to_electric' | 'lead_safe' | 'home_repair'
   program: string
   who: string
@@ -28,6 +32,7 @@ export const REBATES: Rebate[] = [
   // ─── WEATHERIZATION (the single most important category) ─────────────────
   {
     id: 'evt_weatherization_standard',
+    state: 'VT',
     category: 'weatherization',
     program: 'Efficiency Vermont Home Performance with ENERGY STAR',
     who: 'All Vermont households',
@@ -43,6 +48,7 @@ export const REBATES: Rebate[] = [
   },
   {
     id: 'evt_weatherization_income',
+    state: 'VT',
     category: 'weatherization',
     program: 'Efficiency Vermont income-eligible weatherization',
     who: 'Households at or below 80% Area Median Income',
@@ -58,6 +64,7 @@ export const REBATES: Rebate[] = [
   },
   {
     id: 'wap_low_income',
+    state: 'VT',
     category: 'weatherization',
     program: 'Weatherization Assistance Program (WAP) — federal/state',
     who: 'Low-income households (typically below 60% State Median Income)',
@@ -73,6 +80,7 @@ export const REBATES: Rebate[] = [
   },
   {
     id: 'home_repair_program',
+    state: 'VT',
     category: 'home_repair',
     program: 'Home Repair Program',
     who: 'Low/moderate income households needing repairs that block weatherization',
@@ -88,6 +96,7 @@ export const REBATES: Rebate[] = [
   },
   {
     id: 'evt_diy_weatherization',
+    state: 'VT',
     category: 'weatherization',
     program: 'EVT DIY weatherization rebate',
     who: 'Anyone',
@@ -103,6 +112,7 @@ export const REBATES: Rebate[] = [
   },
   {
     id: 'lead_safe_repair',
+    state: 'VT',
     category: 'lead_safe',
     program: 'Vermont Lead Safe + Healthy Homes Program',
     who: 'Homes built before 1978 with children under 6 or pregnant occupants',
@@ -120,6 +130,7 @@ export const REBATES: Rebate[] = [
   // ─── HEAT PUMPS ──────────────────────────────────────────────────────────
   {
     id: 'evt_ductless_minisplit',
+    state: 'VT',
     category: 'heat_pump',
     program: 'EVT cold-climate ductless heat pump rebate',
     who: 'All VT households (per indoor head)',
@@ -135,6 +146,7 @@ export const REBATES: Rebate[] = [
   },
   {
     id: 'evt_ducted_heatpump',
+    state: 'VT',
     category: 'heat_pump',
     program: 'EVT ducted whole-house heat pump rebate',
     who: 'All VT households',
@@ -150,6 +162,7 @@ export const REBATES: Rebate[] = [
   },
   {
     id: 'oil_to_electric',
+    state: 'VT',
     category: 'oil_to_electric',
     program: 'EVT fuel-switching bonus (oil to electric)',
     who: 'Households replacing oil furnace/boiler with heat pump as primary heat',
@@ -167,6 +180,7 @@ export const REBATES: Rebate[] = [
   // ─── WATER HEATERS ───────────────────────────────────────────────────────
   {
     id: 'evt_heatpump_water_heater',
+    state: 'VT',
     category: 'water_heater',
     program: 'EVT heat pump water heater rebate',
     who: 'All VT households',
@@ -182,6 +196,7 @@ export const REBATES: Rebate[] = [
   },
   {
     id: 'evt_solar_water_heater',
+    state: 'VT',
     category: 'water_heater',
     program: 'EVT solar water heater rebate',
     who: 'All VT households (rare in VT now)',
@@ -199,6 +214,7 @@ export const REBATES: Rebate[] = [
   // ─── ELECTRICAL SERVICE UPGRADES ─────────────────────────────────────────
   {
     id: 'evt_panel_upgrade',
+    state: 'VT',
     category: 'electrical',
     program: 'EVT electrical service upgrade rebate',
     who: 'Households upgrading from <200A service to support heat pump/EV/heat pump water heater',
@@ -216,6 +232,7 @@ export const REBATES: Rebate[] = [
   // ─── EV CHARGERS ─────────────────────────────────────────────────────────
   {
     id: 'evt_ev_charger',
+    state: 'VT',
     category: 'ev_charger',
     program: 'EVT Level 2 EV charger rebate',
     who: 'EV-owning VT households',
@@ -231,6 +248,7 @@ export const REBATES: Rebate[] = [
   },
   {
     id: 'gmp_used_ev_rebate',
+    state: 'VT',
     category: 'ev_charger',
     program: 'GMP used EV rebate',
     who: 'GMP customers buying used EV',
@@ -248,6 +266,7 @@ export const REBATES: Rebate[] = [
   // ─── SOLAR ───────────────────────────────────────────────────────────────
   {
     id: 'vt_net_metering',
+    state: 'VT',
     category: 'solar',
     program: 'Vermont net metering Group 2',
     who: 'Residential solar installers up to 15kW',
@@ -263,6 +282,7 @@ export const REBATES: Rebate[] = [
   },
   {
     id: 'evt_solar_storage',
+    state: 'VT',
     category: 'solar',
     program: 'EVT solar + storage incentive',
     who: 'VT homes installing solar + battery (Powerwall, Enphase, Sonnen)',
@@ -280,6 +300,7 @@ export const REBATES: Rebate[] = [
   // ─── FEDERAL (POST-OBBBA REALITY) ────────────────────────────────────────
   {
     id: 'federal_25c_EXPIRED',
+    state: 'federal',
     category: 'heat_pump',
     program: '[EXPIRED] Federal Section 25C — Energy Efficient Home Improvement Credit',
     who: 'NONE — credit expired Dec 31, 2025',
@@ -295,6 +316,7 @@ export const REBATES: Rebate[] = [
   },
   {
     id: 'federal_25d_solar',
+    state: 'federal',
     category: 'solar',
     program: 'Federal Section 25D — Residential Clean Energy Credit (solar/battery)',
     who: 'VT homeowners installing solar PV or battery storage',
@@ -309,6 +331,17 @@ export const REBATES: Rebate[] = [
     source: 'irs.gov/form5695',
   },
 ]
+
+// ---------------------------------------------------------------------------
+// STATE-AWARE ACCESSOR
+// ---------------------------------------------------------------------------
+
+// Returns rebates for the requested state, plus federal entries (which apply
+// regardless of state). Calling with 'federal' returns ONLY federal entries.
+export function getRebatesForState(state: State): Rebate[] {
+  if (state === 'federal') return REBATES.filter(r => r.state === 'federal')
+  return REBATES.filter(r => r.state === state || r.state === 'federal')
+}
 
 // ---------------------------------------------------------------------------
 // UTILITY MAP — VT town to utility
@@ -381,14 +414,15 @@ export function ami80ForCounty(county: string | undefined): number | null {
 // COMPACT SUMMARY for chat system prompt
 // ---------------------------------------------------------------------------
 
-export function rebatesSummaryForPrompt(): string {
+export function rebatesSummaryForPrompt(state: State = DEFAULT_STATE): string {
   const lines: string[] = ['VERMONT REBATE STACK (2026)']
   lines.push('Federal Section 25C EXPIRED Dec 31, 2025. State and utility rebates only.')
   lines.push('Federal Section 25D (solar/battery): still active, 30% through 2032.')
   lines.push('')
 
+  const rebates = getRebatesForState(state)
   const groups: Record<string, Rebate[]> = {}
-  for (const r of REBATES) {
+  for (const r of rebates) {
     if (!groups[r.category]) groups[r.category] = []
     groups[r.category].push(r)
   }

@@ -51,6 +51,34 @@ const C = {
 const FB = "'DM Sans', system-ui, sans-serif"
 const FM = 'monospace'
 
+function NewcomerToggle({ on, onChange }: { on: boolean; onChange: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={onChange}
+      aria-pressed={on}
+      aria-label="Vermont newcomer mode"
+      title="When on, the assistant explains Vermont-specific terms on first mention."
+      style={{
+        flexShrink: 0,
+        padding: '6px 10px',
+        border: `1px solid ${on ? C.accent : C.cardLine}`,
+        borderRadius: 999,
+        background: on ? C.accent : C.card,
+        color: on ? '#FAF7F2' : C.inkSoft,
+        fontSize: 10,
+        fontFamily: FM,
+        letterSpacing: '0.06em',
+        textTransform: 'uppercase',
+        cursor: 'pointer',
+        fontWeight: 600,
+      }}
+    >
+      {on ? '✓ VT newcomer' : 'VT newcomer?'}
+    </button>
+  )
+}
+
 // Minimal CSS.escape polyfill for the moduleId selector. The catalog
 // only emits ASCII-safe ids (snake_case), but harden it anyway.
 function cssEscape(s: string): string {
@@ -88,6 +116,29 @@ export default function PropertyChat({ profile }: Props) {
     scopeClicked: null,
     ctaHovered: null,
   })
+  const [newcomer, setNewcomer] = useState(false)
+
+  // Hydrate newcomer flag from sessionStorage on mount.
+  useEffect(() => {
+    try {
+      const v = sessionStorage.getItem('alder.newcomerMode')
+      if (v === 'true') setNewcomer(true)
+    } catch {
+      /* ignore */
+    }
+  }, [])
+
+  function toggleNewcomer() {
+    setNewcomer(prev => {
+      const next = !prev
+      try {
+        sessionStorage.setItem('alder.newcomerMode', next ? 'true' : 'false')
+      } catch {
+        /* ignore */
+      }
+      return next
+    })
+  }
 
   const tier = bucketLabel(profile.bucket)
   const greeting = `I have ${profile.address} loaded — that's ${tier.toLowerCase()}, on ${profile.utility}. What do you want to know?`
@@ -272,21 +323,26 @@ export default function PropertyChat({ profile }: Props) {
             backgroundColor: C.bg,
           }}
         >
-          <p
-            style={{
-              fontSize: 10,
-              fontFamily: FM,
-              letterSpacing: '0.12em',
-              textTransform: 'uppercase',
-              color: C.inkFaint,
-              margin: 0,
-            }}
-          >
-            Ask about this property
-          </p>
-          <p style={{ fontSize: 13, fontFamily: FB, color: C.ink, lineHeight: 1.5, margin: '4px 0 0' }}>
-            The assistant has the profile loaded as context.
-          </p>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12 }}>
+            <div>
+              <p
+                style={{
+                  fontSize: 10,
+                  fontFamily: FM,
+                  letterSpacing: '0.12em',
+                  textTransform: 'uppercase',
+                  color: C.inkFaint,
+                  margin: 0,
+                }}
+              >
+                Ask about this property
+              </p>
+              <p style={{ fontSize: 13, fontFamily: FB, color: C.ink, lineHeight: 1.5, margin: '4px 0 0' }}>
+                The assistant has the profile loaded as context.
+              </p>
+            </div>
+            <NewcomerToggle on={newcomer} onChange={toggleNewcomer} />
+          </div>
         </div>
         <ChatWidget
           source={`property_profile_${profile.slug}`}
@@ -296,6 +352,7 @@ export default function PropertyChat({ profile }: Props) {
           initialPrompt={pendingPrompt}
           pageState={pageState as unknown as Record<string, unknown>}
           onActions={applyActions}
+          context={{ newcomer }}
         />
       </div>
 

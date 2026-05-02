@@ -321,6 +321,8 @@ type ChatRequest = {
     calculatorState?: Record<string, unknown>
     propertyProfile?: Record<string, unknown>
     pageState?: PageState
+    newcomer?: boolean
+    framing?: 'me' | 'buyer' | 'contractor'
   }
 }
 
@@ -798,6 +800,17 @@ export async function POST(req: Request) {
     }
     if (propertyContext) {
       turnSystemPrompt += `\n\n${formatPropertyContext(propertyContext)}`
+    }
+
+    if (context?.newcomer) {
+      turnSystemPrompt += `\n\nVERMONT NEWCOMER MODE — visitor opted in. On the first mention of any Vermont-specific acronym or program (EVT — Efficiency Vermont, GMP — Green Mountain Power, BED — Burlington Electric, VPPSA, VGS — Vermont Gas Systems, WEC — Washington Electric Co-op, Act 47, Act 250, Homestead Declaration, mud season, NEK — Northeast Kingdom, ANR — Agency of Natural Resources), include a brief one-clause expansion in parentheses. After first mention in this conversation, use the term without re-explaining.`
+    }
+
+    if (context?.framing === 'buyer' || context?.framing === 'contractor') {
+      const audience = context.framing === 'buyer'
+        ? 'a prospective buyer who has not closed on this property yet'
+        : 'a contractor or trade pro evaluating this property for someone else'
+      turnSystemPrompt += `\n\nFRAMING — the visitor is reading this for ${audience}. Adjust phrasing accordingly: use "they" instead of "you" when describing what the homeowner would do, and skip personal-finance framing (income tier, household size) unless the visitor brings it up.`
     }
 
     // Page-state awareness: when the chat sits next to the property page,

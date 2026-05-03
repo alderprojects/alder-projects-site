@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef } from 'react'
+import { useRef, useState } from 'react'
 import type { PropertyProfile, TopicId, TopLevelIntent } from '@/lib/property-modules'
 
 // Two-click hero. The visitor's first click picks one of three top-level
@@ -73,11 +73,18 @@ const FM = 'monospace'
 
 export default function PropertyHero({ profile, intent, topic, onPickIntent, onPickTopic }: Props) {
   const tileGroupRef = useRef<HTMLDivElement>(null)
+  // When the visitor has both an intent + a topic, the picker collapses
+  // to a single row ("Working on: heat pump · Change topic →") to free
+  // up real estate for the actual content. Click "Change topic" to
+  // expand the full picker again. The collapse state is local — we
+  // don't want it persisting in URL, just a pure UI toggle.
+  const [pickerExpanded, setPickerExpanded] = useState(false)
 
   function pickTopic(id: TopicId | typeof SUMMARY_TILE_ID) {
     if (!intent) return
     if (id === SUMMARY_TILE_ID) onPickTopic(null)
     else onPickTopic(id)
+    setPickerExpanded(false)
   }
 
   // Roving-tabindex arrow-key nav across tiles/chips for keyboard users.
@@ -176,7 +183,52 @@ export default function PropertyHero({ profile, intent, topic, onPickIntent, onP
         })}
       </div>
 
-      {intent && (
+      {/* Collapsed picker row — only when intent + topic are both set
+          and the visitor hasn't asked to re-pick. Saves vertical space
+          on owner+topic and buying+topic states where the visitor has
+          already made their choice. */}
+      {intent && topic && !pickerExpanded && (
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: 16,
+            paddingTop: 8,
+            marginTop: 4,
+            borderTop: `1px solid ${C.cardLine}`,
+            flexWrap: 'wrap',
+          }}
+        >
+          <p style={{ fontSize: 13, fontFamily: FB, color: C.inkSoft, margin: '8px 0 0' }}>
+            Working on:{' '}
+            <strong style={{ color: C.ink, fontWeight: 600 }}>
+              {topicDisplayLabel(topic)}
+            </strong>
+          </p>
+          <button
+            type="button"
+            onClick={() => setPickerExpanded(true)}
+            style={{
+              background: 'transparent',
+              border: 'none',
+              padding: 0,
+              fontFamily: FM,
+              fontSize: 11,
+              letterSpacing: '0.08em',
+              textTransform: 'uppercase',
+              color: C.accent,
+              fontWeight: 600,
+              cursor: 'pointer',
+              marginTop: 8,
+            }}
+          >
+            Change topic →
+          </button>
+        </div>
+      )}
+
+      {intent && (!topic || pickerExpanded) && (
         <div
           ref={tileGroupRef}
           onKeyDown={onTileKeyDown}
@@ -320,4 +372,15 @@ function pickerKicker(intent: TopLevelIntent | null): string {
   if (intent === 'owner') return 'Pick a project, a question, or ask'
   if (intent === 'buying') return 'What do you want to know about this place'
   return 'What would you like to know'
+}
+
+// Human-readable label for the collapsed picker row. Walks the same
+// PROJECT_TILES + QUESTION_CHIPS lookup the picker uses, so any future
+// re-labelling propagates automatically.
+function topicDisplayLabel(topic: TopicId): string {
+  const tile = PROJECT_TILES.find(t => t.id === topic)
+  if (tile) return tile.label
+  const chip = QUESTION_CHIPS.find(c => c.id === topic)
+  if (chip) return chip.label
+  return topic
 }

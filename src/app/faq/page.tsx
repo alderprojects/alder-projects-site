@@ -13,10 +13,10 @@ const homeownerFaqs = [
   { q: 'Is it really free to post?', a: "Yes. There's no charge to submit a project, no account required, and no obligation to hire anyone." },
   { q: 'How many contractors will contact me?', a: "We don't send your project to every contractor on the platform. A small, matched set of local contractors sees your request — no flood of calls from people you didn't ask to hear from." },
   { q: 'Do I have to hire someone?', a: "No. Submitting a project doesn't commit you to anything. You decide whether to move forward, and when." },
-  { q: "What if I'm not ready to start yet?", a: "Submit with your honest timeline — even 'planning phase, 12+ months out' is fine. We'll match you with contractors who take planning-stage clients. Or use our planning guide to work through scope and budget first." },
+  { q: "What if I'm not ready to start yet?", a: "Submit with your honest timeline — even 'planning phase, 12+ months out' is fine. The intake routes to contractors who take planning-stage clients. Or use our planning guide to work through scope and budget first." },
   { q: 'Are the contractors licensed and insured?', a: "We only work with Vermont-based contractors. Every application is reviewed — we check trade, location, and insurance coverage before approving anyone onto the platform." },
   { q: 'What kinds of projects do you match?', a: "Kitchens, bathrooms, decks, additions, roofing, electrical, plumbing, HVAC, painting, basement finishing — any residential renovation across all 14 Vermont counties." },
-  { q: 'How is this different from Angi or HomeAdvisor?', a: "We review every project before routing it. You're not entered into an auction. A small matched set of local contractors sees your request — not a national platform's entire database bidding for your click." },
+  { q: 'How does Alder differ from auction-style lead platforms?', a: "We review every project before routing it. Your submission isn't entered into an auction. A small set of local contractors sees your request — not a national database bidding for your click." },
   { q: 'Will I get phone calls from contractors?', a: "We follow up by email, not phone. Contractors receive your contact details only after they've accepted your project request — you won't get unsolicited calls." },
   { q: 'What areas do you cover?', a: "All 14 Vermont counties. Our current contractor density is strongest in Chittenden, Addison, and Lamoille counties." },
 ]
@@ -28,7 +28,7 @@ const contractorFaqs = [
   { q: 'Do I have to respond to every request?', a: "No. Each request is your call. There's no penalty for declining, and no minimum number of requests you're required to take." },
   { q: 'How many contractors see the same request?', a: "We don't auction requests. A small, matched set of contractors — typically 2–3 — sees each project request based on trade and service area alignment." },
   { q: 'Can I update my trade or service area after applying?', a: "Yes. Email hello@alderprojects.com and we'll update your profile same day." },
-  { q: 'How is this different from Angi or HomeAdvisor?', a: "You see project details before paying for anything. We don't sell the same request to your entire competition simultaneously. And there's no monthly subscription whether or not you take any work." },
+  { q: 'How does Alder differ from auction-style lead platforms?', a: "You see project details before paying for anything. The same request isn't sold to your entire competition simultaneously. There's no monthly subscription whether or not you take any work." },
   { q: "What happens if a homeowner doesn't respond after I accept?", a: "We're building a review process for unresponsive homeowners. For now, we monitor request quality manually and flag patterns. Contact us if you accept a request and don't hear back within 48 hours." },
 ]
 

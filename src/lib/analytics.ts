@@ -569,3 +569,183 @@ export function trackEmailCapture(params: {
     source: params.source,
   })
 }
+
+// =====================================================================
+// V7 events — Smart Cart + Worth-It Plan + Upgrade
+// =====================================================================
+//
+// 17 events covering the V7 paid-product funnel. Naming convention
+// matches existing GA4 events on this site: <noun>_<verb> with
+// snake_case parameters.
+
+// ---- Smart Cart -----------------------------------------------------
+
+export function trackSmartCartCtaViewed(params: {
+  placement: 'homepage' | 'property_page' | 'guide' | 'standalone'
+  topic?: string
+}): void {
+  send('smart_cart_cta_viewed', {
+    placement: params.placement,
+    topic: params.topic || '(none)',
+  })
+}
+
+export function trackSmartCartCtaClicked(params: {
+  placement: string
+  topic?: string
+}): void {
+  send('smart_cart_cta_clicked', {
+    placement: params.placement,
+    topic: params.topic || '(none)',
+  })
+}
+
+export function trackSmartCartCurationStep1Completed(params: {
+  topic: string
+  scopeVariantId: string
+  scenario: string
+}): void {
+  send('smart_cart_curation_step1_completed', {
+    topic: params.topic,
+    scope_variant_id: params.scopeVariantId,
+    scenario: params.scenario,
+  })
+}
+
+export function trackSmartCartPurchased(params: {
+  cartId: string
+  topic: string
+  scopeVariantId: string
+}): void {
+  send('smart_cart_purchased', {
+    cart_id: params.cartId,
+    topic: params.topic,
+    scope_variant_id: params.scopeVariantId,
+  })
+}
+
+export function trackSmartCartResultViewed(params: { cartId: string }): void {
+  send('smart_cart_result_viewed', { cart_id: params.cartId })
+}
+
+export function trackSmartCartAffiliateClicked(params: {
+  cartId: string
+  itemId: string
+}): void {
+  send('smart_cart_affiliate_clicked', {
+    cart_id: params.cartId,
+    item_id: params.itemId,
+  })
+}
+
+export function trackSmartCartUpgradeClicked(params: { cartId: string }): void {
+  send('smart_cart_upgrade_clicked', { cart_id: params.cartId })
+}
+
+// ---- Worth-It Plan --------------------------------------------------
+
+export function trackWorthItCtaViewed(params: {
+  placement: 'homepage' | 'property_page' | 'guide' | 'standalone'
+  topic?: string
+}): void {
+  send('worth_it_cta_viewed', {
+    placement: params.placement,
+    topic: params.topic || '(none)',
+  })
+}
+
+export function trackWorthItCtaClicked(params: {
+  placement: string
+  topic?: string
+}): void {
+  send('worth_it_cta_clicked', {
+    placement: params.placement,
+    topic: params.topic || '(none)',
+  })
+}
+
+export function trackWorthItPurchased(params: {
+  planCode: string
+  topic: string
+  scopeVariantId: string
+  townTier?: string
+}): void {
+  send('worth_it_purchased', {
+    plan_code: params.planCode,
+    topic: params.topic,
+    scope_variant_id: params.scopeVariantId,
+    town_tier: params.townTier || '(none)',
+  })
+}
+
+export function trackWorthItDashboardViewed(params: { planCode: string }): void {
+  send('worth_it_dashboard_viewed', { plan_code: params.planCode })
+}
+
+export function trackWorthItPathSwitched(params: {
+  planCode: string
+  fromPath: string
+  toPath: string
+}): void {
+  send('worth_it_path_switched', {
+    plan_code: params.planCode,
+    from_path: params.fromPath,
+    to_path: params.toPath,
+  })
+}
+
+export function trackMoveAddedToPlan(params: {
+  planCode: string
+  moveId: string
+}): void {
+  send('move_added_to_plan', {
+    plan_code: params.planCode,
+    move_id: params.moveId,
+  })
+}
+
+export function trackReminderSelected(params: {
+  planCode: string
+  reminderType: 'friday' | 'saturday_morning' | 'sunday_followup'
+  enabled: boolean
+}): void {
+  send('reminder_selected', {
+    plan_code: params.planCode,
+    reminder_type: params.reminderType,
+    enabled: params.enabled,
+  })
+}
+
+export function trackPunchListClicked(params: { planCode: string }): void {
+  send('punch_list_clicked', { plan_code: params.planCode })
+}
+
+export function trackProjectGrewClicked(params: { planCode: string }): void {
+  send('project_grew_clicked', { plan_code: params.planCode })
+}
+
+export function trackSharePlanClicked(params: {
+  planCode: string
+  channel: 'link_copy' | 'email' | 'sms' | 'other'
+}): void {
+  send('share_plan_clicked', {
+    plan_code: params.planCode,
+    channel: params.channel,
+  })
+}
+
+// ---- Upgrade --------------------------------------------------------
+
+export function trackUpgradeOfferEmailSent(params: { cartId: string }): void {
+  send('upgrade_offer_email_sent', { cart_id: params.cartId })
+}
+
+export function trackUpgradeCompleted(params: {
+  planCode: string
+  fromCartId: string
+}): void {
+  send('upgrade_completed', {
+    plan_code: params.planCode,
+    from_cart_id: params.fromCartId,
+  })
+}

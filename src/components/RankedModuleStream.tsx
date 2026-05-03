@@ -9,6 +9,7 @@ import {
   OwnerSummaryFooterCta,
   ResearcherFooterCta,
 } from './InlineCta'
+import Disclosure from './Disclosure'
 
 // The page renders a stream of property modules ranked by the visitor's
 // signal vector. signals are owned by PropertyInteractive above — this
@@ -16,17 +17,6 @@ import {
 // whenever signals change. The MODULES catalog is imported here (not
 // passed as a prop) because each module carries a render function that
 // cannot cross the server → client boundary serialization.
-
-const C = {
-  bg: '#FAF7F2',
-  ink: '#1C2B1A',
-  inkSoft: 'rgba(28,43,26,0.65)',
-  inkFaint: 'rgba(28,43,26,0.45)',
-  cardLine: 'rgba(28,43,26,0.1)',
-  accent: '#C8732A',
-}
-const FB = "'DM Sans', system-ui, sans-serif"
-const FM = 'monospace'
 
 type Props = {
   profile: PropertyProfile
@@ -70,41 +60,16 @@ export default function RankedModuleStream({ profile, signals }: Props) {
       {isResearcher && <ResearcherFooterCta />}
 
       {rest.length > 0 && (
-        <details
-          data-disclosure-id="show_everything_else"
-          style={{
-            marginTop: 8,
-            border: `1px solid ${C.cardLine}`,
-            borderRadius: 6,
-            padding: '12px 16px',
-            background: '#fff',
-          }}
+        <Disclosure
+          label={`Show everything else (${rest.length})`}
+          hint="Lower-ranked for your current path. Still here if you want it."
         >
-          <summary
-            style={{
-              cursor: 'pointer',
-              listStyle: 'none',
-              fontFamily: FM,
-              fontSize: 11,
-              letterSpacing: '0.1em',
-              textTransform: 'uppercase',
-              color: C.accent,
-              fontWeight: 600,
-            }}
-          >
-            Show everything else ({rest.length})
-          </summary>
-          <p style={{ fontSize: 12, fontFamily: FB, color: C.inkSoft, margin: '8px 0 12px' }}>
-            Lower-ranked for your current path. Still here if you want it.
-          </p>
-          <div style={{ display: 'grid', gap: 16 }}>
-            {rest.map(m => (
-              <div key={m.moduleId} data-module-id={m.moduleId}>
-                {m.render(profile, signals)}
-              </div>
-            ))}
-          </div>
-        </details>
+          {rest.map(m => (
+            <div key={m.moduleId} data-module-id={m.moduleId}>
+              {m.render(profile, signals)}
+            </div>
+          ))}
+        </Disclosure>
       )}
     </div>
   )

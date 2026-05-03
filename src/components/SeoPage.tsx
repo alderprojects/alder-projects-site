@@ -35,6 +35,21 @@ function deriveTown(h1: string): string {
   return ''
 }
 
+// Derive the service label from h1 by stripping the trailing
+// "Contractors in {town}, VT" / "in {town}, VT" / "{town}" suffix.
+// e.g. "Kitchen Remodeling Contractors in Burlington, VT" → "Kitchen Remodeling".
+function deriveService(h1: string): string {
+  let s = h1
+    .replace(/,\s*VT\s*$/i, '')
+    .replace(/\s+in\s+[A-Za-z.\s]+$/i, '')
+    .replace(/\s+(?:Contractors?|Companies)\s*$/i, '')
+    .trim()
+  // For statewide / county pages the town is the suffix (e.g.
+  // "Roofing Contractors in Vermont"). Strip Vermont as a fallback.
+  s = s.replace(/\s+(?:Vermont|VT)\s*$/i, '').trim()
+  return s
+}
+
 function buildSubmitUrl(h1: string, source = 'service-page'): string {
   const sp = new URLSearchParams()
   sp.set('source', source)
@@ -59,10 +74,48 @@ export type SeoPageContent = {
 }
 
 export default function SeoPage({ content }: { content: SeoPageContent }) {
+  const town = deriveTown(content.h1)
+  const service = deriveService(content.h1)
+
   return (
     <main style={{ backgroundColor: '#FAF7F2', minHeight: '100vh' }}>
 
       <Nav />
+
+      {/* V5 breadcrumb — Alder Projects → Towns → {town} → {service}. */}
+      {(town || service) && (
+        <nav
+          aria-label="Breadcrumb"
+          style={{
+            maxWidth: 720,
+            margin: '0 auto',
+            padding: '20px 24px 0',
+            fontSize: 12,
+            fontFamily: 'monospace',
+            color: 'rgba(28,43,26,0.45)',
+            letterSpacing: '0.04em',
+          }}
+        >
+          <Link href="/" style={{ color: 'rgba(28,43,26,0.45)', textDecoration: 'none' }}>
+            Alder Projects
+          </Link>{' → '}
+          <Link href="/towns" style={{ color: 'rgba(28,43,26,0.45)', textDecoration: 'none' }}>
+            Towns
+          </Link>
+          {town && (
+            <>
+              {' → '}
+              <span style={{ color: 'rgba(28,43,26,0.7)' }}>{town}</span>
+            </>
+          )}
+          {service && (
+            <>
+              {' → '}
+              <span style={{ color: 'rgba(28,43,26,0.7)' }}>{service}</span>
+            </>
+          )}
+        </nav>
+      )}
 
       {/* Hero — with optional photo */}
       <div style={{ backgroundColor: '#1C2B1A', position: 'relative', overflow: 'hidden', borderBottom: '1px solid rgba(122,155,111,0.15)' }}>
@@ -148,6 +201,43 @@ export default function SeoPage({ content }: { content: SeoPageContent }) {
             </div>
           </div>
         )}
+
+        {/* V5 funnel block — pushes from the statewide service view back
+            to the address-specific property tool. */}
+        <div
+          style={{
+            marginTop: '36px',
+            padding: '24px',
+            background: '#fff',
+            border: '1px solid rgba(28,43,26,0.1)',
+            borderRadius: '4px',
+          }}
+        >
+          <p
+            style={{
+              fontSize: '14px',
+              color: 'rgba(28,43,26,0.7)',
+              lineHeight: 1.6,
+              margin: '0 0 12px',
+              fontFamily: "'DM Sans', system-ui, sans-serif",
+            }}
+          >
+            This is the statewide view. For permits, regulators, and the rebate stack specific to your address:
+          </p>
+          <Link
+            href="/"
+            style={{
+              display: 'inline-block',
+              fontSize: '14px',
+              fontWeight: 600,
+              color: '#C8732A',
+              textDecoration: 'none',
+              fontFamily: "'DM Sans', system-ui, sans-serif",
+            }}
+          >
+            {town ? `Enter your ${town} address →` : 'Enter your Vermont address →'}
+          </Link>
+        </div>
       </div>
 
       <div style={{ backgroundColor: '#1C2B1A', padding: '24px', textAlign: 'center', marginTop: '40px' }}>

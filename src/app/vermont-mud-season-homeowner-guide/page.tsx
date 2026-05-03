@@ -145,6 +145,34 @@ export default function MudSeasonPage() {
           We answer Vermont homeowner questions for free — costs, rebates, contractor vetting, the actual order to do things in. <a href="/chat" style={{ color: '#7A9B6F', fontWeight: 600 }}>Ask the chat assistant →</a>
         </p>
 
+        {/* V5 funnel CTA — pushes article readers back to the
+            address-specific property tool. */}
+        <div
+          style={{
+            marginTop: 40,
+            padding: 24,
+            background: '#fff',
+            border: '1px solid rgba(28,43,26,0.1)',
+            borderRadius: 4,
+          }}
+        >
+          <p style={{ fontSize: 15, color: 'rgba(28,43,26,0.7)', lineHeight: 1.55, margin: '0 0 12px' }}>
+            Mud season is one piece. For the full Vermont property picture by your address:
+          </p>
+          <a
+            href="/"
+            style={{
+              display: 'inline-block',
+              fontSize: 14,
+              fontWeight: 600,
+              color: '#C8732A',
+              textDecoration: 'none',
+            }}
+          >
+            Enter your address →
+          </a>
+        </div>
+
       </main>
       <Footer />
     </>

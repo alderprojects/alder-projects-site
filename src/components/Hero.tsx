@@ -1,15 +1,26 @@
 'use client'
 
 import { useState, useRef, useCallback, useEffect } from 'react'
+import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import { CONFIG } from '@/lib/recommender-config'
+import { inferSeason } from '@/lib/season-helpers'
+import {
+  trackHomepageHeroView,
+  trackSampleDemoClick,
+} from '@/lib/analytics'
 
-// Address-first hero. Submitting routes to /property/[slug] with the
-// canonical address carried through as a query param so the SSR'd page
-// works whether the user typed it here, shared the URL, or returned to
-// it later.
+// V5 homepage hero. Address-first — submitting routes to /property/[slug]
+// with the canonical address carried through as a query param so the SSR
+// page works whether the user typed it here, shared the URL, or returned
+// later. Cold visitors who do not have an address yet get a pre-built
+// sample demo link below the form.
 //
 // Autocomplete uses the open VT E911 composite geocoder (VCGI). No key
-// required; we just debounce typing and show the top suggestions.
+// required; debounce typing and show the top suggestions.
+//
+// Fires homepage_hero_view once on mount (top-of-funnel) and
+// sample_demo_click on the sample-property link.
 
 const SUGGEST = 'https://maps.vcgi.vermont.gov/arcgis/rest/services/EGC_services/GCS_E911_COMPOSITE_SP_v2/GeocodeServer/suggest'
 
@@ -44,6 +55,14 @@ export default function Hero() {
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
   const ddRef = useRef<HTMLDivElement>(null)
+
+  // homepage_hero_view fires once per session — top of the homepage funnel.
+  useEffect(() => {
+    const season = inferSeason(new Date())
+    const device =
+      typeof window !== 'undefined' && window.innerWidth < 600 ? 'mobile' : 'desktop'
+    trackHomepageHeroView({ season, device })
+  }, [])
 
   useEffect(() => {
     const onClick = (e: MouseEvent) => {
@@ -118,6 +137,16 @@ export default function Hero() {
     } else if (e.key === 'Escape') {
       setOpen(false)
     }
+  }
+
+  function onSampleClick() {
+    const device =
+      typeof window !== 'undefined' && window.innerWidth < 600 ? 'mobile' : 'desktop'
+    trackSampleDemoClick({
+      fromSection: 'hero',
+      intentDestination: 'owner',
+      device,
+    })
   }
 
   return (
@@ -221,9 +250,7 @@ export default function Hero() {
             marginBottom: 18,
           }}
         >
-          Type your Vermont address.
-          <br />
-          <em style={{ color: '#C8732A', fontStyle: 'normal' }}>We will tell you what to do.</em>
+          Vermont properties have <em style={{ color: '#C8732A', fontStyle: 'normal' }}>stories.</em>
         </h1>
 
         <p
@@ -232,12 +259,12 @@ export default function Hero() {
             fontWeight: 300,
             lineHeight: 1.6,
             color: 'rgba(245,239,224,0.7)',
-            maxWidth: 560,
+            maxWidth: 600,
             marginBottom: 32,
           }}
         >
-          One profile per property. What it costs, what is on the table for rebates, what the maps say,
-          when to do what, who to hire. Vermont numbers, not national averages.
+          Permits, rebates, lake setbacks, mud-season timing, contractor history. We pull all of it
+          together, by address, in one page.
         </p>
 
         <form
@@ -343,41 +370,28 @@ export default function Hero() {
           )}
         </form>
 
-        <div style={{ display: 'flex', gap: 14, marginTop: 18, flexWrap: 'wrap', alignItems: 'center' }}>
-          <span
+        <p
+          style={{
+            fontSize: 13,
+            fontFamily: "'DM Sans', system-ui, sans-serif",
+            color: 'rgba(245,239,224,0.6)',
+            marginTop: 22,
+            maxWidth: 560,
+          }}
+        >
+          Don&apos;t have a Vermont address yet?{' '}
+          <Link
+            href={CONFIG.homepage.intentDemoLinks.owner}
+            onClick={onSampleClick}
             style={{
-              fontSize: 11,
-              fontFamily: 'monospace',
-              color: 'rgba(245,239,224,0.4)',
-              letterSpacing: '0.06em',
+              color: '#C8732A',
+              textDecoration: 'none',
+              fontWeight: 500,
             }}
           >
-            Or try:
-          </span>
-          {['Burlington', 'Stowe', 'Middlebury', 'Greensboro'].map(t => (
-            <button
-              key={t}
-              onClick={() => {
-                setAddr(`Main Street, ${t}`)
-                go(`Main Street, ${t}, VT`)
-              }}
-              style={{
-                border: 'none',
-                background: 'transparent',
-                fontSize: 12,
-                color: 'rgba(245,239,224,0.6)',
-                cursor: 'pointer',
-                padding: 0,
-                fontFamily: "'DM Sans', system-ui, sans-serif",
-                textDecoration: 'underline',
-                textDecorationColor: 'rgba(245,239,224,0.2)',
-                textUnderlineOffset: 4,
-              }}
-            >
-              {t}
-            </button>
-          ))}
-        </div>
+            {CONFIG.homepage.sampleProperty.label}
+          </Link>
+        </p>
 
         <p
           style={{

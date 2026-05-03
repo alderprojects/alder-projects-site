@@ -1,30 +1,190 @@
+import Link from 'next/link'
+import { CONFIG } from '@/lib/recommender-config'
+
+// V5 footer. Replaces V4's marketplace-era copy ("renovation matching
+// service", "popular searches", "how we make money") with property-tool
+// framing. Top town links pull from CONFIG.homepage.townGrid.towns so
+// the homepage town grid and the footer stay in sync.
+
+const C = {
+  ink: '#1C2B1A',
+  inkSoft: 'rgba(245,239,224,0.5)',
+  inkFaint: 'rgba(245,239,224,0.3)',
+  bg: '#0F1A0E',
+  border: 'rgba(122,155,111,0.1)',
+  cream: '#F5EFE0',
+  greenAccent: '#7A9B6F',
+  accent: '#C8732A',
+}
+const FB = "'DM Sans', system-ui, sans-serif"
+const FM = 'monospace'
+const FS = "'Playfair Display', Georgia, serif"
+
+const linkStyle = {
+  color: C.inkSoft,
+  fontSize: 13,
+  fontFamily: FB,
+  textDecoration: 'none',
+  display: 'block',
+  padding: '4px 0',
+}
+
 export default function Footer() {
+  const topTowns = CONFIG.homepage.townGrid.towns
+
   return (
-    <footer className="bg-[#0F1A0E] py-16 border-t border-[#7A9B6F]/10">
-      <div className="max-w-6xl mx-auto px-6">
-        <div className="flex items-center gap-2 mb-4">
-          <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
-            <path d="M16 2L4 28H10L13 21H19L22 28H28L16 2Z" fill="#7A9B6F"/>
-            <path d="M14.5 16L16 12L17.5 16H14.5Z" fill="#C8732A"/>
-          </svg>
-          <span className="font-display text-lg font-semibold text-[#F5EFE0]">Alder Projects</span>
-        </div>
-        <p className="text-[#F5EFE0]/35 text-sm max-w-xs mb-3">Vermont&apos;s renovation matching service. Connecting homeowners with local contractors across all 14 counties.</p>
-        <p className="text-[#7A9B6F] text-xs font-mono mb-10">hello@alderprojects.com</p>
-        <div className="mb-10">
-          <p className="text-[#F5EFE0]/25 text-xs font-mono uppercase tracking-widest mb-4">Popular Searches</p>
-          <div className="flex flex-wrap gap-x-5 gap-y-2">
-            {[['Kitchen remodeling Vermont','/kitchen-remodeling-vermont'],['Bathroom remodeling Vermont','/bathroom-remodeling-vermont'],['Deck builders Vermont','/deck-builders-vermont'],['Home additions Vermont','/home-additions-vermont'],['Basement finishing Vermont','/basement-finishing-vermont'],['Roofing contractors Vermont','/roofing-contractors-vermont'],['Window replacement Vermont','/window-replacement-vermont'],['Painting contractors Vermont','/painting-contractors-vermont'],['Kitchen remodeling Burlington','/kitchen-remodeling-burlington-vt'],['Roofing Burlington','/roofing-burlington-vt'],['Basement finishing Burlington','/basement-finishing-burlington-vt'],['Kitchen remodeling Stowe','/kitchen-remodeling-stowe-vt'],['Roofing Stowe','/roofing-stowe-vt'],['Kitchen remodeling Middlebury','/kitchen-remodeling-middlebury-vt'],['Contractors Chittenden County','/chittenden-county-vt'],['Contractors Addison County','/addison-county-vt'],['Contractors Lamoille County','/lamoille-county-vt']].map(([label,href]) => (
-              <a key={href} href={href} className="text-[#F5EFE0]/30 text-xs font-mono hover:text-[#7A9B6F] transition-colors">{label}</a>
-            ))}
+    <footer
+      style={{
+        background: C.bg,
+        padding: 'clamp(56px,8vw,80px) 24px',
+        borderTop: `1px solid ${C.border}`,
+      }}
+    >
+      <div style={{ maxWidth: 1080, margin: '0 auto' }}>
+        <div
+          className="footer-grid"
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+            gap: 32,
+            marginBottom: 32,
+          }}
+        >
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+              <svg width="24" height="24" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+                <path d="M16 2L4 28H10L13 21H19L22 28H28L16 2Z" fill={C.greenAccent} />
+                <path d="M14.5 16L16 12L17.5 16H14.5Z" fill={C.accent} />
+              </svg>
+              <span
+                style={{
+                  fontFamily: FS,
+                  fontSize: 18,
+                  fontWeight: 600,
+                  color: C.cream,
+                }}
+              >
+                Alder Projects
+              </span>
+            </div>
+            <p
+              style={{
+                fontSize: 13,
+                fontFamily: FB,
+                color: C.inkSoft,
+                lineHeight: 1.55,
+                margin: '0 0 10px',
+                maxWidth: 240,
+              }}
+            >
+              Vermont property tool. Address in, full picture out.
+            </p>
+            <a
+              href="mailto:hello@alderprojects.com"
+              style={{
+                fontSize: 12,
+                fontFamily: FM,
+                color: C.greenAccent,
+                textDecoration: 'none',
+              }}
+            >
+              hello@alderprojects.com
+            </a>
+          </div>
+
+          <div>
+            <p
+              style={{
+                fontSize: 11,
+                fontFamily: FM,
+                letterSpacing: '0.1em',
+                textTransform: 'uppercase',
+                color: C.inkFaint,
+                margin: '0 0 12px',
+              }}
+            >
+              Towns
+            </p>
+            <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+              {topTowns.map(t => (
+                <li key={t.pageSlug}>
+                  <Link href={`/${t.pageSlug}`} style={linkStyle}>
+                    {t.town}
+                  </Link>
+                </li>
+              ))}
+              <li>
+                <Link
+                  href={CONFIG.homepage.crossLinks.townsIndex}
+                  style={{ ...linkStyle, color: C.accent, fontWeight: 500 }}
+                >
+                  All 45 Vermont towns →
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          <div>
+            <p
+              style={{
+                fontSize: 11,
+                fontFamily: FM,
+                letterSpacing: '0.1em',
+                textTransform: 'uppercase',
+                color: C.inkFaint,
+                margin: '0 0 12px',
+              }}
+            >
+              Guides
+            </p>
+            <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+              <li>
+                <Link
+                  href={CONFIG.homepage.crossLinks.mudSeasonArticle}
+                  style={linkStyle}
+                >
+                  Mud season guide
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          <div>
+            <p
+              style={{
+                fontSize: 11,
+                fontFamily: FM,
+                letterSpacing: '0.1em',
+                textTransform: 'uppercase',
+                color: C.inkFaint,
+                margin: '0 0 12px',
+              }}
+            >
+              About
+            </p>
+            <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+              <li>
+                <Link href={CONFIG.homepage.crossLinks.disclosure} style={linkStyle}>
+                  How we keep this free (affiliate disclosure)
+                </Link>
+              </li>
+            </ul>
           </div>
         </div>
-        <div className="border-t border-[#7A9B6F]/10 pt-8">
-          <p className="text-[#F5EFE0]/25 text-xs font-mono">&copy; {new Date().getFullYear()} Alder Projects LLC &middot; Vermont, USA</p>
+
+        <div style={{ borderTop: `1px solid ${C.border}`, paddingTop: 20 }}>
+          <p
+            style={{
+              fontSize: 12,
+              fontFamily: FM,
+              color: C.inkFaint,
+              margin: 0,
+              letterSpacing: '0.02em',
+            }}
+          >
+            © {new Date().getFullYear()} Alder Projects LLC · Vermont, USA
+          </p>
         </div>
-      <div style={{ marginTop: 32, paddingTop: 16, borderTop: '1px solid rgba(245, 239, 224, 0.1)', textAlign: 'center' }}>
-        <a href="/disclosure" className="text-[#F5EFE0]/30 text-xs font-mono hover:text-[#7A9B6F] transition-colors">How we make money</a>
-      </div>
       </div>
     </footer>
   )

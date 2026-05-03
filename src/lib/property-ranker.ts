@@ -267,14 +267,15 @@ export function shouldRenderInline(module: PropertyModule, signals: VisitorSigna
     return false
   }
   // Owner with a topic: cost and sequence modules only render when they
-  // actually match that topic. The score floor alone leaves all 14 cost
-  // modules above water for an engaged owner because intent + mode +
-  // scope contributions dominate. The page becomes a wall of unrelated
-  // cost cards. Topic-matching keeps the main flow tight to what the
-  // visitor asked about; the rest sit in the disclosure.
+  // are PRIMARY for that topic. The catalog encodes primary topic match
+  // as weight 10; secondary as 7. V3 used "any non-zero match" which
+  // let the roof_then_solar sequence (secondary heat_pump match) and
+  // adjacent cost modules leak into a heat-pump owner's main flow. V4
+  // tightens this to "primary only" — secondaries surface inside the
+  // disclosure as they should.
   if (intent === 'owner' && signals.topic && (ctype === 'cost' || ctype === 'sequence')) {
     const w = module.relevanceFactors.topicMatch[signals.topic] ?? 0
-    if (w === 0) return false
+    if (w < 10) return false
   }
 
   return scoreModule(module, signals) >= RENDER_SCORE_FLOOR

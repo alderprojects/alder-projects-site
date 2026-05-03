@@ -10,7 +10,7 @@
 import type { RecommenderConfig } from './recommender-config.types'
 
 export const CONFIG: RecommenderConfig = {
-  version: '2026.05.02-v5',
+  version: '2026.05.04-v6',
 
   // ---------- Topic affinity matrix ------------------------------------
   // affinity[from][to] = strength of "if visitor is on `from`, recommend
@@ -580,6 +580,26 @@ export const CONFIG: RecommenderConfig = {
         mud: {
           title: 'Vermont mud season homeowner guide',
           url: '/vermont-mud-season-homeowner-guide',
+        },
+        spring_blackfly: {
+          title: 'Vermont spring blackfly season survival',
+          url: '/vermont-spring-blackfly',
+        },
+        lake: {
+          title: 'Vermont lake season homeowner guide',
+          url: '/vermont-lake-season',
+        },
+        fall_leaf: {
+          title: 'Vermont weatherization season guide',
+          url: '/vermont-fall-leaf-weatherization',
+        },
+        pre_winter: {
+          title: 'Vermont pre-winter prep guide',
+          url: '/vermont-pre-winter-prep',
+        },
+        deep_winter: {
+          title: 'Vermont deep winter homeowner guide',
+          url: '/vermont-deep-winter',
         },
       },
     },

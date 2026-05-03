@@ -1,6 +1,35 @@
 // Lightweight wrappers for sending custom GA4 events.
 // All event helpers are no-ops when GA isn't loaded (SSR, blocked, dev).
 
+// GA4 SETUP — required after deploying these events
+//
+// 1. CUSTOM DIMENSIONS (Admin → Custom definitions → Create):
+//    - intent, topic, town, townTier, device, season, kitId
+//      (event-scoped)
+//    - revenueScore, recommendationScore (event-scoped, number)
+//    - configVersion (event-scoped) — tracks which CONFIG produced
+//      a given event, lets us A/B compare config versions
+//
+// 2. KEY EVENTS (Admin → Events → mark as key event):
+//    - recommendation_click
+//    - accessory_item_click
+//    - cta_get_bids_click
+//    - email_capture_submit
+//    - recommendation_conversion
+//
+// 3. EXPLORATIONS (Reports → Explore → create):
+//    A. Recommendation funnel: picker_topic_select →
+//       recommendation_strip_view → recommendation_click →
+//       recommendation_conversion
+//    B. Accessory revenue funnel: accessory_kit_view →
+//       accessory_item_click; group by kitId; compare device
+//    C. Topic affinity discovery: cohort by initial
+//       picker_topic_select; breakdown by next-clicked topic
+//       in same session. Validates the configured weights.
+//    D. Engagement gate health: % of sessions reaching
+//       engagement_gate_passed; breakdown by device/intent/topic
+//    E. Mobile vs desktop: every key event sliced by device
+
 declare global {
   interface Window {
     gtag?: (...args: unknown[]) => void
@@ -241,4 +270,204 @@ export function initScrollDepthTracking(
     window.removeEventListener('scroll', onScroll)
     if (raf) window.cancelAnimationFrame(raf)
   }
+}
+
+// =====================================================================
+// V4 RECOMMENDER + ACCESSORY EVENTS
+// =====================================================================
+//
+// All events here share a common visitor-context envelope so funnel
+// analysis can slice on (intent × topic × town × device). Pass the
+// envelope from the property page mount via the same hook the rest of
+// the page reads — see PropertyInteractive's analytics wiring.
+
+// Common visitor-context fields surfaced on every V4 event. Optional
+// because some firings (e.g. the engagement gate passing) happen before
+// some signals are populated; (none) is the GA convention for missing.
+type VisitorContext = {
+  intent?: string
+  topic?: string
+  town?: string
+  townTier?: string
+  device?: string
+}
+
+// recommendation_strip_view — fires once per session per strip render
+// when the strip enters the viewport (50% threshold via
+// useElementVisibility).
+export function trackRecommendationStripView(params: VisitorContext & {
+  recommendedTopics: string[]
+  recommendationScores: number[]
+  position: number
+  engagementGateReason: string
+}): void {
+  send('recommendation_strip_view', {
+    intent: params.intent || '(none)',
+    topic: params.topic || '(none)',
+    town: params.town || '(none)',
+    townTier: params.townTier || '(none)',
+    device: params.device || '(none)',
+    recommended_topics: params.recommendedTopics.join(','),
+    recommendation_scores: params.recommendationScores.join(','),
+    position: params.position,
+    engagement_gate_reason: params.engagementGateReason,
+  })
+}
+
+// accessory_kit_view — fires once per session per kit render when the
+// kit enters the viewport. revenueScore lets us prioritize tuning
+// against high-revenue kits in GA explorations.
+export function trackAccessoryKitView(params: VisitorContext & {
+  kitId: string
+  kitTitle: string
+  itemIds: string[]
+  estimatedTicketSize: number
+  revenueScore: number
+  placement: string
+}): void {
+  send('accessory_kit_view', {
+    intent: params.intent || '(none)',
+    topic: params.topic || '(none)',
+    town: params.town || '(none)',
+    townTier: params.townTier || '(none)',
+    device: params.device || '(none)',
+    kit_id: params.kitId,
+    kit_title: params.kitTitle,
+    item_ids: params.itemIds.join(','),
+    estimated_ticket_size: params.estimatedTicketSize,
+    revenue_score: params.revenueScore,
+    placement: params.placement,
+  })
+}
+
+// accessory_item_click — fires when a visitor clicks an item in a kit.
+// itemPositionInKit tracks first-vs-last bias inside a kit. Marked as
+// a key event in GA4.
+export function trackAccessoryItemClick(params: VisitorContext & {
+  kitId: string
+  itemId: string
+  itemDisplay: string
+  itemPositionInKit: number
+  kitRevenueScore: number
+  estimatedItemPrice?: number
+}): void {
+  send('accessory_item_click', {
+    intent: params.intent || '(none)',
+    topic: params.topic || '(none)',
+    town: params.town || '(none)',
+    townTier: params.townTier || '(none)',
+    device: params.device || '(none)',
+    kit_id: params.kitId,
+    item_id: params.itemId,
+    item_display: params.itemDisplay,
+    item_position_in_kit: params.itemPositionInKit,
+    kit_revenue_score: params.kitRevenueScore,
+    estimated_item_price: params.estimatedItemPrice ?? 0,
+  })
+}
+
+// engagement_gate_passed — fires once per session when the gate flips.
+// trigger ∈ scroll | time | chat | cost_tier; timeOnPage is seconds
+// since first paint to gate-passed.
+export function trackEngagementGatePassed(params: VisitorContext & {
+  trigger: string
+  timeOnPage: number
+}): void {
+  send('engagement_gate_passed', {
+    intent: params.intent || '(none)',
+    topic: params.topic || '(none)',
+    town: params.town || '(none)',
+    townTier: params.townTier || '(none)',
+    device: params.device || '(none)',
+    trigger: params.trigger,
+    time_on_page: params.timeOnPage,
+  })
+}
+
+// recommendation_click — fires when a recommendation card is clicked.
+// (fromTopic, toTopic) is the affinity edge that the click validates.
+// Key event for the recommendation funnel.
+export function trackRecommendationClick(params: VisitorContext & {
+  fromTopic: string
+  toTopic: string
+  recommendationScore: number
+  positionInStrip: number
+}): void {
+  send('recommendation_click', {
+    intent: params.intent || '(none)',
+    topic: params.topic || '(none)',
+    town: params.town || '(none)',
+    townTier: params.townTier || '(none)',
+    device: params.device || '(none)',
+    from_topic: params.fromTopic,
+    to_topic: params.toTopic,
+    recommendation_score: params.recommendationScore,
+    position_in_strip: params.positionInStrip,
+  })
+}
+
+// recommendation_conversion — fires when a downstream conversion event
+// (affiliate click, contractor lead, email capture, chat message) lands
+// within 5 minutes of a recommendation_click. Stored attribution lives
+// in sessionStorage 'alder.lastRecClick' (set in trackRecommendationClick).
+export function trackRecommendationConversion(params: VisitorContext & {
+  recommendedTopic: string
+  conversionType: string
+  secondsSinceRecClick: number
+}): void {
+  send('recommendation_conversion', {
+    intent: params.intent || '(none)',
+    topic: params.topic || '(none)',
+    town: params.town || '(none)',
+    townTier: params.townTier || '(none)',
+    device: params.device || '(none)',
+    recommended_topic: params.recommendedTopic,
+    conversion_type: params.conversionType,
+    seconds_since_rec_click: params.secondsSinceRecClick,
+  })
+}
+
+// seasonal_context — fires once per page mount. Snapshot of the
+// seasonal/property characteristics that drove ranking, so GA can
+// segment retro by season + property type.
+export function trackSeasonalContext(params: VisitorContext & {
+  season: string
+  isLakeProperty: boolean
+  isFloodProperty: boolean
+}): void {
+  send('seasonal_context', {
+    intent: params.intent || '(none)',
+    topic: params.topic || '(none)',
+    town: params.town || '(none)',
+    townTier: params.townTier || '(none)',
+    device: params.device || '(none)',
+    season: params.season,
+    is_lake_property: params.isLakeProperty,
+    is_flood_property: params.isFloodProperty,
+  })
+}
+
+// render_decision — fires once per page mount. Snapshots which modules
+// rendered inline vs which sit in the disclosure, plus the score range,
+// plus the CONFIG version that produced the render. Lets us A/B-test
+// CONFIG changes by comparing render distributions across versions.
+export function trackRenderDecision(params: VisitorContext & {
+  inlineModuleIds: string[]
+  hiddenModuleCount: number
+  topModuleScore: number
+  bottomModuleScore: number
+  configVersion: string
+}): void {
+  send('render_decision', {
+    intent: params.intent || '(none)',
+    topic: params.topic || '(none)',
+    town: params.town || '(none)',
+    townTier: params.townTier || '(none)',
+    device: params.device || '(none)',
+    inline_module_ids: params.inlineModuleIds.join(','),
+    hidden_module_count: params.hiddenModuleCount,
+    top_module_score: params.topModuleScore,
+    bottom_module_score: params.bottomModuleScore,
+    config_version: params.configVersion,
+  })
 }

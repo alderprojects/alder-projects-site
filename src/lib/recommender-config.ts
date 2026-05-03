@@ -10,7 +10,7 @@
 import type { RecommenderConfig } from './recommender-config.types'
 
 export const CONFIG: RecommenderConfig = {
-  version: '2026.05.04-v6',
+  version: '2026.05.04-v7',
 
   // ---------- Topic affinity matrix ------------------------------------
   // affinity[from][to] = strength of "if visitor is on `from`, recommend
@@ -624,6 +624,294 @@ export const CONFIG: RecommenderConfig = {
       mudSeasonArticle: '/vermont-mud-season-homeowner-guide',
       townsIndex:       '/towns',
       disclosure:       '/disclosure',
+    },
+  },
+
+  // ---------- V7: Brief scenarios -------------------------------------
+  // Five orthogonal shopping-context lenses applied as a final synthesis
+  // pass over engine-selected items. Authored prose lives in
+  // src/content/scenarios.ts.
+  scenarios: [
+    {
+      id: 'just_starting',
+      label: 'Just starting',
+      description: "First time on this project. Want a clean baseline cart, mid-tier picks, no premium upsells.",
+      emphasizes: ['basic_tool_kit', 'measure_first', 'starter_quantities'],
+      deemphasizes: ['premium_brand', 'specialty_kit', 'bulk_pack'],
+      impliedCostMultiplier: 1.0,
+      primaryKitId: 'basic_tool_kit',
+    },
+    {
+      id: 'already_have_basics',
+      label: 'Already have the basics',
+      description: 'Tools and consumables already in the basement. Surface only the items that fill gaps and the secondary moves.',
+      emphasizes: ['secondary_picks', 'specialty_only', 'consumable_top_up'],
+      deemphasizes: ['basic_tool_kit', 'starter_quantities'],
+      impliedCostMultiplier: 0.6,
+    },
+    {
+      id: 'tight_budget',
+      label: 'Tight budget',
+      description: 'Lower-tier swap-ins where the tradeoff is honest. Skip every premium pick the engine surfaces.',
+      emphasizes: ['tier_tight', 'reusable_tools', 'borrow_first'],
+      deemphasizes: ['tier_premium', 'specialty_kit'],
+      impliedCostMultiplier: 0.7,
+    },
+    {
+      id: 'premium',
+      label: 'Premium',
+      description: "Longer-life picks where the upgrade is worth it. We'll still call out where premium is wasted.",
+      emphasizes: ['tier_premium', 'long_life', 'pro_grade'],
+      deemphasizes: ['tier_tight'],
+      impliedCostMultiplier: 1.4,
+    },
+    {
+      id: 'lake_property',
+      label: 'Lake property',
+      description: 'Weatherproof, lake-rated, and cold-stored over winter. Sunbrella, marine-grade, hidden-fastener picks lead.',
+      emphasizes: ['lake_rated', 'sunbrella', 'marine_grade', 'cold_stored'],
+      deemphasizes: ['indoor_only', 'humidity_sensitive'],
+      impliedCostMultiplier: 1.2,
+    },
+  ],
+
+  // ---------- V7: Products (Smart Cart + Worth-It Plan + Upgrade) -----
+  // All copy, prices, and tunables for the V7 paid products. Edit one
+  // file, change everything that ships to the customer.
+  products: {
+    smartCart: {
+      enabled: true,
+      priceUsd: 19,
+      productName: 'Smart Cart',
+      refundWindowHours: 24,
+      ttlDays: 30,
+      headline: 'Buy this + this. Skip that.',
+      subhead:
+        'Alder builds the lean cart for your project so you avoid redundant products, tempting kits, and expensive mistakes.',
+      bullets: [
+        'Get the right materials and quantities',
+        'Skip tempting, low-value products',
+        'Avoid overbuying and extra trips',
+        'Designed to save more than $19 before checkout',
+      ],
+      trustRow: ['Trusted recommendations', 'Save time & money', 'No account required'],
+      ctaCopy: 'Build My Smart Cart',
+      upgradeCardCopy:
+        'Want the full saved plan with ranked steps and ongoing recommendations? Upgrade for $20.',
+      stripePaymentLinkEnvVar: 'STRIPE_PAYMENT_LINK_SMART_CART',
+      sections: [
+        { id: 'lean_cart',        title: 'Buy These Together (Lean Cart)', enabled: true, order: 1 },
+        { id: 'add_ons',          title: 'Optional Add-Ons (If Needed)',   enabled: true, order: 2 },
+        { id: 'skip_list',        title: 'Skip For Now',                   enabled: true, order: 3 },
+        { id: 'savings_snapshot', title: 'Your Savings Snapshot',          enabled: true, order: 4 },
+      ],
+    },
+    worthIt: {
+      enabled: true,
+      priceUsd: 39,
+      productName: 'Worth-It Plan',
+      refundWindowDays: 7,
+      headline: 'Know the best move. The move after that.',
+      subhead:
+        "Alder ranks the highest-payoff DIY moves for your home, shows alternate paths if you've already done something, and keeps your plan saved.",
+      bullets: [
+        'Ranked, personalized project roadmap',
+        'If-you-already-did-that paths',
+        'What to do first, next, and why',
+        'What to skip and why',
+        'Shopping list, Saturday plan, and stop line',
+        'Optional reminders and saved progress',
+      ],
+      trustRow: [
+        'One-time unlock',
+        'No subscription required',
+        'No account needed',
+        'Optional reminders included',
+      ],
+      ctaCopy: 'Get My Worth-It Plan',
+      stripePaymentLinkEnvVar: 'STRIPE_PAYMENT_LINK_WORTH_IT',
+      pathTabsByTopic: {
+        kitchen: [
+          { id: 'best_overall',     label: 'Best overall',          order: 1, filterRule: 'pathTags includes best_overall' },
+          { id: 'cosmetic_only',    label: 'Cosmetic refresh only', order: 2, filterRule: 'pathTags includes cosmetic_only' },
+          { id: 'cabinets_counters',label: 'Cabinets + counters',   order: 3, filterRule: 'pathTags includes cabinets_counters' },
+          { id: 'layout_curious',   label: 'Layout-change-curious', order: 4, filterRule: 'pathTags includes layout_curious' },
+          { id: 'skip_list',        label: 'Skip list',             order: 5, filterRule: 'pathTags includes skip_list' },
+        ],
+        weatherization: [
+          { id: 'best_overall',         label: 'Best overall',         order: 1, filterRule: 'pathTags includes best_overall' },
+          { id: 'already_weatherized',  label: 'Already weatherized',  order: 2, filterRule: 'pathTags includes already_weatherized' },
+          { id: 'diy_only',             label: 'DIY-only path',        order: 3, filterRule: 'pathTags includes diy_only' },
+          { id: 'saturday_plan',        label: 'Saturday plan',        order: 4, filterRule: 'pathTags includes saturday_plan' },
+          { id: 'skip_list',            label: 'Skip list',            order: 5, filterRule: 'pathTags includes skip_list' },
+        ],
+        outdoor: [
+          { id: 'best_overall',     label: 'Best overall',      order: 1, filterRule: 'pathTags includes best_overall' },
+          { id: 'cosmetic_refresh', label: 'Cosmetic refresh',  order: 2, filterRule: 'pathTags includes cosmetic_refresh' },
+          { id: 'lake_rated',       label: 'Lake-rated picks',  order: 3, filterRule: 'pathTags includes lake_rated' },
+          { id: 'pre_rebuild',      label: 'Pre-rebuild',       order: 4, filterRule: 'pathTags includes pre_rebuild' },
+          { id: 'skip_list',        label: 'Skip list',         order: 5, filterRule: 'pathTags includes skip_list' },
+        ],
+        heat_pump: [
+          { id: 'best_overall',         label: 'Best overall',          order: 1, filterRule: 'pathTags includes best_overall' },
+          { id: 'already_weatherized',  label: 'Already weatherized',   order: 2, filterRule: 'pathTags includes already_weatherized' },
+          { id: 'before_heat_pump',     label: 'Before heat pump',      order: 3, filterRule: 'pathTags includes before_heat_pump' },
+          { id: 'warmer_this_weekend',  label: 'Warmer this weekend',   order: 4, filterRule: 'pathTags includes warmer_this_weekend' },
+          { id: 'skip_list',            label: 'Skip list',             order: 5, filterRule: 'pathTags includes skip_list' },
+        ],
+        bath: [
+          { id: 'best_overall',         label: 'Best overall',           order: 1, filterRule: 'pathTags includes best_overall' },
+          { id: 'accessibility_basics', label: 'Accessibility basics',   order: 2, filterRule: 'pathTags includes accessibility_basics' },
+          { id: 'cosmetic_refresh',     label: 'Cosmetic refresh',       order: 3, filterRule: 'pathTags includes cosmetic_refresh' },
+          { id: 'plumbing_curious',     label: 'Plumbing-curious',       order: 4, filterRule: 'pathTags includes plumbing_curious' },
+          { id: 'skip_list',            label: 'Skip list',              order: 5, filterRule: 'pathTags includes skip_list' },
+        ],
+      },
+      sections: [
+        { id: 'best_path_card',     title: 'Best Path for You',           enabled: true, order: 1 },
+        { id: 'bundle_small_fixes', title: 'Bundle Small Fixes',          enabled: true, order: 2 },
+        { id: 'project_grew',       title: 'Project Grew?',               enabled: true, order: 3 },
+        { id: 'highest_payoff',     title: 'Highest-Payoff Moves',        enabled: true, order: 4 },
+        { id: 'what_to_buy',        title: 'What to Buy',                 enabled: true, order: 5 },
+        { id: 'this_saturday',      title: 'This Saturday',               enabled: true, order: 6 },
+        { id: 'what_to_skip',       title: 'What to Skip',                enabled: true, order: 7 },
+        { id: 'diy_stop_line',      title: 'DIY Stop Line',               enabled: true, order: 8 },
+        { id: 'plan_paths',         title: 'Plan Paths',                  enabled: true, order: 9 },
+        { id: 'summary_bar',        title: 'Plan Summary',                enabled: true, order: 10 },
+        { id: 'town_contacts',      title: 'Town Contacts',               enabled: true, order: 11, requiresAddress: true },
+        { id: 'regulator_overlay',  title: 'Regulators',                  enabled: true, order: 12, requiresAddress: true },
+      ],
+      pdfTemplateVersion: 'v7-2026-05',
+      deliveryEmailSubject: 'Your Worth-It Plan is ready',
+      sessionPasscodeSource: 'email_last_4',
+      reminderDayOptions: [
+        {
+          id: 'friday',
+          label: 'Friday — pick a project for the weekend',
+          sendTimeHour: 17,
+          bodyTemplate:
+            "Friday afternoon nudge for your Worth-It Plan.\n\nYour top three Saturday-friendly moves are saved at {{planUrl}}. Pick one before you leave the desk and the materials will be at the store on the way home.\n\nReply STOP to turn off Friday nudges.",
+        },
+        {
+          id: 'saturday_morning',
+          label: 'Saturday morning — start checklist',
+          sendTimeHour: 8,
+          bodyTemplate:
+            "Good morning. Your Worth-It Plan checklist is at {{planUrl}}.\n\nThree moves on the list this week. Tap the first one, run it, check it off. We'll be quiet until Sunday.\n\nReply STOP to turn off Saturday nudges.",
+        },
+        {
+          id: 'sunday_followup',
+          label: 'Sunday — follow up on what got done',
+          sendTimeHour: 17,
+          bodyTemplate:
+            "Sunday check-in on your Worth-It Plan.\n\nWhatever got crossed off, the next ranked move is waiting at {{planUrl}}. Whatever didn't, no judgment — Vermont weekends fill up.\n\nReply STOP to turn off Sunday nudges.",
+        },
+      ],
+    },
+    upgrade: {
+      enabled: true,
+      deltaPriceUsd: 20,
+      inlineCtaCopy:
+        'Want the full saved plan with ranked steps and ongoing recommendations? Upgrade for $20.',
+      emailDelayHours: 72,
+      emailSubject: 'Did your Smart Cart miss anything?',
+      emailBodyTemplate:
+        "Three days in — how's your shopping going?\n\nIf you've started buying and a question came up like \"but what should I do FIRST?\" or \"is this still DIY territory?\", that's the gap a Worth-It Plan fills.\n\nSame project context you bought, plus a saved dashboard with ranked moves, Saturday plan, and project-specific stop line for your address. $20 to upgrade — your existing Smart Cart stays good.\n\nUpgrade here: {{upgradeUrl}}",
+      stripePaymentLinkEnvVar: 'STRIPE_PAYMENT_LINK_UPGRADE',
+    },
+  },
+
+  // ---------- V7: Shopping timing -------------------------------------
+  // Per-category buy-now / wait-until rules. The Smart Cart engine
+  // surfaces a timing badge on relevant picks. Months are 1..12.
+  shoppingTiming: {
+    patio_furniture: {
+      bestBuyMonths: [8, 9, 10],
+      worstBuyMonths: [4, 5, 6],
+      reasoning:
+        'Late August through early-October clearance is 30-60% off May pricing. Sunbrella stores well over a Vermont winter.',
+    },
+    smart_thermostat: {
+      bestBuyMonths: [3, 4, 9, 11],
+      worstBuyMonths: [12, 1],
+      reasoning:
+        'Spring shoulder months and Black Friday window are reliably $30-80 below mid-winter pricing. EVT rebate eligibility unchanged across months.',
+    },
+    weatherization_materials: {
+      bestBuyMonths: [6, 7, 8],
+      worstBuyMonths: [10, 11, 12],
+      reasoning:
+        "Caulk, foam, and weatherstripping run 15-30% above summer pricing once Vermont's first cold snap hits in late October. Buy in summer, run the project the weekend before Halloween.",
+    },
+    outdoor_textiles: {
+      bestBuyMonths: [9, 10],
+      worstBuyMonths: [5, 6],
+      reasoning: 'Sunbrella cushions, outdoor rugs, hammocks all clear at 40-60% off in early fall.',
+    },
+    fire_pits: {
+      bestBuyMonths: [9, 10],
+      worstBuyMonths: [5, 6],
+      reasoning: 'Same end-of-outdoor-season clearance pattern as patio furniture.',
+    },
+    kitchen_cabinet_hardware: {
+      bestBuyMonths: [1, 2, 7, 11],
+      worstBuyMonths: [],
+      reasoning:
+        'Pulls, knobs, hinges have wide year-round availability. Best deals coincide with January and July home-improvement promotional windows plus November Black Friday.',
+    },
+    paint: {
+      bestBuyMonths: [1, 2, 3, 7],
+      worstBuyMonths: [],
+      reasoning:
+        'Sherwin-Williams and Benjamin Moore run 30-40% off promotions on the major US holidays — MLK Day, Presidents Day, July 4. Vermont stores honor.',
+    },
+    ev_chargers: {
+      bestBuyMonths: [3, 4, 9, 11],
+      worstBuyMonths: [],
+      reasoning:
+        'Spring + late-fall promotions stack with the EVT $200 charger rebate. Don\'t time around equipment availability — time around stack-with-rebate windows.',
+    },
+    snow_blowers: {
+      bestBuyMonths: [4, 5, 6],
+      worstBuyMonths: [11, 12, 1],
+      reasoning:
+        'Late-spring clearance puts last-year stock 30-50% below the November rush. Same machine, often $200-600 less. Store in the basement until needed.',
+    },
+    lake_dock_hardware: {
+      bestBuyMonths: [9, 10],
+      worstBuyMonths: [4, 5],
+      reasoning:
+        'Lake-property suppliers clear seasonal stock once the docks come out. Buy in fall, store, install at ice-out.',
+    },
+    cooler_outdoor: {
+      bestBuyMonths: [8, 9],
+      worstBuyMonths: [5, 6],
+      reasoning:
+        'YETI, RTIC, and rotomolded coolers run end-of-summer clearance. Same product cycle as patio furniture.',
+    },
+    generators: {
+      bestBuyMonths: [4, 5, 6, 7],
+      worstBuyMonths: [10, 11],
+      reasoning:
+        'Buy a generator before the storm forecast — once a major Northeast outage event hits the news, pricing surges 20-40% and inventory goes to backorder.',
+    },
+    mosquito_control: {
+      bestBuyMonths: [3, 4],
+      worstBuyMonths: [6, 7, 8],
+      reasoning:
+        'Stock up before Vermont blackfly + mosquito peaks in May-July. Mid-summer pricing on bug zappers and mosquito magnets is highest of the year.',
+    },
+    light_fixtures: {
+      bestBuyMonths: [1, 2, 11],
+      worstBuyMonths: [],
+      reasoning:
+        'Lighting promotions cluster around January white-sale windows and Black Friday. Year-round wide availability.',
+    },
+    kitchen_organizers: {
+      bestBuyMonths: [1, 2, 8],
+      worstBuyMonths: [],
+      reasoning:
+        'Container Store, IKEA, and Amazon run organizer promotions tied to January New Year resolutions and August back-to-school windows.',
     },
   },
 }

@@ -188,6 +188,134 @@ export type HomepageConfig = {
   }
 }
 
+// ---------- V7: Brief scenarios ---------------------------------------
+//
+// Five orthogonal "shopping-context" scenarios that gate which picks
+// surface from a given scope variant. The synthesis function applies
+// the scenario as a final pass over engine-selected items: emphasis,
+// de-emphasis, tier swap (premium → tight, etc.), and seasonal kit
+// preference. Authored content lives in src/content/scenarios.ts.
+
+export type BriefScenarioId =
+  | 'just_starting'
+  | 'already_have_basics'
+  | 'tight_budget'
+  | 'premium'
+  | 'lake_property'
+
+export type BriefScenario = {
+  id: BriefScenarioId
+  label: string
+  description: string
+  emphasizes: string[]               // tag list — kit ids, item ids, or feature tags
+  deemphasizes: string[]
+  impliedCostMultiplier: number      // 1.0 baseline; tight=0.7, premium=1.4 etc.
+  primaryKitId?: string              // existing accessory kit id to lean on
+  secondaryKitId?: string
+}
+
+// ---------- V7: Products (Smart Cart + Worth-It Plan + Upgrade) -------
+//
+// The two paid products — Smart Cart ($19, property-independent) and
+// Worth-It Plan ($39, property-dependent) — and the $20 upgrade path
+// from one to the other. All tunable values live here so a copy or
+// price change is a one-file edit.
+
+export type ProductId = 'smart_cart' | 'worth_it'
+
+export type SmartCartSection = {
+  id: string                        // 'lean_cart' | 'add_ons' | 'skip_list' | 'savings_snapshot'
+  title: string
+  enabled: boolean
+  order: number
+}
+
+export type SmartCartConfig = {
+  enabled: boolean
+  priceUsd: number                  // 19
+  productName: string               // 'Smart Cart'
+  refundWindowHours: number         // 24
+  ttlDays: number                   // 30
+  headline: string
+  subhead: string
+  bullets: string[]                 // pre-sale bullet list
+  trustRow: string[]                // trust badges
+  ctaCopy: string                   // 'Build My Smart Cart'
+  upgradeCardCopy: string
+  stripePaymentLinkEnvVar: string   // env var name resolved at runtime
+  sections: SmartCartSection[]
+}
+
+export type PathTab = {
+  id: string                        // 'best_overall' | 'cosmetic_refresh' | ...
+  label: string
+  order: number
+  filterRule: string                // engine reference: how to filter moves
+}
+
+export type WorthItSection = {
+  id: string
+  title: string
+  enabled: boolean
+  order: number
+  requiresAddress?: boolean         // skipped if Worth-It generated without address
+}
+
+export type ReminderDayOption = {
+  id: 'friday' | 'saturday_morning' | 'sunday_followup'
+  label: string
+  sendTimeHour: number              // 9 = 9am local
+  bodyTemplate: string
+}
+
+export type WorthItConfig = {
+  enabled: boolean
+  priceUsd: number                  // 39
+  productName: string               // 'Worth-It Plan'
+  refundWindowDays: number          // 7
+  headline: string
+  subhead: string
+  bullets: string[]
+  trustRow: string[]
+  ctaCopy: string                   // 'Get My Worth-It Plan'
+  stripePaymentLinkEnvVar: string
+  pathTabsByTopic: Partial<Record<TopicId, PathTab[]>>
+  sections: WorthItSection[]
+  pdfTemplateVersion: string
+  deliveryEmailSubject: string
+  sessionPasscodeSource: 'email_last_4'
+  reminderDayOptions: ReminderDayOption[]
+}
+
+export type UpgradeConfig = {
+  enabled: boolean
+  deltaPriceUsd: number             // 20
+  inlineCtaCopy: string
+  emailDelayHours: number           // 72
+  emailSubject: string
+  emailBodyTemplate: string
+  stripePaymentLinkEnvVar: string
+}
+
+export type ProductsConfig = {
+  smartCart: SmartCartConfig
+  worthIt: WorthItConfig
+  upgrade: UpgradeConfig
+}
+
+// ---------- V7: Shopping timing ---------------------------------------
+//
+// Per-category "best month / worst month" rules. Engine surfaces a
+// "buy now" / "wait until <month>" badge on relevant Smart Cart picks.
+
+export type ShoppingTimingRule = {
+  bestBuyMonths: number[]           // 1..12
+  worstBuyMonths: number[]
+  reasoning: string
+}
+
+export type ShoppingTimingConfig = Record<string, ShoppingTimingRule>
+
 export type RecommenderConfig = {
   version: string
   topicAffinity: Partial<Record<TopicId, Partial<Record<TopicId, AffinityEdge>>>>
@@ -208,4 +336,8 @@ export type RecommenderConfig = {
   revenueForest: RevenueForestConfig
   decisionTree: DecisionTreeConfig
   homepage: HomepageConfig
+  // V7 additions
+  scenarios: BriefScenario[]
+  products: ProductsConfig
+  shoppingTiming: ShoppingTimingConfig
 }

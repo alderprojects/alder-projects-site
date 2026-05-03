@@ -1,5 +1,66 @@
-import { Metadata } from 'next'
-import SeoPage from '@/components/SeoPage'
-export const metadata: Metadata = { title: 'Painting Contractors Williston VT | Alder Projects', description: 'Find interior and exterior painting contractors in Williston, VT. Post free.', alternates: { canonical: 'https://alderprojects.com/painting-contractors-williston-vt' } }
-const content = { "h1": "Painting Contractors in Williston, VT", "heroImg": "https://images.unsplash.com/photo-1562259949-e8e7689d7828", "intro": "Find interior and exterior painting contractors in Williston, VT. Post free and get matched.", "sections": [{"heading":"Painting in Williston","body":"Williston's mix of newer subdivisions and older ranch-style homes generates steady painting demand. Many homeowners pair exterior painting with trim repairs and minor carpentry work."},{"heading":"What to Expect","body":"Exterior painting in Williston is best done May through October. Interior work can be scheduled year-round. Most contractors book 2–4 weeks out."}], "faqs": [{"q":"How much does exterior painting cost in Williston, VT?","a":"Exterior house painting in Williston runs $3,000–$9,000 for most homes."},{"q":"How often should I repaint my house exterior in Vermont?","a":"Vermont's climate typically means repainting every 5–8 years for wood siding."},{"q":"What's included in a full exterior repaint?","a":"Power washing, surface prep and caulking, priming bare wood, and two coats of finish paint."}], "ctaText": "Post Your Project Free →", "internalLinks": [{"label":"Painting contractors in Vermont","href":"/painting-contractors-vermont"},{"label":"Painting contractors in Burlington","href":"/painting-contractors-burlington-vt"},{"label":"Contractors in Chittenden County","href":"/chittenden-county-vt"}] }
-export default function Page() { return <SeoPage content={content} /> }
+import type { Metadata } from 'next'
+import ServicePage from '@/components/ServicePage'
+
+const PATH = '/painting-contractors-williston-vt'
+
+const content = {
+    "slug": "painting-contractors-williston-vt",
+    "serviceLabel": "Painting",
+    "townName": "Williston",
+    "townSlug": null,
+    "county": "Chittenden County",
+    "metaTitle": "Painting in Williston, VT — costs, rebates, what to know",
+    "metaDescription": "What paint job actually costs in Williston, VT in 2026. Rebates that stack, contractors to vet, timing that works. Built for Williston homeowners.",
+    "h1": "Painting in Williston, VT — costs, contractors, rebates",
+    "leadParagraph": "Chittenden County, residential-and-commercial mix. Suburban-pattern lots make most projects straightforward — fewer historic constraints than Burlington proper. Painting in Williston runs at 1.05-1.15× statewide median. Get bids that know the Williston reality, not generic Vermont pricing.",
+    "sections": [
+      {
+        "h2": "Painting costs in Williston",
+        "body": "Williston runs 1.05-1.15× of statewide median for paint job work. Mid-2026 numbers, with Williston adjustments.\n\n**Statewide median** for paint job varies widely by scope. Get three written bids before assuming a budget; the variance between bids tells you where the scope ambiguity is.\n\nIn Williston, multiply by 1.05-1.15×.\n\nThe cost driver in Williston is the age of the housing stock — pre-1960 homes need supplementary scope (electrical service upgrade, plumbing modernization) on top of the headline service. Get three written bids and ask each one to break out the supplementary scope they expect."
+      },
+      {
+        "h2": "Rebates that apply for paint job in Williston",
+        "body": "GMP territory. Standard GMP and EVT rebate stack applies. Most Williston homes built 1985-2010 — newer construction, fewer surprise weatherization items, but also less dramatic weatherization payback.\n\nInterior and exterior painting do not qualify for rebates directly. If exterior painting is part of a larger weatherization project (replacing siding with insulated cladding, for example), the EVT Home Performance program may cover related work.\n\n**Trap:** the contractor whose bid quotes a rebate stack from a different utility territory. Ask them to break out each rebate by name and confirm in writing which ones apply to Williston (Green Mountain Power (GMP)). Bids that show \"$X off after rebates\" without naming the rebates are the ones that lose money on the actual paperwork."
+      },
+      {
+        "h2": "When to schedule paint job in Vermont",
+        "body": "Vermont exterior painting is mid-May through September — above 50°F daytime temps and minimal rain are required. Interior painting works year-round. Booking exterior work in February for a June paint job locks the schedule; booking in May for July is risky."
+      },
+      {
+        "h2": "Vetting a paint job contractor in Williston",
+        "body": "Lead-paint disclosure rules apply to pre-1978 Vermont homes. If your home pre-dates 1978, the contractor must follow EPA RRP (Renovation, Repair, and Painting) practices. Verify the lead-safe certified renovator (LSCR) credential before signing.\n\n**Vermont-specific:** Williston has stronger contractor density than rural Vermont, so expect 4-6 serious bids in a typical project. Use the variance to identify the bid that's missing scope (cheapest, often) and the bid that's overpriced for Williston (most expensive, often)."
+      }
+    ],
+    "factIds": [
+      "vt-residential-contract-statute",
+      "vt-contractor-registration-threshold"
+    ],
+    "relatedGuideSlugs": [
+      "how-to-find-contractor-vermont",
+      "vermont-renovation-permit-guide",
+      "vermont-contractor-red-flags"
+    ],
+    "relatedServiceSlugs": [
+      "window-replacement-williston-vt",
+      "roofing-williston-vt",
+      "painting-contractors-vermont"
+    ],
+    "samplePropertySlug": null,
+    "verifyDate": "2026-05-03"
+  }
+
+export const metadata: Metadata = {
+  title: "Painting in Williston, VT — costs, rebates, what to know",
+  description: "What paint job actually costs in Williston, VT in 2026. Rebates that stack, contractors to vet, timing that works. Built for Williston homeowners.",
+  alternates: { canonical: `https://alderprojects.com${PATH}` },
+  openGraph: {
+    title: "Painting in Williston, VT — costs, rebates, what to know",
+    description: "What paint job actually costs in Williston, VT in 2026. Rebates that stack, contractors to vet, timing that works. Built for Williston homeowners.",
+    url: `https://alderprojects.com${PATH}`,
+    type: 'article',
+  },
+}
+
+export default function Page() {
+  return <ServicePage content={content} />
+}

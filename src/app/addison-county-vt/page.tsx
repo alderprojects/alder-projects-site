@@ -1,37 +1,78 @@
-import { Metadata } from 'next'
-import SeoPage from '@/components/SeoPage'
+import type { Metadata } from 'next'
+import ServicePage from '@/components/ServicePage'
 
-export const metadata: Metadata = {
-  title: 'Contractors Addison County VT | Alder Projects',
-  description: 'Find vetted renovation contractors in Addison County VT — Middlebury, Vergennes, Bristol and surrounding towns.',
-}
+const PATH = '/addison-county-vt'
 
 const content = {
-  "h1": "Home Renovation Contractors in Addison County, VT",
-  "heroImg": "https://images.unsplash.com/photo-1757661543986-6f418adc8cb6",
-  "intro": "Find vetted renovation contractors in Addison County, VT — Middlebury, Vergennes, Bristol and surrounding towns.",
-  "sections": [
-    {"heading": "How Alder Projects Works", "body": "Post your project free. We match you with vetted Addison County contractors who specialize in your project type. No cold calls, no spam."},
-    {"heading": "Renovation in Addison County", "body": "Addison County sits in the Champlain Valley between the Green Mountains and Lake Champlain. Its towns — Middlebury, Vergennes, Bristol — have a mix of old farmhouses, college-town housing, and rural properties. The housing stock skews older, with many homes built in the 19th and early 20th centuries."}
-  ],
-  "townLinks": [
-    {"label": "Middlebury kitchen remodeling", "href": "/kitchen-remodeling-middlebury-vt"},
-    {"label": "Middlebury deck builders", "href": "/deck-builders-middlebury-vt"},
-    {"label": "Vergennes home additions", "href": "/home-additions-vergennes-vt"}
-  ],
-  "faqs": [
-    {"q": "How do I find a contractor in Addison County?", "a": "Word of mouth is common in smaller Vermont communities. Alder Projects gives you a systematic option — post your project and we match you with vetted contractors working in your area."},
-    {"q": "Are there enough contractors working in Addison County?", "a": "The contractor market is tighter than in Chittenden County. Booking lead times can be longer. Planning ahead and posting early gives you the best options."},
-    {"q": "What types of projects are most common in Addison County?", "a": "Kitchen and bathroom updates are most common in the Middlebury area. Farm properties and older homes often need structural additions and weatherization work."}
-  ],
-  "ctaText": "Post Your Project Free →",
-  "internalLinks": [
-    {"label": "Kitchen remodeling Vermont", "href": "/kitchen-remodeling-vermont"},
-    {"label": "Deck builders Vermont", "href": "/deck-builders-vermont"},
-    {"label": "Chittenden County contractors", "href": "/chittenden-county-vt"}
-  ]
+    "slug": "addison-county-vt",
+    "serviceLabel": "Addison County renovation",
+    "townName": "Addison County",
+    "townSlug": null,
+    "county": "Addison County",
+    "metaTitle": "Addison County, VT property guide — costs, contractors, rebates",
+    "metaDescription": "What renovation, weatherization, and contractor work actually costs in Addison County, Vermont in 2026. Built for Addison County homeowners.",
+    "h1": "Addison County, Vermont — costs, contractors, what to know.",
+    "leadParagraph": "Addison County is Vermont's lakeshore agriculture belt. Middlebury College drives the contractor pipeline; Vergennes is Vermont's smallest city. Otter Creek and the Lake Champlain shoreline mean shoreland buffer permits apply to many residential projects. The contractor reality varies sharply across Addison County — get bids that know your specific town's pricing tier, not a generic county-level number.",
+    "sections": [
+      {
+        "h2": "What Addison County feels like for renovation work",
+        "body": "Addison County is Vermont's lakeshore agriculture belt. Middlebury College drives the contractor pipeline; Vergennes is Vermont's smallest city. Otter Creek and the Lake Champlain shoreline mean shoreland buffer permits apply to many residential projects.\n\nAddison County has fewer per-capita licensed residential contractors than Chittenden or Lamoille counties. The strong crews get pulled north for Burlington-metro work or south for Middlebury College-area renovations. Start the contractor search 4-5 months before you want work to begin."
+      },
+      {
+        "h2": "Project costs in Addison County",
+        "body": "Addison County runs at the 1.00× statewide-median tier for most renovation categories. Specific ranges (verified mid-2026):\n\n**Mid-range kitchen remodel** — $35,000-65,000 statewide median (apply tier multiplier).\n**Bathroom remodel** — $12,000-28,000 statewide median.\n**Roofing replacement** — $8,000-20,000 asphalt, $20,000-40,000 standing seam metal.\n**Heat pump install** — $11,000-22,000 ducted; $3,500-5,500 single-zone ductless.\n**Whole-home weatherization** — $4,000-18,000 typical; EVT 75% rebate (standard tier) brings out-of-pocket to $1,000-4,500.\n\n**Trap:** the bid that quotes \"Addison County\" pricing without specifying which town. The variance between resort-tier and rural Addison County towns is real money. Confirm pricing tier with each bidder."
+      },
+      {
+        "h2": "Rebates that apply across Addison County",
+        "body": "EVT statewide rebates apply equally regardless of town: $2,200 ducted heat pump, $475 ductless head, $400 fuel-switching bonus, $500 electrical service upgrade tied to electrification, $600 heat pump water heater. Weatherization runs 75% of project cost (standard tier) or 90% income-eligible.\n\n**Vermont-specific:** the utility-side incentive layer differs by town within Addison County. Most Addison County towns are on Green Mountain Power (GMP) territory with the $2,000 per condenser income-eligible heat pump bonus. Some towns are on VPPSA member utilities with a $1,000 bonus instead. Verify your specific utility before assuming the stack.\n\nThe federal Section 25C credit (which used to cover heat pumps and weatherization at 30% up to $1,200/year) expired December 31, 2025 and is not in current law. The 2026 stack is leaner than 2024-2025 but still strong for combined heat-pump + weatherization projects."
+      },
+      {
+        "h2": "Vetting a Addison County contractor",
+        "body": "Vermont contractor registration with the AG Consumer Assistance Program is required for any project $3,500+ (free for contractors; refusing is a red flag). Per 9 V.S.A. § 4006, your written contract must include scope, total price, completion date, deposit terms, and 3-day right to cancel.\n\nFor projects over $10,000, request a list of all subcontractors and material suppliers BEFORE work starts to defend against the Vermont mechanic's lien risk under 9 V.S.A. Chapter 51.\n\n**Trap:** bids that come in dramatically lower than the others. Cheap Addison County bids usually skip supplementary scope (electrical service upgrade, plumbing modernization, design review prep) that surfaces as change orders. The cheapest bid often costs the most by the time the project finishes."
+      }
+    ],
+    "factIds": [
+      "evt-ducted-heat-pump-rebate",
+      "evt-ductless-heat-pump-rebate",
+      "evt-fuel-switching-bonus",
+      "evt-weatherization-standard-tier",
+      "gmp-heat-pump-income-bonus",
+      "federal-25c-expired",
+      "vt-residential-contract-statute",
+      "vt-contractor-registration-threshold",
+      "vt-mechanics-lien-statute"
+    ],
+    "relatedGuideSlugs": [
+      "heat-pump-rebates-vermont",
+      "how-to-find-contractor-vermont",
+      "vermont-renovation-permit-guide",
+      "vermont-contractor-red-flags",
+      "vermont-rebate-stack-2026"
+    ],
+    "relatedServiceSlugs": [
+      "kitchen-remodeling-middlebury-vt",
+      "bathroom-remodeling-middlebury-vt",
+      "roofing-middlebury-vt",
+      "deck-builders-middlebury-vt",
+      "middlebury-vt",
+      "vergennes-vt"
+    ],
+    "samplePropertySlug": null,
+    "verifyDate": "2026-05-03"
+  }
+
+export const metadata: Metadata = {
+  title: "Addison County, VT property guide — costs, contractors, rebates",
+  description: "What renovation, weatherization, and contractor work actually costs in Addison County, Vermont in 2026. Built for Addison County homeowners.",
+  alternates: { canonical: `https://alderprojects.com${PATH}` },
+  openGraph: {
+    title: "Addison County, VT property guide — costs, contractors, rebates",
+    description: "What renovation, weatherization, and contractor work actually costs in Addison County, Vermont in 2026. Built for Addison County homeowners.",
+    url: `https://alderprojects.com${PATH}`,
+    type: 'article',
+  },
 }
 
 export default function Page() {
-  return <SeoPage content={content} />
+  return <ServicePage content={content} />
 }

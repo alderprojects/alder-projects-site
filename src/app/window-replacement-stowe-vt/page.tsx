@@ -1,20 +1,69 @@
-import { Metadata } from 'next'
-import SeoPage from '@/components/SeoPage'
-export const metadata: Metadata = {
-  title: 'Window Replacement Stowe VT | Alder Projects',
-  description: 'Find vetted window replacement contractors in Stowe, VT. Post your project free — matched with local window installers in 48 hours.',
-}
+import type { Metadata } from 'next'
+import ServicePage from '@/components/ServicePage'
+
+const PATH = '/window-replacement-stowe-vt'
+
 const content = {
-  "h1": "Window Replacement Contractors in Stowe, VT",
-  "heroImg": "https://images.unsplash.com/photo-1505798577917-a65157d3320a",
-  "intro": "Find vetted window replacement contractors in Stowe, VT. Post your project free — matched with local window installers in 48 hours.",
-  "sections": [{"heading": "Window Replacement in Stowe", "body": "Stowe’s combination of extreme cold winters and high-value properties makes energy-efficient windows a high priority. Many Stowe vacation homes have older windows that lose significant heat — a major issue for properties that may be unoccupied during the coldest months. Triple-pane windows with warm-edge spacers and low-U-factor frames are popular in Stowe for their superior thermal performance in extreme cold."}],
-  "faqs": [
-    {"q": "How much does window replacement cost in Stowe, VT?", "a": "Window replacement in Stowe runs slightly higher than the Vermont average. Expect $500–$1,300 per window installed. High-performance triple-pane options popular in Stowe’s market cost more but pay back quickly in reduced heating costs."},
-    {"q": "What window specifications are best for Stowe’s climate?", "a": "Triple-pane windows with U-factors of 0.18 or lower are ideal for Stowe’s cold winters. Fiberglass frames are thermally stable and resist the temperature swings common at higher elevations. Warm-edge spacers reduce condensation and improve thermal performance at the glass edge."},
-    {"q": "Can I coordinate window replacement for my Stowe vacation home remotely?", "a": "Yes — many Stowe-area window contractors are experienced with absentee owners. Alder Projects can match you with contractors who provide remote coordination, photo updates, and can manage the project without requiring your presence."}
-  ],
-  "ctaText": "Post Your Project Free →",
-  "internalLinks": [{"label": "Window replacement Vermont", "href": "/window-replacement-vermont"}, {"label": "Contractors Lamoille County", "href": "/lamoille-county-vt"}]
+    "slug": "window-replacement-stowe-vt",
+    "serviceLabel": "Window replacement",
+    "townName": "Stowe",
+    "townSlug": "stowe-vt",
+    "county": "Lamoille County",
+    "metaTitle": "Window replacement in Stowe, VT — costs, rebates, what to know",
+    "metaDescription": "What window replacement actually costs in Stowe, VT in 2026. Rebates that stack, contractors to vet, timing that works. Built for Stowe homeowners.",
+    "h1": "Window replacement in Stowe, VT — costs, contractors, rebates",
+    "leadParagraph": "Resort-premium tier. Cost basis runs 30-40% above statewide median. Mountain Road design review applies to any visible exterior work. Stowe Village historic district constrains exterior changes within the district boundary. Window replacement in Stowe runs at 1.30-1.45× statewide median. Get bids that know the Stowe reality, not generic Vermont pricing.",
+    "sections": [
+      {
+        "h2": "Window replacement costs in Stowe",
+        "body": "Stowe runs 1.30-1.45× of statewide median for window replacement work. Mid-2026 numbers, with Stowe adjustments.\n\n**12-window replacement project** — $12,000-28,000 statewide median (modern double-pane vinyl or fiberglass; historic district approval adds time but rarely cost).\n\nIn Stowe, multiply by 1.30-1.45×.\n\nThe cost driver in Stowe is labor scarcity and design-review prep time most contractors quote without. Get three written bids and ask each one to break out the supplementary scope they expect."
+      },
+      {
+        "h2": "Rebates that apply for window replacement in Stowe",
+        "body": "VPPSA member utility (Stowe Electric). Income-eligible heat pump bonus is $1,000 per condenser, not $2,000 like GMP. EVT statewide rebates ($2,200 ducted, $475 ductless head, $400 fuel-switching, $500 panel) apply equally.\n\nThe federal Section 25C credit (which used to cover windows at 30% up to $1,200/year) expired December 31, 2025 and is not in current law. Window replacements in 2026 don't have a federal credit available. Stack value comes from EVT weatherization (75% standard tier, 90% income-eligible) when the project includes air-sealing around the window openings.\n\n**Trap:** the contractor whose bid quotes a rebate stack from a different utility territory. Ask them to break out each rebate by name and confirm in writing which ones apply to Stowe (Stowe Electric (VPPSA member utility)). Bids that show \"$X off after rebates\" without naming the rebates are the ones that lose money on the actual paperwork."
+      },
+      {
+        "h2": "When to schedule window replacement in Vermont",
+        "body": "Window replacement work runs year-round but installs slow in deep winter (above 40°F days needed for proper caulking and sealant cure). Spring through fall is the sweet spot. Historic-district properties need design review approval — add 4-8 weeks for that step."
+      },
+      {
+        "h2": "Vetting a window replacement contractor in Stowe",
+        "body": "Vermont contractor registration with the AG required for any project $3,500+. Modern double-pane vinyl or fiberglass windows can match historic profiles for properties in design review districts (Stowe Village, Woodstock, Burlington Hill Section). Verify the contractor has done historic-district installs if applicable.\n\n**Vermont-specific:** Stowe contractors charge resort-tier rates because labor demand is real. Ask each bidder where most of their work is — local Stowe crews price more honestly for Stowe projects than commuting crews who add windshield time to the bid."
+      }
+    ],
+    "factIds": [
+      "vt-cost-windows-replacement",
+      "vt-residential-contract-statute",
+      "vt-contractor-registration-threshold"
+    ],
+    "relatedGuideSlugs": [
+      "vermont-weatherization-evt-rebate",
+      "how-to-find-contractor-vermont",
+      "vermont-renovation-permit-guide",
+      "vermont-contractor-red-flags"
+    ],
+    "relatedServiceSlugs": [
+      "roofing-stowe-vt",
+      "painting-contractors-stowe-vt",
+      "window-replacement-vermont",
+      "stowe-vt"
+    ],
+    "samplePropertySlug": "main-street-stowe-vt",
+    "verifyDate": "2026-05-03"
+  }
+
+export const metadata: Metadata = {
+  title: "Window replacement in Stowe, VT — costs, rebates, what to know",
+  description: "What window replacement actually costs in Stowe, VT in 2026. Rebates that stack, contractors to vet, timing that works. Built for Stowe homeowners.",
+  alternates: { canonical: `https://alderprojects.com${PATH}` },
+  openGraph: {
+    title: "Window replacement in Stowe, VT — costs, rebates, what to know",
+    description: "What window replacement actually costs in Stowe, VT in 2026. Rebates that stack, contractors to vet, timing that works. Built for Stowe homeowners.",
+    url: `https://alderprojects.com${PATH}`,
+    type: 'article',
+  },
 }
-export default function Page() { return <SeoPage content={content} /> }
+
+export default function Page() {
+  return <ServicePage content={content} />
+}

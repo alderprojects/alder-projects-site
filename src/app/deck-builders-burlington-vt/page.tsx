@@ -1,31 +1,70 @@
-import { Metadata } from 'next'
-import SeoPage from '@/components/SeoPage'
+import type { Metadata } from 'next'
+import ServicePage from '@/components/ServicePage'
 
-export const metadata: Metadata = {
-  title: 'Deck Builders Burlington VT | Alder Projects',
-  description: 'Find vetted deck builders in Burlington, VT. Post your project free — matched with local deck contractors in 48 hours.',
-}
+const PATH = '/deck-builders-burlington-vt'
 
 const content = {
-  "h1": "Deck Builders in Burlington, VT",
-  "heroImg": "https://images.unsplash.com/photo-1754597215918-b4b1f113ca77",
-  "intro": "Find vetted deck builders in Burlington, VT. Post your project free — matched with local deck contractors in 48 hours.",
-  "sections": [
-    {"heading": "Building a Deck in Burlington", "body": "Burlington decks face specific requirements: footings must extend below the frost line (~4 feet), framing must handle Vermont snow loads, and Burlington’s zoning regulations limit lot coverage. Popular options include pressure-treated lumber, composite decking (Trex, TimberTech), rooftop decks on flat-roof buildings, and multi-level decks on Burlington’s hillside lots."}
-  ],
-  "faqs": [
-    {"q": "How much does a deck cost in Burlington, VT?", "a": "A standard 400 sq ft pressure-treated deck in Burlington typically runs $12,000–$20,000. Composite decking adds 20–30%."},
-    {"q": "Do I need a permit for a deck in Burlington?", "a": "Burlington requires permits for attached decks and decks above a certain size. Your contractor will determine what’s needed."},
-    {"q": "When should I book a deck contractor in Burlington?", "a": "Burlington deck contractors are typically booked 4–8 weeks out from May through September. Post your project in March or April for summer construction."}
-  ],
-  "ctaText": "Post Your Project Free →",
-  "internalLinks": [
-    {"label": "Deck builders in Vermont", "href": "/deck-builders-vermont"},
-    {"label": "Contractors in Chittenden County", "href": "/chittenden-county-vt"},
-    {"label": "Kitchen remodeling in Burlington", "href": "/kitchen-remodeling-burlington-vt"}
-  ]
+    "slug": "deck-builders-burlington-vt",
+    "serviceLabel": "Deck building",
+    "townName": "Burlington",
+    "townSlug": "burlington-vt",
+    "county": "Chittenden County",
+    "metaTitle": "Deck building in Burlington, VT — costs, rebates, what to know",
+    "metaDescription": "What deck build actually costs in Burlington, VT in 2026. Rebates that stack, contractors to vet, timing that works. Built for Burlington homeowners.",
+    "h1": "Deck building in Burlington, VT — costs, contractors, rebates",
+    "leadParagraph": "Vermont's largest city. Most housing stock pre-dates 1960; knob-and-tube wiring, oil-to-electric conversions, and undersized service panels are the cost driver in older neighborhoods. Deck building in Burlington runs at 1.10-1.20× statewide median. Get bids that know the Burlington reality, not generic Vermont pricing.",
+    "sections": [
+      {
+        "h2": "Deck building costs in Burlington",
+        "body": "Burlington runs 1.10-1.20× of statewide median for deck build work. Mid-2026 numbers, with Burlington adjustments.\n\n**Pressure-treated deck** — $8,000-18,000 statewide median (basic 10x16 deck with simple stairs $8,000-12,000).\n**Composite deck** — $15,000-40,000 statewide median (mid-size with aluminum railing $18,000-28,000; premium with hidden fasteners and lighting $35,000-40,000).\n\nIn Burlington, multiply by 1.10-1.20×.\n\nThe cost driver in Burlington is the age of the housing stock — pre-1960 homes need supplementary scope (electrical service upgrade, plumbing modernization) on top of the headline service. Get three written bids and ask each one to break out the supplementary scope they expect."
+      },
+      {
+        "h2": "Rebates that apply for deck build in Burlington",
+        "body": "Burlington is in BED territory, not GMP. The $2,000 GMP income-eligible heat pump bonus does NOT apply here; BED has its own narrower incentive layer. EVT statewide rebates ($2,200 ducted, $475 per ductless head, $400 fuel-switching) apply equally regardless of utility.\n\nDecks themselves do not qualify for rebates. If your project is in the shoreland buffer (250 feet from any lake larger than 10 acres, per Vermont DEC), a Vermont shoreland permit may be required — verify with the state DEC before signing.\n\n**Trap:** the contractor whose bid quotes a rebate stack from a different utility territory. Ask them to break out each rebate by name and confirm in writing which ones apply to Burlington (Burlington Electric Department (BED)). Bids that show \"$X off after rebates\" without naming the rebates are the ones that lose money on the actual paperwork."
+      },
+      {
+        "h2": "When to schedule deck build in Vermont",
+        "body": "Deck construction in Vermont runs late May through October. Frost-heave concerns make winter deck builds impractical for footings. Book by April for a same-summer deck; booking in July for October is risky because of weather variability and contractor schedules filling."
+      },
+      {
+        "h2": "Vetting a deck build contractor in Burlington",
+        "body": "Decks built into the side of a Vermont hill or near a lake have unique structural requirements. Ask about footing depth (Vermont frost depth runs 30-48 inches in most counties), railing code compliance (international residential code 36-inch minimum), and load engineering for snow accumulation in winter.\n\n**Vermont-specific:** Burlington has stronger contractor density than rural Vermont, so expect 4-6 serious bids in a typical project. Use the variance to identify the bid that's missing scope (cheapest, often) and the bid that's overpriced for Burlington (most expensive, often)."
+      }
+    ],
+    "factIds": [
+      "vt-cost-deck-pt",
+      "vt-residential-contract-statute",
+      "vt-contractor-registration-threshold",
+      "vt-cost-deck-composite"
+    ],
+    "relatedGuideSlugs": [
+      "how-much-does-a-deck-cost-vermont",
+      "vermont-renovation-permit-guide",
+      "vermont-flood-zone-renovation",
+      "how-to-find-contractor-vermont"
+    ],
+    "relatedServiceSlugs": [
+      "roofing-burlington-vt",
+      "home-additions-burlington-vt",
+      "deck-builders-vermont",
+      "burlington-vt"
+    ],
+    "samplePropertySlug": "main-street-burlington-vt",
+    "verifyDate": "2026-05-03"
+  }
+
+export const metadata: Metadata = {
+  title: "Deck building in Burlington, VT — costs, rebates, what to know",
+  description: "What deck build actually costs in Burlington, VT in 2026. Rebates that stack, contractors to vet, timing that works. Built for Burlington homeowners.",
+  alternates: { canonical: `https://alderprojects.com${PATH}` },
+  openGraph: {
+    title: "Deck building in Burlington, VT — costs, rebates, what to know",
+    description: "What deck build actually costs in Burlington, VT in 2026. Rebates that stack, contractors to vet, timing that works. Built for Burlington homeowners.",
+    url: `https://alderprojects.com${PATH}`,
+    type: 'article',
+  },
 }
 
 export default function Page() {
-  return <SeoPage content={content} />
+  return <ServicePage content={content} />
 }

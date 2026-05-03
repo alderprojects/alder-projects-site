@@ -1,20 +1,69 @@
-import { Metadata } from 'next'
-import SeoPage from '@/components/SeoPage'
-export const metadata: Metadata = {
-  title: 'Window Replacement Burlington VT | Alder Projects',
-  description: 'Find vetted window replacement contractors in Burlington, VT. Post your project free — matched with local installers in 48 hours.',
-}
+import type { Metadata } from 'next'
+import ServicePage from '@/components/ServicePage'
+
+const PATH = '/window-replacement-burlington-vt'
+
 const content = {
-  "h1": "Window Replacement Contractors in Burlington, VT",
-  "heroImg": "https://images.unsplash.com/photo-1505798577917-a65157d3320a",
-  "intro": "Find vetted window replacement contractors in Burlington, VT. Post your project free — matched with local window installers in 48 hours.",
-  "sections": [{"heading": "Window Replacement in Burlington", "body": "Burlington’s older housing stock includes thousands of homes with original wood-frame windows from the early 1900s. These windows are often drafty, single-pane, and a major source of heat loss in Vermont winters. Replacement windows in Burlington must balance energy efficiency with historic character — in certain Burlington neighborhoods, window styles may be subject to design review. Contractors experienced with Burlington’s housing stock understand how to match profiles and trim details while maximizing energy performance."}],
-  "faqs": [
-    {"q": "How much does window replacement cost in Burlington, VT?", "a": "Expect $450–$1,100 per window installed in Burlington. A typical Burlington home needing 10–15 windows might run $6,000–$16,000. Historic homes requiring custom sizes or divided light patterns cost more."},
-    {"q": "Can I replace windows in a historic Burlington home?", "a": "Burlington has design review requirements in some neighborhoods and historic districts. Replacement windows generally need to match the original profile and character. Your contractor should be familiar with Burlington’s historic preservation guidelines."},
-    {"q": "What rebates are available for window replacement in Burlington?", "a": "Vermont’s Efficiency Vermont program offers rebates for qualifying energy-efficient window installations. Burlington Electric customers may have additional incentive programs. Your contractor can help identify applicable rebates."}
-  ],
-  "ctaText": "Post Your Project Free →",
-  "internalLinks": [{"label": "Window replacement Vermont", "href": "/window-replacement-vermont"}, {"label": "Contractors Chittenden County", "href": "/chittenden-county-vt"}]
+    "slug": "window-replacement-burlington-vt",
+    "serviceLabel": "Window replacement",
+    "townName": "Burlington",
+    "townSlug": "burlington-vt",
+    "county": "Chittenden County",
+    "metaTitle": "Window replacement in Burlington, VT — costs, rebates, what to know",
+    "metaDescription": "What window replacement actually costs in Burlington, VT in 2026. Rebates that stack, contractors to vet, timing that works. Built for Burlington homeowners.",
+    "h1": "Window replacement in Burlington, VT — costs, contractors, rebates",
+    "leadParagraph": "Vermont's largest city. Most housing stock pre-dates 1960; knob-and-tube wiring, oil-to-electric conversions, and undersized service panels are the cost driver in older neighborhoods. Window replacement in Burlington runs at 1.10-1.20× statewide median. Get bids that know the Burlington reality, not generic Vermont pricing.",
+    "sections": [
+      {
+        "h2": "Window replacement costs in Burlington",
+        "body": "Burlington runs 1.10-1.20× of statewide median for window replacement work. Mid-2026 numbers, with Burlington adjustments.\n\n**12-window replacement project** — $12,000-28,000 statewide median (modern double-pane vinyl or fiberglass; historic district approval adds time but rarely cost).\n\nIn Burlington, multiply by 1.10-1.20×.\n\nThe cost driver in Burlington is the age of the housing stock — pre-1960 homes need supplementary scope (electrical service upgrade, plumbing modernization) on top of the headline service. Get three written bids and ask each one to break out the supplementary scope they expect."
+      },
+      {
+        "h2": "Rebates that apply for window replacement in Burlington",
+        "body": "Burlington is in BED territory, not GMP. The $2,000 GMP income-eligible heat pump bonus does NOT apply here; BED has its own narrower incentive layer. EVT statewide rebates ($2,200 ducted, $475 per ductless head, $400 fuel-switching) apply equally regardless of utility.\n\nThe federal Section 25C credit (which used to cover windows at 30% up to $1,200/year) expired December 31, 2025 and is not in current law. Window replacements in 2026 don't have a federal credit available. Stack value comes from EVT weatherization (75% standard tier, 90% income-eligible) when the project includes air-sealing around the window openings.\n\n**Trap:** the contractor whose bid quotes a rebate stack from a different utility territory. Ask them to break out each rebate by name and confirm in writing which ones apply to Burlington (Burlington Electric Department (BED)). Bids that show \"$X off after rebates\" without naming the rebates are the ones that lose money on the actual paperwork."
+      },
+      {
+        "h2": "When to schedule window replacement in Vermont",
+        "body": "Window replacement work runs year-round but installs slow in deep winter (above 40°F days needed for proper caulking and sealant cure). Spring through fall is the sweet spot. Historic-district properties need design review approval — add 4-8 weeks for that step."
+      },
+      {
+        "h2": "Vetting a window replacement contractor in Burlington",
+        "body": "Vermont contractor registration with the AG required for any project $3,500+. Modern double-pane vinyl or fiberglass windows can match historic profiles for properties in design review districts (Stowe Village, Woodstock, Burlington Hill Section). Verify the contractor has done historic-district installs if applicable.\n\n**Vermont-specific:** Burlington has stronger contractor density than rural Vermont, so expect 4-6 serious bids in a typical project. Use the variance to identify the bid that's missing scope (cheapest, often) and the bid that's overpriced for Burlington (most expensive, often)."
+      }
+    ],
+    "factIds": [
+      "vt-cost-windows-replacement",
+      "vt-residential-contract-statute",
+      "vt-contractor-registration-threshold"
+    ],
+    "relatedGuideSlugs": [
+      "vermont-weatherization-evt-rebate",
+      "how-to-find-contractor-vermont",
+      "vermont-renovation-permit-guide",
+      "vermont-contractor-red-flags"
+    ],
+    "relatedServiceSlugs": [
+      "roofing-burlington-vt",
+      "painting-contractors-burlington-vt",
+      "window-replacement-vermont",
+      "burlington-vt"
+    ],
+    "samplePropertySlug": "main-street-burlington-vt",
+    "verifyDate": "2026-05-03"
+  }
+
+export const metadata: Metadata = {
+  title: "Window replacement in Burlington, VT — costs, rebates, what to know",
+  description: "What window replacement actually costs in Burlington, VT in 2026. Rebates that stack, contractors to vet, timing that works. Built for Burlington homeowners.",
+  alternates: { canonical: `https://alderprojects.com${PATH}` },
+  openGraph: {
+    title: "Window replacement in Burlington, VT — costs, rebates, what to know",
+    description: "What window replacement actually costs in Burlington, VT in 2026. Rebates that stack, contractors to vet, timing that works. Built for Burlington homeowners.",
+    url: `https://alderprojects.com${PATH}`,
+    type: 'article',
+  },
 }
-export default function Page() { return <SeoPage content={content} /> }
+
+export default function Page() {
+  return <ServicePage content={content} />
+}

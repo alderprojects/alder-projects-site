@@ -1,28 +1,70 @@
-import { Metadata } from 'next'
-import SeoPage from '@/components/SeoPage'
-export const metadata: Metadata = {
-  title: 'Plumbing Contractors Vermont | Alder Projects',
-  description: 'Find licensed plumbing contractors in Vermont for bathroom remodels, water heater replacement, pipe replacement, and kitchen plumbing. Post your project free.',
-  alternates: { canonical: 'https://alderprojects.com/plumbing-contractors-vermont' },
-}
+import type { Metadata } from 'next'
+import ServicePage from '@/components/ServicePage'
+
+const PATH = '/plumbing-contractors-vermont'
+
 const content = {
-  h1: 'Plumbing Contractors in Vermont',
-  heroImg: 'https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1',
-  intro: 'Find licensed plumbing contractors in Vermont for bathroom and kitchen remodels, water heater replacement, and whole-home plumbing work. Post free and get matched.',
-  sections: [
-    { heading: 'Residential Plumbing in Vermont', body: "Vermont's older homes frequently have galvanized steel pipes that corrode over time, reducing water pressure and contaminating water. Replacing galvanized with copper or PEX is one of the most common plumbing projects in Vermont. Water heaters typically need replacement every 8 to 12 years. Vermont's cold winters make freeze protection and proper insulation of pipes in unheated spaces critical." },
-    { heading: 'What to Expect', body: 'Plumbing permits are required for any new fixture installation, pipe rerouting, or water heater replacement with a new connection. Your plumber handles permits and inspections. Most plumbing projects in Vermont require 1 to 5 business days depending on scope.' },
-  ],
-  faqs: [
-    { q: 'How much does plumbing cost in Vermont?', a: 'Water heater replacement runs $1,200 to $2,500 installed. Full bathroom plumbing rough-in runs $3,000 to $6,000. Whole-home repiping of galvanized pipes runs $8,000 to $20,000 depending on home size.' },
-    { q: 'Do I need a licensed plumber in Vermont?', a: 'Yes. Vermont requires licensed plumbers for all permitted plumbing work. Homeowners can do some plumbing on their own primary residence but work must be inspected.' },
-    { q: 'How do I know if my Vermont home has galvanized pipes?', a: 'Galvanized pipes look silver-gray and rust from the inside out. Signs include reduced water pressure, rusty or discolored water, and pipes that are noticeably heavier than modern copper or plastic.' },
-  ],
-  ctaText: 'Post Your Project Free →',
-  internalLinks: [
-    { label: 'Bathroom remodeling Vermont', href: '/bathroom-remodeling-vermont' },
-    { label: 'Kitchen remodeling Vermont', href: '/kitchen-remodeling-vermont' },
-    { label: 'Contractors in Chittenden County', href: '/chittenden-county-vt' },
-  ],
+    "slug": "plumbing-contractors-vermont",
+    "serviceLabel": "Plumbing",
+    "townName": "Vermont",
+    "townSlug": null,
+    "county": null,
+    "metaTitle": "Plumbing in Vermont — what it actually costs in 2026",
+    "metaDescription": "What plumbing work actually costs across Vermont in 2026. Rebates that stack, contractors to vet, timing that works for the Vermont calendar.",
+    "h1": "Plumbing in Vermont — costs, rebates, contractor reality",
+    "leadParagraph": "Vermont plumbing work costs vary 30-40% between the resort-tier towns (Stowe, Manchester, Woodstock), the Burlington metro, and the rural belt. Statewide median runs at one number; your specific town's number runs at a different one. Get bids that know your specific Vermont sub-market, not generic regional pricing.",
+    "sections": [
+      {
+        "h2": "Vermont plumbing work costs by tier",
+        "body": "Vermont breaks into four cost tiers for plumbing work work:\n\n**Resort-premium** (Stowe, Manchester, Woodstock) — runs 30-40% above statewide median. Labor scarcity, design-review prep, second-home premiums.\n\n**Burlington metro** (Burlington, South Burlington, Williston, Essex, Colchester, Winooski, Shelburne) — runs 10-20% above statewide median. Aging housing stock drives supplementary scope.\n\n**Small city / regional center** (Montpelier, Middlebury, Brattleboro, Vergennes, Rutland) — runs at statewide median. Best mix of contractor density and reasonable pricing.\n\n**Rural** (Northeast Kingdom, much of Caledonia/Orleans/Essex counties) — runs 10-20% below statewide median. Smaller bidder pool and longer scheduling lead times.\n\n**Statewide median** for plumbing work varies widely by scope. Get three written bids before assuming a budget; the variance between bids tells you where the scope ambiguity is.\n\nIn resort-tier towns, multiply by 1.30-1.45×; in rural towns, multiply by 0.85×."
+      },
+      {
+        "h2": "Rebates that apply for Vermont plumbing work",
+        "body": "Plumbing tied to a heat pump water heater install qualifies for the EVT $600 rebate. Septic upgrades trigger Vermont DEC wastewater permit requirements ($300-1,500 in fees + septic engineer evaluation $500-1,500). Most other plumbing work doesn't qualify for major rebates.\n\n**Vermont-specific:** rebate stacks differ by utility territory. GMP (most of Vermont), BED (Burlington), VPPSA member utilities (Stowe, Hyde Park, Lyndonville, Northfield, etc.) each have their own incentive layer on top of the EVT statewide rebates. The federal Section 25C credit (which used to cover heat pumps and weatherization at 30% up to $1,200/year) expired December 31, 2025 and is not in current law.\n\n**Trap:** the contractor or online cost calculator that still quotes the federal 25C credit. Reject bids that include expired federal credits as part of the rebate stack."
+      },
+      {
+        "h2": "When to schedule plumbing work in Vermont",
+        "body": "Vermont plumbing work runs year-round indoors. Outdoor service work (water main, septic) is mud-season-blocked from March through mid-May and frost-blocked from December through early April. Schedule outdoor scope for late spring through early fall."
+      },
+      {
+        "h2": "Vetting a Vermont plumbing work contractor",
+        "body": "Vermont plumbing work requires a Vermont-licensed plumber (state Department of Public Safety license, $50-200 permit). Verify license + certificate of liability insurance. For septic and wastewater work, the licensed septic designer must also be Vermont-credentialed — separate from the plumber.\n\n**Vermont-specific:** the Vermont AG's Consumer Assistance Program registration is required for any residential project $3,500+. Verify the contractor is registered (free for them; refusing is a red flag). Per 9 V.S.A. § 4006, your written contract must include scope, total price, completion date, deposit terms, and 3-day right to cancel. Missing items mean the contract is unenforceable AGAINST you, but the contractor can still cash your deposit. For projects over $10,000, request a list of all subcontractors and material suppliers BEFORE work starts to defend against the Vermont mechanic's lien risk under 9 V.S.A. Chapter 51."
+      }
+    ],
+    "factIds": [
+      "vt-residential-contract-statute",
+      "vt-contractor-registration-threshold",
+      "vt-mechanics-lien-statute",
+      "vt-tier-resort-premium",
+      "vt-tier-burlington-metro",
+      "vt-tier-rural-discount"
+    ],
+    "relatedGuideSlugs": [
+      "vermont-septic-what-to-know",
+      "heat-pump-rebates-vermont",
+      "how-to-find-contractor-vermont",
+      "vermont-renovation-permit-guide"
+    ],
+    "relatedServiceSlugs": [
+      "bathroom-remodeling-vermont",
+      "kitchen-remodeling-vermont"
+    ],
+    "samplePropertySlug": null,
+    "verifyDate": "2026-05-03"
+  }
+
+export const metadata: Metadata = {
+  title: "Plumbing in Vermont — what it actually costs in 2026",
+  description: "What plumbing work actually costs across Vermont in 2026. Rebates that stack, contractors to vet, timing that works for the Vermont calendar.",
+  alternates: { canonical: `https://alderprojects.com${PATH}` },
+  openGraph: {
+    title: "Plumbing in Vermont — what it actually costs in 2026",
+    description: "What plumbing work actually costs across Vermont in 2026. Rebates that stack, contractors to vet, timing that works for the Vermont calendar.",
+    url: `https://alderprojects.com${PATH}`,
+    type: 'article',
+  },
 }
-export default function Page() { return <SeoPage content={content} /> }
+
+export default function Page() {
+  return <ServicePage content={content} />
+}

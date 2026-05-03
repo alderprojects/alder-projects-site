@@ -1,29 +1,71 @@
-import { Metadata } from 'next'
-import SeoPage from '@/components/SeoPage'
-export const metadata: Metadata = {
-  title: 'Window Replacement Vermont | Alder Projects',
-  description: 'Find vetted window replacement contractors across Vermont. Post your project free — matched with local installers in 48 hours.',
-}
-const content = {
-  "h1": "Window Replacement Contractors in Vermont",
-  "heroImg": "https://images.unsplash.com/photo-1505798577917-a65157d3320a",
-  "intro": "Find vetted window replacement contractors across Vermont. Post your project free — matched with local window installers in 48 hours.",
-  "sections": [
-    {"heading": "How Alder Projects Works", "body": "Post your window replacement project free. We match you with 2–4 vetted Vermont window contractors in your area. Compare bids and choose who you want to work with."},
-    {"heading": "Window Replacement in Vermont", "body": "Vermont winters make energy-efficient windows one of the highest-ROI home improvements available. Drafty or single-pane windows account for a significant portion of heating costs. Common projects include full window replacement (all windows), selective replacement (worst performers first), historic window restoration in older Vermont homes, and egress window installation for basement finishing. Vermont’s energy efficiency programs often provide rebates for qualified window upgrades."}
-  ],
-  "townLinks": [
-    {"label": "Burlington", "href": "/window-replacement-burlington-vt"},
-    {"label": "Williston", "href": "/window-replacement-williston-vt"},
-    {"label": "Stowe", "href": "/window-replacement-stowe-vt"}
-  ],
-  "faqs": [
-    {"q": "How much does window replacement cost in Vermont?", "a": "Window replacement in Vermont typically runs $400–$1,200 per window installed, depending on window size, type, and brand. A full-house replacement (15–20 windows) might run $8,000–$20,000. Vermont Weatherization programs may offset costs for income-qualified homeowners."},
-    {"q": "What windows are best for Vermont winters?", "a": "Double or triple-pane windows with low-E coating and argon or krypton gas fill are standard for Vermont’s climate. Look for U-factors of 0.22 or lower for maximum energy efficiency. Fiberglass or vinyl frames are more thermally stable than wood in Vermont’s temperature swings."},
-    {"q": "Do I need a permit for window replacement in Vermont?", "a": "Like-for-like window replacement in existing openings typically doesn’t require a permit. Enlarging or adding new window openings requires a permit. Egress window installation always requires a permit. Your contractor will advise on your specific project."}
-  ],
-  "ctaText": "Post Your Project Free →",
-  "internalLinks": [{"label": "Window replacement Burlington", "href": "/window-replacement-burlington-vt"}, {"label": "Window replacement Stowe", "href": "/window-replacement-stowe-vt"}, {"label": "Contractors Chittenden County", "href": "/chittenden-county-vt"}]
-}
-export default function Page() { return <SeoPage content={content} /> }
+import type { Metadata } from 'next'
+import ServicePage from '@/components/ServicePage'
 
+const PATH = '/window-replacement-vermont'
+
+const content = {
+    "slug": "window-replacement-vermont",
+    "serviceLabel": "Window replacement",
+    "townName": "Vermont",
+    "townSlug": null,
+    "county": null,
+    "metaTitle": "Window replacement in Vermont — what it actually costs in 2026",
+    "metaDescription": "What window replacement actually costs across Vermont in 2026. Rebates that stack, contractors to vet, timing that works for the Vermont calendar.",
+    "h1": "Window replacement in Vermont — costs, rebates, contractor reality",
+    "leadParagraph": "Vermont window replacement costs vary 30-40% between the resort-tier towns (Stowe, Manchester, Woodstock), the Burlington metro, and the rural belt. Statewide median runs at one number; your specific town's number runs at a different one. Get bids that know your specific Vermont sub-market, not generic regional pricing.",
+    "sections": [
+      {
+        "h2": "Vermont window replacement costs by tier",
+        "body": "Vermont breaks into four cost tiers for window replacement work:\n\n**Resort-premium** (Stowe, Manchester, Woodstock) — runs 30-40% above statewide median. Labor scarcity, design-review prep, second-home premiums.\n\n**Burlington metro** (Burlington, South Burlington, Williston, Essex, Colchester, Winooski, Shelburne) — runs 10-20% above statewide median. Aging housing stock drives supplementary scope.\n\n**Small city / regional center** (Montpelier, Middlebury, Brattleboro, Vergennes, Rutland) — runs at statewide median. Best mix of contractor density and reasonable pricing.\n\n**Rural** (Northeast Kingdom, much of Caledonia/Orleans/Essex counties) — runs 10-20% below statewide median. Smaller bidder pool and longer scheduling lead times.\n\n**12-window replacement project** — $12,000-28,000 statewide median (modern double-pane vinyl or fiberglass; historic district approval adds time but rarely cost).\n\nIn resort-tier towns, multiply by 1.30-1.45×; in rural towns, multiply by 0.85×."
+      },
+      {
+        "h2": "Rebates that apply for Vermont window replacement",
+        "body": "The federal Section 25C credit (which used to cover windows at 30% up to $1,200/year) expired December 31, 2025 and is not in current law. Window replacements in 2026 don't have a federal credit available. Stack value comes from EVT weatherization (75% standard tier, 90% income-eligible) when the project includes air-sealing around the window openings.\n\n**Vermont-specific:** rebate stacks differ by utility territory. GMP (most of Vermont), BED (Burlington), VPPSA member utilities (Stowe, Hyde Park, Lyndonville, Northfield, etc.) each have their own incentive layer on top of the EVT statewide rebates. The federal Section 25C credit (which used to cover heat pumps and weatherization at 30% up to $1,200/year) expired December 31, 2025 and is not in current law.\n\n**Trap:** the contractor or online cost calculator that still quotes the federal 25C credit. Reject bids that include expired federal credits as part of the rebate stack."
+      },
+      {
+        "h2": "When to schedule window replacement in Vermont",
+        "body": "Window replacement work runs year-round but installs slow in deep winter (above 40°F days needed for proper caulking and sealant cure). Spring through fall is the sweet spot. Historic-district properties need design review approval — add 4-8 weeks for that step."
+      },
+      {
+        "h2": "Vetting a Vermont window replacement contractor",
+        "body": "Vermont contractor registration with the AG required for any project $3,500+. Modern double-pane vinyl or fiberglass windows can match historic profiles for properties in design review districts (Stowe Village, Woodstock, Burlington Hill Section). Verify the contractor has done historic-district installs if applicable.\n\n**Vermont-specific:** the Vermont AG's Consumer Assistance Program registration is required for any residential project $3,500+. Verify the contractor is registered (free for them; refusing is a red flag). Per 9 V.S.A. § 4006, your written contract must include scope, total price, completion date, deposit terms, and 3-day right to cancel. Missing items mean the contract is unenforceable AGAINST you, but the contractor can still cash your deposit. For projects over $10,000, request a list of all subcontractors and material suppliers BEFORE work starts to defend against the Vermont mechanic's lien risk under 9 V.S.A. Chapter 51."
+      }
+    ],
+    "factIds": [
+      "vt-cost-windows-replacement",
+      "vt-residential-contract-statute",
+      "vt-contractor-registration-threshold",
+      "vt-mechanics-lien-statute",
+      "vt-tier-resort-premium",
+      "vt-tier-burlington-metro",
+      "vt-tier-rural-discount"
+    ],
+    "relatedGuideSlugs": [
+      "vermont-weatherization-evt-rebate",
+      "how-to-find-contractor-vermont",
+      "vermont-renovation-permit-guide",
+      "vermont-contractor-red-flags"
+    ],
+    "relatedServiceSlugs": [
+      "roofing-vermont",
+      "painting-contractors-vermont"
+    ],
+    "samplePropertySlug": null,
+    "verifyDate": "2026-05-03"
+  }
+
+export const metadata: Metadata = {
+  title: "Window replacement in Vermont — what it actually costs in 2026",
+  description: "What window replacement actually costs across Vermont in 2026. Rebates that stack, contractors to vet, timing that works for the Vermont calendar.",
+  alternates: { canonical: `https://alderprojects.com${PATH}` },
+  openGraph: {
+    title: "Window replacement in Vermont — what it actually costs in 2026",
+    description: "What window replacement actually costs across Vermont in 2026. Rebates that stack, contractors to vet, timing that works for the Vermont calendar.",
+    url: `https://alderprojects.com${PATH}`,
+    type: 'article',
+  },
+}
+
+export default function Page() {
+  return <ServicePage content={content} />
+}

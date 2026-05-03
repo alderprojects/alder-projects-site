@@ -1637,4 +1637,1003 @@ export const AFFILIATE_CATALOG: AffiliateItem[] = [
     category: 'tools',
     situations: [FIRST_YEAR_OWNER, ANY_OWNER],
   },
+
+  // ===========================================================================
+  // V4 ACCESSORY KIT ITEMS
+  // Items referenced from ACCESSORY_KITS below. These complement the
+  // situational catalog above (which is keyed on intent/topic/season tags
+  // for inline contextual placement) — accessory items live primarily
+  // inside named kits, but are tagged here for any catalog-wide pulls.
+  // ===========================================================================
+
+  // --- Outdoor: outdoor_furniture kit ---
+  {
+    id: 'patio_4pc_set',
+    display: 'Devoko 4-piece outdoor sectional',
+    url: az('devoko 4 piece outdoor sectional'),
+    shortNote: 'Holds up through Vermont winters if you cover or store cushions.',
+    category: 'lake',
+    situations: [{ topic: 'outdoor', intents: ['owner'] }],
+  },
+  {
+    id: 'patio_cushions_sunbrella',
+    display: 'Sunbrella replacement cushions',
+    url: az('sunbrella outdoor patio cushions'),
+    shortNote: 'Sunbrella holds up. Cheaper brands fade in two seasons.',
+    category: 'lake',
+    situations: [{ topic: 'outdoor', intents: ['owner'] }],
+  },
+  {
+    id: 'cantilever_umbrella',
+    display: 'Cantilever patio umbrella',
+    url: az('10ft cantilever patio umbrella with base'),
+    shortNote: 'Cantilever clears the table. Center-pole umbrellas always end up in the way.',
+    category: 'lake',
+    situations: [{ topic: 'outdoor', intents: ['owner'] }],
+  },
+  {
+    id: 'patio_side_tables',
+    display: 'Outdoor side tables (pair)',
+    url: az('outdoor side table set 2'),
+    shortNote: 'Cheap-trick layer that makes a deck feel finished.',
+    category: 'lake',
+    situations: [{ topic: 'outdoor', intents: ['owner'] }],
+  },
+
+  // --- Outdoor: outdoor_lighting kit ---
+  {
+    id: 'brightech_string_lights',
+    display: 'Brightech string lights (48ft)',
+    url: az('brightech ambience pro string lights 48ft'),
+    shortNote: 'Brightech are the ones that survive Vermont. Shatterproof, restaurant-grade bulbs.',
+    category: 'lake',
+    situations: [{ topic: 'outdoor', intents: ['owner'] }],
+  },
+  {
+    id: 'solar_path_lights_8pk',
+    display: 'Solar path lights (8-pack)',
+    url: az('solar path lights stainless steel 8 pack'),
+    shortNote: 'Stainless. Cheap solar lights last one season; these last several.',
+    category: 'lake',
+    situations: [{ topic: 'outdoor', intents: ['owner'] }],
+  },
+  {
+    id: 'solar_deck_post_caps',
+    display: 'Solar deck post cap lights',
+    url: az('solar deck post cap lights 4x4'),
+    shortNote: 'Drop-in for 4x4 posts. No wiring, no GFCI run.',
+    category: 'lake',
+    situations: [{ topic: 'outdoor', intents: ['owner'] }],
+  },
+  {
+    id: 'motion_sconce',
+    display: 'Outdoor motion sconce',
+    url: az('outdoor motion sensor wall sconce dusk to dawn'),
+    shortNote: 'Dusk-to-dawn + motion. Lit entry without leaving the porch light burning all night.',
+    category: 'lake',
+    situations: [{ topic: 'outdoor', intents: ['owner'] }],
+  },
+
+  // --- Outdoor: fire_pit_heat kit ---
+  {
+    id: 'solo_stove_bonfire',
+    display: 'Solo Stove Bonfire 2.0',
+    url: az('solo stove bonfire 2.0'),
+    shortNote: 'Smokeless. Real difference between a 3-month and 6-month deck.',
+    category: 'lake',
+    situations: [{ topic: 'outdoor', intents: ['owner'] }],
+  },
+  {
+    id: 'fire_pit_screen',
+    display: 'Fire pit spark screen',
+    url: az('fire pit spark screen heat dome'),
+    shortNote: 'Required by most VT towns within 25ft of a structure. Get one before the burn ban.',
+    category: 'lake',
+    situations: [{ topic: 'outdoor', intents: ['owner'] }],
+  },
+  {
+    id: 'patio_heater_propane',
+    display: 'Propane patio heater',
+    url: az('outdoor propane patio heater 48000 btu'),
+    shortNote: 'Pyramid-style. Buys you October and early November on the deck.',
+    category: 'lake',
+    situations: [{ topic: 'outdoor', intents: ['owner'] }],
+  },
+  {
+    id: 'firewood_storage_rack',
+    display: 'Firewood storage rack with cover',
+    url: az('firewood storage rack outdoor with cover 8ft'),
+    shortNote: 'Off the ground, under cover. Wood stays dry; no carpenter ants in the deck framing.',
+    category: 'lake',
+    situations: [{ topic: 'outdoor', intents: ['owner'] }],
+  },
+
+  // --- Outdoor: outdoor_textiles kit ---
+  {
+    id: 'outdoor_rug_8x10',
+    display: 'Outdoor rug 8x10',
+    url: az('outdoor rug 8x10 polypropylene reversible'),
+    shortNote: 'Polypropylene reversible. Hose it off in the spring, flip it for the second season.',
+    category: 'lake',
+    situations: [{ topic: 'outdoor', intents: ['owner'] }],
+  },
+  {
+    id: 'sunbrella_throw_pillows',
+    display: 'Sunbrella throw pillows',
+    url: az('sunbrella outdoor throw pillows set'),
+    shortNote: 'The only outdoor pillow fabric worth buying. Everything else molds.',
+    category: 'lake',
+    situations: [{ topic: 'outdoor', intents: ['owner'] }],
+  },
+  {
+    id: 'outdoor_chaise_cushions',
+    display: 'Outdoor chaise cushions',
+    url: az('outdoor chaise lounge cushions waterproof'),
+    shortNote: 'Replacement-grade. Original chaise cushions are usually the first thing to die.',
+    category: 'lake',
+    situations: [{ topic: 'outdoor', intents: ['owner'] }],
+  },
+  {
+    id: 'all_weather_blanket',
+    display: 'All-weather throw blanket',
+    url: az('outdoor waterproof throw blanket fleece'),
+    shortNote: 'Polar fleece + waterproof backing. Stays in the deck box and gets used.',
+    category: 'lake',
+    situations: [{ topic: 'outdoor', intents: ['owner'] }],
+  },
+
+  // --- Outdoor: outdoor_storage kit ---
+  {
+    id: 'keter_deck_box',
+    display: 'Keter 150-gallon deck box',
+    url: az('keter 150 gallon deck box outdoor'),
+    shortNote: 'Holds cushions for the whole sectional. Vermont winter destroys what you leave out.',
+    category: 'lake',
+    situations: [{ topic: 'outdoor', intents: ['owner'] }],
+  },
+  {
+    id: 'patio_furniture_covers_set',
+    display: 'Patio furniture covers (set)',
+    url: az('patio furniture covers waterproof heavy duty set'),
+    shortNote: 'Heavy-duty waterproof. Rip-stop seams; the cheap covers shred in a winter wind.',
+    category: 'lake',
+    situations: [{ topic: 'outdoor', intents: ['owner'] }],
+  },
+  {
+    id: 'outdoor_storage_shed_small',
+    display: 'Resin outdoor storage shed (4x6)',
+    url: az('rubbermaid resin outdoor storage shed 4x6'),
+    shortNote: 'For mowers, shovels, hose. Resin doesn\'t rot like wood and doesn\'t need stain.',
+    category: 'lake',
+    situations: [{ topic: 'outdoor', intents: ['owner'] }],
+  },
+
+  // --- Outdoor: outdoor_cooking kit ---
+  {
+    id: 'weber_genesis_grill',
+    display: 'Weber Genesis 3-burner gas grill',
+    url: az('weber genesis 3 burner gas grill'),
+    shortNote: 'Workhorse. Parts available at any hardware store for the next decade.',
+    category: 'lake',
+    situations: [{ topic: 'outdoor', intents: ['owner'] }],
+  },
+  {
+    id: 'ooni_pizza_oven',
+    display: 'Ooni Karu 16 pizza oven',
+    url: az('ooni karu 16 pizza oven'),
+    shortNote: 'Wood + propane. The piece of outdoor cooking gear that gets the most use after year one.',
+    category: 'lake',
+    situations: [{ topic: 'outdoor', intents: ['owner'] }],
+  },
+  {
+    id: 'grill_cover_premium',
+    display: 'Premium grill cover (heavy duty)',
+    url: az('grill cover heavy duty waterproof 60 inch'),
+    shortNote: 'A real grill cover doubles grill life in Vermont. Cheap covers tear in one winter.',
+    category: 'lake',
+    situations: [{ topic: 'outdoor', intents: ['owner'] }],
+  },
+  {
+    id: 'outdoor_kitchen_cabinet',
+    display: 'Stainless outdoor kitchen cabinet',
+    url: az('stainless steel outdoor kitchen cabinet weatherproof'),
+    shortNote: 'For the side-burner / pizza oven setup. Stainless or it\'s gone in three winters.',
+    category: 'lake',
+    situations: [{ topic: 'outdoor', intents: ['owner'] }],
+  },
+
+  // --- Kitchen: kitchen_cookware kit ---
+  {
+    id: 'allclad_d3_set',
+    display: 'All-Clad D3 stainless cookware set',
+    url: az('all-clad d3 stainless steel cookware set 10 piece'),
+    shortNote: 'Tri-ply, lifetime warranty. The cookware that earns counter space.',
+    category: 'home_systems',
+    situations: [{ topic: 'kitchen', intents: ['owner'] }],
+  },
+  {
+    id: 'wusthof_classic_knives',
+    display: 'Wüsthof Classic 7-piece knife block',
+    url: az('wusthof classic 7 piece knife block set'),
+    shortNote: 'German full-tang. Sharpen these once a year and they outlive the kitchen.',
+    category: 'home_systems',
+    situations: [{ topic: 'kitchen', intents: ['owner'] }],
+  },
+  {
+    id: 'lodge_dutch_oven',
+    display: 'Lodge enameled Dutch oven (6qt)',
+    url: az('lodge enameled cast iron dutch oven 6 quart'),
+    shortNote: 'Cast iron Dutch oven at a quarter of the Le Creuset price.',
+    category: 'home_systems',
+    situations: [{ topic: 'kitchen', intents: ['owner'] }],
+  },
+  {
+    id: 'thermapen_thermometer',
+    display: 'Thermapen ONE instant-read thermometer',
+    url: az('thermapen one instant read thermometer'),
+    shortNote: 'Two-second read. The piece of gear that quietly upgrades every meal.',
+    category: 'home_systems',
+    situations: [{ topic: 'kitchen', intents: ['owner'] }],
+  },
+
+  // --- Kitchen: kitchen_organizers kit ---
+  {
+    id: 'expandable_drawer_organizer',
+    display: 'Expandable bamboo drawer organizer',
+    url: az('expandable bamboo kitchen drawer organizer'),
+    shortNote: 'Bamboo, expandable. Fits any drawer once you measure the inside dimension.',
+    category: 'home_systems',
+    situations: [{ topic: 'kitchen', intents: ['owner'] }],
+  },
+  {
+    id: 'pull_out_pantry_baskets',
+    display: 'Pull-out pantry wire baskets (set)',
+    url: az('pull out pantry baskets cabinet organizer'),
+    shortNote: 'New cabinets are the moment to organize. Don\'t lose it.',
+    category: 'home_systems',
+    situations: [{ topic: 'kitchen', intents: ['owner'] }],
+  },
+  {
+    id: 'spice_drawer_insert',
+    display: 'Spice drawer insert',
+    url: az('drawer spice rack organizer 4 tier'),
+    shortNote: '4-tier slope. Spices visible at a glance — the one you reach for the most.',
+    category: 'home_systems',
+    situations: [{ topic: 'kitchen', intents: ['owner'] }],
+  },
+  {
+    id: 'under_sink_organizer',
+    display: 'Under-sink expandable organizer',
+    url: az('under sink organizer expandable 2 tier'),
+    shortNote: '2-tier expandable. Works around the disposal and the trap.',
+    category: 'home_systems',
+    situations: [{ topic: 'kitchen', intents: ['owner'] }],
+  },
+
+  // --- Kitchen: kitchen_small_appliances kit ---
+  {
+    id: 'kitchenaid_stand_mixer',
+    display: 'KitchenAid Artisan stand mixer (5qt)',
+    url: az('kitchenaid artisan stand mixer 5 quart'),
+    shortNote: 'The one small appliance every cook actually uses. Buy refurbished if budget matters.',
+    category: 'home_systems',
+    situations: [{ topic: 'kitchen', intents: ['owner'] }],
+  },
+  {
+    id: 'breville_espresso',
+    display: 'Breville Bambino Plus espresso',
+    url: az('breville bambino plus espresso machine'),
+    shortNote: 'Compact, real espresso. The Bambino is the smaller-counter version of the Barista Pro.',
+    category: 'home_systems',
+    situations: [{ topic: 'kitchen', intents: ['owner'] }],
+  },
+  {
+    id: 'instant_pot_pro',
+    display: 'Instant Pot Pro (6qt)',
+    url: az('instant pot pro 6 quart'),
+    shortNote: 'Pressure + slow cooker + sauté. The Pro generation is quieter and better-built than older models.',
+    category: 'home_systems',
+    situations: [{ topic: 'kitchen', intents: ['owner'] }],
+  },
+  {
+    id: 'vitamix_blender',
+    display: 'Vitamix 5200 blender',
+    url: az('vitamix 5200 blender'),
+    shortNote: 'Built like a contractor tool. Lifetime soup-and-smoothie machine.',
+    category: 'home_systems',
+    situations: [{ topic: 'kitchen', intents: ['owner'] }],
+  },
+
+  // --- Kitchen: kitchen_lighting kit ---
+  {
+    id: 'pendant_lights_3pk',
+    display: 'Kitchen pendant lights (3-pack)',
+    url: az('kitchen island pendant lights 3 pack matte black'),
+    shortNote: 'Pendants and undercabinet are usually owner-supplied. Don\'t leave them out of the order.',
+    category: 'home_systems',
+    situations: [{ topic: 'kitchen', intents: ['owner'] }],
+  },
+  {
+    id: 'undercabinet_led_strip',
+    display: 'Undercabinet LED strip kit',
+    url: az('undercabinet led light strip kit hardwired'),
+    shortNote: 'Hardwired strip — task lighting that turns the counter into a usable workspace.',
+    category: 'home_systems',
+    situations: [{ topic: 'kitchen', intents: ['owner'] }],
+  },
+  {
+    id: 'motion_pantry_light',
+    display: 'Motion-activated pantry light',
+    url: az('motion sensor pantry light battery'),
+    shortNote: 'Stick-on. Turns the pantry into a "see what you have" room.',
+    category: 'home_systems',
+    situations: [{ topic: 'kitchen', intents: ['owner'] }],
+  },
+  {
+    id: 'edison_bulb_pack',
+    display: 'LED Edison bulbs (6-pack)',
+    url: az('led edison bulbs e26 dimmable 6 pack'),
+    shortNote: 'Dimmable LEDs that look like real Edison bulbs without the heat or wattage.',
+    category: 'home_systems',
+    situations: [{ topic: 'kitchen', intents: ['owner'] }],
+  },
+
+  // --- Kitchen: kitchen_bar_seating kit ---
+  {
+    id: 'counter_stool_pair_modern',
+    display: 'Counter stools (pair)',
+    url: az('modern counter height stool pair'),
+    shortNote: 'Counter (24") not bar height (29"). Most VT islands are counter height.',
+    category: 'home_systems',
+    situations: [{ topic: 'kitchen', intents: ['owner'] }],
+  },
+  {
+    id: 'swivel_bar_stools',
+    display: 'Swivel bar stools (pair)',
+    url: az('swivel bar stools with back leather pair'),
+    shortNote: 'Swivel + back. The stool you actually want to sit on for an hour.',
+    category: 'home_systems',
+    situations: [{ topic: 'kitchen', intents: ['owner'] }],
+  },
+  {
+    id: 'cushion_seat_pads_pair',
+    display: 'Counter stool cushion pads (pair)',
+    url: az('counter stool cushion seat pads tie on'),
+    shortNote: 'Tie-on cushions. Doubles the time anyone wants to sit.',
+    category: 'home_systems',
+    situations: [{ topic: 'kitchen', intents: ['owner'] }],
+  },
+
+  // --- Bath: bath_textiles kit ---
+  {
+    id: 'turkish_towel_set',
+    display: 'Turkish cotton towel set',
+    url: az('turkish cotton bath towel set 6 piece'),
+    shortNote: '600 gsm Turkish cotton. New bath, new towels — don\'t bring old ones into a fresh room.',
+    category: 'home_systems',
+    situations: [{ topic: 'bath', intents: ['owner'] }],
+  },
+  {
+    id: 'bath_mat_memory_foam',
+    display: 'Memory foam bath mat',
+    url: az('memory foam bath mat non slip'),
+    shortNote: 'Non-slip backing. The cheap-trick bath upgrade you notice every morning.',
+    category: 'home_systems',
+    situations: [{ topic: 'bath', intents: ['owner'] }],
+  },
+  {
+    id: 'shower_curtain_hookless',
+    display: 'Hookless hotel shower curtain',
+    url: az('hookless hotel style shower curtain weighted'),
+    shortNote: 'Weighted hem. No more curtain attacking you mid-shower.',
+    category: 'home_systems',
+    situations: [{ topic: 'bath', intents: ['owner'] }],
+  },
+  {
+    id: 'waffle_robe',
+    display: 'Waffle weave robe',
+    url: az('waffle weave robe cotton turkish'),
+    shortNote: 'Quick-dry waffle. The hotel-feel one that doesn\'t mildew on the hook.',
+    category: 'home_systems',
+    situations: [{ topic: 'bath', intents: ['owner'] }],
+  },
+
+  // --- Bath: bath_organization kit ---
+  {
+    id: 'vanity_drawer_organizer',
+    display: 'Vanity drawer organizer set',
+    url: az('vanity drawer organizer bathroom set'),
+    shortNote: 'Drawer dividers turn a $400 vanity into a $1,200 one in usability.',
+    category: 'home_systems',
+    situations: [{ topic: 'bath', intents: ['owner'] }],
+  },
+  {
+    id: 'medicine_cabinet_inserts',
+    display: 'Medicine cabinet shelf inserts',
+    url: az('medicine cabinet organizer expandable shelf'),
+    shortNote: 'Expandable. Doubles usable shelf area in a standard 14-inch cabinet.',
+    category: 'home_systems',
+    situations: [{ topic: 'bath', intents: ['owner'] }],
+  },
+  {
+    id: 'under_sink_pull_out',
+    display: 'Under-sink pull-out drawer',
+    url: az('under sink pull out organizer drawer bathroom'),
+    shortNote: 'Pull-out reaches the back. The corner under a vanity is dead space without one.',
+    category: 'home_systems',
+    situations: [{ topic: 'bath', intents: ['owner'] }],
+  },
+  {
+    id: 'bathroom_basket_set',
+    display: 'Woven bathroom basket set',
+    url: az('woven bathroom storage basket set'),
+    shortNote: 'Toilet-paper visible storage. Cheap-trick layer that finishes the room.',
+    category: 'home_systems',
+    situations: [{ topic: 'bath', intents: ['owner'] }],
+  },
+
+  // --- Bath: bath_smart_fixtures kit ---
+  {
+    id: 'toto_washlet_bidet',
+    display: 'Toto Washlet C2 bidet seat',
+    url: az('toto washlet c2 bidet seat'),
+    shortNote: 'The upgrade everyone hesitates on then never goes back from.',
+    category: 'home_systems',
+    situations: [{ topic: 'bath', intents: ['owner'] }],
+  },
+  {
+    id: 'rainfall_shower_head_smart',
+    display: 'Rainfall shower head + handheld combo',
+    url: az('rainfall shower head with handheld combo'),
+    shortNote: 'Diverter combo. One shower, two modes, no plumber.',
+    category: 'home_systems',
+    situations: [{ topic: 'bath', intents: ['owner'] }],
+  },
+  {
+    id: 'led_mirror_dimmable',
+    display: 'LED dimmable bathroom mirror',
+    url: az('led bathroom mirror dimmable backlit anti fog'),
+    shortNote: 'Backlit + anti-fog. Real upgrade over a flat mirror with side sconces.',
+    category: 'home_systems',
+    situations: [{ topic: 'bath', intents: ['owner'] }],
+  },
+  {
+    id: 'towel_warmer_wall',
+    display: 'Wall-mounted towel warmer',
+    url: az('wall mounted electric towel warmer'),
+    shortNote: 'Hardwired. Vermont winter mornings; warm towel after the shower. Negligible electric cost.',
+    category: 'home_systems',
+    situations: [{ topic: 'bath', intents: ['owner'] }],
+  },
+
+  // --- Heat pump: smart_thermostat kit ---
+  {
+    id: 'ecobee_premium',
+    display: 'Ecobee Smart Thermostat Premium',
+    url: az('ecobee smart thermostat premium'),
+    shortNote: 'Heat pump-aware. Pays for itself the first Vermont winter on time-of-use rates.',
+    category: 'home_systems',
+    situations: [{ topic: 'heat_pump', intents: ['owner'] }, { topic: 'weatherization', intents: ['owner'] }],
+  },
+  {
+    id: 'ecobee_smartsensor_2pk',
+    display: 'Ecobee SmartSensor (2-pack)',
+    url: az('ecobee smartsensor 2 pack'),
+    shortNote: 'Sensors in the bedroom + LR even out heat-pump comfort across an old VT house.',
+    category: 'home_systems',
+    situations: [{ topic: 'heat_pump', intents: ['owner'] }],
+  },
+  {
+    id: 'merv11_filters_12pk',
+    display: 'MERV 11 filters (12-pack)',
+    url: az('merv 11 filter 16x25x1 12 pack'),
+    shortNote: 'A year\'s supply. Heat pumps die early on a clogged filter — change every month.',
+    category: 'home_systems',
+    situations: [{ topic: 'heat_pump', intents: ['owner'] }],
+  },
+  {
+    id: 'awair_iaq_monitor',
+    display: 'Awair Element air-quality monitor',
+    url: az('awair element indoor air quality monitor'),
+    shortNote: 'Tracks CO2, VOCs, humidity. Tells you when a tight house needs the bath fan run longer.',
+    category: 'home_systems',
+    situations: [{ topic: 'heat_pump', intents: ['owner'] }, { topic: 'weatherization', intents: ['owner'] }],
+  },
+
+  // --- Heat pump: hvac_supplements kit ---
+  {
+    id: 'frigidaire_dehumidifier',
+    display: 'Frigidaire 50-pint dehumidifier',
+    url: az('frigidaire 50 pint dehumidifier with pump'),
+    shortNote: 'Built-in pump. Heat pumps don\'t dehumidify like central AC — basements need help in shoulder seasons.',
+    category: 'home_systems',
+    situations: [{ topic: 'heat_pump', intents: ['owner'] }],
+  },
+  {
+    id: 'vornado_space_heater',
+    display: 'Vornado vortex space heater',
+    url: az('vornado vh200 space heater'),
+    shortNote: 'For the polar-vortex week when the heat pump alone is overmatched. Whole-room circulation, not radiant.',
+    category: 'home_systems',
+    situations: [{ topic: 'heat_pump', intents: ['owner'] }],
+  },
+  {
+    id: 'minisplit_outdoor_cover',
+    display: 'Mini-split outdoor unit cover',
+    url: az('mini split outdoor unit cover snow rain breathable'),
+    shortNote: 'Breathable cover for the off-season. Solid wraps trap condensation — kills compressors.',
+    category: 'home_systems',
+    situations: [{ topic: 'heat_pump', intents: ['owner'] }],
+  },
+  {
+    id: 'duct_booster_fan',
+    display: 'Inline duct booster fan',
+    url: az('inline duct booster fan 6 inch'),
+    shortNote: 'For ducted heat pumps with a long run to a back bedroom. $40 fix vs a $4k re-duct.',
+    category: 'home_systems',
+    situations: [{ topic: 'heat_pump', intents: ['owner'] }],
+  },
+
+  // --- Solar: solar_smart_home kit ---
+  {
+    id: 'sense_energy_monitor',
+    display: 'Sense home energy monitor',
+    url: az('sense home energy monitor solar'),
+    shortNote: 'Solar version watches both production and consumption. Tells you which loads to shift.',
+    category: 'home_systems',
+    situations: [{ topic: 'solar_battery', intents: ['owner'] }],
+  },
+  {
+    id: 'wallbox_ev_charger',
+    display: 'Wallbox Pulsar Plus EV charger',
+    url: az('wallbox pulsar plus ev charger 40a'),
+    shortNote: 'Schedule charging during midday solar production. EVT $500 utility incentive in many service areas.',
+    category: 'home_systems',
+    situations: [{ topic: 'solar_battery', intents: ['owner'] }],
+  },
+  {
+    id: 'kasa_smart_plug_4pk',
+    display: 'Kasa smart plug (4-pack)',
+    url: az('kasa smart plug 4 pack'),
+    shortNote: 'Schedule loads — dehumidifier, heat tape, hot tub — to run when solar is generating.',
+    category: 'home_systems',
+    situations: [{ topic: 'solar_battery', intents: ['owner'] }],
+  },
+  {
+    id: 'tp_link_smart_dimmer',
+    display: 'TP-Link smart dimmer (3-pack)',
+    url: az('tp-link kasa smart dimmer 3 pack'),
+    shortNote: 'Dimmer-grade smart switches for the rooms you actually use most.',
+    category: 'home_systems',
+    situations: [{ topic: 'solar_battery', intents: ['owner'] }],
+  },
+
+  // --- Solar: battery_backup_portable kit ---
+  {
+    id: 'ecoflow_delta_max',
+    display: 'EcoFlow Delta Max (2000)',
+    url: az('ecoflow delta max 2000 portable power station'),
+    shortNote: '2kWh. Runs the fridge for ~24 hours. Recharges from solar panels or wall.',
+    category: 'home_systems',
+    situations: [{ topic: 'solar_battery', intents: ['owner'] }],
+  },
+  {
+    id: 'goal_zero_yeti_1500',
+    display: 'Goal Zero Yeti 1500X',
+    url: az('goal zero yeti 1500x portable power station'),
+    shortNote: 'Solar-tied portable backup. Fridge + furnace ignition + a few lights in an outage.',
+    category: 'home_systems',
+    situations: [{ topic: 'solar_battery', intents: ['owner'] }],
+  },
+  {
+    id: 'jackery_explorer_1000',
+    display: 'Jackery Explorer 1000 v2',
+    url: az('jackery explorer 1000 v2'),
+    shortNote: 'Cheaper rung. Plenty for a weekend cabin or a one-night outage at home.',
+    category: 'home_systems',
+    situations: [{ topic: 'solar_battery', intents: ['owner'] }],
+  },
+
+  // --- Weatherization: diy_weatherization_tools kit ---
+  {
+    id: 'ge_silicone_caulk',
+    display: 'GE 100% silicone caulk (case)',
+    url: az('ge advanced silicone 2 caulk window door 12 pack'),
+    shortNote: 'Window + door perimeter. EVT will reimburse $100 of materials with receipts.',
+    category: 'tools',
+    situations: [{ topic: 'weatherization', intents: ['owner'] }],
+  },
+  {
+    id: 'great_stuff_foam_pack',
+    display: 'Great Stuff window+door foam (case)',
+    url: az('great stuff window door foam 12 pack'),
+    shortNote: 'Low-expansion. Use the W+D version on rough openings; the regular formula bows frames.',
+    category: 'tools',
+    situations: [{ topic: 'weatherization', intents: ['owner'] }],
+  },
+  {
+    id: 'weatherstrip_door',
+    display: 'Door weatherstrip kit',
+    url: az('door weatherstrip kit silicone bulb'),
+    shortNote: 'Silicone bulb seal. One door, 30 minutes. Most-overlooked weatherization line item.',
+    category: 'tools',
+    situations: [{ topic: 'weatherization', intents: ['owner'] }],
+  },
+  {
+    id: 'pipe_insulation_set',
+    display: 'Pipe insulation foam (set)',
+    url: az('foam pipe insulation 1/2 inch 3/4 inch set'),
+    shortNote: 'Hot side first. EVT reimburses pipe insulation under the DIY Energy Saver kit.',
+    category: 'tools',
+    situations: [{ topic: 'weatherization', intents: ['owner'] }],
+  },
+  {
+    id: 'outlet_gaskets_pk',
+    display: 'Outlet + switch gaskets (pack)',
+    url: az('outlet gasket foam exterior wall pack'),
+    shortNote: 'Stops the cold pour at exterior outlets. Half-hour install across the whole house.',
+    category: 'tools',
+    situations: [{ topic: 'weatherization', intents: ['owner'] }],
+  },
+
+  // --- Addition/ADU: adu_basic_furnishing kit ---
+  {
+    id: 'queen_bed_frame',
+    display: 'Queen platform bed frame',
+    url: az('queen platform bed frame solid wood'),
+    shortNote: 'Solid wood platform. Good for both rental-ready and family-ready ADU setups.',
+    category: 'home_systems',
+    situations: [{ topic: 'addition_adu', intents: ['owner'] }],
+  },
+  {
+    id: 'mattress_queen_medium',
+    display: 'Queen mattress, medium-firm',
+    url: az('queen mattress medium firm hybrid'),
+    shortNote: 'Hybrid medium-firm — works for any age tenant or family member.',
+    category: 'home_systems',
+    situations: [{ topic: 'addition_adu', intents: ['owner'] }],
+  },
+  {
+    id: 'compact_dining_set',
+    display: 'Compact 4-seat dining set',
+    url: az('compact dining table set 4 chairs small space'),
+    shortNote: '36-inch round, 4 chairs. Sized for an ADU\'s open living/dining footprint.',
+    category: 'home_systems',
+    situations: [{ topic: 'addition_adu', intents: ['owner'] }],
+  },
+  {
+    id: 'living_room_basics_set',
+    display: 'Living-room basics: sofa + coffee table',
+    url: az('apartment size sofa coffee table set'),
+    shortNote: 'Apartment-scale. ADUs are usually under 900 sqft; full-size sectional doesn\'t fit.',
+    category: 'home_systems',
+    situations: [{ topic: 'addition_adu', intents: ['owner'] }],
+  },
+
+  // --- Addition/ADU: smart_locks_security kit ---
+  {
+    id: 'schlage_encode_smart_lock',
+    display: 'Schlage Encode Wi-Fi deadbolt',
+    url: az('schlage encode wifi deadbolt'),
+    shortNote: 'Code-based access. Especially for rental ADUs — beats handing out keys.',
+    category: 'safety',
+    situations: [{ topic: 'addition_adu', intents: ['owner'] }],
+  },
+  {
+    id: 'ring_doorbell_pro',
+    display: 'Ring Video Doorbell Pro 2',
+    url: az('ring video doorbell pro 2'),
+    shortNote: 'Hardwired Pro. ADU entry monitoring without a separate trip charge to install.',
+    category: 'safety',
+    situations: [{ topic: 'addition_adu', intents: ['owner'] }],
+  },
+  {
+    id: 'wyze_cam_v3_pack',
+    display: 'Wyze Cam v3 (3-pack)',
+    url: az('wyze cam v3 3 pack outdoor'),
+    shortNote: 'Indoor/outdoor rated. Cheap-trick monitoring for an ADU you rent on a long-term basis.',
+    category: 'safety',
+    situations: [{ topic: 'addition_adu', intents: ['owner'] }],
+  },
+
+  // --- General: first_year_essentials kit (additional items) ---
+  {
+    id: 'co_detector_10yr',
+    display: 'CO detector (10-year sealed, 2-pack)',
+    url: az('first alert 10 year sealed carbon monoxide detector 2 pack'),
+    shortNote: 'VT requires CO detector outside every sleeping area. Sealed unit lasts a decade — set it and forget it.',
+    category: 'safety',
+    situations: [FIRST_YEAR_OWNER, ANY_OWNER],
+  },
+  {
+    id: 'mud_mat_waterhog',
+    display: 'WaterHog mud mat (XL)',
+    url: az('waterhog door mat outdoor xl'),
+    shortNote: 'Vermont mud is its own weather event. WaterHog at every entry, period.',
+    category: 'seasonal',
+    situations: [FIRST_YEAR_OWNER, ANY_OWNER],
+    seasons: ['mud'],
+  },
+  {
+    id: 'snow_shovel_slush',
+    display: 'Slush-rated snow shovel',
+    url: az('snow shovel slush deep snow ergonomic'),
+    shortNote: 'Steel-edged scoop, ergonomic handle. The shovel that survives a Vermont February.',
+    category: 'seasonal',
+    situations: [FIRST_YEAR_OWNER, ANY_OWNER],
+    seasons: ['deep_winter', 'pre_winter'],
+  },
+  {
+    id: 'outlet_tester_gfci',
+    display: 'GFCI outlet tester',
+    url: az('gfci outlet tester three prong'),
+    shortNote: 'Three-prong tester catches reversed wiring and missing GFCIs. Five minutes per circuit.',
+    category: 'tools',
+    situations: [FIRST_YEAR_OWNER, ANY_OWNER],
+  },
+  {
+    id: 'fire_extinguisher_kitchen',
+    display: 'Kitchen-rated fire extinguisher',
+    url: az('kitchen fire extinguisher abc rated'),
+    shortNote: 'ABC rated. One under the sink, one in the basement. The cheap-trick safety upgrade everyone forgets.',
+    category: 'safety',
+    situations: [FIRST_YEAR_OWNER, ANY_OWNER],
+  },
 ]
+
+// ===========================================================================
+// V4 ACCESSORY KITS
+//
+// Each kit groups 3-7 items into a named, themed bundle that surfaces on
+// the property page when the visitor is on a matching topic (or, for the
+// first-year-essentials kit, on a no-topic / buying state). The
+// AccessoryRecommender picks at most 2 kits per page (one direct topic
+// match, one adjacent via the affinity matrix).
+//
+// Tunables here:
+//   - estimatedTicketSize: total $ if a visitor buys the whole kit
+//   - expectedClickThruRate: share of kit-views that click an item
+// Both are inputs to revenueScore in CONFIG.revenueAssumptions. Tune
+// against GA4 data once revenue accrues.
+// ===========================================================================
+
+export type AccessoryKit = {
+  id: string
+  title: string
+  description: string         // Real Talk VT 1-line
+  topic: AffTopicId           // primary project topic
+  estimatedTicketSize: number
+  expectedClickThruRate: number
+  itemIds: string[]
+}
+
+export const ACCESSORY_KITS: AccessoryKit[] = [
+  // === OUTDOOR (highest revenue category — 6 kits) =====================
+  {
+    id: 'outdoor_furniture',
+    title: 'What goes on your new deck',
+    description: 'Sunbrella holds up. Cheaper brands fade in two seasons.',
+    topic: 'outdoor',
+    estimatedTicketSize: 950,
+    expectedClickThruRate: 0.05,
+    itemIds: ['patio_4pc_set', 'patio_cushions_sunbrella', 'cantilever_umbrella', 'patio_side_tables'],
+  },
+  {
+    id: 'outdoor_lighting',
+    title: 'Lighting that makes a deck usable at night',
+    description: 'String lights are the cheap win. Path lights are the long game.',
+    topic: 'outdoor',
+    estimatedTicketSize: 180,
+    expectedClickThruRate: 0.06,
+    itemIds: ['brightech_string_lights', 'solar_path_lights_8pk', 'solar_deck_post_caps', 'motion_sconce'],
+  },
+  {
+    id: 'fire_pit_heat',
+    title: 'Extending the deck season',
+    description: 'A real fire pit is the difference between a 3-month and a 6-month deck.',
+    topic: 'outdoor',
+    estimatedTicketSize: 400,
+    expectedClickThruRate: 0.04,
+    itemIds: ['solo_stove_bonfire', 'fire_pit_screen', 'patio_heater_propane', 'firewood_storage_rack'],
+  },
+  {
+    id: 'outdoor_textiles',
+    title: 'Soft goods that survive Vermont',
+    description: 'Cushions and rugs need to handle UV and rain. Most do not.',
+    topic: 'outdoor',
+    estimatedTicketSize: 220,
+    expectedClickThruRate: 0.04,
+    itemIds: ['outdoor_rug_8x10', 'sunbrella_throw_pillows', 'outdoor_chaise_cushions', 'all_weather_blanket'],
+  },
+  {
+    id: 'outdoor_storage',
+    title: 'Where to put all this when fall hits',
+    description: 'Vermont winter destroys outdoor furniture left out. Storage matters.',
+    topic: 'outdoor',
+    estimatedTicketSize: 280,
+    expectedClickThruRate: 0.03,
+    itemIds: ['keter_deck_box', 'patio_furniture_covers_set', 'outdoor_storage_shed_small'],
+  },
+  {
+    id: 'outdoor_cooking',
+    title: 'Outdoor cooking setup',
+    description: 'A grill is fine. Grill plus side burner plus pizza oven is a deck people actually use.',
+    topic: 'outdoor',
+    estimatedTicketSize: 600,
+    expectedClickThruRate: 0.03,
+    itemIds: ['weber_genesis_grill', 'ooni_pizza_oven', 'grill_cover_premium', 'outdoor_kitchen_cabinet'],
+  },
+
+  // === KITCHEN (5 kits) ================================================
+  {
+    id: 'kitchen_cookware',
+    title: 'Cookware that earns counter space',
+    description: 'Your new kitchen deserves better than the wedding-gift set.',
+    topic: 'kitchen',
+    estimatedTicketSize: 350,
+    expectedClickThruRate: 0.05,
+    itemIds: ['allclad_d3_set', 'wusthof_classic_knives', 'lodge_dutch_oven', 'thermapen_thermometer'],
+  },
+  {
+    id: 'kitchen_organizers',
+    title: 'Drawer + cabinet organization',
+    description: 'New cabinets are the moment to actually organize. Do not lose it.',
+    topic: 'kitchen',
+    estimatedTicketSize: 100,
+    expectedClickThruRate: 0.06,
+    itemIds: ['expandable_drawer_organizer', 'pull_out_pantry_baskets', 'spice_drawer_insert', 'under_sink_organizer'],
+  },
+  {
+    id: 'kitchen_small_appliances',
+    title: 'Small appliances homeowners love',
+    description: 'The ones that actually get used — not the ones that live in the garage.',
+    topic: 'kitchen',
+    estimatedTicketSize: 350,
+    expectedClickThruRate: 0.04,
+    itemIds: ['kitchenaid_stand_mixer', 'breville_espresso', 'instant_pot_pro', 'vitamix_blender'],
+  },
+  {
+    id: 'kitchen_lighting',
+    title: 'Lighting beyond the GC quote',
+    description: 'Pendants and undercabinet are usually owner-supplied. Do not leave them out.',
+    topic: 'kitchen',
+    estimatedTicketSize: 180,
+    expectedClickThruRate: 0.04,
+    itemIds: ['pendant_lights_3pk', 'undercabinet_led_strip', 'motion_pantry_light', 'edison_bulb_pack'],
+  },
+  {
+    id: 'kitchen_bar_seating',
+    title: 'Counter stools',
+    description: 'If you have a counter or island, this is the seating decision people regret.',
+    topic: 'kitchen',
+    estimatedTicketSize: 400,
+    expectedClickThruRate: 0.03,
+    itemIds: ['counter_stool_pair_modern', 'swivel_bar_stools', 'cushion_seat_pads_pair'],
+  },
+
+  // === BATH (3 kits) ===================================================
+  {
+    id: 'bath_textiles',
+    title: 'Towels and bath textiles',
+    description: 'New bath, new towels. Do not bring old ones into a fresh room.',
+    topic: 'bath',
+    estimatedTicketSize: 180,
+    expectedClickThruRate: 0.05,
+    itemIds: ['turkish_towel_set', 'bath_mat_memory_foam', 'shower_curtain_hookless', 'waffle_robe'],
+  },
+  {
+    id: 'bath_organization',
+    title: 'Vanity organization',
+    description: 'Drawer dividers turn a $400 vanity into a $1,200 one in usability.',
+    topic: 'bath',
+    estimatedTicketSize: 100,
+    expectedClickThruRate: 0.06,
+    itemIds: ['vanity_drawer_organizer', 'medicine_cabinet_inserts', 'under_sink_pull_out', 'bathroom_basket_set'],
+  },
+  {
+    id: 'bath_smart_fixtures',
+    title: 'Smart bath upgrades',
+    description: 'Bidet attachments are the upgrade everyone hesitates on then never goes back from.',
+    topic: 'bath',
+    estimatedTicketSize: 250,
+    expectedClickThruRate: 0.04,
+    itemIds: ['toto_washlet_bidet', 'rainfall_shower_head_smart', 'led_mirror_dimmable', 'towel_warmer_wall'],
+  },
+
+  // === HEAT PUMP (2 kits) ==============================================
+  {
+    id: 'smart_thermostat',
+    title: 'Get more from your new heat pump',
+    description: 'A smart thermostat with sensors is the difference between a heat pump that works fine and one that works great.',
+    topic: 'heat_pump',
+    estimatedTicketSize: 280,
+    expectedClickThruRate: 0.07,
+    itemIds: ['ecobee_premium', 'ecobee_smartsensor_2pk', 'merv11_filters_12pk', 'awair_iaq_monitor'],
+  },
+  {
+    id: 'hvac_supplements',
+    title: 'Cold-climate heat pump supplements',
+    description: 'These help when the heat pump struggles in deep winter or shoulder-season humidity.',
+    topic: 'heat_pump',
+    estimatedTicketSize: 350,
+    expectedClickThruRate: 0.04,
+    itemIds: ['frigidaire_dehumidifier', 'vornado_space_heater', 'minisplit_outdoor_cover', 'duct_booster_fan'],
+  },
+
+  // === SOLAR / EV (2 kits) =============================================
+  {
+    id: 'solar_smart_home',
+    title: 'Make the most of solar',
+    description: 'These pay back fast when you are generating your own power.',
+    topic: 'solar_battery',
+    estimatedTicketSize: 700,
+    expectedClickThruRate: 0.05,
+    itemIds: ['sense_energy_monitor', 'wallbox_ev_charger', 'kasa_smart_plug_4pk', 'tp_link_smart_dimmer'],
+  },
+  {
+    id: 'battery_backup_portable',
+    title: 'Portable backup power',
+    description: 'Solar + grid-tie shuts down during outages. A portable battery keeps the fridge running.',
+    topic: 'solar_battery',
+    estimatedTicketSize: 1200,
+    expectedClickThruRate: 0.03,
+    itemIds: ['ecoflow_delta_max', 'goal_zero_yeti_1500', 'jackery_explorer_1000'],
+  },
+
+  // === WEATHERIZATION DIY (1 kit) ======================================
+  {
+    id: 'diy_weatherization_tools',
+    title: 'DIY weatherization kit',
+    description: 'Submit receipts to EVT for $100 cash back on materials.',
+    topic: 'weatherization',
+    estimatedTicketSize: 150,
+    expectedClickThruRate: 0.06,
+    itemIds: ['ge_silicone_caulk', 'great_stuff_foam_pack', 'weatherstrip_door', 'pipe_insulation_set', 'outlet_gaskets_pk', 'window_film_3m'],
+  },
+
+  // === ADDITION / ADU (2 kits) =========================================
+  {
+    id: 'adu_basic_furnishing',
+    title: 'Furnishing a new ADU',
+    description: 'Rental-ready or family-ready, these are the staples that work for both.',
+    topic: 'addition_adu',
+    estimatedTicketSize: 1500,
+    expectedClickThruRate: 0.04,
+    itemIds: ['queen_bed_frame', 'mattress_queen_medium', 'compact_dining_set', 'living_room_basics_set'],
+  },
+  {
+    id: 'smart_locks_security',
+    title: 'Smart locks + security for the new space',
+    description: 'Especially for ADUs you might rent. Code-based access beats handing out keys.',
+    topic: 'addition_adu',
+    estimatedTicketSize: 350,
+    expectedClickThruRate: 0.04,
+    itemIds: ['schlage_encode_smart_lock', 'ring_doorbell_pro', 'wyze_cam_v3_pack'],
+  },
+
+  // === GENERAL (1 kit — first-year + buyer) ============================
+  {
+    id: 'first_year_essentials',
+    title: 'First-year Vermont homeowner kit',
+    description: 'The stuff every Vermont homeowner ends up buying. Get ahead of it.',
+    topic: 'general_orientation',
+    estimatedTicketSize: 280,
+    expectedClickThruRate: 0.05,
+    itemIds: ['co_detector_10yr', 'smart_thermostat_basic', 'mud_mat_waterhog', 'snow_shovel_slush', 'outlet_tester_gfci', 'fire_extinguisher_kitchen'],
+  },
+]
+
+// Map kit id → fully-resolved items for rendering. Resolves once at
+// module load; missing item ids surface as a warning so authoring errors
+// don't get swallowed.
+export function resolveKitItems(kit: AccessoryKit): AffiliateItem[] {
+  const items: AffiliateItem[] = []
+  for (const id of kit.itemIds) {
+    const item = AFFILIATE_CATALOG.find(i => i.id === id)
+    if (item) items.push(item)
+    else if (typeof console !== 'undefined') {
+      console.warn(`AccessoryKit "${kit.id}" references missing item id: ${id}`)
+    }
+  }
+  return items
+}

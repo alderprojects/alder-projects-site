@@ -551,19 +551,19 @@ export const CONFIG: RecommenderConfig = {
     },
     townGrid: {
       enabled: true,
-      // pageSlug points at the property tool sample URL (which exists)
-      // until commit 8 ships standalone /[townSlug] pages. Commit 15
-      // swaps these back to clean town slugs once those pages exist.
+      // V6 standalone town pages live at /{townSlug}. Each tile resolves
+      // to a real content page with town-specific cost ranges, rebate
+      // stack, contractor density notes, and FAQ.
       towns: [
-        { town: 'Stowe',         townTier: 'resort_premium',   topServices: ['heat pump', 'kitchen', 'solar'],          pageSlug: 'property/main-street-stowe-vt' },
-        { town: 'Burlington',    townTier: 'burlington_metro', topServices: ['kitchen', 'ADU', 'weatherization'],       pageSlug: 'property/main-street-burlington-vt' },
-        { town: 'Vergennes',     townTier: 'small_city',       topServices: ['well/septic', 'ADU', 'outdoor'],          pageSlug: 'property/main-street-vergennes-vt' },
-        { town: 'Montpelier',    townTier: 'small_city',       topServices: ['heat pump', 'weatherization', 'kitchen'], pageSlug: 'property/main-street-montpelier-vt' },
-        { town: 'Manchester',    townTier: 'resort_premium',   topServices: ['kitchen', 'bath', 'outdoor'],             pageSlug: 'property/main-street-manchester-vt' },
-        { town: 'Woodstock',     townTier: 'resort_premium',   topServices: ['heat pump', 'kitchen', 'addition'],       pageSlug: 'property/main-street-woodstock-vt' },
-        { town: 'Middlebury',    townTier: 'small_city',       topServices: ['heat pump', 'weatherization', 'solar'],   pageSlug: 'property/main-street-middlebury-vt' },
-        { town: 'Brattleboro',   townTier: 'small_city',       topServices: ['kitchen', 'weatherization', 'roof'],      pageSlug: 'property/main-street-brattleboro-vt' },
-        { town: 'St. Johnsbury', townTier: 'rural',            topServices: ['heat pump', 'weatherization', 'roof'],    pageSlug: 'property/main-street-st-johnsbury-vt' },
+        { town: 'Stowe',         townTier: 'resort_premium',   topServices: ['heat pump', 'kitchen', 'solar'],          pageSlug: 'stowe-vt' },
+        { town: 'Burlington',    townTier: 'burlington_metro', topServices: ['kitchen', 'ADU', 'weatherization'],       pageSlug: 'burlington-vt' },
+        { town: 'Vergennes',     townTier: 'small_city',       topServices: ['well/septic', 'ADU', 'outdoor'],          pageSlug: 'vergennes-vt' },
+        { town: 'Montpelier',    townTier: 'small_city',       topServices: ['heat pump', 'weatherization', 'kitchen'], pageSlug: 'montpelier-vt' },
+        { town: 'Manchester',    townTier: 'resort_premium',   topServices: ['kitchen', 'bath', 'outdoor'],             pageSlug: 'manchester-vt' },
+        { town: 'Woodstock',     townTier: 'resort_premium',   topServices: ['heat pump', 'kitchen', 'addition'],       pageSlug: 'woodstock-vt' },
+        { town: 'Middlebury',    townTier: 'small_city',       topServices: ['heat pump', 'weatherization', 'solar'],   pageSlug: 'middlebury-vt' },
+        { town: 'Brattleboro',   townTier: 'small_city',       topServices: ['kitchen', 'weatherization', 'roof'],      pageSlug: 'brattleboro-vt' },
+        { town: 'St. Johnsbury', townTier: 'rural',            topServices: ['heat pump', 'weatherization', 'roof'],    pageSlug: 'st-johnsbury-vt' },
       ],
     },
     seasonalStrip: {

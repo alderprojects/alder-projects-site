@@ -139,12 +139,13 @@ export default function PropertyInteractive({ profile, initialSignals, hadExplic
     [signals, season]
   )
 
-  // Accessory kits — at most 2 per render (one direct, one adjacent).
-  // Researchers see none; refund-risk personas see none; buyers/no-topic
-  // owners see the first-year fallback.
+  // Accessory kits — count + ids driven by the V5 decision tree, scored
+  // by the V5 revenue forest. Researchers / refund-risk personas hit
+  // zero-upsell branches and get []. Re-runs once engagement passes so
+  // the engagementSignal feature flips on for the second-pass scoring.
   const accessoryKits = useMemo(
-    () => getAccessoryKits(signals, profile, 2),
-    [signals, profile]
+    () => getAccessoryKits(signals, profile, engagement.passed),
+    [signals, profile, engagement.passed]
   )
 
   // Recommendation click handler: pick the new topic and let the URL

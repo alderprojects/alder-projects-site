@@ -62,8 +62,17 @@ export default function PropertyInteractive({ profile, initialSignals, hadExplic
     // intent / topic / profile cover everything that affects the result.
   }, [intent, topic, profile, initialSignals.sessionDepth])
 
-  // Mirror state to URL via replaceState — bookmark-friendly, no scroll.
-  // Also broadcast so PropertyChat can keep its page-state in sync.
+  // Mirror state to URL via window.history.replaceState — bookmark-
+  // friendly AND no scroll-to-top. We deliberately use the raw browser
+  // API rather than next/navigation's useRouter().replace() because
+  // the Next router treats replace() as a navigation: it kicks off a
+  // server-component refresh, which mounts a new <main> element and
+  // resets window.scrollY. replaceState updates the URL bar and the
+  // history stack without any of that — the React tree is preserved
+  // in place and our scroll position survives. (Verified: V4 audit
+  // confirmed PropertyFraming was the only remaining consumer of
+  // router.push on /property/[slug]; it is now feature-flagged off in
+  // commit 17 of this pass, removing the last nav-triggering call.)
   const firstRenderRef = useRef(true)
   useEffect(() => {
     if (firstRenderRef.current) {

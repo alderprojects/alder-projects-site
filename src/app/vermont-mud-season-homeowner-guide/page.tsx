@@ -149,7 +149,9 @@ export default function MudSeasonPage() {
         <ul style={{ paddingLeft: 24 }}>
           <li><strong>Class 4 roads</strong> — many Vermont towns have unmaintained Class 4 roads that go effectively impassable in mud season. If you{'’'}re looking at property that requires Class 4 access, the answer to "can I get there year-round?" is no.</li>
           <li><strong>Ag exemption laws</strong> — town road postings (weight limits) take effect during mud season to protect the gravel base. Most VT towns post 6-ton or 12-ton limits in late March. Heavy delivery trucks (oil, propane, gravel) can{'’'}t come up posted roads. Stock your tank in February.</li>
-          <li><strong>Septic systems</strong> — saturated ground in mud season can mean septic backups if your leach field is undersized. If you smell anything, call a septic pumper before it becomes a $5,000 problem.</li>
+          <li><strong>Septic systems</strong> — saturated ground in mud season can mean septic backups if your leach field is undersized. If you smell anything, call a septic pumper before it becomes a $5,000 problem. <a href="/guides/vermont-septic-what-to-know" style={{ color: '#7A9B6F' }}>Read the Vermont septic guide</a>.</li>
+          <li><strong>EVT energy audits</strong> — mud season is the perfect window. <a href="/guides/vermont-weatherization-evt-rebate" style={{ color: '#7A9B6F' }}>How the EVT 75-90% weatherization rebate works</a> and what to schedule before summer demand hits.</li>
+          <li><strong>Northeast Kingdom rural reality</strong> — mud season runs longest in the NEK. <a href="/st-johnsbury-vt" style={{ color: '#7A9B6F' }}>St. Johnsbury contractor density notes</a> and how to plan around it.</li>
         </ul>
 
         <h2 style={{ fontSize: 24, fontWeight: 600, marginTop: 40, marginBottom: 16 }}>The mud-season shopping list</h2>

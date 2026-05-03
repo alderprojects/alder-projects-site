@@ -8,6 +8,7 @@ import PropertyChat from '@/components/PropertyChat'
 import PropertyFraming from '@/components/PropertyFraming'
 import PropertyInteractive from '@/components/PropertyInteractive'
 import { computeSignalsFromParams } from '@/lib/property-ranker'
+import { CONFIG } from '@/lib/recommender-config'
 import type { PropertyProfile } from '@/lib/property-modules'
 
 // Per-address pages are noindex by decision. They are working surfaces for
@@ -130,7 +131,10 @@ export default async function PropertyPage({
         <article style={{ minWidth: 0, display: 'grid', gap: 24 }}>
           {/* Universal: hero summary always shows. */}
           <HeroSummary data={data} />
-          <PropertyFraming />
+          {/* V2 framing toggle — feature-flagged off in V4 (single source
+              of truth: CONFIG.featureFlags.ENABLE_FRAMING_TOGGLE).
+              Component file kept so V5 can revive without re-implementing. */}
+          {CONFIG.featureFlags.ENABLE_FRAMING_TOGGLE && <PropertyFraming />}
 
           {/* Live FEMA + ANR Atlas overlay — universal, fetches client-side. */}
           <PropertyGisOverlay address={data.address} />

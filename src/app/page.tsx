@@ -8,6 +8,7 @@ import HomepageTownGrid from '@/components/HomepageTownGrid'
 import HomepageEmailCapture from '@/components/HomepageEmailCapture'
 import HomepageTrustStrip from '@/components/HomepageTrustStrip'
 import Footer from '@/components/Footer'
+import SmartCartGuideFooterCta from '@/components/SmartCartGuideFooterCta'
 
 // V5 homepage. Server-rendered shell — Hero owns address-search and the
 // homepage_hero_view tracker; everything below is config-driven from
@@ -100,6 +101,9 @@ export default function Home() {
       />
       <Nav />
       <Hero />
+      <div className="max-w-5xl mx-auto px-4">
+        <SmartCartGuideFooterCta variant="compact" />
+      </div>
       <HomepageIntentCards />
       <HomepageSeasonalStrip />
       <HomepageCostWidget />

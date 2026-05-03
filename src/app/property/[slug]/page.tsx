@@ -7,6 +7,9 @@ import PropertyGisOverlay from '@/components/PropertyGisOverlay'
 import PropertyChat from '@/components/PropertyChat'
 import PropertyFraming from '@/components/PropertyFraming'
 import PropertyInteractive from '@/components/PropertyInteractive'
+import WorthItCTACard from '@/components/property/WorthItCTACard'
+import SmartCartTextLink from '@/components/property/SmartCartTextLink'
+import CurationModal from '@/components/CurationModal'
 import { computeSignalsFromParams } from '@/lib/property-ranker'
 import { CONFIG } from '@/lib/recommender-config'
 import type { PropertyProfile } from '@/lib/property-modules'
@@ -161,6 +164,14 @@ export default async function PropertyPage({
               Component file kept so V5 can revive without re-implementing. */}
           {CONFIG.featureFlags.ENABLE_FRAMING_TOGGLE && <PropertyFraming />}
 
+          {/* V7 — Worth-It Plan CTA (engagement-gated, refund-risk-suppressed). */}
+          <WorthItCTACard
+            topic={initialSignals.topic ?? null}
+            intent={mapTopLevelIntent(initialSignals.topLevelIntent)}
+            address={data.address}
+            slug={params.slug}
+          />
+
           {/* Live FEMA + ANR Atlas overlay — universal, fetches client-side. */}
           <PropertyGisOverlay address={data.address} />
 
@@ -173,6 +184,12 @@ export default async function PropertyPage({
             hadExplicitIntent={Boolean(searchParams?.intent)}
           />
 
+          {/* V7 — Smart Cart text link near the affiliate-kit area. */}
+          <SmartCartTextLink
+            topic={initialSignals.topic ?? null}
+            intent={mapTopLevelIntent(initialSignals.topLevelIntent)}
+          />
+
           {data.dataLinks.length > 0 && <Sources data={data} />}
         </article>
 
@@ -181,6 +198,7 @@ export default async function PropertyPage({
         </aside>
       </main>
 
+      <CurationModal />
       <Footer />
 
       <style>{`
@@ -412,3 +430,14 @@ function AddressStrip({ address }: { address: string }) {
   )
 }
 
+
+// V7 helper: map V4 TopLevelIntent ('looking' included) to the V7 CTA
+// component's narrower intent prop ('buying' | 'owner' | 'researching').
+function mapTopLevelIntent(
+  intent: 'buying' | 'owner' | 'looking' | 'researching',
+): 'buying' | 'owner' | 'researching' | null {
+  if (intent === 'buying') return 'buying'
+  if (intent === 'owner') return 'owner'
+  if (intent === 'researching') return 'researching'
+  return null
+}

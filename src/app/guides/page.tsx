@@ -32,6 +32,23 @@ const planning = [
   { href: '/guides/how-long-does-bathroom-remodel-take-vermont', title: 'How Long Does a Bathroom Remodel Take?', desc: 'Realistic timelines by scope and what causes delays.', rt: '5 min' },
   { href: '/guides/vermont-home-renovation-winter', title: 'Renovating Your Vermont Home in Winter', desc: 'What works year-round and the off-season advantage.', rt: '4 min' },
 ]
+// V6 topic guides — deep guides on rebate stacking, ADU permitting, weatherization
+const topics = [
+  { href: '/guides/vermont-heat-pump-rebate-stack-2026', title: 'Vermont Heat Pump Rebate Stack 2026', desc: '$7-17k real, in the right order. EVT + GMP/VPPSA + expired federal 25C.', rt: '8 min' },
+  { href: '/guides/vermont-weatherization-evt-rebate', title: 'Vermont Weatherization EVT Rebate', desc: 'EVT 75% standard, 90% income-eligible. Paid to the contractor, not to you.', rt: '7 min' },
+  { href: '/guides/vermont-solar-battery-stack-2026', title: 'Vermont Solar + Battery Stack 2026', desc: 'Federal 25D + EVT solar+storage + Net Metering Group 2 = $28-42k after credits.', rt: '8 min' },
+  { href: '/guides/vermont-adu-permit-cost-2026', title: 'Vermont ADU Permit + Cost 2026', desc: "Act 47 freedom, septic engineering reality. $85-175k built.", rt: '8 min' },
+  { href: '/guides/vermont-rebate-stack-2026', title: 'Vermont Rebate Stack 2026', desc: 'The umbrella guide. Federal + EVT + utility-side + state, layer by layer.', rt: '8 min' },
+]
+// V6 seasonal guides — companion to /seasons index
+const seasons = [
+  { href: '/vermont-mud-season-homeowner-guide', title: 'Vermont Mud Season Homeowner Guide', desc: 'Driveways, mudroom, contractor scheduling. Mid-March – mid-May.', rt: '8 min' },
+  { href: '/vermont-spring-blackfly', title: 'Vermont Spring Blackfly Season', desc: 'Three weeks that shape the spring. What works, when it ends.', rt: '7 min' },
+  { href: '/vermont-lake-season', title: 'Vermont Lake Season', desc: 'Contractor demand peak. Dock work, second-home reopening, shoreland buffer.', rt: '8 min' },
+  { href: '/vermont-fall-leaf-weatherization', title: 'Vermont Fall Weatherization Season', desc: "EVT rebate window. Book in September. Federal 25C is gone.", rt: '8 min' },
+  { href: '/vermont-pre-winter-prep', title: 'Vermont Pre-Winter Prep', desc: 'Contractor scramble, second-home winterization, fuel deliveries.', rt: '8 min' },
+  { href: '/vermont-deep-winter', title: 'Vermont Deep Winter', desc: 'Heating bill peak. Smart thermostat, ice dams, power outage prep.', rt: '8 min' },
+]
 function Section({title,subtitle,guides,accent}:{title:string;subtitle:string;guides:{href:string;title:string;desc:string;rt:string}[];accent?:boolean}){
   return (
     <div style={{marginBottom:'48px'}}>
@@ -53,7 +70,7 @@ const guidesIndexSchemas = [
   buildItemList({
     url: absUrl('/guides'),
     name: 'Vermont home renovation guides',
-    items: [...seasonal, ...costs, ...hiring, ...planning].map(g => ({
+    items: [...seasonal, ...costs, ...hiring, ...planning, ...topics, ...seasons].map(g => ({
       name: g.title,
       url: g.href,
     })),
@@ -93,7 +110,9 @@ export default function Page(){
             <span style={{fontSize:'13px',fontFamily:'monospace',color:'#7A9B6F',whiteSpace:'nowrap'}}>Scan your property →</span>
           </div>
         </Link>
-        <Section title="Seasonal home guides" subtitle="For lake house, cabin, and second-home owners." guides={seasonal} accent />
+        <Section title="Vermont seasons" subtitle={"Six windows, not four. What's happening when. "} guides={seasons} accent />
+        <Section title="Project topics & rebate stacks" subtitle="Heat pump, weatherization, solar+battery, ADU permitting." guides={topics} />
+        <Section title="Seasonal home guides" subtitle="For lake house, cabin, and second-home owners." guides={seasonal} />
         <Section title="What does it cost?" subtitle="Real Vermont pricing by project type." guides={costs} />
         <Section title="Finding and hiring contractors" subtitle="How to find the right one and avoid the wrong one." guides={hiring} />
         <Section title="Planning and permits" subtitle="Timelines, permits, and when to renovate." guides={planning} />

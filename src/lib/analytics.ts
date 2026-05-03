@@ -9,6 +9,8 @@
 //    - revenueScore, recommendationScore (event-scoped, number)
 //    - configVersion (event-scoped) — tracks which CONFIG produced
 //      a given event, lets us A/B compare config versions
+//    - V5: rowLabel, fromSection, intentDestination, source
+//      (event-scoped)
 //
 // 2. KEY EVENTS (Admin → Events → mark as key event):
 //    - recommendation_click
@@ -16,6 +18,7 @@
 //    - cta_get_bids_click
 //    - email_capture_submit
 //    - recommendation_conversion
+//    - sample_demo_click (V5)
 //
 // 3. EXPLORATIONS (Reports → Explore → create):
 //    A. Recommendation funnel: picker_topic_select →
@@ -29,6 +32,11 @@
 //    D. Engagement gate health: % of sessions reaching
 //       engagement_gate_passed; breakdown by device/intent/topic
 //    E. Mobile vs desktop: every key event sliced by device
+//    F. Homepage funnel (V5): homepage_hero_view →
+//       sample_demo_click → engagement_gate_passed →
+//       (accessory_item_click | recommendation_click). Cross-
+//       reference fromSection/intentDestination to see which
+//       homepage surface drives the warmest demo arrivals.
 
 declare global {
   interface Window {
@@ -469,5 +477,95 @@ export function trackRenderDecision(params: VisitorContext & {
     top_module_score: params.topModuleScore,
     bottom_module_score: params.bottomModuleScore,
     config_version: params.configVersion,
+  })
+}
+
+// =====================================================================
+// V5 homepage events
+// =====================================================================
+
+// homepage_hero_view — fires once per homepage mount. Establishes the
+// top of the homepage funnel and snapshots the season at landing time.
+export function trackHomepageHeroView(params: {
+  device?: string
+  season: string
+}): void {
+  send('homepage_hero_view', {
+    device: params.device || '(none)',
+    season: params.season,
+  })
+}
+
+// sample_demo_click — fires when a visitor clicks any "see a sample
+// property" link (hero, intent card, cost-widget row). fromSection +
+// intentDestination together describe which surface drove the click
+// and which intent persona the demo lands on. Marked as a key event.
+export function trackSampleDemoClick(params: {
+  device?: string
+  fromSection: 'hero' | 'intent_card' | 'cost_widget'
+  intentDestination: 'buying' | 'owner' | 'researching'
+}): void {
+  send('sample_demo_click', {
+    device: params.device || '(none)',
+    from_section: params.fromSection,
+    intent_destination: params.intentDestination,
+  })
+}
+
+// homepage_seasonal_kit_view — fires once per homepage mount when the
+// seasonal strip enters the viewport. season + kitId together pin
+// which seasonal recommendation the visitor saw.
+export function trackHomepageSeasonalKitView(params: {
+  device?: string
+  season: string
+  kitId: string
+}): void {
+  send('homepage_seasonal_kit_view', {
+    device: params.device || '(none)',
+    season: params.season,
+    kit_id: params.kitId,
+  })
+}
+
+// homepage_cost_row_click — fires when a cost-widget row is clicked.
+// rowLabel + topicId together let us see which cost categories drive
+// demo arrivals.
+export function trackHomepageCostRowClick(params: {
+  device?: string
+  rowLabel: string
+  topicId?: string
+}): void {
+  send('homepage_cost_row_click', {
+    device: params.device || '(none)',
+    row_label: params.rowLabel,
+    topic_id: params.topicId ?? '(none)',
+  })
+}
+
+// homepage_town_tile_click — fires when a town-grid tile is clicked.
+// town + townTier let us see whether the homepage drives traffic to
+// resort_premium pages (highest revenue) or to small_city/rural.
+export function trackHomepageTownTileClick(params: {
+  device?: string
+  town: string
+  townTier: string
+}): void {
+  send('homepage_town_tile_click', {
+    device: params.device || '(none)',
+    town: params.town,
+    town_tier: params.townTier,
+  })
+}
+
+// email_capture_submit — fires on a successful email capture submit.
+// source identifies which surface captured the email so we can compare
+// homepage / property-page / article capture rates. Marked as a key event.
+export function trackEmailCapture(params: {
+  device?: string
+  source: 'homepage' | 'property_page' | 'article'
+}): void {
+  send('email_capture_submit', {
+    device: params.device || '(none)',
+    source: params.source,
   })
 }

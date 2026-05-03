@@ -2621,6 +2621,15 @@ export const ACCESSORY_KITS: AccessoryKit[] = [
     expectedClickThruRate: 0.05,
     itemIds: ['co_detector_10yr', 'smart_thermostat_basic', 'mud_mat_waterhog', 'snow_shovel_slush', 'outlet_tester_gfci', 'fire_extinguisher_kitchen'],
   },
+  {
+    id: 'mud_season_essentials',
+    title: 'What you need before mud season hits',
+    description: 'Every March-to-mid-May, the dirt road becomes soup and your boots track it indoors. This is the kit.',
+    topic: 'mud_season',
+    estimatedTicketSize: 240,
+    expectedClickThruRate: 0.07,
+    itemIds: ['mud_mat_waterhog', 'boot_tray', 'dog_towel_mud', 'car_floor_liner', 'septic_rid_x', 'tire_chains'],
+  },
 ]
 
 // Map kit id → fully-resolved items for rendering. Resolves once at

@@ -10,7 +10,7 @@
 import type { RecommenderConfig } from './recommender-config.types'
 
 export const CONFIG: RecommenderConfig = {
-  version: '2026.05.02-v4',
+  version: '2026.05.02-v5',
 
   // ---------- Topic affinity matrix ------------------------------------
   // affinity[from][to] = strength of "if visitor is on `from`, recommend
@@ -333,5 +333,274 @@ export const CONFIG: RecommenderConfig = {
   // re-implementing.
   featureFlags: {
     ENABLE_FRAMING_TOGGLE: false,
+  },
+
+  // ---------- V5: Revenue forest ---------------------------------------
+  // Replaces V4's linear (ticket × CTR × commission × conversion) score.
+  // Eight weighted features per kit, summed into a single revenue score.
+  // inventoryDilution is intentionally negative — it penalizes a second
+  // kit on the same topic so we get diversified placements, not two
+  // outdoor furniture kits stacked on top of each other.
+  //
+  // Weight intuition:
+  //   - topicAffinity (0.25): the strongest signal we have. If a visitor
+  //     is on heat_pump, the smart_thermostat kit dominates.
+  //   - clickThruRate (0.20): high-confidence signal — a kit with proven
+  //     CTR has demonstrated revenue, regardless of ticket size.
+  //   - seasonalAlignment (0.15): mud-season kit during mud season ranks
+  //     above any general kit, and similar.
+  //   - ticketSize (0.15): bigger basket = bigger expected commission,
+  //     but it's a noisy signal so we don't over-weight it.
+  //   - commissionRate (0.05): low variance across Amazon categories
+  //     (3-4.5%), so it barely moves the score.
+  //   - townTierMatch (0.05): resort_premium rewards higher-ticket kits;
+  //     rural rewards lower-ticket kits.
+  //   - engagementSignal (0.05): visitors past the gate are warmer.
+  //   - inventoryDilution (-0.10): penalty when the same kit topic has
+  //     already been placed on the page.
+  //
+  // Phase 2 (after 30 days of GA4 data): retune from real conversion data.
+  // Phase 3 (after 100+ affiliate conversions): replace hand weights with
+  // logistic regression coefficients fit on (features → click? buy?).
+  revenueForest: {
+    enabled: true,
+    featureWeights: {
+      topicAffinity:      0.25,
+      seasonalAlignment:  0.15,
+      ticketSize:         0.15,
+      clickThruRate:      0.20,
+      commissionRate:     0.05,
+      townTierMatch:      0.05,
+      engagementSignal:   0.05,
+      inventoryDilution: -0.10,
+    },
+    normalizers: {
+      maxTicketSize:     1500,
+      maxClickThruRate:  0.10,
+      maxCommissionRate: 0.05,
+    },
+  },
+
+  // ---------- V5: Decision tree ----------------------------------------
+  // Picks the per-visitor surface strategy. Branches are evaluated in
+  // order; first match wins. refund_risk_suppress MUST be first so refund-
+  // risk topics never receive upsells, regardless of intent or season.
+  // Researching state always gets email_first (no affiliates) so we don't
+  // burn that audience.
+  decisionTree: {
+    enabled: true,
+    paths: [
+      // Refund risk: zero upsell, no matter what. Must come first.
+      {
+        name: 'refund_risk_suppress',
+        when: { refundRiskFlag: true },
+        strategy: 'zero_upsell',
+        kPrimary: 0,
+        kRecommendation: 0,
+      },
+
+      // Researching: never push affiliates — push email instead.
+      {
+        name: 'researching_email_first',
+        when: { intent: ['researching'] },
+        strategy: 'email_first',
+        kPrimary: 0,
+        kRecommendation: 0,
+      },
+
+      // Lake property + outdoor + lake season = peak revenue path.
+      {
+        name: 'lake_season_outdoor_owner',
+        when: {
+          intent: ['owner'],
+          topic: ['outdoor'],
+          season: ['lake'],
+          isLakeProperty: true,
+        },
+        strategy: 'aggressive_upsell',
+        kPrimary: 2,
+        kRecommendation: 2,
+        forceKitIds: ['outdoor_furniture', 'outdoor_lighting'],
+      },
+
+      // Pre-winter heat-pump moment: smart thermostat + HVAC supplements.
+      {
+        name: 'prewinter_heat_pump',
+        when: {
+          intent: ['owner'],
+          topic: ['heat_pump'],
+          season: ['pre_winter', 'fall_leaf'],
+        },
+        strategy: 'aggressive_upsell',
+        kPrimary: 2,
+        kRecommendation: 2,
+        forceKitIds: ['smart_thermostat', 'hvac_supplements'],
+      },
+
+      // Mud season window: highest CTR period of the year. Forest picks
+      // the kit; the homepage seasonal strip surfaces mud_season_essentials.
+      {
+        name: 'mud_season_owner',
+        when: {
+          intent: ['owner'],
+          season: ['mud'],
+        },
+        strategy: 'balanced',
+        kPrimary: 2,
+        kRecommendation: 2,
+      },
+
+      // Buying: first-year essentials only, no project recs (no project yet).
+      {
+        name: 'buying_balanced',
+        when: { intent: ['buying'] },
+        strategy: 'balanced',
+        kPrimary: 1,
+        kRecommendation: 0,
+        forceKitIds: ['first_year_essentials'],
+      },
+
+      // Resort-premium owner: aggressive across the board.
+      {
+        name: 'resort_premium_owner',
+        when: {
+          intent: ['owner'],
+          townTier: ['resort_premium'],
+        },
+        strategy: 'aggressive_upsell',
+        kPrimary: 2,
+        kRecommendation: 3,
+      },
+
+      // Default owner: balanced.
+      {
+        name: 'default_owner',
+        when: { intent: ['owner'] },
+        strategy: 'balanced',
+        kPrimary: 2,
+        kRecommendation: 2,
+      },
+
+      // Catch-all: zero upsell.
+      {
+        name: 'catch_all',
+        when: {},
+        strategy: 'zero_upsell',
+        kPrimary: 0,
+        kRecommendation: 0,
+      },
+    ],
+  },
+
+  // ---------- V5: Homepage ---------------------------------------------
+  // Every homepage tunable lives here. Components carry zero magic
+  // numbers. Town grid uses V4 TownBucket values (small_city / rural)
+  // directly — V5 spec uses 'mid_tier' / 'rural_value' as positioning
+  // language but the underlying data graph is unchanged.
+  homepage: {
+    enabled: true,
+    sampleProperty: {
+      address: 'Main Street, Stowe, VT',
+      slug: 'main-street-stowe-vt',
+      label: 'See a sample property →',
+    },
+    intentDemoLinks: {
+      buying:      '/property/main-street-stowe-vt?intent=buying',
+      owner:       '/property/main-street-stowe-vt?intent=owner&topic=heat_pump',
+      researching: '/property/main-street-stowe-vt?intent=researching',
+    },
+    costWidget: {
+      enabled: true,
+      rows: [
+        {
+          label: 'Heat pump (ducted)',
+          rangeLow: 11000,
+          rangeHigh: 22000,
+          rebateNote: 'EVT rebate up to $2,200',
+          topicId: 'heat_pump',
+        },
+        {
+          label: 'Kitchen mid-range remodel',
+          rangeLow: 35000,
+          rangeHigh: 65000,
+          rebateNote: 'Combine with bath, save 15-20% on labor',
+          topicId: 'kitchen',
+        },
+        {
+          label: 'Solar 8kW + battery',
+          rangeLow: 28000,
+          rangeHigh: 42000,
+          rebateNote: 'After federal 25D 30% credit',
+          topicId: 'solar_battery',
+        },
+        {
+          label: 'ADU build (900 sq ft)',
+          rangeLow: 85000,
+          rangeHigh: 175000,
+          rebateNote: 'Plus VT wastewater permit, ~$2-5k',
+          topicId: 'addition_adu',
+        },
+        {
+          label: 'Whole-home weatherization',
+          rangeLow: 4000,
+          rangeHigh: 18000,
+          rebateNote: 'EVT 75-90% cash back through end of 2026',
+          topicId: 'weatherization',
+        },
+      ],
+    },
+    townGrid: {
+      enabled: true,
+      towns: [
+        { town: 'Stowe',         townTier: 'resort_premium',   topServices: ['heat pump', 'kitchen', 'solar'],          pageSlug: 'stowe-vt' },
+        { town: 'Burlington',    townTier: 'burlington_metro', topServices: ['kitchen', 'ADU', 'weatherization'],       pageSlug: 'burlington-vt' },
+        { town: 'Vergennes',     townTier: 'small_city',       topServices: ['well/septic', 'ADU', 'outdoor'],          pageSlug: 'vergennes-vt' },
+        { town: 'Montpelier',    townTier: 'small_city',       topServices: ['heat pump', 'weatherization', 'kitchen'], pageSlug: 'montpelier-vt' },
+        { town: 'Manchester',    townTier: 'resort_premium',   topServices: ['kitchen', 'bath', 'outdoor'],             pageSlug: 'manchester-vt' },
+        { town: 'Woodstock',     townTier: 'resort_premium',   topServices: ['heat pump', 'kitchen', 'addition'],       pageSlug: 'woodstock-vt' },
+        { town: 'Middlebury',    townTier: 'small_city',       topServices: ['heat pump', 'weatherization', 'solar'],   pageSlug: 'middlebury-vt' },
+        { town: 'Brattleboro',   townTier: 'small_city',       topServices: ['kitchen', 'weatherization', 'roof'],      pageSlug: 'brattleboro-vt' },
+        { town: 'St. Johnsbury', townTier: 'rural',            topServices: ['heat pump', 'weatherization', 'roof'],    pageSlug: 'st-johnsbury-vt' },
+      ],
+    },
+    seasonalStrip: {
+      enabled: true,
+      kitBySeason: {
+        mud:             'mud_season_essentials',
+        spring_blackfly: 'first_year_essentials',
+        lake:            'outdoor_furniture',
+        fall_leaf:       'diy_weatherization_tools',
+        pre_winter:      'diy_weatherization_tools',
+        deep_winter:     'smart_thermostat',
+      },
+      articleBySeason: {
+        mud: {
+          title: 'Vermont mud season homeowner guide',
+          url: '/vermont-mud-season-homeowner-guide',
+        },
+      },
+    },
+    trustStrip: {
+      enabled: true,
+      dataSources: [
+        'VT Department of Taxes',
+        'Efficiency Vermont',
+        'Vermont DEC',
+        'BED & VGS',
+        'FEMA',
+        'Vermont ANR Atlas',
+      ],
+      lastUpdatedNote: 'Updated monthly. Config 2026.05.02-v5.',
+    },
+    emailCapture: {
+      enabled: true,
+      promise: "We don't sell your data. We don't spam.",
+      cadence: 'Once a month, max — seasonal warnings and rebate-deadline alerts.',
+    },
+    crossLinks: {
+      mudSeasonArticle: '/vermont-mud-season-homeowner-guide',
+      townsIndex:       '/towns',
+      disclosure:       '/disclosure',
+    },
   },
 }

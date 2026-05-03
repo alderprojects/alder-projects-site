@@ -3,6 +3,7 @@ import Link from 'next/link'
 import Nav from '@/components/Nav'
 import Footer from '@/components/Footer'
 import { TOWN_TO_BUCKET, type TownBucket } from '@/data/projects'
+import { buildBreadcrumbList } from '@/lib/jsonld'
 
 // /towns — SEO real estate. Lists every named Vermont town the data
 // graph knows about, grouped by tier, with each tile linking to a
@@ -149,11 +150,20 @@ export default function TownsIndex() {
     })),
   }
 
+  const breadcrumbJsonLd = buildBreadcrumbList([
+    { name: 'Home', url: '/' },
+    { name: 'Towns', url: '/towns' },
+  ])
+
   return (
     <main>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
       />
       <Nav />
 

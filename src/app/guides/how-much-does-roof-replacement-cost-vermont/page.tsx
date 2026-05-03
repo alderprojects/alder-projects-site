@@ -37,4 +37,4 @@ const content = {
     { label: 'Roofing Stowe', href: '/roofing-stowe-vt' },
   ],
 }
-export default function Page() { return <GuidePage content={content} /> }
+export default function Page() { return <GuidePage content={content} meta={{ path: '/guides/how-much-does-roof-replacement-cost-vermont', verifyDate: '2026-05-03' }} /> }

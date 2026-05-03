@@ -36,4 +36,4 @@ const content = {
     { label: 'Kitchen remodeling Vermont', href: '/kitchen-remodeling-vermont' },
   ],
 }
-export default function Page() { return <GuidePage content={content} /> }
+export default function Page() { return <GuidePage content={content} meta={{ path: '/guides/how-much-does-kitchen-remodel-cost-vermont', verifyDate: '2026-05-03' }} /> }

@@ -54,4 +54,4 @@ const content = {
     { label: 'Home additions Vermont', href: '/home-additions-vermont' },
   ],
 }
-export default function Page() { return <GuidePage content={content} /> }
+export default function Page() { return <GuidePage content={content} meta={{ path: '/guides/vermont-contractor-red-flags', verifyDate: '2026-05-03' }} /> }

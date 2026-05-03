@@ -35,4 +35,4 @@ const content = {
     { label: 'HVAC contractors Vermont', href: '/hvac-contractors-vermont' },
   ],
 }
-export default function Page() { return <GuidePage content={content} /> }
+export default function Page() { return <GuidePage content={content} meta={{ path: '/guides/heat-pump-rebates-vermont', verifyDate: '2026-05-03' }} /> }

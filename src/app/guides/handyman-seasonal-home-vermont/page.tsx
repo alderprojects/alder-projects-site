@@ -36,4 +36,4 @@ const content = {
     { label: 'General contractors Vermont', href: '/general-contractors-vermont' },
   ],
 }
-export default function Page() { return <GuidePage content={content} /> }
+export default function Page() { return <GuidePage content={content} meta={{ path: '/guides/handyman-seasonal-home-vermont', verifyDate: '2026-05-03' }} /> }

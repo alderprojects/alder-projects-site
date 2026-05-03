@@ -38,4 +38,4 @@ const content = {
     { label: 'Deck builders Stowe', href: '/deck-builders-stowe-vt' },
   ],
 }
-export default function Page() { return <GuidePage content={content} /> }
+export default function Page() { return <GuidePage content={content} meta={{ path: '/guides/how-much-does-a-deck-cost-vermont', verifyDate: '2026-05-03' }} /> }

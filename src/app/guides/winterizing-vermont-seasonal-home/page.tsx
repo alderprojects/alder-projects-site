@@ -38,4 +38,4 @@ const content = {
     { label: 'Roofing contractors Vermont', href: '/roofing-contractors-vermont' },
   ],
 }
-export default function Page() { return <GuidePage content={content} /> }
+export default function Page() { return <GuidePage content={content} meta={{ path: '/guides/winterizing-vermont-seasonal-home', verifyDate: '2026-05-03' }} /> }

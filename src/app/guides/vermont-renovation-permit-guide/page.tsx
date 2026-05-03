@@ -33,4 +33,4 @@ const content = {
     { label: 'Deck builders Vermont', href: '/deck-builders-vermont' },
   ],
 }
-export default function Page() { return <GuidePage content={content} /> }
+export default function Page() { return <GuidePage content={content} meta={{ path: '/guides/vermont-renovation-permit-guide', verifyDate: '2026-05-03' }} /> }

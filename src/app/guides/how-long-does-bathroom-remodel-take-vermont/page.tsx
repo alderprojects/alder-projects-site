@@ -36,4 +36,4 @@ const content = {
     { label: 'Bathroom remodeling Stowe', href: '/bathroom-remodeling-stowe-vt' },
   ],
 }
-export default function Page() { return <GuidePage content={content} /> }
+export default function Page() { return <GuidePage content={content} meta={{ path: '/guides/how-long-does-bathroom-remodel-take-vermont', verifyDate: '2026-05-03' }} /> }

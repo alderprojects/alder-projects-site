@@ -34,4 +34,4 @@ const content = {
     { label: 'Post a project', href: '/#submit-project' },
   ],
 }
-export default function Page() { return <GuidePage content={content} /> }
+export default function Page() { return <GuidePage content={content} meta={{ path: '/guides/can-i-add-bedroom-vermont-lake-house', verifyDate: '2026-05-03' }} /> }

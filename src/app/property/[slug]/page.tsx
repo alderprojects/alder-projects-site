@@ -10,6 +10,7 @@ import PropertyInteractive from '@/components/PropertyInteractive'
 import { computeSignalsFromParams } from '@/lib/property-ranker'
 import { CONFIG } from '@/lib/recommender-config'
 import type { PropertyProfile } from '@/lib/property-modules'
+import { buildBreadcrumbList, buildWebPage, absUrl } from '@/lib/jsonld'
 
 // Per-address pages are noindex by decision. They are working surfaces for
 // a homeowner, not SEO entry points; the SEO entry points are the town and
@@ -111,8 +112,32 @@ export default async function PropertyPage({
     },
     data
   )
+  // JSON-LD: WebPage + BreadcrumbList. Skip Article (these pages are
+  // working surfaces, not articles, and they're noindex anyway — but
+  // schema is harmless and helps if the page is ever indexed).
+  const propertyPath = `/property/${params.slug}`
+  const propertySchemas = [
+    buildWebPage({
+      url: absUrl(propertyPath),
+      name: `Property profile · ${data.address}`,
+      description: 'Vermont property profile — what to do, what it costs, what the regulators say, what to hire out.',
+    }),
+    buildBreadcrumbList([
+      { name: 'Home', url: '/' },
+      { name: 'Towns', url: '/towns' },
+      { name: data.address, url: propertyPath },
+    ]),
+  ]
+
   return (
     <div style={{ minHeight: '100vh', backgroundColor: C.bg }}>
+      {propertySchemas.map((schema, i) => (
+        <script
+          key={i}
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+        />
+      ))}
       <Nav />
       <AddressStrip address={data.address} />
 

@@ -1,5 +1,11 @@
 import Link from 'next/link'
 import Nav from '@/components/Nav'
+import {
+  buildArticle,
+  buildBreadcrumbList,
+  buildFaqPage,
+  absUrl,
+} from '@/lib/jsonld'
 
 // Auto-derive form pre-fill values from the guide H1 so each guide deep-links
 // the project form with the right category/town context.
@@ -54,9 +60,36 @@ export type GuidePageContent = {
   relatedPages?: { label: string; href: string }[]
 }
 
-export default function GuidePage({ content }: { content: GuidePageContent }) {
+export type GuidePageMeta = {
+  // URL path of this guide, e.g. '/guides/heat-pump-rebates-vermont' or
+  // '/vermont-mud-season-homeowner-guide'. Used to build canonical URL
+  // for Article and BreadcrumbList JSON-LD.
+  path: string
+  // ISO YYYY-MM-DD. Used as Article dateModified — the
+  // last-verified date Google reads as content freshness.
+  verifyDate: string
+  // Optional breadcrumb override. Defaults to Home → Guides → {h1}.
+  breadcrumbs?: { name: string; url: string }[]
+}
+
+export default function GuidePage({
+  content,
+  meta,
+}: {
+  content: GuidePageContent
+  meta?: GuidePageMeta
+}) {
+  const schemas = meta ? buildSchemas(content, meta) : []
+
   return (
     <div style={{ minHeight: '100vh', backgroundColor: '#FAF7F2' }}>
+      {schemas.map((schema, i) => (
+        <script
+          key={i}
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+        />
+      ))}
       <Nav />
       <div style={{ backgroundColor: '#1C2B1A', padding: 'clamp(96px,10vw,120px) 24px clamp(40px,6vw,64px)', borderBottom: '1px solid rgba(122,155,111,0.1)' }}>
         <div style={{ maxWidth: '720px', margin: '0 auto' }}>
@@ -129,4 +162,36 @@ export default function GuidePage({ content }: { content: GuidePageContent }) {
       </footer>
     </div>
   )
-      }
+}
+
+// Build the JSON-LD schema list for a guide page from its content + meta.
+// Returns Article + BreadcrumbList always; FAQPage if there are FAQs.
+function buildSchemas(content: GuidePageContent, meta: GuidePageMeta) {
+  const url = absUrl(meta.path)
+  const breadcrumbs =
+    meta.breadcrumbs ?? [
+      { name: 'Home', url: '/' },
+      { name: 'Guides', url: '/guides' },
+      { name: content.h1, url: meta.path },
+    ]
+
+  const schemas: object[] = [
+    buildArticle({
+      headline: content.h1,
+      description: content.intro,
+      url,
+      dateModified: meta.verifyDate,
+    }),
+    buildBreadcrumbList(breadcrumbs),
+  ]
+
+  if (content.faqs && content.faqs.length > 0) {
+    schemas.push(
+      buildFaqPage(
+        content.faqs.map(f => ({ question: f.q, answer: f.a })),
+      ),
+    )
+  }
+
+  return schemas
+}

@@ -41,4 +41,4 @@ const content = {
     { label: 'Basement finishing Vermont', href: '/basement-finishing-vermont' },
   ],
 }
-export default function Page() { return <GuidePage content={content} /> }
+export default function Page() { return <GuidePage content={content} meta={{ path: '/guides/vermont-home-renovation-winter', verifyDate: '2026-05-03' }} /> }

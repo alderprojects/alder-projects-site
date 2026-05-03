@@ -37,4 +37,4 @@ const content = {
     { label: 'Plumbing contractors Vermont', href: '/plumbing-contractors-vermont' },
   ],
 }
-export default function Page() { return <GuidePage content={content} /> }
+export default function Page() { return <GuidePage content={content} meta={{ path: '/guides/vermont-septic-what-to-know', verifyDate: '2026-05-03' }} /> }

@@ -1,6 +1,12 @@
 import type { Metadata } from 'next'
 import Footer from '@/components/Footer'
 import Nav from '@/components/Nav'
+import {
+  buildArticle,
+  buildBreadcrumbList,
+  buildFaqPage,
+  absUrl,
+} from '@/lib/jsonld'
 
 export const metadata: Metadata = {
   title: 'Vermont Mud Season Survival Guide for Homeowners (2026)',
@@ -17,9 +23,43 @@ export const metadata: Metadata = {
 
 const AMZ = (q: string) => `https://www.amazon.com/s?k=${encodeURIComponent(q)}&tag=alderprojects-20`
 
+const MUD_SEASON_PATH = '/vermont-mud-season-homeowner-guide'
+const MUD_SEASON_VERIFY_DATE = '2026-05-03'
+
+const MUD_SEASON_FAQS = [
+  { q: 'How long does Vermont mud season last?', a: 'Roughly mid-March to early May, with northern and higher-elevation properties running 1-3 weeks behind the southern lowlands. The end correlates with the last hard frost — typically the 2nd-3rd week of May in most of Vermont.' },
+  { q: 'Should I avoid moving to Vermont in mud season?', a: 'If you have a choice, schedule your move for June or late September. Mud season makes truck deliveries to a new property genuinely difficult. Class 4 road properties are effectively unreachable.' },
+  { q: 'Can I do exterior renovation work during mud season?', a: 'Almost none. Painting, roofing, deck building, excavation, and foundation work are all blocked by saturated soil and weight limits. Push exterior work to mid-May. Interior work is fair game.' },
+  { q: 'Are there mud season weight limits on Vermont roads?', a: 'Yes. Most Vermont towns post weight limits (6-ton or 12-ton typical) on dirt and gravel roads from late March through early May. Posted limits affect oil delivery, propane, gravel, and heavy contractor trucks.' },
+  { q: 'Why is my driveway always rutted after mud season?', a: "Almost always because the underlying base is too thin or poorly drained. A properly built Vermont driveway has 6-8 inches of crushed gravel over a free-draining base. A one-time investment in proper drainage and geotextile fabric ($3-5k typical) pays back in 4-5 saved regrades." },
+]
+
+const mudSeasonSchemas = [
+  buildArticle({
+    headline: 'Vermont mud season: a real homeowner guide',
+    description: 'Driveway protection, mudroom setup, contractor scheduling, and the gear that actually works. Vermont specifics, no national fluff.',
+    url: absUrl(MUD_SEASON_PATH),
+    dateModified: MUD_SEASON_VERIFY_DATE,
+  }),
+  buildBreadcrumbList([
+    { name: 'Home', url: '/' },
+    { name: 'Vermont mud season guide', url: MUD_SEASON_PATH },
+  ]),
+  buildFaqPage(
+    MUD_SEASON_FAQS.map(f => ({ question: f.q, answer: f.a })),
+  ),
+]
+
 export default function MudSeasonPage() {
   return (
     <>
+      {mudSeasonSchemas.map((schema, i) => (
+        <script
+          key={i}
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+        />
+      ))}
       <Nav />
       <main style={{ maxWidth: 760, margin: '0 auto', padding: '48px 24px 96px', fontFamily: 'DM Sans, system-ui, sans-serif', color: '#1a1a1a', lineHeight: 1.65, fontSize: 17 }}>
 

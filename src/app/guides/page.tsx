@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import Nav from '@/components/Nav'
 import Link from 'next/link'
+import { buildBreadcrumbList, buildItemList, absUrl } from '@/lib/jsonld'
 export const metadata: Metadata = {
   title: 'Vermont Home Renovation Guides | Alder Projects',
   description: 'Practical guides for Vermont homeowners — seasonal home care, renovation costs, finding contractors, permits, and timelines.',
@@ -48,9 +49,31 @@ function Section({title,subtitle,guides,accent}:{title:string;subtitle:string;gu
     </div>
   )
 }
+const guidesIndexSchemas = [
+  buildItemList({
+    url: absUrl('/guides'),
+    name: 'Vermont home renovation guides',
+    items: [...seasonal, ...costs, ...hiring, ...planning].map(g => ({
+      name: g.title,
+      url: g.href,
+    })),
+  }),
+  buildBreadcrumbList([
+    { name: 'Home', url: '/' },
+    { name: 'Guides', url: '/guides' },
+  ]),
+]
+
 export default function Page(){
   return (
     <div style={{minHeight:'100vh',backgroundColor:'#FAF7F2'}}>
+      {guidesIndexSchemas.map((schema, i) => (
+        <script
+          key={i}
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+        />
+      ))}
       <Nav />
       <div style={{backgroundColor:'#1C2B1A',padding:'clamp(96px,10vw,120px) 24px clamp(40px,6vw,64px)',borderBottom:'1px solid rgba(122,155,111,0.1)'}}>
         <div style={{maxWidth:'720px',margin:'0 auto'}}>

@@ -84,5 +84,5 @@ const content = {
 }
 
 export default function Page() {
-  return <GuidePage content={content} />
+  return <GuidePage content={content} meta={{ path: '/guides/winterizing-lake-house-vermont', verifyDate: '2026-05-03' }} />
 }

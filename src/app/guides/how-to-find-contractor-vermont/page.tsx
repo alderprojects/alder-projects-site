@@ -35,4 +35,4 @@ const content = {
     { label: 'Bathroom remodeling Vermont', href: '/bathroom-remodeling-vermont' },
   ],
 }
-export default function Page() { return <GuidePage content={content} /> }
+export default function Page() { return <GuidePage content={content} meta={{ path: '/guides/how-to-find-contractor-vermont', verifyDate: '2026-05-03' }} /> }

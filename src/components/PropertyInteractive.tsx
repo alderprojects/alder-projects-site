@@ -16,7 +16,13 @@ import { classifyIntentMode, computeSignalsFromParams } from '@/lib/property-ran
 import { getRecommendations, type Recommendation } from '@/lib/topic-recommender'
 import { getAccessoryKits } from '@/lib/accessory-recommender'
 import { useEngagementGate } from '@/lib/useEngagementGate'
-import { inferSeason } from '@/lib/season-helpers'
+import { inferSeason, isLakeProperty, isFloodProperty } from '@/lib/season-helpers'
+import { CONFIG } from '@/lib/recommender-config'
+import {
+  trackEngagementGatePassed,
+  trackSeasonalContext,
+  trackRenderDecision,
+} from '@/lib/analytics'
 
 // PropertyInteractive lifts the {intent, topic} state out of PropertyHero
 // and RankedModuleStream so a click on the hero never triggers a route
@@ -147,6 +153,72 @@ export default function PropertyInteractive({ profile, initialSignals, hadExplic
     setTopic(toTopic)
   }, [])
 
+  // Common analytics envelope shared with child surfaces. Device is a
+  // simple width threshold (matches the 600px breakpoint Tailwind uses
+  // for the property-grid stack).
+  const device = useMemo<'mobile' | 'desktop'>(() => {
+    if (typeof window === 'undefined') return 'desktop'
+    return window.innerWidth < 600 ? 'mobile' : 'desktop'
+  }, [])
+  const analyticsCtx = useMemo(
+    () => ({
+      intent: signals.topLevelIntent,
+      topic: signals.topic ?? undefined,
+      town: profile.town,
+      townTier: signals.townTier,
+      device,
+    }),
+    [signals.topLevelIntent, signals.topic, signals.townTier, profile.town, device]
+  )
+
+  // One-shot mount events: seasonal_context + render_decision. Refire
+  // render_decision when signals change (re-rank), but seasonal_context
+  // is stable for the page lifetime.
+  const seasonalContextFiredRef = useRef(false)
+  useEffect(() => {
+    if (seasonalContextFiredRef.current) return
+    seasonalContextFiredRef.current = true
+    trackSeasonalContext({
+      ...analyticsCtx,
+      season,
+      isLakeProperty: isLakeProperty(profile),
+      isFloodProperty: isFloodProperty(profile),
+    })
+  }, [analyticsCtx, profile, season])
+
+  useEffect(() => {
+    if (isResearching) return
+    // Lightweight render-decision snapshot. Module IDs come from the
+    // ranker-decided inline set; we approximate with the recommended
+    // topics + accessory-kit ids since this client doesn't ingest the
+    // full ranked list. The intent is to track which CONFIG produced
+    // the surface — exact module IDs flow through GA4 BigQuery export.
+    trackRenderDecision({
+      ...analyticsCtx,
+      inlineModuleIds: [
+        ...recommendations.map(r => `rec_${r.topicId}`),
+        ...accessoryKits.map(k => `kit_${k.id}`),
+      ],
+      hiddenModuleCount: 0,
+      topModuleScore: recommendations[0]?.score ?? 0,
+      bottomModuleScore: recommendations[recommendations.length - 1]?.score ?? 0,
+      configVersion: CONFIG.version,
+    })
+  }, [analyticsCtx, recommendations, accessoryKits, isResearching])
+
+  // engagement_gate_passed — fire once when the gate flips.
+  const engagementGateFiredRef = useRef(false)
+  useEffect(() => {
+    if (engagementGateFiredRef.current) return
+    if (!engagement.passed || !engagement.trigger) return
+    engagementGateFiredRef.current = true
+    trackEngagementGatePassed({
+      ...analyticsCtx,
+      trigger: engagement.trigger,
+      timeOnPage: engagement.secondsUntilPassed ?? 0,
+    })
+  }, [engagement.passed, engagement.trigger, engagement.secondsUntilPassed, analyticsCtx])
+
   return (
     <>
       <PropertyHero profile={profile} intent={intent} topic={topic} onPickIntent={onPickIntent} onPickTopic={onPickTopic} />
@@ -162,17 +234,29 @@ export default function PropertyInteractive({ profile, initialSignals, hadExplic
                 3. Adjacent accessory kit (lower-revenue, broader)
               All hidden until the visitor demonstrates engagement. */}
           {engagement.passed && accessoryKits[0] && (
-            <AccessoryKit kit={accessoryKits[0]} placement="topic_module_inline" />
+            <AccessoryKit
+              kit={accessoryKits[0]}
+              placement="topic_module_inline"
+              analyticsCtx={analyticsCtx}
+            />
           )}
           {engagement.passed && (
             <RecommendationStrip
               recs={recommendations}
               signals={signals}
               onPick={onPickRecommendation}
+              analyticsCtx={{
+                ...analyticsCtx,
+                engagementGateReason: engagement.trigger ?? 'unknown',
+              }}
             />
           )}
           {engagement.passed && accessoryKits[1] && (
-            <AccessoryKit kit={accessoryKits[1]} placement="after_recommendations" />
+            <AccessoryKit
+              kit={accessoryKits[1]}
+              placement="after_recommendations"
+              analyticsCtx={analyticsCtx}
+            />
           )}
         </>
       )}

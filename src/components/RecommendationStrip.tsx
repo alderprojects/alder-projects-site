@@ -3,6 +3,11 @@
 import { useCallback } from 'react'
 import type { Recommendation } from '@/lib/topic-recommender'
 import type { TopicId, VisitorSignals } from '@/lib/property-modules'
+import { useElementVisibility } from '@/lib/useElementVisibility'
+import {
+  trackRecommendationStripView,
+  trackRecommendationClick,
+} from '@/lib/analytics'
 
 // Renders the project↔project recommendation strip — 2-3 horizontally-
 // stacked cards (vertical on mobile). Each card shows a one-line
@@ -32,6 +37,14 @@ type Props = {
   // Parent should call setTopic(toTopic) and let URL replaceState
   // happen via PropertyInteractive's useEffect.
   onPick: (toTopic: TopicId, rec: Recommendation) => void
+  // Visitor-context envelope for analytics.
+  analyticsCtx: {
+    intent?: string
+    town?: string
+    townTier?: string
+    device?: string
+    engagementGateReason: string
+  }
 }
 
 const TOPIC_LABEL: Partial<Record<TopicId, string>> = {
@@ -56,18 +69,57 @@ function topicLabel(t: TopicId): string {
   return TOPIC_LABEL[t] ?? t
 }
 
-export default function RecommendationStrip({ recs, signals, onPick }: Props) {
+export default function RecommendationStrip({ recs, signals, onPick, analyticsCtx }: Props) {
+  const fromTopic = signals.topic ?? 'general_orientation'
+
+  const sectionRef = useElementVisibility<HTMLElement>(0.5, () => {
+    trackRecommendationStripView({
+      intent: analyticsCtx.intent,
+      topic: fromTopic,
+      town: analyticsCtx.town,
+      townTier: analyticsCtx.townTier,
+      device: analyticsCtx.device,
+      recommendedTopics: recs.map(r => r.topicId),
+      recommendationScores: recs.map(r => r.score),
+      position: 0,
+      engagementGateReason: analyticsCtx.engagementGateReason,
+    })
+  })
+
   const onClick = useCallback(
-    (rec: Recommendation) => {
+    (rec: Recommendation, idx: number) => {
+      trackRecommendationClick({
+        intent: analyticsCtx.intent,
+        topic: fromTopic,
+        town: analyticsCtx.town,
+        townTier: analyticsCtx.townTier,
+        device: analyticsCtx.device,
+        fromTopic,
+        toTopic: rec.topicId,
+        recommendationScore: rec.score,
+        positionInStrip: idx,
+      })
+      // Stash for cross-event attribution — accessory_item_click and
+      // contractor-lead handlers check this within the 5-min window
+      // and fire recommendation_conversion.
+      try {
+        sessionStorage.setItem(
+          'alder.lastRecClick',
+          JSON.stringify({ recommendedTopic: rec.topicId, ts: Date.now() })
+        )
+      } catch {
+        /* ignore */
+      }
       onPick(rec.topicId, rec)
     },
-    [onPick]
+    [onPick, analyticsCtx, fromTopic]
   )
 
   if (recs.length === 0) return null
 
   return (
     <section
+      ref={sectionRef}
       data-component="recommendation-strip"
       style={{
         backgroundColor: C.card,
@@ -104,7 +156,7 @@ export default function RecommendationStrip({ recs, signals, onPick }: Props) {
           <button
             key={rec.topicId}
             type="button"
-            onClick={() => onClick(rec)}
+            onClick={() => onClick(rec, idx)}
             data-rec-position={idx}
             data-rec-topic={rec.topicId}
             style={{

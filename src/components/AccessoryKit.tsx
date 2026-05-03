@@ -3,6 +3,12 @@
 import { useCallback } from 'react'
 import type { AccessoryKitRec } from '@/lib/accessory-recommender'
 import { resolveKitItems } from '@/data/affiliates'
+import { useElementVisibility } from '@/lib/useElementVisibility'
+import {
+  trackAccessoryKitView,
+  trackAccessoryItemClick,
+  trackRecommendationConversion,
+} from '@/lib/analytics'
 
 // AccessoryKit renders a single recommended kit. Per the V4 spec it is
 // NEVER a full-width box — instead a small horizontal text-button row:
@@ -24,21 +30,40 @@ const C = {
 const FB = "'DM Sans', system-ui, sans-serif"
 const FM = 'monospace'
 
+type AnalyticsCtx = {
+  intent?: string
+  topic?: string
+  town?: string
+  townTier?: string
+  device?: string
+}
+
 type Props = {
   kit: AccessoryKitRec
   placement?: string
-  // Optional click reporter — wired up in commit 20 for analytics.
-  onItemClick?: (params: {
-    kitId: string
-    itemId: string
-    itemDisplay: string
-    itemPositionInKit: number
-    estimatedItemPrice?: number
-  }) => void
+  analyticsCtx?: AnalyticsCtx
 }
 
-export default function AccessoryKit({ kit, placement = 'topic_module_inline', onItemClick }: Props) {
+const REC_CLICK_ATTRIBUTION_WINDOW_MS = 5 * 60 * 1000
+
+export default function AccessoryKit({
+  kit,
+  placement = 'topic_module_inline',
+  analyticsCtx = {},
+}: Props) {
   const items = resolveKitItems(kit)
+
+  const sectionRef = useElementVisibility<HTMLElement>(0.5, () => {
+    trackAccessoryKitView({
+      ...analyticsCtx,
+      kitId: kit.id,
+      kitTitle: kit.title,
+      itemIds: kit.itemIds,
+      estimatedTicketSize: kit.estimatedTicketSize,
+      revenueScore: kit.revenueScore,
+      placement,
+    })
+  })
 
   const handleClick = useCallback(
     (
@@ -48,15 +73,47 @@ export default function AccessoryKit({ kit, placement = 'topic_module_inline', o
       itemPositionInKit: number,
       estimatedItemPrice?: number
     ) => {
-      onItemClick?.({ kitId, itemId, itemDisplay, itemPositionInKit, estimatedItemPrice })
+      trackAccessoryItemClick({
+        ...analyticsCtx,
+        kitId,
+        itemId,
+        itemDisplay,
+        itemPositionInKit,
+        kitRevenueScore: kit.revenueScore,
+        estimatedItemPrice,
+      })
+      // Recommendation attribution: if a recommendation card was
+      // clicked within the last 5 minutes, this affiliate click
+      // counts as a conversion attributable to that rec.
+      try {
+        const raw = sessionStorage.getItem('alder.lastRecClick')
+        if (raw) {
+          const { recommendedTopic, ts } = JSON.parse(raw) as {
+            recommendedTopic: string
+            ts: number
+          }
+          const elapsedMs = Date.now() - ts
+          if (elapsedMs <= REC_CLICK_ATTRIBUTION_WINDOW_MS) {
+            trackRecommendationConversion({
+              ...analyticsCtx,
+              recommendedTopic,
+              conversionType: 'affiliate_click',
+              secondsSinceRecClick: elapsedMs / 1000,
+            })
+          }
+        }
+      } catch {
+        /* ignore */
+      }
     },
-    [onItemClick]
+    [analyticsCtx, kit.revenueScore]
   )
 
   if (items.length === 0) return null
 
   return (
     <section
+      ref={sectionRef}
       data-component="accessory-kit"
       data-kit-id={kit.id}
       data-kit-placement={placement}

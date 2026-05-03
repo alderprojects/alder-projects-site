@@ -2,6 +2,9 @@ User-agent: *
 Allow: /
 Disallow: /thanks
 Disallow: /contractors/welcome
+Disallow: /property/
 Disallow: /api/
+Disallow: /chat
+Disallow: /plan
 
 Sitemap: https://alderprojects.com/sitemap.xml

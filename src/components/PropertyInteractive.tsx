@@ -4,6 +4,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import PropertyHero from './PropertyHero'
 import RankedModuleStream from './RankedModuleStream'
 import VermontBasicsSection from './VermontBasicsSection'
+import RecommendationStrip from './RecommendationStrip'
+import AccessoryKit from './AccessoryKit'
 import type {
   PropertyProfile,
   TopicId,
@@ -11,6 +13,10 @@ import type {
   VisitorSignals,
 } from '@/lib/property-modules'
 import { classifyIntentMode, computeSignalsFromParams } from '@/lib/property-ranker'
+import { getRecommendations, type Recommendation } from '@/lib/topic-recommender'
+import { getAccessoryKits } from '@/lib/accessory-recommender'
+import { useEngagementGate } from '@/lib/useEngagementGate'
+import { inferSeason } from '@/lib/season-helpers'
 
 // PropertyInteractive lifts the {intent, topic} state out of PropertyHero
 // and RankedModuleStream so a click on the hero never triggers a route
@@ -102,13 +108,64 @@ export default function PropertyInteractive({ profile, initialSignals, hadExplic
   // affiliate items.
   const isResearching = intent === 'researching'
 
+  // Engagement gate — passes once the visitor has scrolled past the
+  // CONFIG threshold, opened chat, clicked a cost tier, or hit the
+  // time threshold. Recs + accessory kits stay hidden until then so
+  // we don't push affiliate links at a bouncing visitor.
+  const engagement = useEngagementGate()
+
+  // Cross-topic recommendations — empty for buyers (no topic), refund-
+  // risk personas, and visitors with topics that have no edges in the
+  // affinity matrix. Memoize on signals so we don't recompute every
+  // engagement-tick.
+  const season = useMemo(() => inferSeason(new Date()), [])
+  const recommendations = useMemo<Recommendation[]>(
+    () => getRecommendations(signals, { season, k: 3 }),
+    [signals, season]
+  )
+
+  // Accessory kits — at most 2 per render (one direct, one adjacent).
+  // Researchers see none; refund-risk personas see none; buyers/no-topic
+  // owners see the first-year fallback.
+  const accessoryKits = useMemo(
+    () => getAccessoryKits(signals, profile, 2),
+    [signals, profile]
+  )
+
+  // Recommendation click handler: pick the new topic and let the URL
+  // sync useEffect mirror it via replaceState (no scroll, no navigate).
+  const onPickRecommendation = useCallback((toTopic: TopicId, _rec: Recommendation) => {
+    setTopic(toTopic)
+  }, [])
+
   return (
     <>
       <PropertyHero profile={profile} intent={intent} topic={topic} onPickIntent={onPickIntent} onPickTopic={onPickTopic} />
       {isResearching ? (
         <VermontBasicsSection />
       ) : (
-        <RankedModuleStream profile={profile} signals={signals} />
+        <>
+          <RankedModuleStream profile={profile} signals={signals} />
+
+          {/* Engagement-gated revenue surfaces. Order:
+                1. Direct accessory kit (highest revenue match)
+                2. Project↔project recommendations
+                3. Adjacent accessory kit (lower-revenue, broader)
+              All hidden until the visitor demonstrates engagement. */}
+          {engagement.passed && accessoryKits[0] && (
+            <AccessoryKit kit={accessoryKits[0]} placement="topic_module_inline" />
+          )}
+          {engagement.passed && (
+            <RecommendationStrip
+              recs={recommendations}
+              signals={signals}
+              onPick={onPickRecommendation}
+            />
+          )}
+          {engagement.passed && accessoryKits[1] && (
+            <AccessoryKit kit={accessoryKits[1]} placement="after_recommendations" />
+          )}
+        </>
       )}
     </>
   )

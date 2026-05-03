@@ -195,7 +195,9 @@ export function getInlineKitForContext(
   if (context === 'calendar_module') {
     // Surface the seasonal kit. Lake-property + lake months gets the
     // sub-window kit (lake_opening / lake_operations / lake_closing);
-    // everything else uses the broad season.
+    // everything else uses the broad season. Strictly season-axis —
+    // we only want items tagged for the target season, not items that
+    // happen to match the visitor's topic on a different axis.
     const targetSeason: Season =
       chars.has('lake') && lakeWindow ? lakeWindow : season
     candidates = AFFILIATE_CATALOG.filter(item => item.seasons?.includes(targetSeason) ?? false)
@@ -205,8 +207,24 @@ export function getInlineKitForContext(
     candidates = AFFILIATE_CATALOG.filter(item =>
       item.situations.some(s => s.propertyChars?.includes('flood') || s.topic === 'flood_zone')
     )
+  } else if (context === 'topic_module') {
+    // Strict topic-axis match. V3 used the broad itemMatchesAnySituation
+    // which let any situation tag (including seasons or property
+    // characteristics) qualify an item — so the heat-pump season-prep
+    // kit on owner+heat_pump bled in mud_mat / slush_shovel from the
+    // first-year-owner seasonal situation. V4 requires that one of the
+    // item's situation tags has topic === signals.topic (and the rest
+    // of that tag matches the visitor) so seasonal-only items only
+    // surface inside calendar_module.
+    candidates = AFFILIATE_CATALOG.filter(item =>
+      item.situations.some(
+        s => s.topic === signals.topic && matchesSituation(s, signals, chars)
+      )
+    )
   } else {
-    // Topic / pre-purchase / summary — match against situation tags.
+    // pre_purchase / summary — these use the broad situation matcher
+    // because they're context-driven, not topic-driven (a buyer kit
+    // surfaces buyer items even if they don't have a matching topic).
     candidates = AFFILIATE_CATALOG.filter(item => itemMatchesAnySituation(item, signals, chars))
   }
 

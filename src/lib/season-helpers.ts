@@ -70,3 +70,43 @@ export function detectRefundRisk(signals: Pick<VisitorSignals, 'topic'>): boolea
   }
   return false
 }
+
+// getSeasonNote: short Real-Talk-VT headline + one-line context for the
+// current season. Used by the homepage seasonal strip and (eventually)
+// any other surface that wants a season-aware kicker. Notes are baked
+// in here so seasonal copy stays in one place — content surface, not
+// CONFIG, because it's literal copy not tunable values.
+export function getSeasonNote(season: Season): { headline: string; note: string } {
+  switch (season) {
+    case 'mud':
+      return {
+        headline: "It's mud season in Vermont.",
+        note: 'Frost coming out of the ground. Dirt roads soup. Septic systems saturated. Many towns posted with weight limits — heavy contractor work delayed until June.',
+      }
+    case 'spring_blackfly':
+      return {
+        headline: 'Spring is here. So are the blackflies.',
+        note: 'Outdoor projects are unblocked. Lake water still cold. Blackflies brutal late-May through mid-June. Plan accordingly.',
+      }
+    case 'lake':
+      return {
+        headline: "It's lake season.",
+        note: 'Docks in. Outdoor projects in full swing. Contractor schedules booking 4-6 weeks out.',
+      }
+    case 'fall_leaf':
+      return {
+        headline: 'Foliage is peak. So is weatherization season.',
+        note: 'EVT 75-90% weatherization cash-back deadline is end of 2026. Book now, not in November.',
+      }
+    case 'pre_winter':
+      return {
+        headline: 'Pre-winter prep window.',
+        note: "Heat pump installs, weatherization, snow tires, generator service. Roof rakes on sale before they're sold out.",
+      }
+    case 'deep_winter':
+      return {
+        headline: 'Deep winter.',
+        note: 'Heating bills hitting hard. Smart thermostat ROI strongest now. Ice damming risk peaks Jan-Feb.',
+      }
+  }
+}

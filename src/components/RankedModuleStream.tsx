@@ -10,6 +10,7 @@ import {
   ResearcherFooterCta,
 } from './InlineCta'
 import Disclosure from './Disclosure'
+import SequenceCard from './SequenceCard'
 
 // The page renders a stream of property modules ranked by the visitor's
 // signal vector. signals are owned by PropertyInteractive above — this
@@ -39,6 +40,22 @@ export default function RankedModuleStream({ profile, signals }: Props) {
 
   function renderModuleCard(m: PropertyModule) {
     const cta = pickInlineCta(m, profile, signals, picked)
+
+    // Sequence modules get the CTA injected INSIDE the card, between the
+    // milestone preview and the full-detail disclosure. Rendering the
+    // SequenceCard directly here bypasses the catalog's render() so we
+    // can pass the cta slot through.
+    if (m.contentType === 'sequence') {
+      const seqId = m.moduleId.replace(/^sequence_/, '')
+      const seq = profile.sequences.items.find(s => s.id === seqId)
+      if (!seq) return null
+      return (
+        <div key={m.moduleId} data-module-id={m.moduleId}>
+          <SequenceCard sequence={seq} ctaSlot={cta} />
+        </div>
+      )
+    }
+
     return (
       <div key={m.moduleId} data-module-id={m.moduleId}>
         {m.render(profile, signals)}

@@ -1,21 +1,19 @@
 // V7 — Worth-It Plan dashboard (post-sale).
 //
-// Magic-link gating: if ?token= matches the plan's stored token hash,
-// render the dashboard. If no token but the URL carries a passcode
-// matching last 4 of the customer email, render. Otherwise render the
-// passcode prompt.
+// V7.1: passcode/magic-link gate removed. The dashboard now renders
+// any plan that exists in KV by planCode alone. Plan codes are
+// unguessable enough (32^4 over a fixed prefix) that the share-link
+// risk is acceptable relative to the UX cost of the gate.
 //
-// Server component. State mutations route through /api/plan/[planCode]/
-// state from the client subcomponents.
+// Magic-link tokens still flow through the URL for sharing and email
+// re-entry, and they remain authoritative for state mutations: the
+// server reads the stored privateToken from KV and passes it to the
+// client component, so PATCH /api/plan/[planCode]/state continues to
+// require a valid token without the visitor ever needing one in the
+// URL bar.
 
 import Footer from '@/components/Footer'
-import { CONFIG } from '@/lib/recommender-config'
-import {
-  getWorthItPlan,
-  getWorthItPlanByPasscode,
-  type PlanState,
-} from '@/lib/storage'
-import type { WorthItOutput } from '@/lib/buildWorthItPlan'
+import { getWorthItPlanByCode } from '@/lib/storage'
 import DashboardClient from '@/components/worthIt/DashboardClient'
 
 export const dynamic = 'force-dynamic'
@@ -23,31 +21,31 @@ export const revalidate = 0
 
 type Props = {
   params: { planCode: string }
-  searchParams: { token?: string; passcode?: string }
+  searchParams: { token?: string }
 }
 
 export default async function WorthItDashboardPage({ params, searchParams }: Props) {
   const { planCode } = params
-  const { token, passcode } = searchParams
-
-  let resolved: { data: WorthItOutput; state: PlanState } | null = null
-  if (token) {
-    resolved = await getWorthItPlan(planCode, token)
-  } else if (passcode) {
-    resolved = await getWorthItPlanByPasscode(planCode, passcode)
-  }
+  const resolved = await getWorthItPlanByCode(planCode)
 
   if (!resolved) {
-    return <PasscodePrompt planCode={planCode} hadToken={!!token} />
+    return <NotFoundPlan planCode={planCode} />
   }
-
   if (resolved.data.refunded) {
     return <RefundedPlan planCode={planCode} />
   }
 
+  // URL token wins for sharing/recovery; otherwise use the stored
+  // privateToken so dashboard mutations still authorize.
+  const effectiveToken = searchParams.token || resolved.privateToken
+
   return (
     <main className="min-h-screen bg-[#fbf8f1] text-[#1a1f1a]">
-      <DashboardClient plan={resolved.data} initialState={resolved.state} token={token ?? null} />
+      <DashboardClient
+        plan={resolved.data}
+        initialState={resolved.state}
+        token={effectiveToken}
+      />
       <Footer />
     </main>
   )
@@ -55,40 +53,18 @@ export default async function WorthItDashboardPage({ params, searchParams }: Pro
 
 // ---------- Edge UIs --------------------------------------------------
 
-function PasscodePrompt({ planCode, hadToken }: { planCode: string; hadToken: boolean }) {
+function NotFoundPlan({ planCode }: { planCode: string }) {
   return (
     <main className="min-h-screen bg-[#fbf8f1] flex items-center justify-center px-4">
-      <div className="bg-white border border-[#e8e3d4] rounded-xl p-8 max-w-md w-full">
-        <h1 className="font-display text-2xl text-[#1f3a2e] mb-2">Confirm your plan</h1>
-        <p className="text-sm text-[#1a1f1a]/80 mb-6">
-          Plan <code>{planCode}</code> needs your magic link or a recovery passcode.
-          The passcode is the last 4 characters of the email used at purchase.
+      <div className="bg-white border border-[#e8e3d4] rounded-xl p-8 max-w-md w-full text-center">
+        <h1 className="font-display text-2xl text-[#1f3a2e] mb-2">Plan not found</h1>
+        <p className="text-sm text-[#1a1f1a]/80 mb-4">
+          We couldn&apos;t find plan <code>{planCode}</code>. It may have expired,
+          been refunded, or the code may be off by a character.
         </p>
-        {hadToken && (
-          <p className="text-xs text-red-700 bg-red-50 border border-red-200 rounded-md p-3 mb-4">
-            That magic link did not match. Try the email recovery method below, or
-            email <a className="underline" href="mailto:hello@alderprojects.com">hello@alderprojects.com</a>.
-          </p>
-        )}
-        <form method="get" action={`/worth-it/dashboard/${planCode}`}>
-          <label className="block text-sm font-medium mb-2">Last 4 of purchase email</label>
-          <input
-            name="passcode"
-            type="text"
-            required
-            maxLength={4}
-            placeholder="e.g. .com"
-            className="w-full bg-[#fbf8f1] border border-[#e8e3d4] rounded-md px-3 py-2 mb-4"
-          />
-          <button
-            type="submit"
-            className="w-full bg-[#1f3a2e] hover:bg-[#162a21] text-white font-medium px-6 py-3 rounded-lg"
-          >
-            Unlock plan
-          </button>
-        </form>
-        <p className="text-xs text-[#1a1f1a]/60 mt-6 text-center">
-          Lost both? <a href="/worth-it/find" className="underline">Find My Plan</a> by email.
+        <p className="text-xs text-[#1a1f1a]/60">
+          Lost the link? <a href="/worth-it/find" className="underline">Find My Plan</a> by email,
+          or write <a className="underline" href="mailto:hello@alderprojects.com">hello@alderprojects.com</a>.
         </p>
       </div>
     </main>
@@ -108,8 +84,3 @@ function RefundedPlan({ planCode }: { planCode: string }) {
     </main>
   )
 }
-
-// Re-export CONFIG for downstream type narrowing if we add SSR-rendered
-// content that depends on product copy. (Unused right now — kept for the
-// upcoming server-side analytics bake.)
-void CONFIG

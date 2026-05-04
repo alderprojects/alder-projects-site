@@ -173,15 +173,28 @@ export async function getWorthItPlan(
   return { data: record.data, state: record.state }
 }
 
-export async function getWorthItPlanByPasscode(
+// V7.1 — passcode-less retrieval. Returns the plan if it exists in
+// KV, regardless of whether the visitor has a magic-link token. Plan
+// codes are unguessable enough (32^4 over a fixed prefix) that the
+// share-link risk is acceptable relative to the UX cost of the
+// passcode gate. Mutations still go through updatePlanState which
+// continues to require the privateToken; the dashboard reads the
+// stored privateToken from the record and passes it to the client
+// for state writes.
+export async function getWorthItPlanByCode(
   planCode: string,
-  emailLast4: string,
-): Promise<{ data: WorthItOutput; state: PlanState } | null> {
+): Promise<{
+  data: WorthItOutput
+  state: PlanState
+  privateToken: string
+} | null> {
   const record = (await kv.get(`plan:${planCode}`)) as PlanRecord | null
   if (!record) return null
-  const last4 = record.data.customerEmail.slice(-4).toLowerCase()
-  if (last4 !== emailLast4.toLowerCase()) return null
-  return { data: record.data, state: record.state }
+  return {
+    data: record.data,
+    state: record.state,
+    privateToken: record.data.privateToken,
+  }
 }
 
 export async function updatePlanState(

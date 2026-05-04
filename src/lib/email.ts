@@ -17,10 +17,27 @@
 // ensures the queue has full plan context if delivery retries.
 
 import { kv } from '@vercel/kv'
+import { Resend } from 'resend'
 import { CONFIG } from './recommender-config'
 import { formatPrice } from './format'
 import type { SmartCartOutput } from './buildSmartCart'
 import type { WorthItOutput } from './buildWorthItPlan'
+
+// V7.1 — single Resend client, lazy-initialized so missing env vars
+// during build don't crash. Returns null if Resend is not configured;
+// sendNow() falls back to leaving the envelope queued.
+let resendClient: Resend | null = null
+function getResend(): Resend | null {
+  if (resendClient) return resendClient
+  const key = process.env.RESEND_API_KEY
+  if (!key) return null
+  resendClient = new Resend(key)
+  return resendClient
+}
+
+const SEND_MAX_ATTEMPTS = 3
+const FROM_ADDRESS =
+  process.env.RESEND_FROM_ADDRESS ?? 'hello@alderprojects.com'
 
 // ---------- Envelope --------------------------------------------------
 
@@ -53,6 +70,44 @@ async function enqueueEmail(envelope: EmailEnvelope): Promise<void> {
   await kv.set(EMAIL_INDEX_KEY, [...index, envelope.id].slice(-1000))
 }
 
+// V7.1 — sendNow: fire the envelope through Resend immediately, then
+// reflect the outcome back to KV. Designed to never throw. Webhook
+// callers wrap us in try/catch anyway, but extra defense matters
+// because a 500 from this path retries the whole Stripe webhook.
+async function sendNow(envelope: EmailEnvelope): Promise<void> {
+  // Skip non-immediate sends (e.g. T+72h upgrade offers); the cron
+  // job processes those when their scheduledFor lands.
+  const due = new Date(envelope.scheduledFor).getTime() <= Date.now()
+  if (!due) return
+  const client = getResend()
+  if (!client) return                                // RESEND_API_KEY unset — stay queued
+  try {
+    const result = await client.emails.send({
+      from: FROM_ADDRESS,
+      to: envelope.toEmail,
+      subject: envelope.subject,
+      text: envelope.body,
+    })
+    if (result.error) {
+      throw new Error(result.error.message)
+    }
+    envelope.status = 'sent'
+    envelope.sentAt = new Date().toISOString()
+    await kv.set(`${EMAIL_QUEUE_PREFIX}:${envelope.id}`, envelope)
+  } catch (e: unknown) {
+    envelope.attempts += 1
+    envelope.error = e instanceof Error ? e.message : String(e)
+    if (envelope.attempts >= SEND_MAX_ATTEMPTS) {
+      envelope.status = 'failed'
+    }
+    try {
+      await kv.set(`${EMAIL_QUEUE_PREFIX}:${envelope.id}`, envelope)
+    } catch {
+      /* swallow — KV transient failure */
+    }
+  }
+}
+
 function newEnvelopeId(): string {
   return `eml_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 10)}`
 }
@@ -65,7 +120,7 @@ export async function sendSmartCartReceiptEmail(
 ): Promise<void> {
   const subject = `Your Smart Cart for ${cart.scopeLabel}`
   const body = renderSmartCartReceiptBody(cart)
-  await enqueueEmail({
+  const envelope: EmailEnvelope = {
     id: newEnvelopeId(),
     type: 'smart_cart_receipt',
     toEmail,
@@ -76,7 +131,9 @@ export async function sendSmartCartReceiptEmail(
     status: 'queued',
     attempts: 0,
     createdAt: new Date().toISOString(),
-  })
+  }
+  await enqueueEmail(envelope)
+  await sendNow(envelope)
 }
 
 export async function sendWorthItDeliveryEmail(
@@ -86,7 +143,7 @@ export async function sendWorthItDeliveryEmail(
   const planUrl = buildPlanUrl(plan)
   const subject = CONFIG.products.worthIt.deliveryEmailSubject
   const body = renderWorthItDeliveryBody(plan, planUrl)
-  await enqueueEmail({
+  const envelope: EmailEnvelope = {
     id: newEnvelopeId(),
     type: 'worth_it_delivery',
     toEmail,
@@ -97,7 +154,9 @@ export async function sendWorthItDeliveryEmail(
     status: 'queued',
     attempts: 0,
     createdAt: new Date().toISOString(),
-  })
+  }
+  await enqueueEmail(envelope)
+  await sendNow(envelope)
 }
 
 export async function scheduleUpgradeOfferEmail(
@@ -138,7 +197,7 @@ export async function sendUpgradeCompleteEmail(
   const planUrl = buildPlanUrl(plan)
   const subject = `Your Worth-It Plan is ready (upgraded from Smart Cart)`
   const body = `Your Smart Cart upgraded to a Worth-It Plan.\n\nMagic link to your saved dashboard: ${planUrl}\n\nPlan code: ${plan.planCode}\n\nYour original Smart Cart ${fromCartId} stays good for the remainder of its 30-day window.`
-  await enqueueEmail({
+  const envelope: EmailEnvelope = {
     id: newEnvelopeId(),
     type: 'upgrade_complete',
     toEmail,
@@ -149,7 +208,9 @@ export async function sendUpgradeCompleteEmail(
     status: 'queued',
     attempts: 0,
     createdAt: new Date().toISOString(),
-  })
+  }
+  await enqueueEmail(envelope)
+  await sendNow(envelope)
 }
 
 export async function sendReminder(

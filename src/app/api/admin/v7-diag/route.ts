@@ -97,6 +97,49 @@ export async function GET(req: Request) {
   )
   checks.push(envCheck('ADMIN_REFUND_TOKEN', env.ADMIN_REFUND_TOKEN))
 
+  // V7.1 — Resend transport
+  checks.push(envCheck('RESEND_API_KEY', env.RESEND_API_KEY, /^re_/))
+  if (env.RESEND_API_KEY) {
+    try {
+      // Lightweight reachability check — list domains is a 200 with empty
+      // body when no domains configured, so it's a clean smoke signal.
+      const resp = await fetch('https://api.resend.com/domains', {
+        method: 'GET',
+        headers: {
+          authorization: `Bearer ${env.RESEND_API_KEY}`,
+          'content-type': 'application/json',
+        },
+      })
+      if (resp.ok) {
+        checks.push({
+          id: 'resend_smoke_test',
+          status: 'ok',
+          detail: 'Resend domains endpoint returned 200',
+        })
+      } else {
+        checks.push({
+          id: 'resend_smoke_test',
+          status: 'error',
+          detail: `Resend returned ${resp.status}`,
+          hint: 'Confirm RESEND_API_KEY is valid and has domains:list permission.',
+        })
+      }
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : 'unknown error'
+      checks.push({
+        id: 'resend_smoke_test',
+        status: 'error',
+        detail: `Resend call failed: ${msg}`,
+      })
+    }
+  } else {
+    checks.push({
+      id: 'resend_smoke_test',
+      status: 'missing',
+      detail: 'RESEND_API_KEY not set — emails will stay queued, not sent',
+    })
+  }
+
   // ---------- Mode detection (test vs live) ----------
   const stripeKey = env.STRIPE_SECRET_KEY ?? ''
   const isTestMode = stripeKey.startsWith('sk_test_')

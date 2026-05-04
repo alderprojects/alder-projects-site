@@ -9,6 +9,7 @@ import type { SmartCartOutput } from '@/lib/buildSmartCart'
 import type { SmartCartV2Output } from '@/lib/smart-cart-model'
 import { getGeneralSkipPrinciples } from '@/content/skip-list'
 import CartActions from '@/components/smartCart/CartActions'
+import V2ResultLayout from '@/components/smartCart/V2ResultLayout'
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
@@ -20,15 +21,14 @@ export default async function SmartCartResultPage({ params }: Props) {
   if (!cart) {
     notFound()
   }
-  // V7.2.1 — discriminate on cart.version. v1 (legacy) carts go to
-  // the existing layout; v2 carts go to the new tiered-slot layout
-  // (filled in by Section 5).
+  // V7.2.1 — discriminate on cart.version. v1 (legacy) carts keep
+  // the existing layout; v2 carts render the tiered-slot layout.
   if (isV2Cart(cart)) {
     if (cart.refunded) return <V2Refunded cart={cart} />
     if (new Date(cart.expiresAt).getTime() < Date.now()) {
       return <V2Expired cart={cart} />
     }
-    return <SmartCartV2Placeholder cart={cart} />
+    return <V2ResultLayout cart={cart} />
   }
 
   if (cart.refunded) {
@@ -38,26 +38,6 @@ export default async function SmartCartResultPage({ params }: Props) {
     return <ExpiredCart cart={cart} />
   }
   return <SmartCartResult cart={cart} />
-}
-
-// V7.2.1 — placeholder stub for v2 carts. Section 5 replaces this
-// with the full tiered-slot layout. Lives here so the v2 framework
-// commit type-checks cleanly without forcing the result-page rewrite
-// into the same commit.
-function SmartCartV2Placeholder({ cart }: { cart: SmartCartV2Output }) {
-  return (
-    <main className="min-h-screen bg-[#fbf8f1] flex items-center justify-center px-4">
-      <div className="bg-white border border-[#e8e3d4] rounded-xl p-8 max-w-md w-full text-center">
-        <h1 className="font-display text-2xl text-[#1f3a2e] mb-2">
-          Cart {cart.cartId}
-        </h1>
-        <p className="text-sm text-[#1a1f1a]/85">
-          Built for {cart.scopeLabel} ({cart.scenarioLabel}).
-          The full v2 layout ships in the next commit.
-        </p>
-      </div>
-    </main>
-  )
 }
 
 function V2Refunded({ cart }: { cart: SmartCartV2Output }) {

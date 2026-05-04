@@ -101,6 +101,10 @@ export type SmartCartOutput = {
 
   configVersion: string
   refunded?: boolean
+
+  // V7.1 — edit/respin panel state. Initialized lazily by the respin
+  // endpoint; absence is treated as 0.
+  respinCount?: number
 }
 
 // ---------- Implementation -------------------------------------------

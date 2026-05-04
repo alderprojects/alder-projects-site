@@ -1,45 +1,38 @@
-// V7.1 — homepage product strip. Two cards side by side (Smart Cart
-// $19.99, Worth-It $39.99) with a comparison link to /decide.
+// V7.2.1 — homepage product strip, single-product. Worth-It is paused;
+// only the Smart Cart card renders. Below the card, a small line
+// links to the Worth-It coming-soon page for visitors who came
+// looking for it.
 //
-// Sits between HomepageIntentCards (the "pick a project / question /
-// ask" block) and HomepageCostWidget (the cost-ranges table) so the
-// paid products appear at the natural decision moment on the page.
+// Sits between HomepageIntentCards and HomepageCostWidget so the
+// paid product appears at the natural decision moment on the page.
 
 import { CONFIG } from '@/lib/recommender-config'
 import { formatPrice } from '@/lib/format'
 
 export default function HomepageProductStrip() {
   const sc = CONFIG.products.smartCart
-  const wi = CONFIG.products.worthIt
   return (
     <section className="bg-[#fbf8f1] border-y border-[#e8e3d4]">
       <div className="max-w-5xl mx-auto px-4 py-12 md:py-16">
         <h2 className="font-display text-2xl md:text-3xl text-[#1a1f1a] mb-6 text-center">
-          Two ways Alder helps you spend smarter
+          Smart Cart — buy this, skip that
         </h2>
-        <div className="grid md:grid-cols-2 gap-4 mb-4">
+        <div className="grid grid-cols-1 max-w-2xl mx-auto mb-4">
           <ProductCard
             label="Smart Cart"
             price={formatPrice(sc.priceUsd)}
-            tagline='Buy this + this. Skip that. Lean cart for projects $100+.'
+            tagline='Lean cart for kitchen organizers (more scopes coming). Buy this + this. Skip that.'
             ctaCopy="Build My Smart Cart →"
             product="smart_cart"
           />
-          <ProductCard
-            label="Worth-It Plan"
-            price={formatPrice(wi.priceUsd)}
-            tagline="DIY, hire, or hold? Ranked next moves with the skip list."
-            ctaCopy="Get My Worth-It Plan →"
-            product="worth_it"
-          />
         </div>
         <p className="text-center text-sm text-[#1a1f1a]/70">
-          Not sure which?{' '}
+          Looking for the Worth-It Plan?{' '}
           <a
-            href="/decide"
+            href="/worth-it"
             className="text-[#1f3a2e] underline-offset-2 hover:underline"
           >
-            See the comparison →
+            It&apos;s being rebuilt →
           </a>
         </p>
       </div>

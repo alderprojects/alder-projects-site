@@ -62,7 +62,14 @@ export default function CurationModal() {
       const btn = target.closest('[data-curation-modal-open]') as HTMLElement | null
       if (!btn) return
       e.preventDefault()
-      const p = (btn.getAttribute('data-curation-modal-product') as ProductId) ?? 'smart_cart'
+      const requested = btn.getAttribute('data-curation-modal-product')
+      // V7.2.1 — Worth-It is paused. Any leftover worth_it open-button
+      // redirects to the coming-soon page instead of opening the modal.
+      if (requested === 'worth_it') {
+        window.location.href = '/worth-it'
+        return
+      }
+      const p: ProductId = 'smart_cart'
       setProduct(p)
       setStep(0)
       setTeaser(null)

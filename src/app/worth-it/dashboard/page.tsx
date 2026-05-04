@@ -7,6 +7,7 @@
 // existing /worth-it/dashboard/[planCode] route. Polls if the
 // webhook hasn't yet written to KV.
 
+import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
 import Stripe from 'stripe'
 import Footer from '@/components/Footer'
@@ -14,6 +15,12 @@ import { kv } from '@vercel/kv'
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
+
+export const metadata: Metadata = {
+  // V7.2.1 — exchange route is post-payment redirect glue; never
+  // index it.
+  robots: { index: false, follow: false },
+}
 
 type Props = { searchParams: { session_id?: string } }
 

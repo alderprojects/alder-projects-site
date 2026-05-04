@@ -6,6 +6,7 @@ import { getSmartCart } from '@/lib/storage'
 import { CONFIG } from '@/lib/recommender-config'
 import { formatPrice, formatPriceRange } from '@/lib/format'
 import type { SmartCartOutput } from '@/lib/buildSmartCart'
+import CartActions from '@/components/smartCart/CartActions'
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
@@ -29,19 +30,24 @@ export default async function SmartCartResultPage({ params }: Props) {
 // ---------- Result content -------------------------------------------
 
 function SmartCartResult({ cart }: { cart: SmartCartOutput }) {
+  const itemCount = cart.leanCart.items.length
+  const savingsLabel =
+    cart.savings.potentialSavingsLow === 0 && cart.savings.potentialSavingsHigh === 0
+      ? null
+      : `${formatPriceRange(cart.savings.potentialSavingsLow, cart.savings.potentialSavingsHigh)} potential savings`
   return (
     <main className="min-h-screen bg-[#fbf8f1] text-[#1a1f1a] print:bg-white">
       <ResultHeader cart={cart} />
 
       <div className="max-w-4xl mx-auto px-4 py-8 md:py-12">
-        <div className="mb-6 text-sm text-[#1a1f1a]/80">
-          <strong>Built for your project:</strong> {cart.scopeLabel}
-          {cart.customerProvidedAddress ? ` · ${cart.customerProvidedAddress}` : null}
-        </div>
-
-        <div className="bg-[#1f3a2e] text-white rounded-lg px-5 py-3 mb-8 flex items-center gap-3">
+        <div className="bg-[#1f3a2e] text-white rounded-lg px-5 py-3 mb-3 flex items-center gap-3">
           <CheckCircleIcon />
           <span>Designed to save more than {formatPrice(CONFIG.products.smartCart.priceUsd)} before checkout.</span>
+        </div>
+        <div className="mb-8 text-sm text-[#1a1f1a]/80">
+          Built for {cart.scopeLabel} · {scenarioLabel(cart.scenario)} · {itemCount} item{itemCount === 1 ? '' : 's'}
+          {savingsLabel ? ` · ${savingsLabel}` : ''}
+          {cart.customerProvidedAddress ? ` · ${cart.customerProvidedAddress}` : ''}
         </div>
 
         <LeanCartSection cart={cart} />
@@ -63,17 +69,23 @@ function SmartCartResult({ cart }: { cart: SmartCartOutput }) {
 
 // ---------- Header ----------------------------------------------------
 
-function ResultHeader({ cart: _cart }: { cart: SmartCartOutput }) {
+function ResultHeader({ cart }: { cart: SmartCartOutput }) {
   return (
     <header className="bg-white border-b border-[#e8e3d4] print:hidden">
-      <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
-        <a href="/" className="font-display text-2xl text-[#1f3a2e]">
-          Alder
+      <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between gap-4">
+        <a href="/" className="flex items-baseline gap-2 text-[#1f3a2e]">
+          <span className="font-display text-2xl">Smart Cart</span>
+          <span className="text-xs uppercase tracking-wide text-[#1a1f1a]/55">
+            by Alder
+          </span>
         </a>
-        <div className="flex items-center gap-3">
-          <PrintButton />
-          <DownloadButton />
-        </div>
+        <CartActions
+          cartId={cart.cartId}
+          topic={cart.topic}
+          initialScopeVariantId={cart.scopeVariantId}
+          initialScenario={cart.scenario}
+          respinCount={cart.respinCount ?? 0}
+        />
       </div>
       <div className="max-w-4xl mx-auto px-4 pb-4 flex items-center gap-2 text-[#1f3a2e]">
         <CheckCircleIcon />
@@ -81,6 +93,17 @@ function ResultHeader({ cart: _cart }: { cart: SmartCartOutput }) {
       </div>
     </header>
   )
+}
+
+function scenarioLabel(scenario: string): string {
+  switch (scenario) {
+    case 'just_starting': return 'Just starting'
+    case 'already_have_basics': return 'Already have basics'
+    case 'tight_budget': return 'Tight budget'
+    case 'premium': return 'Premium'
+    case 'lake_property': return 'Lake property'
+    default: return scenario
+  }
 }
 
 // ---------- Sections --------------------------------------------------
@@ -306,32 +329,6 @@ function Section({
       </div>
       {children}
     </section>
-  )
-}
-
-// ---------- Print/Download buttons -----------------------------------
-
-function PrintButton() {
-  // No 'use client' here — render as a form action that calls window.print
-  // via a small inline script. Server-rendered page.
-  return (
-    <a
-      href="javascript:window.print()"
-      className="text-sm border border-[#e8e3d4] rounded-md px-3 py-2 hover:bg-[#f5efe2]"
-    >
-      Print
-    </a>
-  )
-}
-
-function DownloadButton() {
-  return (
-    <a
-      href="javascript:window.print()"
-      className="text-sm border border-[#e8e3d4] rounded-md px-3 py-2 hover:bg-[#f5efe2]"
-    >
-      Download
-    </a>
   )
 }
 

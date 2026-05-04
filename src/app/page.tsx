@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import Nav from '@/components/Nav'
 import Hero from '@/components/Hero'
 import HomepageIntentCards from '@/components/HomepageIntentCards'
+import HomepageProductStrip from '@/components/HomepageProductStrip'
 import HomepageSeasonalStrip from '@/components/HomepageSeasonalStrip'
 import HomepageCostWidget from '@/components/HomepageCostWidget'
 import HomepageTownGrid from '@/components/HomepageTownGrid'
@@ -9,6 +10,7 @@ import HomepageEmailCapture from '@/components/HomepageEmailCapture'
 import HomepageTrustStrip from '@/components/HomepageTrustStrip'
 import Footer from '@/components/Footer'
 import SmartCartGuideFooterCta from '@/components/SmartCartGuideFooterCta'
+import CurationModal from '@/components/CurationModal'
 
 // V5 homepage. Server-rendered shell — Hero owns address-search and the
 // homepage_hero_view tracker; everything below is config-driven from
@@ -105,11 +107,13 @@ export default function Home() {
         <SmartCartGuideFooterCta variant="compact" />
       </div>
       <HomepageIntentCards />
+      <HomepageProductStrip />
       <HomepageSeasonalStrip />
       <HomepageCostWidget />
       <HomepageTownGrid />
       <HomepageEmailCapture />
       <HomepageTrustStrip />
+      <CurationModal />
       <Footer />
     </main>
   )

@@ -8,6 +8,7 @@ import PropertyChat from '@/components/PropertyChat'
 import PropertyFraming from '@/components/PropertyFraming'
 import PropertyInteractive from '@/components/PropertyInteractive'
 import WorthItCTACard from '@/components/property/WorthItCTACard'
+import SmartCartCTACard from '@/components/property/SmartCartCTACard'
 import SmartCartTextLink from '@/components/property/SmartCartTextLink'
 import CurationModal from '@/components/CurationModal'
 import { computeSignalsFromParams } from '@/lib/property-ranker'
@@ -164,7 +165,16 @@ export default async function PropertyPage({
               Component file kept so V5 can revive without re-implementing. */}
           {CONFIG.featureFlags.ENABLE_FRAMING_TOGGLE && <PropertyFraming />}
 
-          {/* V7 — Worth-It Plan CTA (engagement-gated, refund-risk-suppressed). */}
+          {/* V7.1 — paid product CTA pair (engagement-gated, refund-risk-
+              suppressed). Smart Cart appears first so the cheaper, higher-
+              intent option is the visible default; Worth-It below for the
+              decision-stuck visitor. */}
+          <SmartCartCTACard
+            topic={initialSignals.topic ?? null}
+            intent={mapTopLevelIntent(initialSignals.topLevelIntent)}
+            address={data.address}
+            slug={params.slug}
+          />
           <WorthItCTACard
             topic={initialSignals.topic ?? null}
             intent={mapTopLevelIntent(initialSignals.topLevelIntent)}

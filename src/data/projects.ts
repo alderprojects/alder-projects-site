@@ -669,6 +669,19 @@ export function bucketForTown(town: string | undefined): TownBucket {
   return TOWN_TO_BUCKET[key] || 'rural'
 }
 
+// Count of distinct named towns the property tool covers — used by the
+// footer "All N Vermont towns" link so the number stays in sync with
+// the /towns page no matter how the catalog grows. Dedupes the
+// "st johnsbury" / "st. johnsbury" pair using the same canonicalization
+// the /towns page uses.
+export function getTrackedVermontTownCount(): number {
+  const canonical = new Set<string>()
+  for (const key of Object.keys(TOWN_TO_BUCKET)) {
+    canonical.add(key.replace(/\./g, '').replace(/\s+/g, ' ').trim())
+  }
+  return canonical.size
+}
+
 // ---------------------------------------------------------------------------
 // STATE-AWARE ACCESSOR
 // ---------------------------------------------------------------------------

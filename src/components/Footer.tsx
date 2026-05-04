@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { CONFIG } from '@/lib/recommender-config'
+import { getTrackedVermontTownCount } from '@/data/projects'
 
 // V5 footer. Replaces V4's marketplace-era copy ("renovation matching
 // service", "popular searches", "how we make money") with property-tool
@@ -31,6 +32,7 @@ const linkStyle = {
 
 export default function Footer() {
   const topTowns = CONFIG.homepage.townGrid.towns
+  const townCount = getTrackedVermontTownCount()
 
   return (
     <footer
@@ -118,7 +120,7 @@ export default function Footer() {
                   href={CONFIG.homepage.crossLinks.townsIndex}
                   style={{ ...linkStyle, color: C.accent, fontWeight: 500 }}
                 >
-                  All 45 Vermont towns →
+                  All {townCount} Vermont towns →
                 </Link>
               </li>
             </ul>

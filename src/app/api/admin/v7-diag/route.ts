@@ -170,8 +170,8 @@ export async function GET(req: Request) {
 
   // ---------- Payment Link resolution ----------
   for (const [envName, productLabel] of [
-    ['STRIPE_PAYMENT_LINK_SMART_CART', 'Smart Cart $19'],
-    ['STRIPE_PAYMENT_LINK_WORTH_IT', 'Worth-It Plan $39'],
+    ['STRIPE_PAYMENT_LINK_SMART_CART', 'Smart Cart $19.99'],
+    ['STRIPE_PAYMENT_LINK_WORTH_IT', 'Worth-It Plan $39.99'],
     ['STRIPE_PAYMENT_LINK_UPGRADE', 'Upgrade $20'],
   ] as const) {
     const value = env[envName]

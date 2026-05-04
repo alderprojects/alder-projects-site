@@ -681,23 +681,23 @@ export const CONFIG: RecommenderConfig = {
   products: {
     smartCart: {
       enabled: true,
-      priceUsd: 19,
+      priceUsd: 19.99,
       productName: 'Smart Cart',
       refundWindowHours: 24,
       ttlDays: 30,
       headline: 'Buy this + this. Skip that.',
       subhead:
-        'Alder builds the lean cart for your project so you avoid redundant products, tempting kits, and expensive mistakes.',
+        "Tell us what you're trying to do. Alder gives you the right materials, quantities, skip list, and overbuy warnings. If your project budget is $100+, Smart Cart typically pays for itself with $20+ in savings.",
       bullets: [
         'Get the right materials and quantities',
         'Skip tempting, low-value products',
         'Avoid overbuying and extra trips',
-        'Designed to save more than $19 before checkout',
+        'Designed to save more than $19.99 before checkout',
       ],
       trustRow: ['Trusted recommendations', 'Save time & money', 'No account required'],
       ctaCopy: 'Build My Smart Cart',
       upgradeCardCopy:
-        'Want the full saved plan with ranked steps and ongoing recommendations? Upgrade for $20.',
+        'Upgrade to the full saved plan with ranked steps, sequencing, and DIY stop line — for $20 (same as paying $39.99 directly for Worth-It).',
       stripePaymentLinkEnvVar: 'STRIPE_PAYMENT_LINK_SMART_CART',
       sections: [
         { id: 'lean_cart',        title: 'Buy These Together (Lean Cart)', enabled: true, order: 1 },
@@ -708,12 +708,12 @@ export const CONFIG: RecommenderConfig = {
     },
     worthIt: {
       enabled: true,
-      priceUsd: 39,
+      priceUsd: 39.99,
       productName: 'Worth-It Plan',
       refundWindowDays: 7,
-      headline: 'Know the best move. The move after that.',
+      headline: 'Know whether to DIY, hire, or hold before you spend.',
       subhead:
-        "Alder ranks the highest-payoff DIY moves for your home, shows alternate paths if you've already done something, and keeps your plan saved.",
+        "Alder ranks the highest-payoff path for your project, shows what to skip, and gives you the next move based on your property, budget, and goal.",
       bullets: [
         'Ranked, personalized project roadmap',
         'If-you-already-did-that paths',
@@ -812,7 +812,7 @@ export const CONFIG: RecommenderConfig = {
       enabled: true,
       deltaPriceUsd: 20,
       inlineCtaCopy:
-        'Want the full saved plan with ranked steps and ongoing recommendations? Upgrade for $20.',
+        'Upgrade to the full saved plan with ranked steps, sequencing, and DIY stop line — for $20 (same as paying $39.99 directly for Worth-It).',
       emailDelayHours: 72,
       emailSubject: 'Did your Smart Cart miss anything?',
       emailBodyTemplate:

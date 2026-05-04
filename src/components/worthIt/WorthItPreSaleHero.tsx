@@ -5,6 +5,7 @@
 // placeholder.
 
 import { CONFIG } from '@/lib/recommender-config'
+import { formatPrice } from '@/lib/format'
 
 export default function WorthItPreSaleHero() {
   const cfg = CONFIG.products.worthIt
@@ -49,7 +50,7 @@ export default function WorthItPreSaleHero() {
 
           <div className="border-t border-[#e8e3d4] pt-6">
             <div className="flex items-baseline gap-3 mb-1">
-              <span className="font-display text-4xl text-[#1f3a2e]">${cfg.priceUsd}</span>
+              <span className="font-display text-4xl text-[#1f3a2e]">{formatPrice(cfg.priceUsd)}</span>
               <span className="text-xs uppercase tracking-wide bg-[#1f3a2e] text-white px-2 py-1 rounded">
                 Best Value
               </span>

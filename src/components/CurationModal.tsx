@@ -12,6 +12,7 @@
 
 import { useEffect, useState } from 'react'
 import { CONFIG } from '@/lib/recommender-config'
+import { formatPrice } from '@/lib/format'
 import { SCOPE_VARIANTS, getV7Topics } from '@/lib/scope-variants'
 import type { TopicId } from '@/lib/property-modules'
 import type { BriefScenarioId } from '@/lib/recommender-config.types'
@@ -225,7 +226,7 @@ export default function CurationModal() {
             <div className="bg-white border border-[#e8e3d4] rounded-md p-4 text-sm">
               <div className="flex items-baseline justify-between mb-1">
                 <span className="text-[#1a1f1a]/70">{cfg.productName}</span>
-                <span className="font-display text-2xl text-[#1f3a2e]">${cfg.priceUsd}</span>
+                <span className="font-display text-2xl text-[#1f3a2e]">{formatPrice(cfg.priceUsd)}</span>
               </div>
               <p className="text-xs text-[#1a1f1a]/70">{refundCopy} · One-time · No account required</p>
             </div>

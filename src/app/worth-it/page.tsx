@@ -9,12 +9,12 @@ import CurationModal from '@/components/CurationModal'
 export const metadata: Metadata = {
   title: 'Worth-It Plan — Know the best move. The move after that. — Alder Projects',
   description:
-    "Alder ranks the highest-payoff DIY moves for your home, shows alternate paths, and keeps your plan saved. $39, one-time, no subscription.",
+    "Alder ranks the highest-payoff DIY moves for your home, shows alternate paths, and keeps your plan saved. $39.99, one-time, no subscription.",
   alternates: { canonical: 'https://alderprojects.com/worth-it' },
   openGraph: {
     title: 'Worth-It Plan — Alder Projects',
     description:
-      "Ranked moves. If-you-already-did-that paths. Saturday plan. DIY stop line. Optional reminders. $39 one-time.",
+      "Ranked moves. If-you-already-did-that paths. Saturday plan. DIY stop line. Optional reminders. $39.99 one-time.",
     url: 'https://alderprojects.com/worth-it',
   },
   robots: { index: true, follow: true },

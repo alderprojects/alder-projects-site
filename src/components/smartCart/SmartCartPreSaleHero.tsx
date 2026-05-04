@@ -3,6 +3,7 @@
 // checks, "What You Get" card, $19 button, trust row.
 
 import { CONFIG } from '@/lib/recommender-config'
+import { formatPrice } from '@/lib/format'
 
 export default function SmartCartPreSaleHero() {
   const cfg = CONFIG.products.smartCart
@@ -57,7 +58,7 @@ export default function SmartCartPreSaleHero() {
 
           <div className="border-t border-[#e8e3d4] pt-6">
             <div className="flex items-baseline gap-2 mb-1">
-              <span className="font-display text-4xl text-[#1f3a2e]">${cfg.priceUsd}</span>
+              <span className="font-display text-4xl text-[#1f3a2e]">{formatPrice(cfg.priceUsd)}</span>
               <span className="text-sm text-[#1a1f1a]/70">One-time · No subscription</span>
             </div>
 

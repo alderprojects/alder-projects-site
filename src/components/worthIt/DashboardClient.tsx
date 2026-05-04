@@ -2,27 +2,22 @@
 
 // V7 — Worth-It Plan dashboard interactive client.
 //
-// Renders the post-sale dashboard mockup quadrant: top nav with Find
-// My Plan + Share + Download PDF, plan identity row, three path cards
-// (Best Path / Bundle Small Fixes / Project Grew?), Highest-Payoff
-// Moves table with 5 path tabs, supporting cards row, summary bar,
-// action bar with reminder checkboxes.
-//
-// Client interactions:
-//   - Path tab switching (no server roundtrip — full data on initial load)
-//   - Add to plan (savedMoveIds toggle, PATCH plan state)
-//   - Reminder checkbox (PATCH plan state)
-//   - Bundle Small Fixes opens PunchListModal
-//   - Project Grew opens ProjectGrewModal
-//   - Share copies link to clipboard
-//   - Download PDF hits /api/plan/[planCode]/pdf
+// V7.1 changes:
+// - First-view confirmation banner that fades in on first render
+// - "Project complexity" relabel (was "Worth-It Score") + drop the
+//   "Light/Moderate/Strong" sub-label when the score is < 6.0
+// - Per-row "Not relevant" dismiss with state.dismissedMoveIds
+// - Empty path tabs are filtered out (Section 5)
+// - Four context modals (Start checklist, View Skip List, DIY Stop
+//   Line, Compare Paths) replace the dead Card "→" labels
 
-import { useState, useTransition } from 'react'
+import { useEffect, useRef, useState, useTransition } from 'react'
 import type { WorthItOutput } from '@/lib/buildWorthItPlan'
 import type { PlanState } from '@/lib/storage'
 import type { Move } from '@/content/moves'
 import PunchListModal from './PunchListModal'
 import ProjectGrewModal from './ProjectGrewModal'
+import PathContextModal from './PathContextModal'
 
 type Props = {
   plan: WorthItOutput
@@ -30,15 +25,47 @@ type Props = {
   token: string | null
 }
 
+type ContextModalId =
+  | null
+  | 'start_checklist'
+  | 'skip_list'
+  | 'diy_stop_line'
+  | 'compare_paths'
+
 export default function DashboardClient({ plan, initialState, token }: Props) {
   const [state, setState] = useState<PlanState>(initialState)
+  // Section 5 — only render path tabs that have content. Pre-compute
+  // the visible tabs so the active id stays in range.
+  const visiblePaths = plan.planPaths.filter(
+    p => (plan.movesByPath[p.id]?.length ?? 0) > 0,
+  )
   const [activePathId, setActivePathId] = useState<string>(
-    state.selectedPath || plan.planPaths[0]?.id || 'best_overall',
+    visiblePaths.find(p => p.id === state.selectedPath)?.id
+      ?? visiblePaths[0]?.id
+      ?? plan.planPaths[0]?.id
+      ?? 'best_overall',
   )
   const [punchOpen, setPunchOpen] = useState(false)
   const [grewOpen, setGrewOpen] = useState(false)
+  const [contextModal, setContextModal] = useState<ContextModalId>(null)
   const [shareToast, setShareToast] = useState<string | null>(null)
+  const [showFirstViewBanner, setShowFirstViewBanner] = useState(false)
   const [, startTransition] = useTransition()
+  const firstViewSet = useRef(false)
+
+  // First-view banner — fade in on first load if firstViewedAt is unset,
+  // then mark it server-side so subsequent loads stay quiet.
+  useEffect(() => {
+    if (firstViewSet.current) return
+    if (!state.firstViewedAt) {
+      setShowFirstViewBanner(true)
+      firstViewSet.current = true
+      void patchState({ firstViewedAt: new Date().toISOString() })
+      const timeout = window.setTimeout(() => setShowFirstViewBanner(false), 5000)
+      return () => window.clearTimeout(timeout)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   async function patchState(patch: Partial<PlanState>) {
     const next: PlanState = { ...state, ...patch }
@@ -52,9 +79,8 @@ export default function DashboardClient({ plan, initialState, token }: Props) {
           body: JSON.stringify(patch),
         })
       } catch {
-        // surface failure through toast; non-blocking
         setShareToast('Could not save. Try again.')
-        setTimeout(() => setShareToast(null), 3000)
+        window.setTimeout(() => setShareToast(null), 3000)
       }
     })
   }
@@ -64,6 +90,13 @@ export default function DashboardClient({ plan, initialState, token }: Props) {
       ? state.savedMoveIds.filter(id => id !== moveId)
       : [...state.savedMoveIds, moveId]
     void patchState({ savedMoveIds: saved })
+  }
+
+  function dismissMove(moveId: string) {
+    if (state.dismissedMoveIds.includes(moveId)) return
+    void patchState({
+      dismissedMoveIds: [...state.dismissedMoveIds, moveId],
+    })
   }
 
   function toggleReminder(id: keyof PlanState['reminderPreferences']) {
@@ -89,17 +122,18 @@ export default function DashboardClient({ plan, initialState, token }: Props) {
     } catch {
       setShareToast('Copy failed. Use the URL bar.')
     }
-    setTimeout(() => setShareToast(null), 2500)
+    window.setTimeout(() => setShareToast(null), 2500)
   }
 
   function copyPlanCode() {
     void navigator.clipboard?.writeText(plan.planCode)
     setShareToast('Plan code copied.')
-    setTimeout(() => setShareToast(null), 2000)
+    window.setTimeout(() => setShareToast(null), 2000)
   }
 
   function startChecklist() {
     void patchState({ checklistStarted: true })
+    setContextModal('start_checklist')
   }
 
   function downloadPdf() {
@@ -111,11 +145,17 @@ export default function DashboardClient({ plan, initialState, token }: Props) {
     void patchState({ pdfDownloaded: true })
   }
 
-  const movesForPath = plan.movesByPath[activePathId] ?? []
+  const movesForPath = (plan.movesByPath[activePathId] ?? []).filter(
+    m => !state.dismissedMoveIds.includes(m.id),
+  )
 
   return (
     <>
       <Header plan={plan} onShare={copyShareLink} onDownload={downloadPdf} />
+
+      {showFirstViewBanner && (
+        <FirstViewBanner plan={plan} />
+      )}
 
       <div className="max-w-6xl mx-auto px-4 py-8">
         <PlanIdentity plan={plan} onCopyCode={copyPlanCode} onCopyLink={copyShareLink} />
@@ -129,14 +169,22 @@ export default function DashboardClient({ plan, initialState, token }: Props) {
 
         <MovesTable
           plan={plan}
+          visiblePaths={visiblePaths}
           activePathId={activePathId}
           onSwitchPath={switchPath}
           movesForPath={movesForPath}
           savedIds={state.savedMoveIds}
           onToggleSaved={toggleSavedMove}
+          onDismiss={dismissMove}
         />
 
-        <SupportingCards plan={plan} />
+        <SupportingCards
+          plan={plan}
+          onSkipList={() => setContextModal('skip_list')}
+          onDiyStopLine={() => setContextModal('diy_stop_line')}
+          onComparePaths={() => setContextModal('compare_paths')}
+          onStartChecklist={startChecklist}
+        />
 
         <SummaryBar plan={plan} />
 
@@ -167,11 +215,146 @@ export default function DashboardClient({ plan, initialState, token }: Props) {
           onClose={() => setGrewOpen(false)}
         />
       )}
+      {contextModal === 'start_checklist' && (
+        <PathContextModal
+          plan={plan}
+          token={token}
+          title="Start your checklist"
+          intro="Walk through the highest-payoff moves one at a time. Mark each as done, skip it, or send it to a pro."
+          ctaLabel="Get help with this checklist →"
+          ctaIntentType="chat_followup"
+          ctaTrigger="start_checklist"
+          onClose={() => setContextModal(null)}
+        >
+          <ol className="space-y-3 text-sm">
+            {plan.thisSaturday.slice(0, 5).map((m, i) => (
+              <li
+                key={m.id}
+                className="border border-[#e8e3d4] rounded-md p-3 flex items-start gap-3"
+              >
+                <span className="w-6 h-6 rounded-full bg-[#1f3a2e] text-white inline-flex items-center justify-center text-xs flex-shrink-0">
+                  {i + 1}
+                </span>
+                <div>
+                  <div className="font-medium text-[#1a1f1a]">{m.title}</div>
+                  <div className="text-xs text-[#1a1f1a]/65 mt-0.5">
+                    {m.timeMinutes < 60
+                      ? `${m.timeMinutes} min`
+                      : `${Math.round(m.timeMinutes / 60)} hr`}
+                    {' · '}${m.spend.low}
+                    {m.spend.low !== m.spend.high && `-$${m.spend.high}`}
+                  </div>
+                </div>
+              </li>
+            ))}
+          </ol>
+        </PathContextModal>
+      )}
+      {contextModal === 'skip_list' && (
+        <PathContextModal
+          plan={plan}
+          token={token}
+          title="What to skip"
+          intro="The avoid list for this project. Each entry pairs the dollar amount avoided with the reason it does not earn its dollar."
+          ctaLabel="Want help avoiding these? →"
+          ctaIntentType="chat_followup"
+          ctaTrigger="skip_list_view"
+          onClose={() => setContextModal(null)}
+        >
+          <ul className="space-y-3 text-sm">
+            {plan.whatToSkip.map(s => (
+              <li key={s.id} className="border-b border-[#e8e3d4] pb-3">
+                <strong className="block text-[#1a1f1a]">{s.title}</strong>
+                <p className="text-[#1a1f1a]/80 mt-1">{s.reasoning}</p>
+                <p className="text-xs text-[#1a1f1a]/55 mt-1">
+                  Avoided: {s.moneyAvoided}
+                </p>
+              </li>
+            ))}
+          </ul>
+        </PathContextModal>
+      )}
+      {contextModal === 'diy_stop_line' && (
+        <PathContextModal
+          plan={plan}
+          token={token}
+          title="DIY Stop Line"
+          intro="The conditions that end DIY territory and start the call-a-pro conversation. Vermont specifics included where they apply."
+          ctaLabel="I need a pro for this →"
+          ctaIntentType="contractor_needed"
+          ctaTrigger="diy_stop_line_view"
+          onClose={() => setContextModal(null)}
+        >
+          <ul className="space-y-3 text-sm">
+            {plan.diyStopLine.map(s => (
+              <li key={s.id} className="border-b border-[#e8e3d4] pb-3">
+                <strong className="block text-[#1a1f1a]">{s.trigger}</strong>
+                <p className="text-[#1a1f1a]/80 mt-1">{s.why}</p>
+                <p className="text-xs text-[#1a1f1a]/60 mt-1">
+                  Who to call: <strong>{s.whoToCall}</strong>
+                </p>
+              </li>
+            ))}
+          </ul>
+        </PathContextModal>
+      )}
+      {contextModal === 'compare_paths' && (
+        <PathContextModal
+          plan={plan}
+          token={token}
+          title="Compare paths"
+          intro="Side by side: how each plan path differs in scope, time, and number of moves."
+          ctaLabel="Help me decide →"
+          ctaIntentType="chat_followup"
+          ctaTrigger="compare_paths_view"
+          onClose={() => setContextModal(null)}
+        >
+          <div className="grid sm:grid-cols-2 gap-3 text-sm">
+            {visiblePaths.map(p => {
+              const moves = plan.movesByPath[p.id] ?? []
+              const totalSpendLow = moves.reduce((a, m) => a + (m.spend?.low ?? 0), 0)
+              const totalSpendHigh = moves.reduce((a, m) => a + (m.spend?.high ?? 0), 0)
+              return (
+                <div
+                  key={p.id}
+                  className="border border-[#e8e3d4] rounded-md p-3"
+                >
+                  <div className="font-medium text-[#1f3a2e]">{p.label}</div>
+                  <div className="text-xs text-[#1a1f1a]/65 mt-1">
+                    {moves.length} move{moves.length === 1 ? '' : 's'} · ${totalSpendLow}
+                    {totalSpendLow !== totalSpendHigh && `-$${totalSpendHigh}`}
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        </PathContextModal>
+      )}
     </>
   )
 }
 
 // ============== Subcomponents =======================================
+
+function FirstViewBanner({ plan }: { plan: WorthItOutput }) {
+  return (
+    <div className="bg-[#f5efe2] border-b border-[#e8e3d4] text-sm text-[#1a1f1a]/85">
+      <div className="max-w-6xl mx-auto px-4 py-3 flex items-center gap-3">
+        <span className="w-5 h-5 rounded-full bg-[#1f3a2e] text-white inline-flex items-center justify-center text-[10px]">
+          ✓
+        </span>
+        <span>
+          Your Worth-It Plan is ready. Plan code{' '}
+          <code className="font-mono bg-white border border-[#e8e3d4] rounded px-1.5">
+            {plan.planCode}
+          </code>{' '}
+          saved to <strong>{plan.customerEmail}</strong>. Use the link in your
+          email to return anytime.
+        </span>
+      </div>
+    </div>
+  )
+}
 
 function Header({
   plan,
@@ -316,26 +499,31 @@ function PathCardsRow({
 
 function MovesTable({
   plan,
+  visiblePaths,
   activePathId,
   onSwitchPath,
   movesForPath,
   savedIds,
   onToggleSaved,
+  onDismiss,
 }: {
   plan: WorthItOutput
+  visiblePaths: WorthItOutput['planPaths']
   activePathId: string
   onSwitchPath: (id: string) => void
   movesForPath: Move[]
   savedIds: string[]
   onToggleSaved: (id: string) => void
+  onDismiss: (id: string) => void
 }) {
+  void plan
   return (
     <section className="bg-white border border-[#e8e3d4] rounded-xl mb-6">
       <div className="px-6 pt-6 pb-2">
         <h2 className="font-display text-2xl text-[#1a1f1a] mb-1">Your highest-payoff moves</h2>
       </div>
       <div className="px-6 border-b border-[#e8e3d4] flex flex-wrap gap-1">
-        {plan.planPaths.map(p => (
+        {visiblePaths.map(p => (
           <button
             key={p.id}
             onClick={() => onSwitchPath(p.id)}
@@ -394,17 +582,28 @@ function MovesTable({
                     </div>
                   </td>
                   <td className="py-3 px-3 text-right">
-                    <button
-                      type="button"
-                      onClick={() => onToggleSaved(move.id)}
-                      className={`text-xs px-3 py-1.5 rounded-md border ${
-                        saved
-                          ? 'bg-[#1f3a2e] text-white border-[#1f3a2e]'
-                          : 'border-[#e8e3d4] hover:bg-[#fbf8f1]'
-                      }`}
-                    >
-                      {saved ? 'Added' : 'Add to plan'}
-                    </button>
+                    <div className="inline-flex items-center gap-1">
+                      <button
+                        type="button"
+                        onClick={() => onToggleSaved(move.id)}
+                        className={`text-xs px-3 py-1.5 rounded-md border ${
+                          saved
+                            ? 'bg-[#1f3a2e] text-white border-[#1f3a2e]'
+                            : 'border-[#e8e3d4] hover:bg-[#fbf8f1]'
+                        }`}
+                      >
+                        {saved ? 'Added' : 'Add to plan'}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => onDismiss(move.id)}
+                        title="Not relevant — hide this move"
+                        aria-label="Not relevant"
+                        className="text-xs text-[#1a1f1a]/45 hover:text-[#a44e2c] px-2 py-1.5 rounded-md"
+                      >
+                        ×
+                      </button>
+                    </div>
                   </td>
                   <td className="py-3 px-6 text-[#1a1f1a]/40">
                     <BookmarkIcon filled={saved} />
@@ -419,14 +618,56 @@ function MovesTable({
   )
 }
 
-function SupportingCards({ plan }: { plan: WorthItOutput }) {
+function SupportingCards({
+  plan,
+  onSkipList,
+  onDiyStopLine,
+  onComparePaths,
+  onStartChecklist,
+}: {
+  plan: WorthItOutput
+  onSkipList: () => void
+  onDiyStopLine: () => void
+  onComparePaths: () => void
+  onStartChecklist: () => void
+}) {
   return (
     <section className="grid md:grid-cols-5 gap-4 mb-6">
-      <Card title="What to Buy" subtitle={`${plan.whatToBuy.length} items in your shopping list`} actionLabel="View Shopping List" actionHref={`/api/plan/${plan.planCode}/shopping-list`} preview={plan.whatToBuy.slice(0, 4).map(i => i.display)} />
-      <Card title="This Saturday" subtitle={`${plan.thisSaturday.length} tasks · 3-4 hrs`} actionLabel="Start checklist" preview={plan.thisSaturday.slice(0, 4).map(m => m.title)} />
-      <Card title="What to Skip" subtitle={`${plan.whatToSkip.length} items`} actionLabel="View Skip List" preview={plan.whatToSkip.slice(0, 4).map(s => s.title)} />
-      <Card title="DIY Stop Line" subtitle="Know when to call a pro" actionLabel="Learn more" preview={plan.diyStopLine.slice(0, 4).map(s => s.trigger)} />
-      <Card title="Plan Paths" subtitle="" actionLabel="Compare paths" preview={plan.planPaths.map(p => p.label)} />
+      <Card
+        title="What to Buy"
+        subtitle={`${plan.whatToBuy.length} items in your shopping list`}
+        actionLabel="View Shopping List"
+        actionHref={`/api/plan/${plan.planCode}/shopping-list`}
+        preview={plan.whatToBuy.slice(0, 4).map(i => i.display)}
+      />
+      <Card
+        title="This Saturday"
+        subtitle={`${plan.thisSaturday.length} tasks · 3-4 hrs`}
+        actionLabel="Start checklist"
+        onAction={onStartChecklist}
+        preview={plan.thisSaturday.slice(0, 4).map(m => m.title)}
+      />
+      <Card
+        title="What to Skip"
+        subtitle={`${plan.whatToSkip.length} items`}
+        actionLabel="View Skip List"
+        onAction={onSkipList}
+        preview={plan.whatToSkip.slice(0, 4).map(s => s.title)}
+      />
+      <Card
+        title="DIY Stop Line"
+        subtitle="Know when to call a pro"
+        actionLabel="Learn more"
+        onAction={onDiyStopLine}
+        preview={plan.diyStopLine.slice(0, 4).map(s => s.trigger)}
+      />
+      <Card
+        title="Plan Paths"
+        subtitle=""
+        actionLabel="Compare paths"
+        onAction={onComparePaths}
+        preview={plan.planPaths.map(p => p.label)}
+      />
     </section>
   )
 }
@@ -437,12 +678,14 @@ function Card({
   preview,
   actionLabel,
   actionHref,
+  onAction,
 }: {
   title: string
   subtitle: string
   preview: string[]
   actionLabel: string
   actionHref?: string
+  onAction?: () => void
 }) {
   return (
     <article className="bg-white border border-[#e8e3d4] rounded-xl p-4 flex flex-col">
@@ -457,6 +700,14 @@ function Card({
         <a href={actionHref} className="text-xs text-[#1f3a2e] underline-offset-2 hover:underline">
           {actionLabel} →
         </a>
+      ) : onAction ? (
+        <button
+          type="button"
+          onClick={onAction}
+          className="text-xs text-[#1f3a2e] underline-offset-2 hover:underline text-left"
+        >
+          {actionLabel} →
+        </button>
       ) : (
         <span className="text-xs text-[#1f3a2e]/60">{actionLabel} →</span>
       )}
@@ -469,15 +720,20 @@ function SummaryBar({ plan }: { plan: WorthItOutput }) {
     plan.summary.totalTimeHours.low === plan.summary.totalTimeHours.high
       ? `${plan.summary.totalTimeHours.low} hrs`
       : `${plan.summary.totalTimeHours.low}–${plan.summary.totalTimeHours.high} hrs`
-  const score =
-    plan.worthItScore === 'Strong' ? '9.1 / 10' : plan.worthItScore === 'Moderate' ? '7.4 / 10' : '5.6 / 10'
+  const numericScore =
+    plan.worthItScore === 'Strong' ? 9.1 : plan.worthItScore === 'Moderate' ? 7.4 : 5.6
+  const showSubLabel = numericScore >= 6.0
   return (
     <section className="bg-[#f5efe2] border border-[#e8e3d4] rounded-xl p-6 mb-6 grid md:grid-cols-5 gap-4 text-sm text-center">
       <Stat label="Est. Spend" value={`$${plan.summary.estSpend.low}–$${plan.summary.estSpend.high}`} />
       <Stat label="Total Time" value={totalTimeLabel} />
       <Stat label="Comfort Payoff" value={plan.summary.comfortLift} />
       <Stat label="Confidence" value={plan.summary.confidence} />
-      <Stat label="Worth-It Score" value={score} sub={plan.worthItScore} />
+      <Stat
+        label="Project Complexity"
+        value={`${numericScore.toFixed(1)} / 10`}
+        sub={showSubLabel ? plan.worthItScore : undefined}
+      />
     </section>
   )
 }

@@ -2,10 +2,11 @@
 
 import { notFound } from 'next/navigation'
 import Footer from '@/components/Footer'
-import { getSmartCart } from '@/lib/storage'
+import { getSmartCart, isV2Cart } from '@/lib/storage'
 import { CONFIG } from '@/lib/recommender-config'
 import { formatPrice, formatPriceRange } from '@/lib/format'
 import type { SmartCartOutput } from '@/lib/buildSmartCart'
+import type { SmartCartV2Output } from '@/lib/smart-cart-model'
 import { getGeneralSkipPrinciples } from '@/content/skip-list'
 import CartActions from '@/components/smartCart/CartActions'
 
@@ -19,6 +20,17 @@ export default async function SmartCartResultPage({ params }: Props) {
   if (!cart) {
     notFound()
   }
+  // V7.2.1 — discriminate on cart.version. v1 (legacy) carts go to
+  // the existing layout; v2 carts go to the new tiered-slot layout
+  // (filled in by Section 5).
+  if (isV2Cart(cart)) {
+    if (cart.refunded) return <V2Refunded cart={cart} />
+    if (new Date(cart.expiresAt).getTime() < Date.now()) {
+      return <V2Expired cart={cart} />
+    }
+    return <SmartCartV2Placeholder cart={cart} />
+  }
+
   if (cart.refunded) {
     return <RefundedCart cart={cart} />
   }
@@ -26,6 +38,66 @@ export default async function SmartCartResultPage({ params }: Props) {
     return <ExpiredCart cart={cart} />
   }
   return <SmartCartResult cart={cart} />
+}
+
+// V7.2.1 — placeholder stub for v2 carts. Section 5 replaces this
+// with the full tiered-slot layout. Lives here so the v2 framework
+// commit type-checks cleanly without forcing the result-page rewrite
+// into the same commit.
+function SmartCartV2Placeholder({ cart }: { cart: SmartCartV2Output }) {
+  return (
+    <main className="min-h-screen bg-[#fbf8f1] flex items-center justify-center px-4">
+      <div className="bg-white border border-[#e8e3d4] rounded-xl p-8 max-w-md w-full text-center">
+        <h1 className="font-display text-2xl text-[#1f3a2e] mb-2">
+          Cart {cart.cartId}
+        </h1>
+        <p className="text-sm text-[#1a1f1a]/85">
+          Built for {cart.scopeLabel} ({cart.scenarioLabel}).
+          The full v2 layout ships in the next commit.
+        </p>
+      </div>
+    </main>
+  )
+}
+
+function V2Refunded({ cart }: { cart: SmartCartV2Output }) {
+  return (
+    <main className="min-h-screen bg-[#fbf8f1] flex items-center justify-center px-4">
+      <div className="max-w-md text-center">
+        <h1 className="font-display text-3xl text-[#1f3a2e] mb-4">
+          Smart Cart refunded
+        </h1>
+        <p className="text-[#1a1f1a]/85">
+          Cart {cart.cartId} was refunded. Email{' '}
+          <a className="underline" href="mailto:hello@alderprojects.com">
+            hello@alderprojects.com
+          </a>{' '}
+          if this is a mistake.
+        </p>
+      </div>
+    </main>
+  )
+}
+
+function V2Expired({ cart }: { cart: SmartCartV2Output }) {
+  void cart
+  return (
+    <main className="min-h-screen bg-[#fbf8f1] flex items-center justify-center px-4">
+      <div className="max-w-md text-center">
+        <h1 className="font-display text-3xl text-[#1f3a2e] mb-4">Smart Cart expired</h1>
+        <p className="text-[#1a1f1a]/85 mb-8">
+          The 30-day link for this Smart Cart has passed. Building a fresh
+          one runs {formatPrice(CONFIG.products.smartCart.priceUsd)}.
+        </p>
+        <a
+          href="/smart-cart"
+          className="inline-block bg-[#1f3a2e] hover:bg-[#162a21] text-white font-medium px-6 py-3 rounded-lg"
+        >
+          Build a new Smart Cart — {formatPrice(CONFIG.products.smartCart.priceUsd)}
+        </a>
+      </div>
+    </main>
+  )
 }
 
 // ---------- Result content -------------------------------------------

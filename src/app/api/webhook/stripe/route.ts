@@ -27,13 +27,16 @@ import {
   logPlanEvent,
 } from '@/lib/storage'
 import { buildSmartCart, type SmartCartInput } from '@/lib/buildSmartCart'
+import { buildSmartCartV2 } from '@/lib/buildSmartCartV2'
 import { buildWorthItPlan, type WorthItInput } from '@/lib/buildWorthItPlan'
 import { inferSeason } from '@/lib/season-helpers'
+import { isV2Combination, getScenarioDefaults } from '@/content/smart-cart'
+import type { CartTier } from '@/lib/smart-cart-model'
 import {
   sendSmartCartReceiptEmail,
+  sendSmartCartReceiptEmailV2,
   sendWorthItDeliveryEmail,
   sendUpgradeCompleteEmail,
-  scheduleUpgradeOfferEmail,
 } from '@/lib/email'
 
 export const dynamic = 'force-dynamic'
@@ -41,6 +44,10 @@ export const dynamic = 'force-dynamic'
 type PendingSmartCartInput = Omit<SmartCartInput, 'season' | 'customerEmail'> & {
   email: string
   address?: string
+  // V7.2.1 — passed by the modal data-plumbing for v2 combinations.
+  // Optional and ignored for legacy v1 carts.
+  selectedTier?: CartTier
+  alreadyHave?: string[]
 }
 type PendingWorthItInput = Omit<WorthItInput, 'season' | 'customerEmail'> & {
   email: string
@@ -101,20 +108,46 @@ async function handleSessionCompleted(session: Stripe.Checkout.Session) {
     const cartId = reference
     const pending = (await getPendingSmartCart(cartId)) as PendingSmartCartInput | null
     if (!pending) throw new Error(`No pending Smart Cart for ${cartId}`)
+    const buyerEmail = customerEmail || pending.email
+
+    // V7.2.1 — route to v2 builder when the (topic, scope) is in the
+    // v2 catalog; otherwise fall back to legacy v1 path. The webhook
+    // signature itself is unchanged.
+    if (isV2Combination(pending.topic, pending.scopeVariantId)) {
+      const defaults = getScenarioDefaults(
+        pending.topic,
+        pending.scopeVariantId,
+        pending.scenario,
+      )
+      const cart = buildSmartCartV2({
+        cartId,
+        topic: pending.topic,
+        scopeVariantId: pending.scopeVariantId,
+        scenario: pending.scenario,
+        customerEmail: buyerEmail,
+        customerProvidedAddress: pending.address,
+        selectedTier: pending.selectedTier ?? defaults.selectedTier,
+        alreadyHave: pending.alreadyHave ?? defaults.alreadyHave,
+      })
+      await saveSmartCart(cart)
+      await sendSmartCartReceiptEmailV2(cart, cart.customerEmail)
+      // V7.2.1 — Worth-It is paused. Skip the T+72h upgrade-offer
+      // schedule until Worth-It returns.
+      return
+    }
+
     const cart = buildSmartCart({
       topic: pending.topic,
       scopeVariantId: pending.scopeVariantId,
       scenario: pending.scenario,
       season,
-      customerEmail: customerEmail || pending.email,
+      customerEmail: buyerEmail,
       customerProvidedAddress: pending.address,
     })
     cart.cartId = cartId
     await saveSmartCart(cart)
     await sendSmartCartReceiptEmail(cart, cart.customerEmail)
-    if (CONFIG.products.upgrade.enabled) {
-      await scheduleUpgradeOfferEmail(cart, CONFIG.products.upgrade.emailDelayHours)
-    }
+    // V7.2.1 — Worth-It paused; skip the T+72h upgrade-offer schedule.
     return
   }
 

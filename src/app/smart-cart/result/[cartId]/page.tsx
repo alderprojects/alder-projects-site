@@ -4,7 +4,7 @@ import { notFound } from 'next/navigation'
 import Footer from '@/components/Footer'
 import { getSmartCart } from '@/lib/storage'
 import { CONFIG } from '@/lib/recommender-config'
-import { formatPrice } from '@/lib/format'
+import { formatPrice, formatPriceRange } from '@/lib/format'
 import type { SmartCartOutput } from '@/lib/buildSmartCart'
 
 export const dynamic = 'force-dynamic'
@@ -115,7 +115,7 @@ function LeanCartSection({ cart }: { cart: SmartCartOutput }) {
                   {item.quantity} {item.unit}
                 </td>
                 <td className="py-3 pr-4 whitespace-nowrap">
-                  ${item.estimatedPrice}
+                  {formatPriceRange(item.estimatedPrice.low, item.estimatedPrice.high)}
                 </td>
                 <td className="py-3 text-[#1a1f1a]/85">{item.whyThis}</td>
               </tr>
@@ -157,7 +157,7 @@ function AddOnsSection({ cart }: { cart: SmartCartOutput }) {
             </a>
             <span className="text-[#1a1f1a]/70 italic">{a.whenYouNeedIt}</span>
             <span className="font-medium whitespace-nowrap">
-              ${a.estimatedPrice.low} – ${a.estimatedPrice.high}
+              {formatPriceRange(a.estimatedPrice.low, a.estimatedPrice.high)}
             </span>
           </li>
         ))}

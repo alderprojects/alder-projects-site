@@ -18,6 +18,7 @@
 
 import { kv } from '@vercel/kv'
 import { CONFIG } from './recommender-config'
+import { formatPrice } from './format'
 import type { SmartCartOutput } from './buildSmartCart'
 import type { WorthItOutput } from './buildWorthItPlan'
 
@@ -187,7 +188,7 @@ function renderSmartCartReceiptBody(cart: SmartCartOutput): string {
     `Lean cart total: $${cart.leanCart.totalLow}–$${cart.leanCart.totalHigh}`,
     `Potential savings vs common overbuy: $${cart.savings.potentialSavingsLow}–$${cart.savings.potentialSavingsHigh}+`,
     '',
-    `Designed to save more than $${CONFIG.products.smartCart.priceUsd} before checkout.`,
+    `Designed to save more than ${formatPrice(CONFIG.products.smartCart.priceUsd)} before checkout.`,
     '',
     `Need a refund? Within 24 hours of purchase, reply to this email or write hello@alderprojects.com — we refund liberally.`,
   ].join('\n')

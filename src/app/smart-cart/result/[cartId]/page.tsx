@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation'
 import Footer from '@/components/Footer'
 import { getSmartCart } from '@/lib/storage'
 import { CONFIG } from '@/lib/recommender-config'
+import { formatPrice } from '@/lib/format'
 import type { SmartCartOutput } from '@/lib/buildSmartCart'
 
 export const dynamic = 'force-dynamic'
@@ -40,7 +41,7 @@ function SmartCartResult({ cart }: { cart: SmartCartOutput }) {
 
         <div className="bg-[#1f3a2e] text-white rounded-lg px-5 py-3 mb-8 flex items-center gap-3">
           <CheckCircleIcon />
-          <span>Designed to save more than ${CONFIG.products.smartCart.priceUsd} before checkout.</span>
+          <span>Designed to save more than {formatPrice(CONFIG.products.smartCart.priceUsd)} before checkout.</span>
         </div>
 
         <LeanCartSection cart={cart} />
@@ -261,6 +262,8 @@ function Stat({
 function UpgradeCard({ cart }: { cart: SmartCartOutput }) {
   if (!CONFIG.products.upgrade.enabled) return null
   const target = `/api/upgrade/smart-cart-to-worth-it?cartId=${cart.cartId}`
+  const delta =
+    CONFIG.products.worthIt.priceUsd - CONFIG.products.smartCart.priceUsd
   return (
     <aside className="mt-10 bg-white border border-[#e8e3d4] rounded-xl p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
       <div className="text-sm text-[#1a1f1a]/85 max-w-2xl">
@@ -270,7 +273,7 @@ function UpgradeCard({ cart }: { cart: SmartCartOutput }) {
         href={target}
         className="bg-[#1f3a2e] hover:bg-[#162a21] text-white font-medium px-6 py-3 rounded-lg transition-colors whitespace-nowrap"
       >
-        Upgrade Now — ${CONFIG.products.upgrade.deltaPriceUsd}
+        Upgrade Now — {formatPrice(delta)}
       </a>
     </aside>
   )
@@ -349,13 +352,13 @@ function ExpiredCart({ cart: _cart }: { cart: SmartCartOutput }) {
         <h1 className="font-display text-3xl text-[#1f3a2e] mb-4">Smart Cart expired</h1>
         <p className="text-[#1a1f1a]/85 mb-8">
           The 30-day link for this Smart Cart has passed. Project shapes evolve;
-          building a new one with current product picks runs ${CONFIG.products.smartCart.priceUsd}.
+          building a new one with current product picks runs {formatPrice(CONFIG.products.smartCart.priceUsd)}.
         </p>
         <a
           href="/smart-cart"
           className="inline-block bg-[#1f3a2e] hover:bg-[#162a21] text-white font-medium px-6 py-3 rounded-lg"
         >
-          Build a new Smart Cart — ${CONFIG.products.smartCart.priceUsd}
+          Build a new Smart Cart — {formatPrice(CONFIG.products.smartCart.priceUsd)}
         </a>
       </div>
     </main>

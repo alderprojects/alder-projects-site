@@ -4,6 +4,7 @@
 // CurationModal picks up on landing.
 
 import { CONFIG } from '@/lib/recommender-config'
+import { formatPrice } from '@/lib/format'
 
 type Props = {
   topicHint?: string                  // 'kitchen', 'weatherization', etc.
@@ -33,7 +34,7 @@ export default function SmartCartGuideFooterCta({
           href={href}
           className="bg-[#1f3a2e] hover:bg-[#162a21] text-white text-sm whitespace-nowrap px-4 py-2 rounded-md"
         >
-          Get the Smart Cart — ${cfg.priceUsd}
+          Get the Smart Cart — {formatPrice(cfg.priceUsd)}
         </a>
       </div>
     )
@@ -47,7 +48,7 @@ export default function SmartCartGuideFooterCta({
         <p className="text-sm text-white/85">
           Alder writes the lean cart for the actual project shape so the
           obvious upsells go in the skip column. Designed to save more than
-          ${cfg.priceUsd} before checkout.
+          {formatPrice(cfg.priceUsd)} before checkout.
         </p>
       </div>
       <div>
@@ -55,7 +56,7 @@ export default function SmartCartGuideFooterCta({
           href={href}
           className="bg-white text-[#1f3a2e] font-medium px-5 py-3 rounded-lg hover:bg-[#fbf8f1] inline-block"
         >
-          Build My Smart Cart — ${cfg.priceUsd}
+          Build My Smart Cart — {formatPrice(cfg.priceUsd)}
         </a>
         <p className="text-xs text-white/65 mt-2">
           {cfg.refundWindowHours}-hour refund window · No subscription

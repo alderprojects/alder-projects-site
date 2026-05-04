@@ -10,6 +10,7 @@
 
 import { useEffect, useState } from 'react'
 import { CONFIG } from '@/lib/recommender-config'
+import { formatPrice } from '@/lib/format'
 import { useEngagementGate } from '@/lib/useEngagementGate'
 import type { TopicId } from '@/lib/property-modules'
 import { SCOPE_VARIANTS } from '@/lib/scope-variants'
@@ -65,7 +66,7 @@ export default function WorthItCTACard({ topic, intent, address, slug }: Props) 
           data-curation-modal-slug={slug ?? ''}
           className="bg-white text-[#1f3a2e] font-medium px-5 py-3 rounded-lg hover:bg-[#fbf8f1]"
         >
-          {cfg.ctaCopy} — ${cfg.priceUsd}
+          {cfg.ctaCopy} — {formatPrice(cfg.priceUsd)}
         </button>
         <p className="text-xs text-white/65 mt-2">
           {cfg.refundWindowDays}-day guarantee · No subscription

@@ -20,9 +20,14 @@ import {
 import { SKIP_LIST, getSkipListForCart, type SkipItem } from '../content/skip-list'
 import { resolveOverbuyTraps, combineOverbuyTotals } from '../content/overbuy-traps'
 import { QUANTITY_GUIDANCE } from '../content/quantity-guidance'
-import { PICK_TIERS, getPickTier, type PickTier } from './pick-tiers'
+import { getPickTier, type PickTier } from './pick-tiers'
 import { buildAmazonUrl } from './buildAmazonUrl'
 import { SCENARIOS } from '../content/scenarios'
+import {
+  resolveItemPriceRange,
+  resolveAddOnPriceRange,
+  type PriceRange,
+} from './item-prices'
 
 // ---------- Public types ----------------------------------------------
 
@@ -40,7 +45,7 @@ export type LeanCartItem = {
   display: string
   quantity: number
   unit: string
-  estimatedPrice: number
+  estimatedPrice: PriceRange            // { low, high } — show "$X" if equal, "$X-$Y" otherwise
   whyThis: string
   affiliateUrl: string
   timingBadge?: string                  // "Buy now" / "Wait until <month>" if shoppingTiming applies
@@ -132,10 +137,13 @@ export function buildSmartCart(input: SmartCartInput): SmartCartOutput {
   const skipForNow = getSkipListForCart(input.topic, input.scopeVariantId, input.scenario)
 
   const leanCartTotalLow = leanCartItems.reduce(
-    (acc, i) => acc + i.estimatedPrice * i.quantity,
+    (acc, i) => acc + i.estimatedPrice.low * i.quantity,
     0,
   )
-  const leanCartTotalHigh = Math.round(leanCartTotalLow * 1.25)
+  const leanCartTotalHigh = leanCartItems.reduce(
+    (acc, i) => acc + i.estimatedPrice.high * i.quantity,
+    0,
+  )
 
   const overbuyTraps = resolveOverbuyTraps(variant.overbuyTrapIds)
   const overbuyTotal = combineOverbuyTotals(overbuyTraps)
@@ -227,7 +235,9 @@ function applyScenarioTier(
 }
 
 // Build the lean cart — top 4-6 items per scope, with quantity
-// guidance applied. Drops items lacking a clear price signal.
+// guidance applied. Prices resolve through the item-prices ladder
+// (tier → explicit id → name pattern → category band) instead of the
+// pre-v7.1 hard-coded $25 default.
 function buildLeanCart(
   items: Array<AffiliateItem & { _tier?: PickTier; _tierUrl?: string; _tierPrice?: number; _tradeoff?: string }>,
   scopeVariantId: string,
@@ -238,9 +248,10 @@ function buildLeanCart(
     const guidance = QUANTITY_GUIDANCE[item.id]
     const quantity = guidance?.typicalQuantity.mid ?? 1
     const unit = guidance?.typicalQuantity.unit ?? 'unit'
-    const estimatedPrice =
-      item._tierPrice ?? estimatePriceFromShortNote(item) ?? 25
-    const whyThis = item._tradeoff ?? truncateNote(item.shortNote)
+    const estimatedPrice: PriceRange = item._tierPrice
+      ? { low: item._tierPrice, high: item._tierPrice }
+      : resolveItemPriceRange(item)
+    const whyThis = item._tradeoff ?? item.shortNote
     const url = item._tierUrl ?? item.url ?? buildAmazonUrl(item.display)
     const timingBadge = computeTimingBadge(scopeVariantId, season)
     lean.push({
@@ -266,15 +277,13 @@ function buildAddOns(
   const remaining = items.filter(i => !usedIds.has(i.id))
   const addOns: AddOnItem[] = []
   for (const item of remaining.slice(0, 3)) {
-    const tiered = PICK_TIERS[item.id]
-    const low = tiered?.tight.estPrice ?? 6
-    const high = tiered?.premium?.estPrice ?? tiered?.mid.estPrice ?? 30
+    const range = resolveAddOnPriceRange(item)
     const url = item.url ?? buildAmazonUrl(item.display)
     addOns.push({
       itemId: item.id,
       display: item.display,
-      estimatedPrice: { low, high },
-      whenYouNeedIt: truncateNote(item.shortNote, 90),
+      estimatedPrice: range,
+      whenYouNeedIt: item.shortNote,
       affiliateUrl: url,
     })
   }
@@ -309,22 +318,6 @@ function seasonToMonth(season: Season): number {
   }
 }
 
-function estimatePriceFromShortNote(item: AffiliateItem): number | undefined {
-  // The catalog does not carry explicit prices on every item. For lean
-  // cart synthesis we fall back to a category-default. This keeps the
-  // function pure and safe even when an item is missing tier metadata.
-  const note = item.shortNote.toLowerCase()
-  if (note.includes('$')) {
-    const match = note.match(/\$([0-9,]+)/)
-    if (match) return Number(match[1].replace(/,/g, ''))
-  }
-  return undefined
-}
-
-function truncateNote(note: string, max = 80): string {
-  if (note.length <= max) return note
-  return note.slice(0, max - 1).trimEnd() + '…'
-}
 
 // Cart id — printable, prefixed, base-32 random suffix. Format
 // CART-XXXXXX (6 chars). Collision risk is negligible at V7 launch

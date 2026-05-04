@@ -85,7 +85,7 @@ function renderPrintableHtml(plan: import('@/lib/buildWorthItPlan').WorthItOutpu
     <tr>
       <td>${escapeHtml(i.display)}</td>
       <td>${i.quantity} ${escapeHtml(i.unit)}</td>
-      <td>$${i.estimatedPrice}</td>
+      <td>${i.estimatedPrice.low === i.estimatedPrice.high ? `$${i.estimatedPrice.low}` : `$${i.estimatedPrice.low}–$${i.estimatedPrice.high}`}</td>
     </tr>
   `).join('')
   return `<!doctype html>

@@ -353,8 +353,7 @@ function MovesTable({
         <table className="w-full text-sm">
           <thead className="text-left text-xs uppercase tracking-wide text-[#1a1f1a]/55 bg-[#fbf8f1]">
             <tr>
-              <th className="py-3 px-6 w-12">#</th>
-              <th className="py-3 px-3">Move</th>
+              <th className="py-3 px-6">Move</th>
               <th className="py-3 px-3">Impact</th>
               <th className="py-3 px-3">Spend</th>
               <th className="py-3 px-3">Time</th>
@@ -366,7 +365,7 @@ function MovesTable({
           <tbody>
             {movesForPath.length === 0 && (
               <tr>
-                <td colSpan={8} className="py-8 px-6 text-center text-[#1a1f1a]/55 italic">
+                <td colSpan={7} className="py-8 px-6 text-center text-[#1a1f1a]/55 italic">
                   No moves on this path. Try a different tab.
                 </td>
               </tr>
@@ -376,11 +375,6 @@ function MovesTable({
               return (
                 <tr key={move.id} className="border-t border-[#e8e3d4]">
                   <td className="py-3 px-6">
-                    <span className="w-6 h-6 rounded-full bg-[#1f3a2e] text-white inline-flex items-center justify-center text-xs">
-                      {move.rank}
-                    </span>
-                  </td>
-                  <td className="py-3 px-3">
                     <div className="font-medium text-[#1a1f1a]">{move.title}</div>
                     <div className="text-xs text-[#1a1f1a]/65">{move.whyRanked}</div>
                   </td>

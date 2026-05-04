@@ -21,6 +21,7 @@ import { Resend } from 'resend'
 import { CONFIG } from './recommender-config'
 import { formatPrice } from './format'
 import type { SmartCartOutput } from './buildSmartCart'
+import type { SmartCartV2Output } from './smart-cart-model'
 import type { WorthItOutput } from './buildWorthItPlan'
 
 // V7.1 — single Resend client, lazy-initialized so missing env vars
@@ -136,6 +137,35 @@ export async function sendSmartCartReceiptEmail(
   await sendNow(envelope)
 }
 
+// V7.2.1 — receipt email for v2 carts. Same envelope shape as v1 so
+// the queue and admin index stay homogeneous; only the body changes.
+export async function sendSmartCartReceiptEmailV2(
+  cart: SmartCartV2Output,
+  toEmail: string,
+): Promise<void> {
+  const subject = `Your Smart Cart for ${cart.scopeLabel}`
+  const body = renderSmartCartReceiptBodyV2(cart)
+  const envelope: EmailEnvelope = {
+    id: newEnvelopeId(),
+    type: 'smart_cart_receipt',
+    toEmail,
+    subject,
+    body,
+    metadata: {
+      cartId: cart.cartId,
+      topic: cart.topic,
+      scopeVariantId: cart.scopeVariantId,
+      version: 2,
+    },
+    scheduledFor: new Date().toISOString(),
+    status: 'queued',
+    attempts: 0,
+    createdAt: new Date().toISOString(),
+  }
+  await enqueueEmail(envelope)
+  await sendNow(envelope)
+}
+
 export async function sendWorthItDeliveryEmail(
   plan: WorthItOutput,
   toEmail: string,
@@ -237,6 +267,23 @@ export async function sendReminder(
 }
 
 // ---------- Body rendering ------------------------------------------
+
+function renderSmartCartReceiptBodyV2(cart: SmartCartV2Output): string {
+  const url = `https://alderprojects.com/smart-cart/result/${cart.cartId}`
+  return [
+    `Your Smart Cart for ${cart.scopeLabel} is ready.`,
+    '',
+    `View it for the next 30 days at:`,
+    url,
+    '',
+    `Lean cart total: $${cart.savings.leanCartLow}–$${cart.savings.leanCartHigh}`,
+    `Potential savings vs typical first-time spend: $${cart.savings.potentialSavingsLow}–$${cart.savings.potentialSavingsHigh}+`,
+    '',
+    `Designed to save more than ${formatPrice(CONFIG.products.smartCart.priceUsd)} before checkout.`,
+    '',
+    `Need a refund? Within 24 hours of purchase, reply to this email or write hello@alderprojects.com — we refund liberally.`,
+  ].join('\n')
+}
 
 function renderSmartCartReceiptBody(cart: SmartCartOutput): string {
   const url = `https://alderprojects.com/smart-cart/result/${cart.cartId}`

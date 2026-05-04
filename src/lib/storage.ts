@@ -18,7 +18,18 @@
 import { kv } from '@vercel/kv'
 import { createHash } from 'crypto'
 import type { SmartCartOutput } from './buildSmartCart'
+import type { SmartCartV2Output } from './smart-cart-model'
 import type { WorthItOutput } from './buildWorthItPlan'
+
+// V7.2.1 — Smart Cart can now be either the legacy v1 shape
+// (SmartCartOutput, with no version field on the oldest records) or
+// the new v2 shape (SmartCartV2Output, version: 2). Consumers
+// discriminate on `cart.version`; legacy reads default to 1.
+export type AnySmartCart = SmartCartOutput | SmartCartV2Output
+
+export function isV2Cart(cart: AnySmartCart): cart is SmartCartV2Output {
+  return (cart as SmartCartV2Output).version === 2
+}
 
 // ---------- Plan state -----------------------------------------------
 
@@ -108,13 +119,13 @@ export async function getPendingSmartCart(cartId: string): Promise<object | null
   return (v as object) ?? null
 }
 
-export async function saveSmartCart(cart: SmartCartOutput): Promise<void> {
+export async function saveSmartCart(cart: AnySmartCart): Promise<void> {
   await kv.set(`smartcart:${cart.cartId}`, cart, { ex: SMART_CART_TTL_SECONDS })
 }
 
-export async function getSmartCart(cartId: string): Promise<SmartCartOutput | null> {
+export async function getSmartCart(cartId: string): Promise<AnySmartCart | null> {
   const v = await kv.get(`smartcart:${cartId}`)
-  return (v as SmartCartOutput) ?? null
+  return (v as AnySmartCart) ?? null
 }
 
 export async function markSmartCartRefunded(cartId: string): Promise<void> {

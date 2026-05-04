@@ -38,6 +38,8 @@ export type PlanState = {
   checklistCompleted: boolean
   lastOpenedAt: string
   savedPunchList?: { taskIds: string[]; whenSaved: string; timing?: string }
+  // V7.1 — first-view banner support; written by DashboardClient.
+  firstViewedAt?: string
 }
 
 export function defaultPlanState(): PlanState {
@@ -58,6 +60,7 @@ export function defaultPlanState(): PlanState {
     lastOpenedAt: new Date().toISOString(),
   }
 }
+
 
 // ---------- Lead intents (V8 bridge) ---------------------------------
 

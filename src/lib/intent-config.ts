@@ -116,33 +116,34 @@ const ICON_LEAF =
 export const SMART_CART_CATEGORIES: SmartCartCategory[] = [
   {
     id: 'kitchen_refresh',
-    label: 'Kitchen refresh',
+    label: 'Kitchen organizers',
     iconSvg: ICON_KITCHEN,
     problem:
-      "I want a new-feeling kitchen without ripping anything out. What do I actually buy?",
+      "I want a kitchen that finally works. What do I actually buy and what do I skip?",
     topicId: 'kitchen',
-    defaultScopeVariantId: 'kitchen_cosmetic_refresh',
+    // V7.2.1 — points at the curated v2 combination so the modal
+    // and the webhook route through buildSmartCartV2.
+    defaultScopeVariantId: 'kitchen_organizers',
     defaultScenarioId: 'just_starting',
     seasonality: 'all',
     teaser: {
-      buyCount: 6,
-      skipCount: 4,
-      spendLow: 95,
-      spendHigh: 240,
-      savingsLow: 110,
-      savingsHigh: 280,
+      buyCount: 8,
+      skipCount: 11,
+      spendLow: 260,
+      spendHigh: 342,
+      savingsLow: 140,
+      savingsHigh: 310,
       payoffSentence:
-        'Avoids the all-in-one cabinet kit, the bulk pulls pack, and the kitchen-branded paint upcharge.',
+        'Avoids the bamboo cutlery tray that does not fit older drawers, the pantry pull-out that hits the P-trap, and the premium spice rack you will outgrow.',
     },
     rightForYouIf: [
-      'Layout, cabinets, plumbing all work — you just want it to look better',
+      'You want a working kitchen, not a Pinterest one',
       'You can spend a Saturday on it and want a clear shopping list before you go',
-      'You are wary of the cabinet refresh kit at the endcap',
-      'You have $100+ to spend and want $20+ back in savings on the cart',
+      'You are wary of the all-in-one organization kits at Container Store',
+      'You have $100+ to spend and want real savings on the cart',
     ],
     notRightIfPointsToWorthIt: [
-      'You are deciding refresh vs remodel — start with Worth-It',
-      'You have a contractor quote and want a second opinion',
+      'You are deciding whether to refresh, repair, or remodel — Worth-It returns soon',
     ],
     curationStatus: 'curated',
   },

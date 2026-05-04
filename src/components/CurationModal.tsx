@@ -20,6 +20,7 @@ import { SCOPE_VARIANTS, getV7Topics } from '@/lib/scope-variants'
 import type { TopicId } from '@/lib/property-modules'
 import type { BriefScenarioId } from '@/lib/recommender-config.types'
 import type { IntentTeaser } from '@/lib/intent-config'
+import type { CartTier } from '@/lib/smart-cart-model'
 import DynamicExampleCard from './intent/DynamicExampleCard'
 
 type ProductId = 'smart_cart' | 'worth_it'
@@ -54,6 +55,12 @@ export default function CurationModal() {
   const [error, setError] = useState<string | null>(null)
   const [teaser, setTeaser] = useState<IntentTeaser | null>(null)
   const [teaserLoading, setTeaserLoading] = useState(false)
+  // V7.2.1 — data plumbing for the v2 model. State-probe UI ships in
+  // v7.2.2; for now these read from optional data attributes on the
+  // open-button so callers can pre-fill them. When unset, the
+  // checkout endpoint fills them from SCENARIO_DEFAULTS.
+  const [selectedTier, setSelectedTier] = useState<CartTier | undefined>(undefined)
+  const [alreadyHave, setAlreadyHave] = useState<string[] | undefined>(undefined)
 
   // Wire global open buttons via data attributes.
   useEffect(() => {
@@ -81,6 +88,15 @@ export default function CurationModal() {
       if (s) setScenario(s)
       const addr = btn.getAttribute('data-curation-modal-address')
       if (addr) setAddress(addr)
+      // V7.2.1 — optional v2 data plumbing.
+      const tierAttr = btn.getAttribute('data-curation-modal-tier') as CartTier | null
+      setSelectedTier(tierAttr ?? undefined)
+      const haveAttr = btn.getAttribute('data-curation-modal-already-have')
+      setAlreadyHave(
+        haveAttr
+          ? haveAttr.split(',').map(s => s.trim()).filter(Boolean)
+          : undefined,
+      )
       setError(null)
       setOpen(true)
     }
@@ -174,6 +190,10 @@ export default function CurationModal() {
           scenario,
           address: product === 'worth_it' ? address || undefined : undefined,
           email,
+          // V7.2.1 — pass through optional v2 model probe values.
+          // Server fills SCENARIO_DEFAULTS when these are undefined.
+          selectedTier,
+          alreadyHave,
         }),
       })
       if (!res.ok) {

@@ -140,6 +140,29 @@ export async function GET(req: Request) {
     })
   }
 
+  // ---------- V7.2.1: Worth-It pause status ----------
+  checks.push({
+    id: 'worth_it_status',
+    status: 'ok',
+    detail:
+      'Worth-It is paused (coming-soon page). Notify list captures via /api/worth-it/notify-me.',
+  })
+  try {
+    const notifyIndex = (await kv.get<string[]>('worth_it_notify:index')) ?? []
+    checks.push({
+      id: 'worth_it_notify_count',
+      status: 'ok',
+      detail: `Worth-It notify list: ${notifyIndex.length} email${notifyIndex.length === 1 ? '' : 's'} captured`,
+    })
+  } catch (e: unknown) {
+    const msg = e instanceof Error ? e.message : 'unknown error'
+    checks.push({
+      id: 'worth_it_notify_count',
+      status: 'error',
+      detail: `Could not read notify list index: ${msg}`,
+    })
+  }
+
   // ---------- Mode detection (test vs live) ----------
   const stripeKey = env.STRIPE_SECRET_KEY ?? ''
   const isTestMode = stripeKey.startsWith('sk_test_')

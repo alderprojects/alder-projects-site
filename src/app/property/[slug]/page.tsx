@@ -7,7 +7,8 @@ import PropertyGisOverlay from '@/components/PropertyGisOverlay'
 import PropertyChat from '@/components/PropertyChat'
 import PropertyFraming from '@/components/PropertyFraming'
 import PropertyInteractive from '@/components/PropertyInteractive'
-import WorthItCTACard from '@/components/property/WorthItCTACard'
+// V7.2.1 — WorthItCTACard removed while Worth-It Plan is paused.
+// SmartCartCTACard is the only paid-product CTA on property pages.
 import SmartCartCTACard from '@/components/property/SmartCartCTACard'
 import SmartCartTextLink from '@/components/property/SmartCartTextLink'
 import CurationModal from '@/components/CurationModal'
@@ -165,17 +166,9 @@ export default async function PropertyPage({
               Component file kept so V5 can revive without re-implementing. */}
           {CONFIG.featureFlags.ENABLE_FRAMING_TOGGLE && <PropertyFraming />}
 
-          {/* V7.1 — paid product CTA pair (engagement-gated, refund-risk-
-              suppressed). Smart Cart appears first so the cheaper, higher-
-              intent option is the visible default; Worth-It below for the
-              decision-stuck visitor. */}
+          {/* V7.2.1 — Smart Cart only (Worth-It paused).
+              Engagement-gated and refund-risk suppressed. */}
           <SmartCartCTACard
-            topic={initialSignals.topic ?? null}
-            intent={mapTopLevelIntent(initialSignals.topLevelIntent)}
-            address={data.address}
-            slug={params.slug}
-          />
-          <WorthItCTACard
             topic={initialSignals.topic ?? null}
             intent={mapTopLevelIntent(initialSignals.topLevelIntent)}
             address={data.address}

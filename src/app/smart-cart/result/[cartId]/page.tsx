@@ -6,6 +6,7 @@ import { getSmartCart } from '@/lib/storage'
 import { CONFIG } from '@/lib/recommender-config'
 import { formatPrice, formatPriceRange } from '@/lib/format'
 import type { SmartCartOutput } from '@/lib/buildSmartCart'
+import { getGeneralSkipPrinciples } from '@/content/skip-list'
 import CartActions from '@/components/smartCart/CartActions'
 
 export const dynamic = 'force-dynamic'
@@ -54,6 +55,7 @@ function SmartCartResult({ cart }: { cart: SmartCartOutput }) {
         <AddOnsSection cart={cart} />
         <SkipForNowSection cart={cart} />
         <SavingsSnapshot cart={cart} />
+        <GeneralPrinciplesSection cart={cart} />
 
         <p className="mt-8 text-xs text-[#1a1f1a]/60 text-center">
           30-day link to view your cart. Saved at <code>{`/smart-cart/result/${cart.cartId}`}</code>.
@@ -329,6 +331,39 @@ function Section({
       </div>
       {children}
     </section>
+  )
+}
+
+function GeneralPrinciplesSection({ cart }: { cart: SmartCartOutput }) {
+  const items = getGeneralSkipPrinciples(cart.topic, cart.scopeVariantId, cart.scenario)
+  if (!items.length) return null
+  return (
+    <details className="bg-white border border-[#e8e3d4] rounded-xl p-6 md:p-8 mb-6 group">
+      <summary className="cursor-pointer flex items-center justify-between gap-3">
+        <span className="font-display text-base text-[#1a1f1a]">
+          General buying principles
+        </span>
+        <span className="text-xs text-[#1a1f1a]/60 group-open:hidden">
+          {items.length} item{items.length === 1 ? '' : 's'} · click to expand
+        </span>
+      </summary>
+      <p className="text-xs text-[#1a1f1a]/65 mt-3 mb-4">
+        These apply to most home-improvement projects. They&apos;re not counted
+        in the headline savings tile above — they&apos;re here for the
+        education.
+      </p>
+      <ul className="space-y-3 text-sm">
+        {items.map(s => (
+          <li key={s.id} className="border-b border-[#e8e3d4] pb-3 last:border-0">
+            <strong className="block text-[#1a1f1a]">{s.title}</strong>
+            <p className="text-[#1a1f1a]/80 mt-1">{s.reasoning}</p>
+            <p className="text-xs text-[#1a1f1a]/55 mt-1">
+              Common avoid: {s.moneyAvoided}
+            </p>
+          </li>
+        ))}
+      </ul>
+    </details>
   )
 }
 

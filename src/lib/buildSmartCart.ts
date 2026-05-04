@@ -17,7 +17,13 @@ import {
   type AffiliateItem,
   type AccessoryKit,
 } from '@/data/affiliates'
-import { SKIP_LIST, getSkipListForCart, type SkipItem } from '../content/skip-list'
+import {
+  SKIP_LIST,
+  getSkipListForCart,
+  resolveSkipItemScope,
+  parseMoneyAvoided,
+  type SkipItem,
+} from '../content/skip-list'
 import { resolveOverbuyTraps, combineOverbuyTotals } from '../content/overbuy-traps'
 import { QUANTITY_GUIDANCE } from '../content/quantity-guidance'
 import { getPickTier, type PickTier } from './pick-tiers'
@@ -155,6 +161,24 @@ export function buildSmartCart(input: SmartCartInput): SmartCartOutput {
     t.overboughtItems.map(i => i.label),
   )
 
+  // V7.1 — savings honesty (Section 16). Headline savings come ONLY
+  // from skip items that are tied to the topic or scope; generic
+  // buying-discipline items do NOT inflate the headline number. The
+  // result page renders general items in a separate expandable
+  // section.
+  const honestSkip = skipForNow.filter(s => resolveSkipItemScope(s) !== 'general')
+  let skipSavingsLow = 0
+  let skipSavingsHigh = 0
+  for (const item of honestSkip) {
+    const range = parseMoneyAvoided(item.moneyAvoided)
+    skipSavingsLow += range.low
+    skipSavingsHigh += range.high
+  }
+  // Combine with overbuy-trap totals — those are already scope-tied
+  // through variant.overbuyTrapIds so they remain in the headline.
+  const potentialSavingsLow = skipSavingsLow + overbuyTotal.low
+  const potentialSavingsHigh = skipSavingsHigh + overbuyTotal.high
+
   return {
     cartId,
     createdAt: createdAt.toISOString(),
@@ -182,8 +206,8 @@ export function buildSmartCart(input: SmartCartInput): SmartCartOutput {
       leanCartEstHigh: leanCartTotalHigh,
       commonOverbuyLow: overbuyTotal.low,
       commonOverbuyHigh: overbuyTotal.high,
-      potentialSavingsLow: Math.max(overbuyTotal.low - leanCartTotalHigh, 0),
-      potentialSavingsHigh: Math.max(overbuyTotal.high - leanCartTotalLow, 0),
+      potentialSavingsLow,
+      potentialSavingsHigh,
     },
 
     overbuyTrapCallout: overbuyItemsLabels.length

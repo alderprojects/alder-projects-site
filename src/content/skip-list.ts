@@ -14,15 +14,45 @@
 import type { TopicId } from '../lib/property-modules'
 import type { BriefScenarioId } from '../lib/recommender-config.types'
 
+export type SkipItemScope =
+  | 'topic_specific'                 // relevant to a topic but any scope
+  | 'scope_specific'                 // relevant to a specific scope variant
+  | 'general'                        // generic buying-discipline advice
+
 export type SkipItem = {
   id: string
   topic?: TopicId
   scopeVariantIds?: string[]         // narrows to specific scope; omit = applies to whole topic
   scenario?: BriefScenarioId         // narrows to scenario; omit = applies to all scenarios
+  // V7.1 — drives savings honesty + UI bucketing. When omitted,
+  // resolveSkipItemScope() infers the scope from topic/scopeVariantIds
+  // presence. Override explicitly for items that LOOK topic-specific
+  // but really are generic buying discipline.
+  scope?: SkipItemScope
   title: string
   reasoning: string                  // why skip; voice-guide.md compliant
   moneyAvoided: string               // dollars or range
   confidence: 'high' | 'medium' | 'low'
+}
+
+// Resolve the effective scope of a skip item, falling back to inference
+// when not explicitly authored.
+export function resolveSkipItemScope(item: SkipItem): SkipItemScope {
+  if (item.scope) return item.scope
+  if (item.scopeVariantIds && item.scopeVariantIds.length) return 'scope_specific'
+  if (item.topic) return 'topic_specific'
+  return 'general'
+}
+
+// Parse "$X-Y" / "$X" / "$X-$Y" / "$X-Y per door" etc into a numeric
+// {low, high} range. Used by buildSmartCart savings honesty and the
+// /api/intent/teaser fallback.
+export function parseMoneyAvoided(s: string): { low: number; high: number } {
+  const match = s.match(/\$([0-9,]+)(?:\s*-\s*\$?([0-9,]+))?/)
+  if (!match) return { low: 0, high: 0 }
+  const low = Number(match[1].replace(/,/g, ''))
+  const high = match[2] ? Number(match[2].replace(/,/g, '')) : low
+  return { low: isNaN(low) ? 0 : low, high: isNaN(high) ? low : high }
 }
 
 export const SKIP_LIST: SkipItem[] = [
@@ -179,6 +209,7 @@ export const SKIP_LIST: SkipItem[] = [
   {
     id: 'skip_lifetime_warranty_marketing',
     topic: 'kitchen',
+    scope: 'general',                // generic buying discipline; bucketed under "general principles"
     title: 'Lifetime warranty marketing on items that wear in 2 years',
     reasoning:
       'Cabinet pulls, faucet finishes, drawer slides — "lifetime warranty" usually means the manufacturer will replace under specific defect conditions, not "this will not wear." Vermont basement humidity wears finishes regardless of warranty language.',
@@ -421,12 +452,46 @@ export const SKIP_LIST: SkipItem[] = [
 
 // ---------- Helpers ---------------------------------------------------
 
-// Filter the skip list for a given Smart Cart context. The order:
-//   1. Match topic (skip-list entries without a topic apply across all)
-//   2. Match scopeVariantId if entry specifies one
-//   3. Match scenario if entry specifies one
-// Entries with neither scope nor scenario qualifier apply broadly.
+// Filter the skip list for a given Smart Cart context. V7.1 applies
+// the curation rules from spec § Section 16:
+//   1. Always include scope_specific items for the user's scope
+//   2. Add topic_specific items if fewer than 4 scope_specific items
+//   3. Add general items only if total skip count is still < 4
+//   4. Hard cap at 6 items total
+// The legacy filter (topic + scope + scenario gating) is preserved
+// inside the candidate pool — only items that survive that filter are
+// eligible for the priority pass.
 export function getSkipListForCart(
+  topic: TopicId,
+  scopeVariantId: string,
+  scenario?: import('../lib/recommender-config.types').BriefScenarioId,
+): SkipItem[] {
+  const candidates = SKIP_LIST.filter(item => {
+    if (item.topic && item.topic !== topic) return false
+    if (item.scopeVariantIds && !item.scopeVariantIds.includes(scopeVariantId)) return false
+    if (item.scenario && scenario && item.scenario !== scenario) return false
+    return true
+  })
+
+  const scoped = candidates.filter(i => resolveSkipItemScope(i) === 'scope_specific')
+  const topical = candidates.filter(i => resolveSkipItemScope(i) === 'topic_specific')
+  const general = candidates.filter(i => resolveSkipItemScope(i) === 'general')
+
+  const out: SkipItem[] = [...scoped]
+  if (out.length < 4) {
+    out.push(...topical.slice(0, 4 - out.length))
+  }
+  if (out.length < 4) {
+    out.push(...general.slice(0, 4 - out.length))
+  }
+  return out.slice(0, 6)
+}
+
+// Returns the entries that should appear in the "General buying
+// principles" expandable section under the savings snapshot. These are
+// excluded from the headline savings tile but still surfaced for the
+// educational value.
+export function getGeneralSkipPrinciples(
   topic: TopicId,
   scopeVariantId: string,
   scenario?: import('../lib/recommender-config.types').BriefScenarioId,
@@ -435,7 +500,7 @@ export function getSkipListForCart(
     if (item.topic && item.topic !== topic) return false
     if (item.scopeVariantIds && !item.scopeVariantIds.includes(scopeVariantId)) return false
     if (item.scenario && scenario && item.scenario !== scenario) return false
-    return true
+    return resolveSkipItemScope(item) === 'general'
   })
 }
 

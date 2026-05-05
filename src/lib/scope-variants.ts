@@ -43,7 +43,23 @@ export type ScopeVariant = {
 
 export const SCOPE_VARIANTS: Record<TopicId, ScopeVariant[]> = {
   // ---------- Kitchen (5 variants) -----------------------------------
+  // V7.2.2: kitchen_organizers leads because it's the longest-verified
+  // v2-curated catalog. Modal auto-default lands here when no explicit
+  // data-curation-modal-scope is passed.
   kitchen: [
+    {
+      id: 'kitchen_organizers',
+      topic: 'kitchen',
+      label: 'Kitchen organizers',
+      description: 'Drawer dividers, lazy susans, pantry organizers. Pulled from the existing kit; deeper authored content lands in V7.1.',
+      smartCartReady: false,
+      defaultLane: 'diy',
+      estCostRange: { low: 40, high: 200 },
+      relevantKitIds: ['kitchen_organizers'],
+      overbuyTrapIds: ['organizer_premium_kits'],
+      skipListTopicTags: ['kitchen_organizers'],
+      timingCategory: 'kitchen_organizers',
+    },
     {
       id: 'kitchen_cosmetic_refresh',
       topic: 'kitchen',
@@ -69,19 +85,6 @@ export const SCOPE_VARIANTS: Record<TopicId, ScopeVariant[]> = {
       overbuyTrapIds: ['kitchen_premium_pulls', 'kitchen_decorative_hinges'],
       skipListTopicTags: ['kitchen_hardware'],
       timingCategory: 'kitchen_cabinet_hardware',
-    },
-    {
-      id: 'kitchen_organizers',
-      topic: 'kitchen',
-      label: 'Kitchen organizers',
-      description: 'Drawer dividers, lazy susans, pantry organizers. Pulled from the existing kit; deeper authored content lands in V7.1.',
-      smartCartReady: false,
-      defaultLane: 'diy',
-      estCostRange: { low: 40, high: 200 },
-      relevantKitIds: ['kitchen_organizers'],
-      overbuyTrapIds: ['organizer_premium_kits'],
-      skipListTopicTags: ['kitchen_organizers'],
-      timingCategory: 'kitchen_organizers',
     },
     {
       id: 'kitchen_lighting_swap',
@@ -141,20 +144,10 @@ export const SCOPE_VARIANTS: Record<TopicId, ScopeVariant[]> = {
   ],
 
   // ---------- Outdoor (2 variants) -----------------------------------
+  // V7.2.2: outdoor_lake_season leads because it becomes v2-curated in
+  // this PR (Section 4). outdoor_deck_refresh stays available via the
+  // dropdown for buyers whose project doesn't fit lake-season.
   outdoor: [
-    {
-      id: 'outdoor_deck_refresh',
-      topic: 'outdoor',
-      label: 'Deck refresh — stain, hardware, soft goods',
-      description: 'Spring-to-summer cosmetic refresh of an existing deck. Ships structurally for V7.',
-      smartCartReady: false,
-      defaultLane: 'diy',
-      estCostRange: { low: 120, high: 450 },
-      relevantKitIds: ['outdoor_furniture', 'outdoor_textiles', 'outdoor_storage'],
-      overbuyTrapIds: ['deck_premium_stain', 'deck_specialty_cleaner'],
-      skipListTopicTags: ['outdoor_deck', 'outdoor_textiles'],
-      timingCategory: 'patio_furniture',
-    },
     {
       id: 'outdoor_lake_season',
       topic: 'outdoor',
@@ -167,6 +160,19 @@ export const SCOPE_VARIANTS: Record<TopicId, ScopeVariant[]> = {
       overbuyTrapIds: ['lake_propane_patio_heater', 'lake_specialty_cleaners', 'lake_citronella'],
       skipListTopicTags: ['outdoor_lake', 'outdoor_textiles'],
       timingCategory: 'lake_dock_hardware',
+    },
+    {
+      id: 'outdoor_deck_refresh',
+      topic: 'outdoor',
+      label: 'Deck refresh — stain, hardware, soft goods',
+      description: 'Spring-to-summer cosmetic refresh of an existing deck. Ships structurally for V7.',
+      smartCartReady: false,
+      defaultLane: 'diy',
+      estCostRange: { low: 120, high: 450 },
+      relevantKitIds: ['outdoor_furniture', 'outdoor_textiles', 'outdoor_storage'],
+      overbuyTrapIds: ['deck_premium_stain', 'deck_specialty_cleaner'],
+      skipListTopicTags: ['outdoor_deck', 'outdoor_textiles'],
+      timingCategory: 'patio_furniture',
     },
   ],
 

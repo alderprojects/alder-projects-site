@@ -26,6 +26,7 @@ import type { UniverseProduct } from '@/lib/smart-cart-universe'
 // a new product type means adding a constant here and using it in
 // both the universe entry's tags and the scope catalog's query.
 export const FN = {
+  // V7.2.1 — kitchen_organizers
   cutleryDrawerOrganizer: 'cutlery_drawer_organizer',
   pullOutPantryBasket: 'pull_out_pantry_basket',
   spiceDrawerOrganizer: 'spice_drawer_organizer',
@@ -37,6 +38,34 @@ export const FN = {
   magneticSpiceStorage: 'magnetic_spice_storage',
   dishDryingMat: 'dish_drying_mat',
   fridgeOrganizer: 'fridge_organizer',
+
+  // V7.2.4 — kitchen_cabinet_hardware_swap + kitchen_cosmetic_refresh
+  cabinetPaint: 'cabinet_paint',
+  bondingPrimer: 'bonding_primer',
+  cabinetPull: 'cabinet_pull',
+  cabinetKnob: 'cabinet_knob',
+  softCloseHinge: 'soft_close_hinge',
+  undercabinetLighting: 'undercabinet_lighting',
+  kitchenCaulk: 'kitchen_caulk',
+  paintingSupplies: 'painting_supplies',
+  drawerSlide: 'drawer_slide',
+  hardwareScrews: 'hardware_screws',
+  cabinetHardwareJig: 'cabinet_hardware_jig',
+  woodPutty: 'wood_putty',
+
+  // V7.2.4 — outdoor_lake_season
+  adirondackChair: 'adirondack_chair',
+  outdoorSideTable: 'outdoor_side_table',
+  outdoorCushion: 'outdoor_cushion',
+  patioUmbrella: 'patio_umbrella',
+  outdoorRug: 'outdoor_rug',
+  gasGrill: 'gas_grill',
+  grillCover: 'grill_cover',
+  grillTools: 'grill_tools',
+  outdoorStringLights: 'outdoor_string_lights',
+  outdoorCooler: 'outdoor_cooler',
+  lakeFloats: 'lake_floats',
+  mosquitoControl: 'mosquito_control',
 } as const
 
 // ---------- Migration source ----------------------------------------
@@ -593,5 +622,351 @@ export const UNIVERSE: UniverseProduct[] = [
     },
     citations: [],
     migratedFrom: { scope: 'kitchen_organizers', slotId: 'kitchen_fridge_bins', tier: 'sweet_spot' },
+  },
+
+  // ====================================================================
+  // V7.2.4 — kitchen_cabinet_hardware_swap (13 products)
+  // ====================================================================
+
+  // ---------- Drawer pulls -----------------------------------------
+  {
+    universeId: 'liberty_hardware_bar_pulls_10_pack',
+    rank: 100,
+    variant: {
+      productName: 'Liberty Hardware Bar Pulls 10-pack (3-3/4" or 5-1/16" center)',
+      priceLow: 25,
+      priceHigh: 38,
+      affiliateUrl: 'https://www.amazon.com/s?k=liberty+hardware+bar+pulls+10+pack&tag=alderprojects-20',
+      productSpec:
+        'Zinc alloy. ~$2.50-3.80 per pull. Available at Home Depot in matte black, satin nickel, oil-rubbed bronze. Lightweight feel.',
+    },
+    tags: {
+      topics: ['kitchen'],
+      roles: ['hardware'],
+      functions: [FN.cabinetPull],
+      seasons: [],
+      alreadyHaveFlag: 'has_satisfactory_pulls',
+      conditions: [],
+      tier: 'budget',
+      propertyTypes: [],
+    },
+    citations: [],
+    migratedFrom: { scope: 'kitchen_cabinet_hardware_swap', slotId: 'hardware_swap_drawer_pulls', tier: 'budget' },
+  },
+  {
+    universeId: 'amerock_bar_pulls_5116_matte_black_10pk',
+    rank: 100,
+    variant: {
+      productName: 'Amerock Bar Pulls 5-1/16" Matte Black 10-pack (10BX40517MB)',
+      priceLow: 33,
+      priceHigh: 45,
+      amazonAsin: 'B0DLWN5QLH',
+      affiliateUrl: 'https://www.amazon.com/dp/B0DLWN5QLH?tag=alderprojects-20',
+      productSpec:
+        'Zinc alloy with substantial weight. 7-3/8" overall length, 5-1/16" (128mm) center-to-center. Limited lifetime warranty. ~$3.34 per pull at Home Depot. 10+ finishes available (matte black, brushed nickel, champagne bronze, oil-rubbed bronze, satin nickel, polished chrome).',
+    },
+    tags: {
+      topics: ['kitchen'],
+      roles: ['hardware'],
+      functions: [FN.cabinetPull],
+      seasons: [],
+      alreadyHaveFlag: 'has_satisfactory_pulls',
+      conditions: [],
+      tier: 'sweet_spot',
+      propertyTypes: [],
+    },
+    citations: [
+      'Amerock Bar Pulls product listing (Amazon ASIN B0DLWN5QLH, Home Depot 334543944)',
+      'Houzz forum thread: "Cabinet Hardware—cheap vs. expensive"',
+      'Bob Vila Best Cabinet Hardware 2025 roundup',
+      'Property Nest 9 Best Kitchen Cabinet Hardware Brands 2024',
+    ],
+    migratedFrom: { scope: 'kitchen_cabinet_hardware_swap', slotId: 'hardware_swap_drawer_pulls', tier: 'sweet_spot' },
+  },
+  {
+    universeId: 'top_knobs_amwell_bridgeport_bar_pulls',
+    rank: 100,
+    variant: {
+      productName: 'Top Knobs Amwell or Bridgeport bar pulls (single)',
+      priceLow: 160,
+      priceHigh: 250,
+      affiliateUrl: 'https://www.amazon.com/s?k=top+knobs+amwell+bar+pull&tag=alderprojects-20',
+      productSpec:
+        'Solid steel construction with optional knurled detail. Cabinet-shop grade. ~$16-25 per pull. Sold individually through Wayfair, designer hardware retailers.',
+    },
+    tags: {
+      topics: ['kitchen'],
+      roles: ['hardware'],
+      functions: [FN.cabinetPull],
+      seasons: [],
+      alreadyHaveFlag: 'has_satisfactory_pulls',
+      conditions: [],
+      tier: 'premium',
+      propertyTypes: [],
+    },
+    citations: [],
+    migratedFrom: { scope: 'kitchen_cabinet_hardware_swap', slotId: 'hardware_swap_drawer_pulls', tier: 'premium' },
+  },
+
+  // ---------- Knobs ------------------------------------------------
+  {
+    universeId: 'hardware_swap_knobs__generic_round_knobs_6pk',
+    rank: 100,
+    variant: {
+      productName: 'Generic round knobs 6-pack',
+      priceLow: 8,
+      priceHigh: 14,
+      affiliateUrl: 'https://www.amazon.com/s?k=cabinet+knobs+round+6+pack&tag=alderprojects-20',
+      productSpec:
+        'Zinc alloy or plated steel. Various finishes. Often non-UV-stable.',
+    },
+    tags: {
+      topics: ['kitchen'],
+      roles: ['hardware'],
+      functions: [FN.cabinetKnob],
+      seasons: [],
+      alreadyHaveFlag: 'has_satisfactory_knobs',
+      conditions: [],
+      tier: 'budget',
+      propertyTypes: [],
+    },
+    citations: [],
+    migratedFrom: { scope: 'kitchen_cabinet_hardware_swap', slotId: 'hardware_swap_knobs', tier: 'budget' },
+  },
+  {
+    universeId: 'liberty_harmon_round_cabinet_knobs',
+    rank: 100,
+    variant: {
+      productName: 'Liberty Harmon Round Cabinet Knobs (1.25" diameter, finish-matched)',
+      priceLow: 18,
+      priceHigh: 26,
+      affiliateUrl: 'https://www.amazon.com/s?k=liberty+harmon+round+cabinet+knob&tag=alderprojects-20',
+      productSpec:
+        'Classic round profile, 1.25" diameter. Available in matte black, satin nickel, oil-rubbed bronze, polished chrome at Home Depot. 1,200+ Home Depot reviews at full 5 stars. ~$2.98 per knob.',
+    },
+    tags: {
+      topics: ['kitchen'],
+      roles: ['hardware'],
+      functions: [FN.cabinetKnob],
+      seasons: [],
+      alreadyHaveFlag: 'has_satisfactory_knobs',
+      conditions: [],
+      tier: 'sweet_spot',
+      propertyTypes: [],
+    },
+    citations: [
+      'Bob Vila Best Cabinet Hardware roundup (Liberty Harmon: 1,200+ Home Depot 5-star reviews)',
+      'Liberty Hardware finish coordination guide',
+    ],
+    migratedFrom: { scope: 'kitchen_cabinet_hardware_swap', slotId: 'hardware_swap_knobs', tier: 'sweet_spot' },
+  },
+  {
+    universeId: 'top_knobs_aspen_collection_round_knobs',
+    rank: 100,
+    variant: {
+      productName: 'Top Knobs Aspen Collection round knobs',
+      priceLow: 90,
+      priceHigh: 150,
+      affiliateUrl: 'https://www.amazon.com/s?k=top+knobs+aspen+round+knob&tag=alderprojects-20',
+      productSpec:
+        'Solid steel. Premium finishes. ~$15-25 per knob. Sold individually.',
+    },
+    tags: {
+      topics: ['kitchen'],
+      roles: ['hardware'],
+      functions: [FN.cabinetKnob],
+      seasons: [],
+      alreadyHaveFlag: 'has_satisfactory_knobs',
+      conditions: [],
+      tier: 'premium',
+      propertyTypes: [],
+    },
+    citations: [],
+    migratedFrom: { scope: 'kitchen_cabinet_hardware_swap', slotId: 'hardware_swap_knobs', tier: 'premium' },
+  },
+
+  // ---------- Screws ------------------------------------------------
+  {
+    universeId: 'hardware_swap_screws__m4_machine_screws_assortment',
+    rank: 100,
+    variant: {
+      productName: 'M4 machine screws assortment, 3/4" / 1" / 1-1/4" lengths',
+      priceLow: 8,
+      priceHigh: 14,
+      affiliateUrl: 'https://www.amazon.com/s?k=M4+machine+screws+assortment+kit&tag=alderprojects-20',
+      productSpec:
+        'Standard M4 (8/32 thread) machine screws in 3/4", 1", and 1-1/4" lengths. ~50-100 piece variety pack. Slot mount, zinc-plated steel.',
+    },
+    tags: {
+      topics: ['kitchen'],
+      roles: ['hardware'],
+      functions: [FN.hardwareScrews],
+      seasons: [],
+      alreadyHaveFlag: '',
+      conditions: [],
+      tier: 'sweet_spot',
+      propertyTypes: [],
+    },
+    citations: [],
+    migratedFrom: { scope: 'kitchen_cabinet_hardware_swap', slotId: 'hardware_swap_screws', tier: 'sweet_spot' },
+  },
+
+  // ---------- Drill jig --------------------------------------------
+  {
+    universeId: 'hardware_swap_jig__paper_template_tape_measure',
+    rank: 100,
+    variant: {
+      productName: 'Paper template + tape measure',
+      priceLow: 0,
+      priceHigh: 5,
+      affiliateUrl: 'https://www.amazon.com/s?k=cabinet+pull+template+paper&tag=alderprojects-20',
+      productSpec:
+        'DIY paper templates for marking pull/knob hole locations. Free if you measure carefully; ~$5 for printed templates.',
+    },
+    tags: {
+      topics: ['kitchen'],
+      roles: ['tool'],
+      functions: [FN.cabinetHardwareJig],
+      seasons: [],
+      alreadyHaveFlag: 'hardware_holes_match_existing',
+      conditions: [],
+      tier: 'budget',
+      propertyTypes: [],
+    },
+    citations: [],
+    migratedFrom: { scope: 'kitchen_cabinet_hardware_swap', slotId: 'hardware_swap_jig', tier: 'budget' },
+  },
+  {
+    universeId: 'kreg_khi_pull_cabinet_hardware_jig',
+    rank: 100,
+    variant: {
+      productName: 'Kreg KHI-PULL Cabinet Hardware Jig',
+      priceLow: 28,
+      priceHigh: 42,
+      amazonAsin: 'B01JQ74J5E',
+      affiliateUrl: 'https://www.amazon.com/dp/B01JQ74J5E?tag=alderprojects-20',
+      productSpec:
+        'Adjustable polymer jig with hardened-steel drill guides. Movable edge guide for accurate positioning. 8.5" length, 1.7" depth. Suitable for knobs and pulls up to ~7" wide. Lifetime warranty on drill guides.',
+    },
+    tags: {
+      topics: ['kitchen'],
+      roles: ['tool'],
+      functions: [FN.cabinetHardwareJig],
+      seasons: [],
+      alreadyHaveFlag: 'hardware_holes_match_existing',
+      conditions: [],
+      tier: 'sweet_spot',
+      propertyTypes: [],
+    },
+    citations: [
+      'Kreg KHI-PULL Amazon listing (B01JQ74J5E)',
+      'Kreg Tool Company official product documentation',
+      'Amazon review consensus on KHI-PULL accuracy and ease',
+    ],
+    migratedFrom: { scope: 'kitchen_cabinet_hardware_swap', slotId: 'hardware_swap_jig', tier: 'sweet_spot' },
+  },
+  {
+    universeId: 'kreg_khi_xlpull_cabinet_hardware_jig_pro',
+    rank: 100,
+    variant: {
+      productName: 'Kreg KHI-XLPULL Cabinet Hardware Jig Pro',
+      priceLow: 80,
+      priceHigh: 120,
+      amazonAsin: 'B0CPTHH4VF',
+      affiliateUrl: 'https://www.amazon.com/dp/B0CPTHH4VF?tag=alderprojects-20',
+      productSpec:
+        'Pro version. Handles pulls 1-3/4" to 12" wide. Faster setup for production volumes.',
+    },
+    tags: {
+      topics: ['kitchen'],
+      roles: ['tool'],
+      functions: [FN.cabinetHardwareJig],
+      seasons: [],
+      alreadyHaveFlag: 'hardware_holes_match_existing',
+      conditions: [],
+      tier: 'premium',
+      propertyTypes: [],
+    },
+    citations: [],
+    migratedFrom: { scope: 'kitchen_cabinet_hardware_swap', slotId: 'hardware_swap_jig', tier: 'premium' },
+  },
+
+  // ---------- Soft-close hinges -------------------------------------
+  {
+    universeId: 'hardware_swap_softclose_hinges__generic_concealed_hinge_soft_close_12pk',
+    rank: 100,
+    variant: {
+      productName: 'Generic concealed hinge with soft-close (12-pack)',
+      priceLow: 22,
+      priceHigh: 32,
+      affiliateUrl: 'https://www.amazon.com/s?k=concealed+cabinet+hinge+soft+close+12+pack&tag=alderprojects-20',
+      productSpec:
+        'Standard 35mm cup hinge. 105° opening. Adjustable. Plastic damper.',
+    },
+    tags: {
+      topics: ['kitchen'],
+      roles: ['hardware'],
+      functions: [FN.softCloseHinge],
+      seasons: [],
+      alreadyHaveFlag: 'has_softclose_hinges',
+      conditions: [],
+      tier: 'budget',
+      propertyTypes: [],
+    },
+    citations: [],
+    migratedFrom: { scope: 'kitchen_cabinet_hardware_swap', slotId: 'hardware_swap_softclose_hinges', tier: 'budget' },
+  },
+  {
+    universeId: 'blum_compact_soft_close_hinges_12pk',
+    rank: 100,
+    variant: {
+      productName: 'Blum Compact Soft-Close hinges (12-pack)',
+      priceLow: 55,
+      priceHigh: 78,
+      affiliateUrl: 'https://www.amazon.com/s?k=blum+compact+soft+close+hinge+12&tag=alderprojects-20',
+      productSpec:
+        'Cabinet-shop standard. 35mm cup, 110° opening. 3-dimensional adjustment. Lifetime damper. Industry standard at IKEA, KraftMaid, mid-tier cabinet brands.',
+    },
+    tags: {
+      topics: ['kitchen'],
+      roles: ['hardware'],
+      functions: [FN.softCloseHinge],
+      seasons: [],
+      alreadyHaveFlag: 'has_softclose_hinges',
+      conditions: [],
+      tier: 'sweet_spot',
+      propertyTypes: [],
+    },
+    citations: [
+      'Blum hardware product datasheet',
+      'Cabinet shop forum standards on Blum vs generic',
+    ],
+    migratedFrom: { scope: 'kitchen_cabinet_hardware_swap', slotId: 'hardware_swap_softclose_hinges', tier: 'sweet_spot' },
+  },
+
+  // ---------- Wood putty --------------------------------------------
+  {
+    universeId: 'minwax_wood_putty',
+    rank: 100,
+    variant: {
+      productName: 'Minwax Wood Putty (color-matched to cabinet finish)',
+      priceLow: 5,
+      priceHigh: 9,
+      affiliateUrl: 'https://www.amazon.com/s?k=minwax+wood+putty+stainable&tag=alderprojects-20',
+      productSpec:
+        '3.75 oz tub. Pre-tinted to match common wood finishes (cherry, maple, oak, walnut, white). Stainable. Air-dries.',
+    },
+    tags: {
+      topics: ['kitchen'],
+      roles: ['consumable_material'],
+      functions: [FN.woodPutty],
+      seasons: [],
+      alreadyHaveFlag: 'hardware_holes_match_existing',
+      conditions: [],
+      tier: 'sweet_spot',
+      propertyTypes: [],
+    },
+    citations: [],
+    migratedFrom: { scope: 'kitchen_cabinet_hardware_swap', slotId: 'hardware_swap_wood_putty', tier: 'sweet_spot' },
   },
 ]

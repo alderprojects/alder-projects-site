@@ -969,4 +969,410 @@ export const UNIVERSE: UniverseProduct[] = [
     citations: [],
     migratedFrom: { scope: 'kitchen_cabinet_hardware_swap', slotId: 'hardware_swap_wood_putty', tier: 'sweet_spot' },
   },
+
+  // ====================================================================
+  // V7.2.4 — kitchen_cosmetic_refresh (15 new products; 8 dedup hits
+  // against hardware_swap entries above — pulls, knobs, generic hinges,
+  // and Blum Compact reuse existing universe entries with no tag-merge
+  // delta because the tags were already identical)
+  // ====================================================================
+
+  // ---------- Cabinet paint -----------------------------------------
+  {
+    universeId: 'behr_alkyd_semi_gloss_enamel_gallon',
+    rank: 100,
+    variant: {
+      productName: 'Behr Alkyd Semi-Gloss Enamel (1 gallon)',
+      priceLow: 42,
+      priceHigh: 55,
+      affiliateUrl: 'https://www.amazon.com/s?k=behr+alkyd+enamel+semi+gloss+gallon&tag=alderprojects-20',
+      productSpec:
+        'Hybrid alkyd enamel formulated for cabinets and trim. Sold at Home Depot. Water-based cleanup. Fewer reviews than INSL-X but verified by professional painters as a budget alkyd that works.',
+    },
+    tags: {
+      topics: ['kitchen'],
+      roles: ['consumable_material', 'finish'],
+      functions: [FN.cabinetPaint],
+      seasons: [],
+      alreadyHaveFlag: 'has_painted_cabinets_recently',
+      conditions: [],
+      tier: 'budget',
+      propertyTypes: [],
+    },
+    citations: [],
+    migratedFrom: { scope: 'kitchen_cosmetic_refresh', slotId: 'kitchen_cabinet_paint', tier: 'budget' },
+  },
+  {
+    universeId: 'inslx_cabinet_coat_acrylic_urethane_satin_gallon',
+    rank: 100,
+    variant: {
+      productName: 'INSL-X Cabinet Coat Acrylic Urethane Satin (1 gallon, white)',
+      priceLow: 75,
+      priceHigh: 95,
+      amazonAsin: 'B07KXLPCG1',
+      affiliateUrl: 'https://www.amazon.com/dp/B07KXLPCG1?tag=alderprojects-20',
+      productSpec:
+        'Urethane-acrylic waterborne enamel made by Benjamin Moore. 350-450 sq ft per gallon. Adheres to polyurethane and varnish without primer. Resists chipping, scuffing, food stains, grease, and water. Apply between 50-90°F.',
+    },
+    tags: {
+      topics: ['kitchen'],
+      roles: ['consumable_material', 'finish'],
+      functions: [FN.cabinetPaint],
+      seasons: [],
+      alreadyHaveFlag: 'has_painted_cabinets_recently',
+      conditions: [],
+      tier: 'sweet_spot',
+      propertyTypes: [],
+    },
+    citations: [
+      'Reviewed.com 2026 Best Cabinet Paint roundup',
+      'Brackens Painting (4-generation paint pro) cabinet paint guide',
+      'Renovated Faith 24-brand blind test (BM Advance overall winner)',
+      'Greathomedepot.com INSL-X Cabinet Coat hands-on review',
+    ],
+    migratedFrom: { scope: 'kitchen_cosmetic_refresh', slotId: 'kitchen_cabinet_paint', tier: 'sweet_spot' },
+  },
+  {
+    universeId: 'benjamin_moore_advance_waterborne_alkyd_satin',
+    rank: 100,
+    variant: {
+      productName: 'Benjamin Moore Advance Waterborne Alkyd Satin (1 gallon)',
+      priceLow: 80,
+      priceHigh: 95,
+      affiliateUrl: 'https://www.amazon.com/s?k=benjamin+moore+advance+gallon&tag=alderprojects-20',
+      productSpec:
+        'Premium waterborne alkyd. Cures hard like oil-based, cleans up with water. Furniture-quality finish. 14-day cure window. Sold primarily through Benjamin Moore dealers; Amazon has limited inventory.',
+    },
+    tags: {
+      topics: ['kitchen'],
+      roles: ['consumable_material', 'finish'],
+      functions: [FN.cabinetPaint],
+      seasons: [],
+      alreadyHaveFlag: 'has_painted_cabinets_recently',
+      conditions: [],
+      tier: 'premium',
+      propertyTypes: [],
+    },
+    citations: [],
+    migratedFrom: { scope: 'kitchen_cosmetic_refresh', slotId: 'kitchen_cabinet_paint', tier: 'premium' },
+  },
+
+  // ---------- Bonding primer -----------------------------------------
+  {
+    universeId: 'kilz_adhesion_bonding_primer_gallon',
+    rank: 100,
+    variant: {
+      productName: 'KILZ Adhesion Bonding Primer (1 gallon)',
+      priceLow: 22,
+      priceHigh: 30,
+      affiliateUrl: 'https://www.amazon.com/s?k=kilz+adhesion+primer+gallon&tag=alderprojects-20',
+      productSpec:
+        'Acrylic bonding primer. Works on glossy laminate, glass, tile. 300 sq ft per gallon coverage.',
+    },
+    tags: {
+      topics: ['kitchen'],
+      roles: ['consumable_material'],
+      functions: [FN.bondingPrimer],
+      seasons: [],
+      alreadyHaveFlag: 'has_bare_wood_cabinets',
+      conditions: [],
+      tier: 'budget',
+      propertyTypes: [],
+    },
+    citations: [],
+    migratedFrom: { scope: 'kitchen_cosmetic_refresh', slotId: 'kitchen_bonding_primer', tier: 'budget' },
+  },
+  {
+    universeId: 'inslx_stix_acrylic_waterborne_bonding_primer_gallon',
+    rank: 100,
+    variant: {
+      productName: 'INSL-X Stix Acrylic Waterborne Bonding Primer (1 gallon)',
+      priceLow: 38,
+      priceHigh: 52,
+      affiliateUrl: 'https://www.amazon.com/s?k=insl-x+stix+bonding+primer+gallon&tag=alderprojects-20',
+      productSpec:
+        'Acrylic-urethane bonding primer. Adheres to glossy tile, PVC, vinyl, plastic, glass, glazed block, glossy paint, fiberglass, galvanized metals. Coverage 300-400 sq ft per gallon. Cures in temps as low as 35°F.',
+    },
+    tags: {
+      topics: ['kitchen'],
+      roles: ['consumable_material'],
+      functions: [FN.bondingPrimer],
+      seasons: [],
+      alreadyHaveFlag: 'has_bare_wood_cabinets',
+      conditions: [],
+      tier: 'sweet_spot',
+      propertyTypes: [],
+    },
+    citations: [
+      'INSL-X Stix product datasheet',
+      'cathleendavittbell.com Stix Primer review thread',
+    ],
+    migratedFrom: { scope: 'kitchen_cosmetic_refresh', slotId: 'kitchen_bonding_primer', tier: 'sweet_spot' },
+  },
+  {
+    universeId: 'zinsser_bin_shellac_based_primer_gallon',
+    rank: 100,
+    variant: {
+      productName: 'Zinsser BIN Shellac-Based Primer (1 gallon)',
+      priceLow: 50,
+      priceHigh: 65,
+      affiliateUrl: 'https://www.amazon.com/s?k=zinsser+bin+shellac+primer+gallon&tag=alderprojects-20',
+      productSpec:
+        'Shellac-based stain blocker. Best for cabinets bleeding tannins (oak, knotty pine). Solvent cleanup, strong odor.',
+    },
+    tags: {
+      topics: ['kitchen'],
+      roles: ['consumable_material'],
+      functions: [FN.bondingPrimer],
+      seasons: [],
+      alreadyHaveFlag: 'has_bare_wood_cabinets',
+      conditions: [],
+      tier: 'premium',
+      propertyTypes: [],
+    },
+    citations: [],
+    migratedFrom: { scope: 'kitchen_cosmetic_refresh', slotId: 'kitchen_bonding_primer', tier: 'premium' },
+  },
+
+  // ---------- Soft-close hinges (premium tier; budget + sweet_spot
+  //            already in universe from hardware_swap ingestion) ------
+  {
+    universeId: 'blum_clip_top_blumotion_12pk',
+    rank: 100,
+    variant: {
+      productName: 'Blum Clip Top Blumotion (12-pack)',
+      priceLow: 95,
+      priceHigh: 130,
+      affiliateUrl: 'https://www.amazon.com/s?k=blum+clip+top+blumotion+hinge&tag=alderprojects-20',
+      productSpec:
+        'Tool-less clip-on installation. Integrated soft-close mechanism. 110° or 155° opening options.',
+    },
+    tags: {
+      topics: ['kitchen'],
+      roles: ['hardware'],
+      functions: [FN.softCloseHinge],
+      seasons: [],
+      alreadyHaveFlag: 'has_softclose_hinges',
+      conditions: [],
+      tier: 'premium',
+      propertyTypes: [],
+    },
+    citations: [],
+    migratedFrom: { scope: 'kitchen_cosmetic_refresh', slotId: 'kitchen_softclose_hinges', tier: 'premium' },
+  },
+
+  // ---------- Under-cabinet lighting --------------------------------
+  {
+    universeId: 'kitchen_undercabinet_lighting__generic_amazon_led_strip_kit_10ft',
+    rank: 100,
+    variant: {
+      productName: 'Generic Amazon LED strip kit (10ft, plug-in)',
+      priceLow: 14,
+      priceHigh: 22,
+      affiliateUrl: 'https://www.amazon.com/s?k=led+strip+kitchen+10ft+plug+in&tag=alderprojects-20',
+      productSpec:
+        'Adhesive-back LED strip with plug-in transformer. Various color temps. No-name brand.',
+    },
+    tags: {
+      topics: ['kitchen'],
+      roles: ['lighting'],
+      functions: [FN.undercabinetLighting],
+      seasons: [],
+      alreadyHaveFlag: 'has_undercabinet_lighting',
+      conditions: [],
+      tier: 'budget',
+      propertyTypes: [],
+    },
+    citations: [],
+    migratedFrom: { scope: 'kitchen_cosmetic_refresh', slotId: 'kitchen_undercabinet_lighting', tier: 'budget' },
+  },
+  {
+    universeId: 'wobane_under_cabinet_lighting_kit_10ft',
+    rank: 100,
+    variant: {
+      productName: 'Wobane Under Cabinet LED Lighting Kit (10ft)',
+      priceLow: 28,
+      priceHigh: 45,
+      affiliateUrl: 'https://www.amazon.com/s?k=wobane+under+cabinet+lighting&tag=alderprojects-20',
+      productSpec:
+        '1100 lumens, warm white (3000K), thin profile fits under standard cabinets. Adhesive-back installation. Plugs into existing outlet. 30-minute install.',
+    },
+    tags: {
+      topics: ['kitchen'],
+      roles: ['lighting'],
+      functions: [FN.undercabinetLighting],
+      seasons: [],
+      alreadyHaveFlag: 'has_undercabinet_lighting',
+      conditions: [],
+      tier: 'sweet_spot',
+      propertyTypes: [],
+    },
+    citations: [
+      'Bob Vila Best Under-Cabinet Lighting 2026 roundup',
+      'Lumaz hardwired-vs-plug-in guide',
+      'PROLIGHTING fixture installation guide',
+    ],
+    migratedFrom: { scope: 'kitchen_cosmetic_refresh', slotId: 'kitchen_undercabinet_lighting', tier: 'sweet_spot' },
+  },
+  {
+    universeId: 'ge_direct_wire_led_bar_10ft',
+    rank: 100,
+    variant: {
+      productName: 'GE Direct Wire LED Bar (hardwired, 10ft)',
+      priceLow: 110,
+      priceHigh: 160,
+      affiliateUrl: 'https://www.amazon.com/s?k=ge+direct+wire+led+under+cabinet&tag=alderprojects-20',
+      productSpec:
+        'Linkable hardwired LED bars. Wall-switch control. Requires electrician or significant DIY electrical skill.',
+    },
+    tags: {
+      topics: ['kitchen'],
+      roles: ['lighting'],
+      functions: [FN.undercabinetLighting],
+      seasons: [],
+      alreadyHaveFlag: 'has_undercabinet_lighting',
+      conditions: [],
+      tier: 'premium',
+      propertyTypes: [],
+    },
+    citations: [],
+    migratedFrom: { scope: 'kitchen_cosmetic_refresh', slotId: 'kitchen_undercabinet_lighting', tier: 'premium' },
+  },
+
+  // ---------- Caulk -------------------------------------------------
+  {
+    universeId: 'dap_alex_plus_kitchen_caulk_kit',
+    rank: 100,
+    variant: {
+      productName: 'DAP Alex Plus Acrylic Latex + Silicone Caulk (white) + steel caulking gun',
+      priceLow: 15,
+      priceHigh: 24,
+      affiliateUrl: 'https://www.amazon.com/s?k=dap+alex+plus+kitchen+caulk+gun&tag=alderprojects-20',
+      productSpec:
+        'Paintable, mildew-resistant, water cleanup. Standard pro choice for backsplash and trim seams. Steel skeleton caulking gun ~$10-15.',
+    },
+    tags: {
+      topics: ['kitchen'],
+      roles: ['consumable_material'],
+      functions: [FN.kitchenCaulk],
+      seasons: [],
+      alreadyHaveFlag: '',
+      conditions: [],
+      tier: 'sweet_spot',
+      propertyTypes: [],
+    },
+    citations: [
+      'DAP product datasheet',
+      'Pro caulking guide consensus',
+    ],
+    migratedFrom: { scope: 'kitchen_cosmetic_refresh', slotId: 'kitchen_caulk_kit', tier: 'sweet_spot' },
+  },
+
+  // ---------- Painting supplies kit ---------------------------------
+  {
+    universeId: 'wooster_shortcut_painting_supplies_kit',
+    rank: 100,
+    variant: {
+      productName:
+        'Wooster 2.5" Shortcut angled sash brush + 4" foam roller + 9x12 canvas drop cloth + 220/320 sandpaper',
+      priceLow: 32,
+      priceHigh: 48,
+      affiliateUrl:
+        'https://www.amazon.com/s?k=wooster+shortcut+brush+foam+roller+canvas+drop+cloth&tag=alderprojects-20',
+      productSpec:
+        'Wooster Shortcut 2.5" angled sash brush (~$8). Whizz 4" foam roller frame + covers (~$10). 9x12 canvas drop cloth (~$12). 220 + 320 grit sandpaper assortment (~$10).',
+    },
+    tags: {
+      topics: ['kitchen'],
+      roles: ['tool', 'consumable_material'],
+      functions: [FN.paintingSupplies],
+      seasons: [],
+      alreadyHaveFlag: '',
+      conditions: [],
+      tier: 'sweet_spot',
+      propertyTypes: [],
+    },
+    citations: [
+      'Wooster product line review consensus',
+      'DIY painting tool guides',
+    ],
+    migratedFrom: { scope: 'kitchen_cosmetic_refresh', slotId: 'kitchen_painting_supplies', tier: 'sweet_spot' },
+  },
+
+  // ---------- Drawer slides -----------------------------------------
+  {
+    universeId: 'kitchen_drawer_slides__side_mount_ball_bearing_slides_5pair',
+    rank: 100,
+    variant: {
+      productName: 'Side-mount ball-bearing slides (generic, 5-pair)',
+      priceLow: 35,
+      priceHigh: 55,
+      affiliateUrl: 'https://www.amazon.com/s?k=cabinet+drawer+slides+21+inch+5+pair&tag=alderprojects-20',
+      productSpec:
+        'Generic ball-bearing slides. 21" length. 75-100 lb capacity.',
+    },
+    tags: {
+      topics: ['kitchen'],
+      roles: ['hardware'],
+      functions: [FN.drawerSlide],
+      seasons: [],
+      alreadyHaveFlag: 'drawers_already_full_extension',
+      conditions: [],
+      tier: 'budget',
+      propertyTypes: [],
+    },
+    citations: [],
+    migratedFrom: { scope: 'kitchen_cosmetic_refresh', slotId: 'kitchen_drawer_slides', tier: 'budget' },
+  },
+  {
+    universeId: 'blum_tandem_plus_blumotion_21in_5pair',
+    rank: 100,
+    variant: {
+      productName: 'Blum Tandem Plus Blumotion 21" full-extension slides (5-pair)',
+      priceLow: 75,
+      priceHigh: 110,
+      affiliateUrl: 'https://www.amazon.com/s?k=blum+tandem+plus+blumotion+21+inch&tag=alderprojects-20',
+      productSpec:
+        'Cabinet-shop standard 21" undermount slides. Soft-close, full-extension, 100 lb capacity. Industry-standard hardware.',
+    },
+    tags: {
+      topics: ['kitchen'],
+      roles: ['hardware'],
+      functions: [FN.drawerSlide],
+      seasons: [],
+      alreadyHaveFlag: 'drawers_already_full_extension',
+      conditions: [],
+      tier: 'sweet_spot',
+      propertyTypes: [],
+    },
+    citations: [
+      'Blum Tandem product datasheet',
+      'Pro cabinet shop forum standards',
+    ],
+    migratedFrom: { scope: 'kitchen_cosmetic_refresh', slotId: 'kitchen_drawer_slides', tier: 'sweet_spot' },
+  },
+  {
+    universeId: 'blum_movento_undermount_slides_5pair',
+    rank: 100,
+    variant: {
+      productName: 'Blum Movento undermount slides (5-pair)',
+      priceLow: 200,
+      priceHigh: 320,
+      affiliateUrl: 'https://www.amazon.com/s?k=blum+movento+slide&tag=alderprojects-20',
+      productSpec:
+        'Premium undermount slides invisible from outside the drawer. Cabinet-shop install required.',
+    },
+    tags: {
+      topics: ['kitchen'],
+      roles: ['hardware'],
+      functions: [FN.drawerSlide],
+      seasons: [],
+      alreadyHaveFlag: 'drawers_already_full_extension',
+      conditions: [],
+      tier: 'premium',
+      propertyTypes: [],
+    },
+    citations: [],
+    migratedFrom: { scope: 'kitchen_cosmetic_refresh', slotId: 'kitchen_drawer_slides', tier: 'premium' },
+  },
 ]

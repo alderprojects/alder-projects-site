@@ -30,7 +30,12 @@ import { buildSmartCart, type SmartCartInput } from '@/lib/buildSmartCart'
 import { buildSmartCartV2 } from '@/lib/buildSmartCartV2'
 import { buildWorthItPlan, type WorthItInput } from '@/lib/buildWorthItPlan'
 import { inferSeason } from '@/lib/season-helpers'
-import { isV2Combination, getScenarioDefaults } from '@/content/smart-cart'
+import {
+  isV2Combination,
+  getScenarioDefaults,
+  getCatalog,
+  getUniverse,
+} from '@/content/smart-cart'
 import type { CartTier } from '@/lib/smart-cart-model'
 import {
   sendSmartCartReceiptEmail,
@@ -111,24 +116,34 @@ async function handleSessionCompleted(session: Stripe.Checkout.Session) {
     const buyerEmail = customerEmail || pending.email
 
     // V7.2.1 — route to v2 builder when the (topic, scope) is in the
-    // v2 catalog; otherwise fall back to legacy v1 path. The webhook
-    // signature itself is unchanged.
+    // v2 catalog; otherwise fall back to legacy v1 path.
+    // V7.2.3 — pass the resolved scope catalog and universe into the
+    // builder (dependency injection) so tests can call buildSmartCartV2
+    // directly without touching the registry. isV2Combination is a
+    // catalog presence check; getCatalog returns the same catalog the
+    // builder needs.
     if (isV2Combination(pending.topic, pending.scopeVariantId)) {
       const defaults = getScenarioDefaults(
         pending.topic,
         pending.scopeVariantId,
         pending.scenario,
       )
-      const cart = buildSmartCartV2({
-        cartId,
-        topic: pending.topic,
-        scopeVariantId: pending.scopeVariantId,
-        scenario: pending.scenario,
-        customerEmail: buyerEmail,
-        customerProvidedAddress: pending.address,
-        selectedTier: pending.selectedTier ?? defaults.selectedTier,
-        alreadyHave: pending.alreadyHave ?? defaults.alreadyHave,
-      })
+      const catalog = getCatalog(pending.topic, pending.scopeVariantId)!
+      const universe = getUniverse()
+      const cart = buildSmartCartV2(
+        {
+          cartId,
+          topic: pending.topic,
+          scopeVariantId: pending.scopeVariantId,
+          scenario: pending.scenario,
+          customerEmail: buyerEmail,
+          customerProvidedAddress: pending.address,
+          selectedTier: pending.selectedTier ?? defaults.selectedTier,
+          alreadyHave: pending.alreadyHave ?? defaults.alreadyHave,
+        },
+        catalog,
+        universe,
+      )
       await saveSmartCart(cart)
       await sendSmartCartReceiptEmailV2(cart, cart.customerEmail)
       // V7.2.1 — Worth-It is paused. Skip the T+72h upgrade-offer

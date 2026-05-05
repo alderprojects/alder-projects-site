@@ -1,10 +1,11 @@
-// V7.2.1 — Smart Cart V2 builder.
+// V7.2.3 — Smart Cart V2 builder, refactored over the hybrid
+// universe + scope-catalog model.
 //
 // Pure function. Takes the buyer's (topic, scope, scenario, email,
-// selectedTier, alreadyHave) and returns a SmartCartV2Output by
-// looking up the slot universe + skip list from the catalog,
-// filtering slots gated by alreadyHave, and computing honest savings
-// using the selected tier as the lean-cart baseline.
+// selectedTier, alreadyHave) PLUS injected scope catalog + universe
+// and returns a SmartCartV2Output. Output shape unchanged from v7.2.1
+// — the result page consumes the same fields. Internal sourcing
+// changed from per-scope embedded products to universe queries.
 //
 // Lives alongside the v1 buildSmartCart; the webhook handler picks
 // which builder to call via isV2Combination().
@@ -13,18 +14,17 @@ import { CONFIG } from './recommender-config'
 import type { TopicId } from './property-modules'
 import type { BriefScenarioId } from './recommender-config.types'
 import { getScopeVariant } from './scope-variants'
-import {
-  getSlotUniverse,
-  getSkipList,
-} from '@/content/smart-cart'
 import type {
   CartSlot,
   CartTier,
   CartTierVariant,
+  ScopeCatalog,
+  ScopeCatalogSlot,
   SkipItemV2,
   SmartCartV2Output,
   SmartCartV2Savings,
 } from './smart-cart-model'
+import { queryUniverse, type UniverseProduct, type UniverseQuery } from './smart-cart-universe'
 
 const SCENARIO_LABEL: Record<BriefScenarioId, string> = {
   just_starting: 'Just starting',
@@ -43,14 +43,33 @@ export interface BuildSmartCartV2Input {
   customerProvidedAddress?: string
   selectedTier?: CartTier
   alreadyHave?: string[]
-  createdAt?: string                             // optional, defaults to now (used by respin to preserve)
-  expiresAt?: string                             // optional, defaults to +30d (used by respin to preserve)
+  /** Optional, defaults to now (used by respin to preserve). */
+  createdAt?: string
+  /** Optional, defaults to +30d (used by respin to preserve). */
+  expiresAt?: string
 }
 
 const TTL_MS = 30 * 24 * 3600 * 1000
-const SKIP_CAP = 12
+const SKIP_CAP = 14
 
-export function buildSmartCartV2(input: BuildSmartCartV2Input): SmartCartV2Output {
+/**
+ * Build a v2 cart from the hybrid universe + scope catalog.
+ *
+ * The builder is pure and dependency-injected: catalog and universe
+ * are passed in. The webhook handler resolves both from the registry
+ * (`getCatalog`, `getUniverse`) before calling. Tests can construct
+ * fixtures directly.
+ *
+ * Returns null if the scope catalog can't resolve a sweet_spot tier
+ * variant for any required slot — the webhook should fall through to
+ * the legacy v1 path in that case (defensive; shouldn't happen with
+ * a healthy catalog).
+ */
+export function buildSmartCartV2(
+  input: BuildSmartCartV2Input,
+  catalog: ScopeCatalog,
+  universe: UniverseProduct[],
+): SmartCartV2Output {
   const variant = getScopeVariant(input.topic, input.scopeVariantId)
   const scopeLabel = variant?.label ?? input.scopeVariantId
   const scenarioLabel = SCENARIO_LABEL[input.scenario] ?? input.scenario
@@ -58,19 +77,41 @@ export function buildSmartCartV2(input: BuildSmartCartV2Input): SmartCartV2Outpu
   const selectedTier = input.selectedTier ?? 'sweet_spot'
   const alreadyHave = input.alreadyHave ?? []
 
-  // Filter slots whose conditionalOn intersects alreadyHave.
-  const universe = getSlotUniverse(input.topic, input.scopeVariantId)
-  const slots = universe.filter(slot => {
-    if (!slot.conditionalOn?.length) return true
-    return !slot.conditionalOn.some(cond => alreadyHave.includes(cond))
+  // 1. Filter scope-catalog slots whose conditionalOn intersects
+  //    alreadyHave. Empty conditionalOn = always visible.
+  const visibleScopeSlots = catalog.slots.filter(slot => {
+    if (!slot.conditionalOn.length) return true
+    return !slot.conditionalOn.some(flag => alreadyHave.includes(flag))
   })
 
-  // Skip list: sort by potential savings (Type A only contributes;
-  // Type B has no amountSaved). Cap at 12 total.
-  const skipList = [...getSkipList(input.topic, input.scopeVariantId)]
+  // 2. Resolve each visible slot's tier variants from the universe.
+  //    Drop slots whose required sweet_spot tier returns no product
+  //    (defensive — indicates a tag-mismatch authoring bug).
+  const slots: CartSlot[] = []
+  for (const scopeSlot of visibleScopeSlots) {
+    const composed = composeSlot(scopeSlot, universe, alreadyHave)
+    if (composed) slots.push(composed)
+  }
+
+  // 3. Pull and filter skip list. Sort by potential savings desc
+  //    (Type A wrong_version contributes; Type B has no amountSaved).
+  //    Cap at SKIP_CAP.
+  const skipList: SkipItemV2[] = catalog.skipList
+    .filter(s => s.appliesToScope.includes(input.scopeVariantId))
+    .map(s => ({
+      id: s.id,
+      type: s.type,
+      title: s.title,
+      marketingPitch: s.marketingPitch,
+      realReason: s.realReason,
+      amountSaved: s.amountSaved,
+      appliesToScope: s.appliesToScope,
+      citations: s.citations,
+    }))
     .sort((a, b) => (b.amountSaved?.high ?? 0) - (a.amountSaved?.high ?? 0))
     .slice(0, SKIP_CAP)
 
+  // 4. Compute savings (same math as v7.2.1).
   const savings = computeSavings(slots, skipList, selectedTier)
 
   const createdAt = input.createdAt ?? new Date().toISOString()
@@ -100,11 +141,58 @@ export function buildSmartCartV2(input: BuildSmartCartV2Input): SmartCartV2Outpu
   }
 }
 
-// Resolve a slot's price for a requested tier, falling back to
-// sweet_spot when the requested tier isn't authored. The fallback
-// matters for budget tiers — some slots (under-sink organizer in the
-// kitchen catalog) intentionally have no budget tier because no
-// product in that price band actually works.
+// ---------- Slot composition ----------------------------------------
+
+function composeSlot(
+  scopeSlot: ScopeCatalogSlot,
+  universe: UniverseProduct[],
+  alreadyHave: string[],
+): CartSlot | null {
+  const sweetSpot = resolveVariant(
+    scopeSlot.tierQueries.sweet_spot,
+    universe,
+    alreadyHave,
+  )
+  if (!sweetSpot) return null  // defensive — sweet_spot is required
+
+  const tiers: CartSlot['tiers'] = { sweet_spot: sweetSpot }
+
+  if (scopeSlot.tierQueries.budget) {
+    const v = resolveVariant(scopeSlot.tierQueries.budget, universe, alreadyHave)
+    if (v) tiers.budget = v
+  }
+  if (scopeSlot.tierQueries.premium) {
+    const v = resolveVariant(scopeSlot.tierQueries.premium, universe, alreadyHave)
+    if (v) tiers.premium = v
+  }
+
+  return {
+    slotId: scopeSlot.slotId,
+    slotLabel: scopeSlot.slotLabel,
+    slotKind: scopeSlot.slotKind,
+    conditionalOn: scopeSlot.conditionalOn,
+    tiers,
+    whyThis: scopeSlot.whyThis,
+    whyNotCheaper: scopeSlot.whyNotCheaper,
+    whyNotPremium: scopeSlot.whyNotPremium,
+    contextNote: scopeSlot.contextNote,
+    warnings: scopeSlot.warnings,
+    citations: scopeSlot.citations,
+  }
+}
+
+function resolveVariant(
+  query: UniverseQuery,
+  universe: UniverseProduct[],
+  alreadyHave: string[],
+): CartTierVariant | undefined {
+  const results = queryUniverse(universe, query, alreadyHave)
+  if (results.length === 0) return undefined
+  return results[0].variant
+}
+
+// ---------- Savings math (verbatim from v7.2.1) ---------------------
+
 function resolveTierVariant(slot: CartSlot, tier: CartTier): CartTierVariant {
   return slot.tiers[tier] ?? slot.tiers.sweet_spot
 }
@@ -137,8 +225,6 @@ function computeSavings(
   }
   for (const item of skipList) {
     if (item.type !== 'wrong_version' || !item.amountSaved) continue
-    // Overbuy includes the typical trap: low band reflects half the
-    // floor (some buyers dodge it), high band reflects the full ceiling.
     overbuyLow += item.amountSaved.low * 0.5
     overbuyHigh += item.amountSaved.high
   }

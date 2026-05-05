@@ -171,6 +171,58 @@ export async function GET(req: Request) {
       'Admin cart debug endpoint at /api/admin/cart/[cartId] available. Pass ?adminToken=<ADMIN_REFUND_TOKEN> to inspect cart.version and routing fields.',
   })
 
+  // ---------- V7.2.3: hybrid universe + scope catalog ----------
+  try {
+    const { getUniverse, getAllCatalogs } = await import('@/content/smart-cart')
+    const universe = getUniverse()
+    const catalogs = getAllCatalogs()
+
+    if (universe.length > 0) {
+      checks.push({
+        id: 'universe_loaded',
+        status: 'ok',
+        detail: `Universe size: ${universe.length} products`,
+      })
+    } else {
+      checks.push({
+        id: 'universe_loaded',
+        status: 'error',
+        detail: 'Universe is empty — v2 carts will not resolve any slots',
+      })
+    }
+
+    checks.push({
+      id: 'catalogs_loaded',
+      status: 'ok',
+      detail: `Scope catalogs: ${catalogs.length} (${catalogs
+        .map(c => c.scopeVariantId)
+        .join(', ')})`,
+    })
+
+    const allHaveProvenance = universe.every(p => p.migratedFrom)
+    checks.push({
+      id: 'migration_audit',
+      status: allHaveProvenance ? 'ok' : 'warn',
+      detail: allHaveProvenance
+        ? 'All universe entries trace to a source via migratedFrom'
+        : `${universe.filter(p => !p.migratedFrom).length} universe entries lack migratedFrom (post-migration authored entries are expected to omit it)`,
+    })
+
+    checks.push({
+      id: 'admin_universe_endpoint',
+      status: 'ok',
+      detail:
+        'Admin universe stats at /api/admin/universe and verification at /api/admin/v723-verify (both ?adminToken=<ADMIN_REFUND_TOKEN>).',
+    })
+  } catch (e: unknown) {
+    const msg = e instanceof Error ? e.message : 'unknown error'
+    checks.push({
+      id: 'universe_loaded',
+      status: 'error',
+      detail: `Could not import @/content/smart-cart: ${msg}`,
+    })
+  }
+
   // ---------- Mode detection (test vs live) ----------
   const stripeKey = env.STRIPE_SECRET_KEY ?? ''
   const isTestMode = stripeKey.startsWith('sk_test_')

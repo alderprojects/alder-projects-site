@@ -15,9 +15,15 @@ import type { UniverseProduct } from '@/lib/smart-cart-universe'
 
 import { UNIVERSE } from './universe'
 import { KITCHEN_ORGANIZERS } from './scope-catalogs/kitchen-organizers'
+import { KITCHEN_COSMETIC_REFRESH } from './scope-catalogs/kitchen-cosmetic-refresh'
+import { KITCHEN_CABINET_HARDWARE_SWAP } from './scope-catalogs/kitchen-cabinet-hardware-swap'
+import { OUTDOOR_LAKE_SEASON } from './scope-catalogs/outdoor-lake-season'
 
 const CATALOGS: ScopeCatalog[] = [
   KITCHEN_ORGANIZERS,
+  KITCHEN_COSMETIC_REFRESH,
+  KITCHEN_CABINET_HARDWARE_SWAP,
+  OUTDOOR_LAKE_SEASON,
 ]
 
 // ---------- Catalog lookup ------------------------------------------

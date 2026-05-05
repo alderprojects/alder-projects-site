@@ -1,84 +1,69 @@
-// V7.2.1 — Smart Cart V2 catalog registry.
+// V7.2.3 — Smart Cart V2 catalog registry.
 //
-// Each CatalogEntry binds a (topic, scopeVariantId) pair to a slot
-// universe + skip list. The builder uses this registry to resolve
-// what slots a buyer should see and what skip-for-now content to ship.
+// The registry imports all scope catalogs and the universe, exposes
+// lookup helpers used by the webhook + checkout endpoints, and keeps
+// `isV2Combination` and `getScenarioDefaults` signatures backwards-
+// compatible with v7.2.1/v7.2.2 callers.
 //
-// v7.2.1 ships ONE entry: kitchen / kitchen_organizers (all four
-// scenarios share the same slot universe; scenario differences are
-// expressed via SCENARIO_DEFAULTS below for the modal data plumbing).
+// v7.2.3 ships ONE catalog: kitchen_organizers (migrated to the new
+// hybrid universe + scope-catalog model). The 3 v7.2.2 catalogs
+// (kitchen_cosmetic_refresh, kitchen_cabinet_hardware_swap,
+// outdoor_lake_season) plug in here when their content lands.
 
-import type { CartSlot, SkipItemV2, CartTier } from '@/lib/smart-cart-model'
-import type { TopicId } from '@/lib/property-modules'
-import type { BriefScenarioId } from '@/lib/recommender-config.types'
-import { KITCHEN_ORGANIZERS_SLOTS } from './kitchen-organizers/slots'
-import { KITCHEN_ORGANIZERS_SKIP_LIST } from './kitchen-organizers/skip-list'
+import type { CartTier, ScopeCatalog } from '@/lib/smart-cart-model'
+import type { UniverseProduct } from '@/lib/smart-cart-universe'
 
-export interface CatalogEntry {
-  topic: TopicId
-  scopeVariantId: string
-  scenarios: BriefScenarioId[]                   // which scenarios this entry serves
-  slotUniverse: CartSlot[]
-  skipList: SkipItemV2[]
-}
+import { UNIVERSE } from './universe'
+import { KITCHEN_ORGANIZERS } from './scope-catalogs/kitchen-organizers'
 
-export const CATALOG: CatalogEntry[] = [
-  {
-    topic: 'kitchen',
-    scopeVariantId: 'kitchen_organizers',
-    scenarios: ['just_starting', 'already_have_basics', 'tight_budget', 'premium'],
-    slotUniverse: KITCHEN_ORGANIZERS_SLOTS,
-    skipList: KITCHEN_ORGANIZERS_SKIP_LIST,
-  },
+const CATALOGS: ScopeCatalog[] = [
+  KITCHEN_ORGANIZERS,
 ]
 
-// Per-scenario defaults for the modal data plumbing. The state-probe
-// UI is v7.2.2; in v7.2.1 the modal passes these defaults through.
-export const SCENARIO_DEFAULTS: Record<
-  string,                                        // key: `${topic}/${scope}/${scenario}`
-  { selectedTier: CartTier; alreadyHave: string[] }
-> = {
-  'kitchen/kitchen_organizers/just_starting': {
-    selectedTier: 'sweet_spot',
-    alreadyHave: [],
-  },
-  'kitchen/kitchen_organizers/already_have_basics': {
-    selectedTier: 'sweet_spot',
-    alreadyHave: ['has_cutlery_tray', 'has_drawer_dividers'],
-  },
-  'kitchen/kitchen_organizers/tight_budget': {
-    selectedTier: 'budget',
-    alreadyHave: [],
-  },
-  'kitchen/kitchen_organizers/premium': {
-    selectedTier: 'premium',
-    alreadyHave: [],
-  },
+// ---------- Catalog lookup ------------------------------------------
+
+export function getCatalog(
+  topic: string,
+  scopeVariantId: string,
+): ScopeCatalog | null {
+  return (
+    CATALOGS.find(
+      c => c.topic === topic && c.scopeVariantId === scopeVariantId,
+    ) ?? null
+  )
 }
 
-export function getSlotUniverse(topic: string, scope: string): CartSlot[] {
-  const entry = CATALOG.find(e => e.topic === topic && e.scopeVariantId === scope)
-  return entry?.slotUniverse ?? []
+export function getAllCatalogs(): ScopeCatalog[] {
+  return CATALOGS
 }
 
-export function getSkipList(topic: string, scope: string): SkipItemV2[] {
-  const entry = CATALOG.find(e => e.topic === topic && e.scopeVariantId === scope)
-  return entry?.skipList ?? []
+export function isV2Combination(
+  topic: string,
+  scopeVariantId: string,
+): boolean {
+  return getCatalog(topic, scopeVariantId) !== null
 }
 
-export function isV2Combination(topic: string, scope: string): boolean {
-  return CATALOG.some(e => e.topic === topic && e.scopeVariantId === scope)
-}
+// ---------- Scenario defaults ---------------------------------------
+// V7.2.1/v7.2.2 callers (checkout route, webhook) use this to fill
+// modal data plumbing when state-probe UI hasn't run. Signature
+// preserved: always returns a value, falls back to sweet_spot/[] if
+// the catalog or scenario is unknown.
 
 export function getScenarioDefaults(
   topic: string,
-  scope: string,
+  scopeVariantId: string,
   scenario: string,
 ): { selectedTier: CartTier; alreadyHave: string[] } {
-  return (
-    SCENARIO_DEFAULTS[`${topic}/${scope}/${scenario}`] ?? {
-      selectedTier: 'sweet_spot',
-      alreadyHave: [],
-    }
-  )
+  const catalog = getCatalog(topic, scopeVariantId)
+  if (catalog && catalog.scenarioDefaults[scenario]) {
+    return catalog.scenarioDefaults[scenario]
+  }
+  return { selectedTier: 'sweet_spot', alreadyHave: [] }
+}
+
+// ---------- Universe access -----------------------------------------
+
+export function getUniverse(): UniverseProduct[] {
+  return UNIVERSE
 }

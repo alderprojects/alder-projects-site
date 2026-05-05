@@ -39,6 +39,16 @@ interface Failure {
   detail: string
 }
 
+// V7.2.4 — per-catalog expected slot/skip counts. Source of truth
+// for "did the migration preserve information." Update when new
+// catalogs land or when a catalog adds/removes slots.
+const EXPECTED_STATS: Record<string, { slotCount: number; skipCount: number }> = {
+  kitchen_organizers: { slotCount: 11, skipCount: 11 },         // 8 core + 3 add-ons
+  kitchen_cosmetic_refresh: { slotCount: 9, skipCount: 11 },
+  kitchen_cabinet_hardware_swap: { slotCount: 6, skipCount: 10 },
+  outdoor_lake_season: { slotCount: 12, skipCount: 14 },
+}
+
 export async function GET(req: NextRequest) {
   if (!authorized(req)) {
     return NextResponse.json({ error: 'unauthorized' }, { status: 401 })
@@ -102,10 +112,35 @@ export async function GET(req: NextRequest) {
         })
       }
     }
+
+    // V7.2.4 — slot/skip count regression check.
+    const expected = EXPECTED_STATS[c.scopeVariantId]
+    if (!expected) {
+      failures.push({
+        check: 'expected_stats_registered',
+        detail: `No EXPECTED_STATS entry for ${c.scopeVariantId} — add one to v723-verify when authoring a new catalog`,
+      })
+    } else {
+      if (c.slots.length !== expected.slotCount) {
+        failures.push({
+          check: 'catalog_slot_count',
+          detail: `${c.scopeVariantId}: slot count ${c.slots.length} !== expected ${expected.slotCount}`,
+        })
+      }
+      if (c.skipList.length !== expected.skipCount) {
+        failures.push({
+          check: 'catalog_skip_count',
+          detail: `${c.scopeVariantId}: skip count ${c.skipList.length} !== expected ${expected.skipCount}`,
+        })
+      }
+    }
   }
 
   // ---------- Per-scope cart-equivalence checks --------------------
-  const scenarios: BriefScenarioId[] = [
+  // V7.2.4 — verify each scenario the catalog declares it serves
+  // (rather than a fixed list). This covers outdoor_lake_season's
+  // lake_property scenario in addition to the standard four.
+  const STANDARD_SCENARIOS: BriefScenarioId[] = [
     'just_starting',
     'tight_budget',
     'already_have_basics',
@@ -128,7 +163,13 @@ export async function GET(req: NextRequest) {
       alreadyHaveFilteringWorks: null,
     }
 
-    for (const scenario of scenarios) {
+    // Verify the standard four scenarios + any catalog-specific
+    // additions (e.g. outdoor_lake_season adds lake_property).
+    const scenariosForCatalog = Array.from(
+      new Set<BriefScenarioId>([...STANDARD_SCENARIOS, ...c.scenarios]),
+    )
+
+    for (const scenario of scenariosForCatalog) {
       const cart = buildSmartCartV2(
         {
           cartId: `VERIFY-${c.scopeVariantId}-${scenario}`,

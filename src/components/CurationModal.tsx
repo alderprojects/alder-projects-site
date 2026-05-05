@@ -13,7 +13,7 @@
 // Submit posts to /api/smart-cart/checkout or /api/worth-it/checkout
 // and redirects the browser to the returned Stripe Payment Link URL.
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { CONFIG } from '@/lib/recommender-config'
 import { formatPrice } from '@/lib/format'
 import { SCOPE_VARIANTS, getV7Topics } from '@/lib/scope-variants'
@@ -62,6 +62,14 @@ export default function CurationModal() {
   const [selectedTier, setSelectedTier] = useState<CartTier | undefined>(undefined)
   const [alreadyHave, setAlreadyHave] = useState<string[] | undefined>(undefined)
 
+  // V7.2.2 — guard for the modal-open race. The "default scope when
+  // topic changes" effect runs after each commit and used to stomp
+  // an explicitly-passed data-curation-modal-scope when the prior
+  // scope state didn't match the new topic's variants. The ref lets
+  // the open handler signal "the scope I just set is intentional;
+  // skip the next auto-default tick".
+  const explicitlySetScopeRef = useRef(false)
+
   // Wire global open buttons via data attributes.
   useEffect(() => {
     function handler(e: Event) {
@@ -83,7 +91,13 @@ export default function CurationModal() {
       const t = (btn.getAttribute('data-curation-modal-topic') as TopicId) ?? 'kitchen'
       setTopic(t)
       const sc = btn.getAttribute('data-curation-modal-scope')
-      if (sc) setScopeVariantId(sc)
+      if (sc) {
+        setScopeVariantId(sc)
+        // V7.2.2 — flag this explicit set so the topic-change effect
+        // doesn't immediately reset us to list[0] when the prior
+        // scopeVariantId state belongs to a different topic.
+        explicitlySetScopeRef.current = true
+      }
       const s = btn.getAttribute('data-curation-modal-scenario') as BriefScenarioId | null
       if (s) setScenario(s)
       const addr = btn.getAttribute('data-curation-modal-address')
@@ -111,10 +125,27 @@ export default function CurationModal() {
       setScopeVariantId('')
       return
     }
+    // V7.2.2 — if the open handler just set scope explicitly, don't
+    // overwrite it. Consume the flag so subsequent topic changes
+    // (when the user picks a different topic in the dropdown) still
+    // auto-default to the first variant of the new topic.
+    if (explicitlySetScopeRef.current) {
+      explicitlySetScopeRef.current = false
+      return
+    }
     if (!list.find(v => v.id === scopeVariantId)) {
       setScopeVariantId(list[0].id)
     }
   }, [topic, scopeVariantId])
+
+  // V7.2.2 — reset the explicit-scope flag whenever the modal closes,
+  // so a subsequent open with no data-curation-modal-scope attribute
+  // gets fresh auto-default behavior.
+  useEffect(() => {
+    if (!open) {
+      explicitlySetScopeRef.current = false
+    }
+  }, [open])
 
   if (!open) return null
 

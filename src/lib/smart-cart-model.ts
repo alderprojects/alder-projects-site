@@ -42,6 +42,10 @@ export interface CartSlot {
   contextNote?: string                           // optional editorial note ("Vermont tip:...")
   slotKind: 'core' | 'addon'
   conditionalOn?: string[]                       // alreadyHave values that HIDE this slot
+  // V7.2.3 — citations describing this slot's editorial framing
+  // (research notes, reviewer rankings). Optional for back-compat
+  // with v7.2.1/v7.2.2 carts that didn't carry citations.
+  citations?: string[]
 }
 
 export type SkipReasonType =
@@ -56,6 +60,9 @@ export interface SkipItemV2 {
   realReason: string                             // why skip
   amountSaved?: { low: number; high: number }   // Type A only
   appliesToScope: string[]                       // scope variant ids this applies to
+  // V7.2.3 — citations describing this skip claim's research basis.
+  // Optional for back-compat with v7.2.1/v7.2.2 records.
+  citations?: string[]
 }
 
 export interface SmartCartV2Savings {
@@ -95,3 +102,90 @@ export const TIER_LABEL: Record<CartTier, string> = {
   sweet_spot: 'Recommended pick',
   premium: 'Premium pick',
 }
+
+// =====================================================================
+// V7.2.3 — Hybrid universe + scope-catalog architecture
+// =====================================================================
+//
+// The types above (CartSlot, SkipItemV2, SmartCartV2Output, etc.) are
+// the BUILDER OUTPUT shape — what the result page renders. Those stay
+// stable.
+//
+// The types below describe the SOURCE shape — what we author. A
+// ScopeCatalog references the universe by tag query and layers in
+// scope-specific editorial prose. The builder joins the two and emits
+// the same SmartCartV2Output shape as v7.2.1.
+
+import type { UniverseQuery } from './smart-cart-universe'
+
+/**
+ * ScopeCatalogSlot — slot definition in a scope catalog.
+ *
+ * A slot is "the cabinet pull recommendation for this scope". It
+ * defines what role to fill (via tierQueries) and how to present it
+ * (via prose).
+ *
+ * Differences from CartSlot:
+ *   - Carries `tierQueries` instead of resolved `tiers` — the builder
+ *     resolves queries against the universe at synthesis time.
+ *   - `conditionalOn` is required (always an array; empty if no gate).
+ *   - `citations` is required (always an array; empty if none).
+ */
+export interface ScopeCatalogSlot {
+  slotId: CartSlotId
+  slotLabel: string
+  slotKind: 'core' | 'addon'
+  conditionalOn: string[]
+  tierQueries: {
+    budget?: UniverseQuery
+    sweet_spot: UniverseQuery                    // required
+    premium?: UniverseQuery
+  }
+  whyThis: string
+  whyNotCheaper?: string
+  whyNotPremium?: string
+  contextNote?: string
+  warnings?: string[]
+  citations: string[]
+}
+
+/**
+ * ScopeCatalogSkipItem — same shape as SkipItemV2 but with required
+ * citations (the builder's emitted SkipItemV2 keeps citations
+ * optional for back-compat with v7.2.1/v7.2.2 carts).
+ */
+export interface ScopeCatalogSkipItem {
+  id: string
+  type: SkipReasonType
+  title: string
+  marketingPitch?: string
+  realReason: string
+  amountSaved?: { low: number; high: number }
+  appliesToScope: string[]
+  citations: string[]
+}
+
+/**
+ * ScopeCatalogScenarioDefaults — scenario-keyed map of default
+ * selectedTier + alreadyHave the modal data plumbing fills when the
+ * buyer hasn't answered the state probe.
+ */
+export type ScopeCatalogScenarioDefaults = Record<
+  string,                                        // BriefScenarioId
+  { selectedTier: CartTier; alreadyHave: string[] }
+>
+
+/**
+ * ScopeCatalog — full editorial layer for one (topic, scope)
+ * combination. One file per catalog under
+ * src/content/smart-cart/scope-catalogs/.
+ */
+export interface ScopeCatalog {
+  topic: TopicId
+  scopeVariantId: string
+  scenarios: BriefScenarioId[]
+  slots: ScopeCatalogSlot[]
+  skipList: ScopeCatalogSkipItem[]
+  scenarioDefaults: ScopeCatalogScenarioDefaults
+}
+

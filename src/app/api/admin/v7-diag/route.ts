@@ -163,6 +163,14 @@ export async function GET(req: Request) {
     })
   }
 
+  // ---------- V7.2.2: admin cart debug endpoint ----------
+  checks.push({
+    id: 'admin_cart_endpoint',
+    status: 'ok',
+    detail:
+      'Admin cart debug endpoint at /api/admin/cart/[cartId] available. Pass ?adminToken=<ADMIN_REFUND_TOKEN> to inspect cart.version and routing fields.',
+  })
+
   // ---------- Mode detection (test vs live) ----------
   const stripeKey = env.STRIPE_SECRET_KEY ?? ''
   const isTestMode = stripeKey.startsWith('sk_test_')

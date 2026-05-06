@@ -143,10 +143,13 @@ export const SCOPE_VARIANTS: Record<TopicId, ScopeVariant[]> = {
     },
   ],
 
-  // ---------- Outdoor (2 variants) -----------------------------------
+  // ---------- Outdoor (5 variants) -----------------------------------
   // V7.2.2: outdoor_lake_season leads because it becomes v2-curated in
   // this PR (Section 4). outdoor_deck_refresh stays available via the
   // dropdown for buyers whose project doesn't fit lake-season.
+  // V7.2.5: 3 new variants (freeze prevention, seasonal opening, dock
+  // & lake) ship structurally; pastes 2-4 fill in catalog content and
+  // flip smartCartReady to true.
   outdoor: [
     {
       id: 'outdoor_lake_season',
@@ -173,6 +176,50 @@ export const SCOPE_VARIANTS: Record<TopicId, ScopeVariant[]> = {
       overbuyTrapIds: ['deck_premium_stain', 'deck_specialty_cleaner'],
       skipListTopicTags: ['outdoor_deck', 'outdoor_textiles'],
       timingCategory: 'patio_furniture',
+    },
+
+    // ===== v7.2.5 — outdoor additions ===============================
+    {
+      id: 'outdoor_freeze_prevention',
+      topic: 'outdoor',
+      label: 'Winterization & freeze prevention',
+      description:
+        'Detect, prevent, and contain frozen-pipe risk before the season.',
+      smartCartReady: false, // flips to true in paste 2
+      defaultLane: 'diy',
+      estCostRange: { low: 100, high: 500 },
+      relevantKitIds: ['outdoor_freeze_prevention', 'home_freeze_kit'],
+      overbuyTrapIds: [],
+      skipListTopicTags: ['outdoor_freeze_prevention', 'winterization'],
+      timingCategory: 'fall_closing',
+    },
+    {
+      id: 'outdoor_seasonal_opening',
+      topic: 'outdoor',
+      label: 'Spring opening & water startup',
+      description:
+        'Open a seasonal home without losing the first weekend to leaks, missing supplies, and reset work.',
+      smartCartReady: false, // flips to true in paste 2
+      defaultLane: 'diy',
+      estCostRange: { low: 80, high: 300 },
+      relevantKitIds: ['outdoor_seasonal_opening', 'home_water_startup'],
+      overbuyTrapIds: [],
+      skipListTopicTags: ['outdoor_seasonal_opening'],
+      timingCategory: 'spring_opening',
+    },
+    {
+      id: 'outdoor_dock_lake',
+      topic: 'outdoor',
+      label: 'Dock & lake practical maintenance',
+      description:
+        'Make the dock and lake setup safer and more usable without turning every issue into a rebuild.',
+      smartCartReady: false, // flips to true in paste 4
+      defaultLane: 'diy',
+      estCostRange: { low: 150, high: 800 },
+      relevantKitIds: ['outdoor_dock_lake'],
+      overbuyTrapIds: [],
+      skipListTopicTags: ['dock', 'lake_practical'],
+      timingCategory: 'spring_opening',
     },
   ],
 
@@ -223,12 +270,105 @@ export const SCOPE_VARIANTS: Record<TopicId, ScopeVariant[]> = {
   mud_season: [],
   well_septic: [],
 
-  // v7.2.5 — placeholders for new topics introduced this release.
-  // Section 7 of paste 1 populates these. Pastes 2-4 add catalog
-  // content + flip smartCartReady to true.
-  mudroom: [],
-  home_repair: [],
-  universal: [],
+  // ---------- Mudroom (1 variant — v7.2.5) ---------------------------
+  mudroom: [
+    {
+      id: 'mudroom_entry_reset',
+      topic: 'mudroom',
+      label: 'Mudroom & entry reset',
+      description:
+        'Keep mud, boots, wet gear, and lake stuff from taking over the house.',
+      smartCartReady: false, // flips to true in paste 3
+      defaultLane: 'diy',
+      estCostRange: { low: 80, high: 400 },
+      relevantKitIds: ['mudroom_entry_reset'],
+      overbuyTrapIds: [],
+      skipListTopicTags: ['mudroom'],
+      timingCategory: 'mud_season',
+    },
+  ],
+
+  // ---------- Home repair (3 variants — v7.2.5) ----------------------
+  home_repair: [
+    {
+      id: 'home_moisture_control',
+      topic: 'home_repair',
+      label: 'Moisture & smell prevention',
+      description:
+        'Catch moisture problems before they become smell, mold, or repair issues.',
+      smartCartReady: false, // flips to true in paste 3
+      defaultLane: 'diy',
+      estCostRange: { low: 80, high: 450 },
+      relevantKitIds: ['home_moisture_control'],
+      overbuyTrapIds: [],
+      skipListTopicTags: ['moisture'],
+      timingCategory: 'year_round',
+    },
+    {
+      id: 'home_water_quality',
+      topic: 'home_repair',
+      label: 'Water quality & filtration',
+      description:
+        'Test before treating. Avoid buying the wrong filter for the wrong water problem.',
+      smartCartReady: false, // flips to true in paste 4
+      defaultLane: 'diy',
+      estCostRange: { low: 50, high: 350 },
+      relevantKitIds: ['home_water_quality'],
+      overbuyTrapIds: [],
+      skipListTopicTags: ['water_quality'],
+      timingCategory: 'spring_opening',
+    },
+    {
+      id: 'home_safety_kit',
+      topic: 'home_repair',
+      label: 'Seasonal home safety kit',
+      description:
+        'Cover the basics that are easy to forget when a home is used seasonally.',
+      smartCartReady: false, // flips to true in paste 4
+      defaultLane: 'diy',
+      estCostRange: { low: 120, high: 450 },
+      relevantKitIds: ['home_safety_kit'],
+      overbuyTrapIds: [],
+      skipListTopicTags: ['safety'],
+      timingCategory: 'year_round',
+    },
+  ],
+
+  // ---------- Universal (2 variants — v7.2.5) ------------------------
+  // Cross-project tools and prep that show up across multiple scope
+  // contexts. Universal scopes are fully-featured catalogs in their
+  // own right; the result page does not auto-blend them into other
+  // carts (that's a result-page UX decision deferred to post-paste-4).
+  universal: [
+    {
+      id: 'universal_owner_kit',
+      topic: 'universal',
+      label: 'Small repair owner kit',
+      description:
+        'The minimal kit that prevents extra trips and avoids buying contractor-grade tools.',
+      smartCartReady: false, // flips to true in paste 3
+      defaultLane: 'diy',
+      estCostRange: { low: 120, high: 500 },
+      relevantKitIds: ['universal_owner_kit'],
+      overbuyTrapIds: [],
+      skipListTopicTags: ['owner_tools'],
+      timingCategory: 'year_round',
+    },
+    {
+      id: 'universal_project_prep',
+      topic: 'universal',
+      label: 'Project prep, measure, document',
+      description:
+        'Get the measurements, photos, and notes right before buying materials or calling someone.',
+      smartCartReady: false, // flips to true in paste 4
+      defaultLane: 'diy',
+      estCostRange: { low: 40, high: 200 },
+      relevantKitIds: ['universal_project_prep'],
+      overbuyTrapIds: [],
+      skipListTopicTags: ['project_prep'],
+      timingCategory: 'year_round',
+    },
+  ],
 }
 
 // ---------- Helpers ---------------------------------------------------

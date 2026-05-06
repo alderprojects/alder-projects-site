@@ -4442,4 +4442,787 @@ export const UNIVERSE: UniverseProduct[] = [
       tier: "sweet_spot"
     }
   },
+  {
+    universeId: "moisture_hygrometer__acurite_digital_hygrometer_single",
+    rank: 100,
+    variant: {
+      productName: "AcuRite digital hygrometer (single)",
+      priceLow: 12,
+      priceHigh: 22,
+      affiliateUrl: "https://www.amazon.com/s?k=acurite+digital+hygrometer+thermometer&tag=alderprojects-20",
+      productSpec: "Battery-powered digital hygrometer. Reads temperature + humidity. ~$15. AcuRite is the consumer standard. Local readout only — no remote alerts."
+    },
+    tags: {
+      topics: [
+        "home_repair"
+      ],
+      roles: [
+        "sensor",
+        "monitor",
+        "measurement_tool"
+      ],
+      functions: [
+        "hygrometer"
+      ],
+      seasons: [
+        "year_round"
+      ],
+      propertyTypes: [],
+      conditions: [],
+      alreadyHaveFlag: "has_hygrometer",
+      tier: "budget"
+    },
+    citations: [
+      "Govee WiFi Hygrometer documentation",
+      "AcuRite product line",
+      "SensorPush HTP.xw specifications",
+      "EPA mold growth thresholds"
+    ],
+    migratedFrom: {
+      scope: "home_moisture_control",
+      slotId: "moisture_hygrometer",
+      tier: "budget"
+    }
+  },
+  {
+    universeId: "govee_wifi_hygrometer_3_pack_with_app_alerts",
+    rank: 100,
+    variant: {
+      productName: "Govee WiFi Hygrometer 3-pack with app alerts",
+      priceLow: 35,
+      priceHigh: 55,
+      affiliateUrl: "https://www.amazon.com/s?k=govee+wifi+hygrometer+3+pack&tag=alderprojects-20",
+      productSpec: "3 WiFi-connected hygrometers. App alerts when humidity exceeds threshold. Historical graphs over weeks/months. Place in basement, bedroom, kitchen for whole-house picture. Govee Home app."
+    },
+    tags: {
+      topics: [
+        "home_repair"
+      ],
+      roles: [
+        "sensor",
+        "monitor",
+        "measurement_tool"
+      ],
+      functions: [
+        "hygrometer"
+      ],
+      seasons: [
+        "year_round"
+      ],
+      propertyTypes: [],
+      conditions: [],
+      alreadyHaveFlag: "has_hygrometer",
+      tier: "sweet_spot"
+    },
+    citations: [
+      "Govee WiFi Hygrometer documentation",
+      "AcuRite product line",
+      "SensorPush HTP.xw specifications",
+      "EPA mold growth thresholds"
+    ],
+    migratedFrom: {
+      scope: "home_moisture_control",
+      slotId: "moisture_hygrometer",
+      tier: "sweet_spot"
+    }
+  },
+  {
+    universeId: "moisture_hygrometer__sensorpush_htp_xw_outdoor_rated_wireless_hygrometer_kit",
+    rank: 100,
+    variant: {
+      productName: "SensorPush HTP.xw outdoor-rated wireless hygrometer kit",
+      priceLow: 145,
+      priceHigh: 220,
+      affiliateUrl: "https://www.amazon.com/s?k=sensorpush+wireless+hygrometer+gateway&tag=alderprojects-20",
+      productSpec: "Pro-grade hygrometers. SensorPush gateway for remote access. Long-range (~100 ft). Used by humidor and instrument-storage owners for precise humidity tracking. Better accuracy than Govee."
+    },
+    tags: {
+      topics: [
+        "home_repair"
+      ],
+      roles: [
+        "sensor",
+        "monitor",
+        "measurement_tool"
+      ],
+      functions: [
+        "hygrometer"
+      ],
+      seasons: [
+        "year_round"
+      ],
+      propertyTypes: [],
+      conditions: [],
+      alreadyHaveFlag: "has_hygrometer",
+      tier: "premium"
+    },
+    citations: [
+      "Govee WiFi Hygrometer documentation",
+      "AcuRite product line",
+      "SensorPush HTP.xw specifications",
+      "EPA mold growth thresholds"
+    ],
+    migratedFrom: {
+      scope: "home_moisture_control",
+      slotId: "moisture_hygrometer",
+      tier: "premium"
+    }
+  },
+  {
+    universeId: "moisture_mold_test__my_mold_detective_diy_mold_test_kit",
+    rank: 100,
+    variant: {
+      productName: "My Mold Detective DIY mold test kit",
+      priceLow: 35,
+      priceHigh: 55,
+      affiliateUrl: "https://www.amazon.com/s?k=my+mold+detective+diy+test+kit&tag=alderprojects-20",
+      productSpec: "DIY surface and air sampling. Mail-in lab analysis. Identifies common mold genera. Useful as a screening tool. NOT a substitute for professional mold inspection if you have visible mold."
+    },
+    tags: {
+      topics: [
+        "home_repair"
+      ],
+      roles: [
+        "measurement_tool",
+        "safety_item"
+      ],
+      functions: [
+        "mold_test_kit"
+      ],
+      seasons: [
+        "year_round"
+      ],
+      propertyTypes: [],
+      conditions: [],
+      alreadyHaveFlag: "has_recent_mold_test",
+      tier: "sweet_spot"
+    },
+    citations: [
+      "EPA mold remediation guidance",
+      "My Mold Detective product documentation"
+    ],
+    migratedFrom: {
+      scope: "home_moisture_control",
+      slotId: "moisture_mold_test",
+      tier: "sweet_spot"
+    }
+  },
+  {
+    universeId: "moisture_odor_absorber__moso_natural_bamboo_charcoal_air_purifying_bags_4_pack_200g_each",
+    rank: 100,
+    variant: {
+      productName: "Moso Natural Bamboo Charcoal Air Purifying Bags (4-pack, 200g each)",
+      priceLow: 18,
+      priceHigh: 32,
+      affiliateUrl: "https://www.amazon.com/s?k=moso+natural+bamboo+charcoal+air+purifying+bags+4+pack&tag=alderprojects-20",
+      productSpec: "Activated bamboo charcoal in natural fabric bags. Adsorbs odors and excess moisture. 4 bags × 200g. Reactivate by sun-drying monthly. ~$25 for 2-year supply. Wirecutter-tier pick."
+    },
+    tags: {
+      topics: [
+        "home_repair"
+      ],
+      roles: [
+        "consumable_material",
+        "cleaner"
+      ],
+      functions: [
+        "odor_absorber"
+      ],
+      seasons: [
+        "year_round"
+      ],
+      propertyTypes: [],
+      conditions: [],
+      alreadyHaveFlag: "has_odor_absorber",
+      tier: "sweet_spot"
+    },
+    citations: [
+      "Moso bamboo charcoal product documentation",
+      "Wirecutter air purifier and odor absorber testing"
+    ],
+    migratedFrom: {
+      scope: "home_moisture_control",
+      slotId: "moisture_odor_absorber",
+      tier: "sweet_spot"
+    }
+  },
+  {
+    universeId: "moisture_air_mover__lasko_3300_wind_machine_3_speed_air_circulator",
+    rank: 100,
+    variant: {
+      productName: "Lasko 3300 Wind Machine 3-speed air circulator",
+      priceLow: 55,
+      priceHigh: 85,
+      affiliateUrl: "https://www.amazon.com/s?k=lasko+3300+wind+machine+air+circulator&tag=alderprojects-20",
+      productSpec: "20\" diameter pivoting fan with 3 speeds. Heavy-duty plastic frame. Used for drying spaces and rapid air circulation in basements. Lasko is the consumer standard."
+    },
+    tags: {
+      topics: [
+        "home_repair"
+      ],
+      roles: [
+        "appliance"
+      ],
+      functions: [
+        "air_mover"
+      ],
+      seasons: [
+        "year_round"
+      ],
+      propertyTypes: [],
+      conditions: [],
+      alreadyHaveFlag: "has_air_mover",
+      tier: "sweet_spot"
+    },
+    citations: [
+      "Lasko 3300 product documentation"
+    ],
+    migratedFrom: {
+      scope: "home_moisture_control",
+      slotId: "moisture_air_mover",
+      tier: "sweet_spot"
+    }
+  },
+  {
+    universeId: "owner_drill_driver__black_decker_20v_max_cordless_drill_kit_with_battery_charger",
+    rank: 100,
+    variant: {
+      productName: "Black+Decker 20V MAX cordless drill kit (with battery + charger)",
+      priceLow: 55,
+      priceHigh: 85,
+      affiliateUrl: "https://www.amazon.com/s?k=black+decker+20v+cordless+drill+kit&tag=alderprojects-20",
+      productSpec: "20V MAX lithium-ion. 1 battery + charger. ~$65. Adequate torque for residential use; struggles on hardwood and large fasteners. 2-3 year typical battery life with regular use."
+    },
+    tags: {
+      topics: [
+        "universal"
+      ],
+      roles: [
+        "tool",
+        "appliance"
+      ],
+      functions: [
+        "drill_driver"
+      ],
+      seasons: [
+        "year_round"
+      ],
+      propertyTypes: [],
+      conditions: [],
+      alreadyHaveFlag: "has_cordless_drill",
+      tier: "budget"
+    },
+    citations: [
+      "Wirecutter best cordless drill review",
+      "DeWalt DCD777 product documentation",
+      "Brushless vs brushed motor lifespan data"
+    ],
+    migratedFrom: {
+      scope: "universal_owner_kit",
+      slotId: "owner_drill_driver",
+      tier: "budget"
+    }
+  },
+  {
+    universeId: "owner_drill_driver__dewalt_dcd777_20v_max_brushless_drill_kit_2_batteries_charger",
+    rank: 100,
+    variant: {
+      productName: "DeWalt DCD777 20V MAX brushless drill kit (2 batteries + charger)",
+      priceLow: 145,
+      priceHigh: 195,
+      affiliateUrl: "https://www.amazon.com/s?k=dewalt+dcd777+20v+max+brushless+drill+kit&tag=alderprojects-20",
+      productSpec: "Brushless motor (longer life than brushed). 20V MAX. 2 batteries + fast charger + bag. ~$160. The DeWalt DCD777 is the verified Wirecutter pick for homeowner use. Brushless = 50% longer motor life and runtime than brushed equivalents."
+    },
+    tags: {
+      topics: [
+        "universal"
+      ],
+      roles: [
+        "tool",
+        "appliance"
+      ],
+      functions: [
+        "drill_driver"
+      ],
+      seasons: [
+        "year_round"
+      ],
+      propertyTypes: [],
+      conditions: [],
+      alreadyHaveFlag: "has_cordless_drill",
+      tier: "sweet_spot"
+    },
+    citations: [
+      "Wirecutter best cordless drill review",
+      "DeWalt DCD777 product documentation",
+      "Brushless vs brushed motor lifespan data"
+    ],
+    migratedFrom: {
+      scope: "universal_owner_kit",
+      slotId: "owner_drill_driver",
+      tier: "sweet_spot"
+    }
+  },
+  {
+    universeId: "owner_drill_driver__milwaukee_m18_fuel_drill_impact_driver_combo_kit",
+    rank: 100,
+    variant: {
+      productName: "Milwaukee M18 FUEL drill + impact driver combo kit",
+      priceLow: 280,
+      priceHigh: 420,
+      affiliateUrl: "https://www.amazon.com/s?k=milwaukee+m18+fuel+drill+impact+driver+combo&tag=alderprojects-20",
+      productSpec: "Pro-grade. Drill + impact driver in one kit. Significantly higher torque than DeWalt at homeowner tier. Worth it ONLY if you have ongoing serious projects (deck building, large carpentry)."
+    },
+    tags: {
+      topics: [
+        "universal"
+      ],
+      roles: [
+        "tool",
+        "appliance"
+      ],
+      functions: [
+        "drill_driver"
+      ],
+      seasons: [
+        "year_round"
+      ],
+      propertyTypes: [],
+      conditions: [],
+      alreadyHaveFlag: "has_cordless_drill",
+      tier: "premium"
+    },
+    citations: [
+      "Wirecutter best cordless drill review",
+      "DeWalt DCD777 product documentation",
+      "Brushless vs brushed motor lifespan data"
+    ],
+    migratedFrom: {
+      scope: "universal_owner_kit",
+      slotId: "owner_drill_driver",
+      tier: "premium"
+    }
+  },
+  {
+    universeId: "generic_100_piece_drill_bit_set",
+    rank: 100,
+    variant: {
+      productName: "Generic 100-piece drill bit set",
+      priceLow: 18,
+      priceHigh: 32,
+      affiliateUrl: "https://www.amazon.com/s?k=100+piece+drill+bit+set+homeowner&tag=alderprojects-20",
+      productSpec: "Mixed steel drill bits + driver bits in plastic case. 100+ pieces. Most are filler (rarely-needed sizes). The 8-12 you actually use are mid-quality; rest is decoration."
+    },
+    tags: {
+      topics: [
+        "universal"
+      ],
+      roles: [
+        "tool",
+        "consumable_material"
+      ],
+      functions: [
+        "drill_bit_set"
+      ],
+      seasons: [
+        "year_round"
+      ],
+      propertyTypes: [],
+      conditions: [],
+      alreadyHaveFlag: "has_drill_bits",
+      tier: "budget"
+    },
+    citations: [
+      "DeWalt titanium drill bit specifications",
+      "Wera driver bit reviews"
+    ],
+    migratedFrom: {
+      scope: "universal_owner_kit",
+      slotId: "owner_drill_bits",
+      tier: "budget"
+    }
+  },
+  {
+    universeId: "owner_drill_bits__dewalt_20_piece_titanium_drill_bit_set_30_piece_driver_bit_set",
+    rank: 100,
+    variant: {
+      productName: "DeWalt 20-piece titanium drill bit set + 30-piece driver bit set",
+      priceLow: 35,
+      priceHigh: 60,
+      affiliateUrl: "https://www.amazon.com/s?k=dewalt+titanium+drill+bit+set+driver+bit+set&tag=alderprojects-20",
+      productSpec: "Titanium-coated drill bits (longer life than uncoated). Pyramid-style driver bit set (Phillips, square, Torx). Pro-grade quality on the bits you actually use."
+    },
+    tags: {
+      topics: [
+        "universal"
+      ],
+      roles: [
+        "tool",
+        "consumable_material"
+      ],
+      functions: [
+        "drill_bit_set"
+      ],
+      seasons: [
+        "year_round"
+      ],
+      propertyTypes: [],
+      conditions: [],
+      alreadyHaveFlag: "has_drill_bits",
+      tier: "sweet_spot"
+    },
+    citations: [
+      "DeWalt titanium drill bit specifications",
+      "Wera driver bit reviews"
+    ],
+    migratedFrom: {
+      scope: "universal_owner_kit",
+      slotId: "owner_drill_bits",
+      tier: "sweet_spot"
+    }
+  },
+  {
+    universeId: "owner_drill_bits__dewalt_cobalt_drill_bit_set_wera_driver_bit_kit",
+    rank: 100,
+    variant: {
+      productName: "DeWalt cobalt drill bit set + Wera driver bit kit",
+      priceLow: 90,
+      priceHigh: 150,
+      affiliateUrl: "https://www.amazon.com/s?k=dewalt+cobalt+drill+bit+set+wera+driver+bits&tag=alderprojects-20",
+      productSpec: "Cobalt steel drill bits (cuts hardened materials, longer life). Wera driver bits — German-made, the cabinet-shop standard. Premium."
+    },
+    tags: {
+      topics: [
+        "universal"
+      ],
+      roles: [
+        "tool",
+        "consumable_material"
+      ],
+      functions: [
+        "drill_bit_set"
+      ],
+      seasons: [
+        "year_round"
+      ],
+      propertyTypes: [],
+      conditions: [],
+      alreadyHaveFlag: "has_drill_bits",
+      tier: "premium"
+    },
+    citations: [
+      "DeWalt titanium drill bit specifications",
+      "Wera driver bit reviews"
+    ],
+    migratedFrom: {
+      scope: "universal_owner_kit",
+      slotId: "owner_drill_bits",
+      tier: "premium"
+    }
+  },
+  {
+    universeId: "owner_level__stanley_fatmax_24_magnetic_level",
+    rank: 100,
+    variant: {
+      productName: "Stanley FatMax 24\" magnetic level",
+      priceLow: 25,
+      priceHigh: 38,
+      affiliateUrl: "https://www.amazon.com/s?k=stanley+fatmax+24+inch+magnetic+level&tag=alderprojects-20",
+      productSpec: "24-inch aluminum body. 3 vials (horizontal, vertical, 45°). Strong magnetic edge for steel surfaces. Stanley FatMax is the standard residential level. ~$30. Lifetime accuracy if not dropped on concrete."
+    },
+    tags: {
+      topics: [
+        "universal"
+      ],
+      roles: [
+        "measurement_tool",
+        "tool"
+      ],
+      functions: [
+        "level"
+      ],
+      seasons: [
+        "year_round"
+      ],
+      propertyTypes: [],
+      conditions: [],
+      alreadyHaveFlag: "has_level",
+      tier: "sweet_spot"
+    },
+    citations: [
+      "Stanley FatMax product line documentation",
+      "Carpenter level calibration testing"
+    ],
+    migratedFrom: {
+      scope: "universal_owner_kit",
+      slotId: "owner_level",
+      tier: "sweet_spot"
+    }
+  },
+  {
+    universeId: "owner_stud_finder__franklin_sensors_prosensor_710_stud_finder",
+    rank: 100,
+    variant: {
+      productName: "Franklin Sensors ProSensor 710 stud finder",
+      priceLow: 45,
+      priceHigh: 65,
+      affiliateUrl: "https://www.amazon.com/s?k=franklin+sensors+prosensor+710+stud+finder&tag=alderprojects-20",
+      productSpec: "Multi-sensor (no calibration required). Detects studs through standard drywall. Wirecutter pick for residential use. ~$50. Battery-powered (1 9V battery)."
+    },
+    tags: {
+      topics: [
+        "universal"
+      ],
+      roles: [
+        "sensor",
+        "measurement_tool"
+      ],
+      functions: [
+        "stud_finder"
+      ],
+      seasons: [
+        "year_round"
+      ],
+      propertyTypes: [],
+      conditions: [],
+      alreadyHaveFlag: "has_stud_finder",
+      tier: "sweet_spot"
+    },
+    citations: [
+      "Wirecutter best stud finder review",
+      "Franklin Sensors product documentation"
+    ],
+    migratedFrom: {
+      scope: "universal_owner_kit",
+      slotId: "owner_stud_finder",
+      tier: "sweet_spot"
+    }
+  },
+  {
+    universeId: "owner_tape_measure__stanley_fatmax_25_foot_tape_measure",
+    rank: 100,
+    variant: {
+      productName: "Stanley FatMax 25-foot tape measure",
+      priceLow: 18,
+      priceHigh: 28,
+      affiliateUrl: "https://www.amazon.com/s?k=stanley+fatmax+25+foot+tape+measure&tag=alderprojects-20",
+      productSpec: "25-foot length. 1.25\" wide blade with 11-foot standout (extends 11 feet without bending). Belt clip, magnetic tip, BladeArmor coating. Stanley FatMax is the residential standard."
+    },
+    tags: {
+      topics: [
+        "universal"
+      ],
+      roles: [
+        "measurement_tool",
+        "tool"
+      ],
+      functions: [
+        "tape_measure"
+      ],
+      seasons: [
+        "year_round"
+      ],
+      propertyTypes: [],
+      conditions: [],
+      alreadyHaveFlag: "has_tape_measure",
+      tier: "sweet_spot"
+    },
+    citations: [
+      "Stanley FatMax tape measure documentation"
+    ],
+    migratedFrom: {
+      scope: "universal_owner_kit",
+      slotId: "owner_tape_measure",
+      tier: "sweet_spot"
+    }
+  },
+  {
+    universeId: "owner_utility_knife__milwaukee_fastback_folding_utility_knife_100_pack_blades",
+    rank: 100,
+    variant: {
+      productName: "Milwaukee FastBack folding utility knife + 100-pack blades",
+      priceLow: 28,
+      priceHigh: 42,
+      affiliateUrl: "https://www.amazon.com/s?k=milwaukee+fastback+utility+knife+100+pack+blades&tag=alderprojects-20",
+      productSpec: "Folding utility knife with quick-blade-change. Pocket-friendly. 100-pack of replacement blades. Milwaukee is the cabinet-shop standard. ~$15 knife + ~$20 blades."
+    },
+    tags: {
+      topics: [
+        "universal"
+      ],
+      roles: [
+        "tool"
+      ],
+      functions: [
+        "utility_knife"
+      ],
+      seasons: [
+        "year_round"
+      ],
+      propertyTypes: [],
+      conditions: [],
+      alreadyHaveFlag: "has_utility_knife",
+      tier: "sweet_spot"
+    },
+    citations: [
+      "Milwaukee FastBack product documentation"
+    ],
+    migratedFrom: {
+      scope: "universal_owner_kit",
+      slotId: "owner_utility_knife",
+      tier: "sweet_spot"
+    }
+  },
+  {
+    universeId: "owner_caulk_gun__newborn_brothers_250_steel_skeleton_caulk_gun",
+    rank: 100,
+    variant: {
+      productName: "Newborn Brothers 250 steel skeleton caulk gun",
+      priceLow: 18,
+      priceHigh: 28,
+      affiliateUrl: "https://www.amazon.com/s?k=newborn+brothers+250+caulk+gun&tag=alderprojects-20",
+      productSpec: "Steel skeleton frame, 10:1 thrust ratio. Drip-free design. Pro-grade construction. ~$22. Used by professional caulkers and tile setters."
+    },
+    tags: {
+      topics: [
+        "universal"
+      ],
+      roles: [
+        "consumable_material"
+      ],
+      functions: [
+        "caulk_gun"
+      ],
+      seasons: [
+        "year_round"
+      ],
+      propertyTypes: [],
+      conditions: [],
+      alreadyHaveFlag: "has_caulk_gun",
+      tier: "sweet_spot"
+    },
+    citations: [
+      "Newborn Brothers product line documentation"
+    ],
+    migratedFrom: {
+      scope: "universal_owner_kit",
+      slotId: "owner_caulk_gun",
+      tier: "sweet_spot"
+    }
+  },
+  {
+    universeId: "owner_multitool__dewalt_dcs354_20v_max_brushless_oscillating_multi_tool_bare_tool",
+    rank: 100,
+    variant: {
+      productName: "DeWalt DCS354 20V MAX brushless oscillating multi-tool (bare tool)",
+      priceLow: 130,
+      priceHigh: 180,
+      affiliateUrl: "https://www.amazon.com/s?k=dewalt+dcs354+20v+max+oscillating+multi+tool&tag=alderprojects-20",
+      productSpec: "Brushless oscillating multi-tool. Cuts, sands, scrapes, plunges. Universal blade interface. Bare tool (uses your existing DeWalt 20V battery). ~$150."
+    },
+    tags: {
+      topics: [
+        "universal"
+      ],
+      roles: [
+        "tool",
+        "appliance"
+      ],
+      functions: [
+        "oscillating_multitool"
+      ],
+      seasons: [
+        "year_round"
+      ],
+      propertyTypes: [],
+      conditions: [],
+      alreadyHaveFlag: "has_oscillating_multitool",
+      tier: "sweet_spot"
+    },
+    citations: [
+      "DeWalt DCS354 product documentation"
+    ],
+    migratedFrom: {
+      scope: "universal_owner_kit",
+      slotId: "owner_multitool",
+      tier: "sweet_spot"
+    }
+  },
+  {
+    universeId: "owner_fastener_kit__drywall_anchor_kit_screw_assortment_deck_wood_sheetmetal_screws",
+    rank: 100,
+    variant: {
+      productName: "Drywall anchor kit + screw assortment (deck/wood/sheetmetal screws)",
+      priceLow: 35,
+      priceHigh: 55,
+      affiliateUrl: "https://www.amazon.com/s?k=drywall+anchor+kit+screw+assortment+homeowner&tag=alderprojects-20",
+      productSpec: "Plastic toggle anchors (50+), self-drilling drywall anchors (25+), wood screws (#6, #8 in various lengths), exterior deck screws, sheet metal screws. ~$40 for 200+ pieces. Covers residential mounting and small repair needs."
+    },
+    tags: {
+      topics: [
+        "universal"
+      ],
+      roles: [
+        "hardware",
+        "consumable_material"
+      ],
+      functions: [
+        "fastener_kit"
+      ],
+      seasons: [
+        "year_round"
+      ],
+      propertyTypes: [],
+      conditions: [],
+      alreadyHaveFlag: "has_fastener_kit",
+      tier: "sweet_spot"
+    },
+    citations: [
+      "Residential fastener kit composition guidance"
+    ],
+    migratedFrom: {
+      scope: "universal_owner_kit",
+      slotId: "owner_fastener_kit",
+      tier: "sweet_spot"
+    }
+  },
+  {
+    universeId: "owner_work_light__dewalt_20v_max_led_work_light_coast_headlamp",
+    rank: 100,
+    variant: {
+      productName: "DeWalt 20V MAX LED work light + Coast headlamp",
+      priceLow: 60,
+      priceHigh: 100,
+      affiliateUrl: "https://www.amazon.com/s?k=dewalt+20v+max+led+work+light+coast+headlamp&tag=alderprojects-20",
+      productSpec: "DeWalt LED work light (uses 20V MAX battery from your drill — no separate battery needed) ~$45. Coast HL7 or HL8 headlamp ~$30 — for hands-free work in dark spaces (basements, attics, under sinks)."
+    },
+    tags: {
+      topics: [
+        "universal"
+      ],
+      roles: [
+        "lighting",
+        "tool"
+      ],
+      functions: [
+        "work_light"
+      ],
+      seasons: [
+        "year_round"
+      ],
+      propertyTypes: [],
+      conditions: [],
+      alreadyHaveFlag: "has_work_light",
+      tier: "sweet_spot"
+    },
+    citations: [
+      "DeWalt 20V MAX work light documentation",
+      "Coast HL7/HL8 headlamp specifications"
+    ],
+    migratedFrom: {
+      scope: "universal_owner_kit",
+      slotId: "owner_work_light",
+      tier: "sweet_spot"
+    }
+  },
 ]

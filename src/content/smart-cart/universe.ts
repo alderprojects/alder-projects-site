@@ -5225,4 +5225,1967 @@ export const UNIVERSE: UniverseProduct[] = [
       tier: "sweet_spot"
     }
   },
+  {
+    universeId: "water_bacteria_test__coliform_e_coli_well_water_bacteria_test_kit",
+    rank: 100,
+    variant: {
+      productName: "Coliform/E. coli well water bacteria test kit",
+      priceLow: 28,
+      priceHigh: 45,
+      affiliateUrl: "https://www.amazon.com/s?k=coliform+e+coli+well+water+bacteria+test+kit&tag=alderprojects-20",
+      productSpec: "Mail-in or 48-hour incubation kit for total coliform and E. coli detection. Useful as standalone bacteria test between full lab panels (annual full + every 6 months bacteria)."
+    },
+    tags: {
+      topics: [
+        "home_repair"
+      ],
+      roles: [
+        "measurement_tool",
+        "safety_item"
+      ],
+      functions: [
+        "bacteria_test_kit"
+      ],
+      seasons: [
+        "year_round"
+      ],
+      propertyTypes: [],
+      conditions: [],
+      alreadyHaveFlag: "has_recent_bacteria_test",
+      tier: "sweet_spot"
+    },
+    citations: [
+      "Vermont DEC private well bacteria testing guidance"
+    ],
+    migratedFrom: {
+      scope: "home_water_quality",
+      slotId: "water_bacteria_test",
+      tier: "sweet_spot"
+    }
+  },
+  {
+    universeId: "generic_brand_fridge_filter_compatible_with_major_brands",
+    rank: 100,
+    variant: {
+      productName: "Generic-brand fridge filter compatible with major brands",
+      priceLow: 12,
+      priceHigh: 25,
+      affiliateUrl: "https://www.amazon.com/s?k=refrigerator+water+filter+compatible+samsung+lg+whirlpool&tag=alderprojects-20",
+      productSpec: "Aftermarket fridge filter compatible with Samsung, LG, Whirlpool, and other brand-specific filter housings. Carbon-based filtration. ~50% cost of OEM."
+    },
+    tags: {
+      topics: [
+        "home_repair"
+      ],
+      roles: [
+        "consumable_material"
+      ],
+      functions: [
+        "fridge_filter"
+      ],
+      seasons: [
+        "year_round"
+      ],
+      propertyTypes: [],
+      conditions: [],
+      alreadyHaveFlag: "has_fridge_filter_compatible",
+      tier: "budget"
+    },
+    citations: [
+      "NSF certification standards for refrigerator filters"
+    ],
+    migratedFrom: {
+      scope: "home_water_quality",
+      slotId: "water_fridge_filter",
+      tier: "budget"
+    }
+  },
+  {
+    universeId: "water_fridge_filter__oem_fridge_filter_samsung_haf_cin_lg_lt700p_etc",
+    rank: 100,
+    variant: {
+      productName: "OEM fridge filter (Samsung HAF-CIN, LG LT700P, etc.)",
+      priceLow: 35,
+      priceHigh: 65,
+      affiliateUrl: "https://www.amazon.com/s?k=samsung+haf+cin+lg+lt700p+oem+refrigerator+filter&tag=alderprojects-20",
+      productSpec: "Original-equipment filter from your refrigerator manufacturer. NSF-certified for the specific contaminants the filter is designed to remove. Tested fit with no leaks. 6-month replacement cycle."
+    },
+    tags: {
+      topics: [
+        "home_repair"
+      ],
+      roles: [
+        "consumable_material"
+      ],
+      functions: [
+        "fridge_filter"
+      ],
+      seasons: [
+        "year_round"
+      ],
+      propertyTypes: [],
+      conditions: [],
+      alreadyHaveFlag: "has_fridge_filter_compatible",
+      tier: "sweet_spot"
+    },
+    citations: [
+      "NSF certification standards for refrigerator filters"
+    ],
+    migratedFrom: {
+      scope: "home_water_quality",
+      slotId: "water_fridge_filter",
+      tier: "sweet_spot"
+    }
+  },
+  {
+    universeId: "water_drinking_filter__brita_standard_10_cup_pitcher_with_filter",
+    rank: 100,
+    variant: {
+      productName: "Brita Standard 10-cup pitcher with filter",
+      priceLow: 25,
+      priceHigh: 38,
+      affiliateUrl: "https://www.amazon.com/s?k=brita+standard+10+cup+pitcher&tag=alderprojects-20",
+      productSpec: "Brita pitcher with standard activated carbon filter. NSF certified for chlorine, taste, odor, mercury, copper, zinc. Does NOT remove lead, arsenic, or bacteria. 40-gallon filter life."
+    },
+    tags: {
+      topics: [
+        "home_repair"
+      ],
+      roles: [
+        "appliance",
+        "consumable_material"
+      ],
+      functions: [
+        "drinking_water_filter"
+      ],
+      seasons: [
+        "year_round"
+      ],
+      propertyTypes: [],
+      conditions: [],
+      alreadyHaveFlag: "has_drinking_water_filter",
+      tier: "budget"
+    },
+    citations: [
+      "NSF certification standards for drinking water pitchers",
+      "ZeroWater contaminant reduction documentation",
+      "Aquasana AQ-5300+ specifications"
+    ],
+    migratedFrom: {
+      scope: "home_water_quality",
+      slotId: "water_drinking_filter",
+      tier: "budget"
+    }
+  },
+  {
+    universeId: "water_drinking_filter__zerowater_10_cup_pitcher_with_tds_meter",
+    rank: 100,
+    variant: {
+      productName: "ZeroWater 10-cup pitcher with TDS meter",
+      priceLow: 38,
+      priceHigh: 65,
+      affiliateUrl: "https://www.amazon.com/s?k=zerowater+10+cup+pitcher+tds+meter&tag=alderprojects-20",
+      productSpec: "5-stage ion exchange + activated carbon. Certified to reduce lead, chromium, mercury, fluoride, plus all the items Brita addresses. TDS meter included shows when filter is exhausted. 20-30 gallon filter life (shorter than Brita due to deeper filtration)."
+    },
+    tags: {
+      topics: [
+        "home_repair"
+      ],
+      roles: [
+        "appliance",
+        "consumable_material"
+      ],
+      functions: [
+        "drinking_water_filter"
+      ],
+      seasons: [
+        "year_round"
+      ],
+      propertyTypes: [],
+      conditions: [],
+      alreadyHaveFlag: "has_drinking_water_filter",
+      tier: "sweet_spot"
+    },
+    citations: [
+      "NSF certification standards for drinking water pitchers",
+      "ZeroWater contaminant reduction documentation",
+      "Aquasana AQ-5300+ specifications"
+    ],
+    migratedFrom: {
+      scope: "home_water_quality",
+      slotId: "water_drinking_filter",
+      tier: "sweet_spot"
+    }
+  },
+  {
+    universeId: "water_drinking_filter__aquasana_aq_5300_3_stage_under_sink_filter_system",
+    rank: 100,
+    variant: {
+      productName: "Aquasana AQ-5300+ 3-stage under-sink filter system",
+      priceLow: 130,
+      priceHigh: 195,
+      affiliateUrl: "https://www.amazon.com/s?k=aquasana+aq+5300+under+sink+filter+3+stage&tag=alderprojects-20",
+      productSpec: "Under-sink installation with dedicated faucet. 3-stage filtration. NSF certified for 77 contaminants including lead, asbestos, chlorine, chloramines, and more. 600-gallon filter life. Installation requires basic plumbing."
+    },
+    tags: {
+      topics: [
+        "home_repair"
+      ],
+      roles: [
+        "appliance",
+        "consumable_material"
+      ],
+      functions: [
+        "drinking_water_filter"
+      ],
+      seasons: [
+        "year_round"
+      ],
+      propertyTypes: [],
+      conditions: [],
+      alreadyHaveFlag: "has_drinking_water_filter",
+      tier: "premium"
+    },
+    citations: [
+      "NSF certification standards for drinking water pitchers",
+      "ZeroWater contaminant reduction documentation",
+      "Aquasana AQ-5300+ specifications"
+    ],
+    migratedFrom: {
+      scope: "home_water_quality",
+      slotId: "water_drinking_filter",
+      tier: "premium"
+    }
+  },
+  {
+    universeId: "water_filter_wrench__standard_10_filter_housing_wrench_spare_o_ring_kit",
+    rank: 100,
+    variant: {
+      productName: "Standard 10\" filter housing wrench + spare O-ring kit",
+      priceLow: 12,
+      priceHigh: 22,
+      affiliateUrl: "https://www.amazon.com/s?k=10+inch+filter+housing+wrench+o+ring&tag=alderprojects-20",
+      productSpec: "Plastic wrench sized for standard 10\" filter housings + 2 spare O-rings + silicone grease packet. ~$15. The O-rings are the failure point — they go bad before the housing."
+    },
+    tags: {
+      topics: [
+        "home_repair"
+      ],
+      roles: [
+        "tool"
+      ],
+      functions: [
+        "filter_wrench"
+      ],
+      seasons: [
+        "year_round"
+      ],
+      propertyTypes: [],
+      conditions: [],
+      alreadyHaveFlag: "has_filter_wrench",
+      tier: "sweet_spot"
+    },
+    citations: [
+      "Filter housing maintenance guidance"
+    ],
+    migratedFrom: {
+      scope: "home_water_quality",
+      slotId: "water_filter_wrench",
+      tier: "sweet_spot"
+    }
+  },
+  {
+    universeId: "water_pressure_gauge__hose_bib_mount_water_pressure_gauge_0_200_psi",
+    rank: 100,
+    variant: {
+      productName: "Hose-bib mount water pressure gauge (0-200 PSI)",
+      priceLow: 10,
+      priceHigh: 18,
+      affiliateUrl: "https://www.amazon.com/s?k=hose+bib+water+pressure+gauge&tag=alderprojects-20",
+      productSpec: "3/4\" garden-hose-thread fitting. 0-200 PSI dial gauge. Screw onto any hose bib for instant pressure read. Lasts 10+ years."
+    },
+    tags: {
+      topics: [
+        "home_repair"
+      ],
+      roles: [
+        "measurement_tool",
+        "tool"
+      ],
+      functions: [
+        "pressure_gauge"
+      ],
+      seasons: [
+        "year_round"
+      ],
+      propertyTypes: [],
+      conditions: [],
+      alreadyHaveFlag: "has_pressure_gauge",
+      tier: "sweet_spot"
+    },
+    citations: [
+      "Water pressure diagnosis guidance"
+    ],
+    migratedFrom: {
+      scope: "home_water_quality",
+      slotId: "water_pressure_gauge",
+      tier: "sweet_spot"
+    }
+  },
+  {
+    universeId: "generic_1_2_nylon_double_braid_dock_line_25_ft_single",
+    rank: 100,
+    variant: {
+      productName: "Generic 1/2\" nylon double-braid dock line, 25 ft (single)",
+      priceLow: 15,
+      priceHigh: 25,
+      affiliateUrl: "https://www.amazon.com/s?k=nylon+double+braid+dock+line+25+foot&tag=alderprojects-20",
+      productSpec: "1/2\" diameter nylon. 25 ft length with eye-spliced loop. Generic brand. Single. Adequate for small boats or temporary mooring."
+    },
+    tags: {
+      topics: [
+        "outdoor"
+      ],
+      roles: [
+        "hardware",
+        "safety_item"
+      ],
+      functions: [
+        "dock_lines"
+      ],
+      seasons: [
+        "summer",
+        "opening_season",
+        "spring"
+      ],
+      propertyTypes: [
+        "lake"
+      ],
+      conditions: [],
+      alreadyHaveFlag: "has_dock_lines",
+      tier: "budget"
+    },
+    citations: [
+      "New England Ropes product documentation",
+      "Marine line sizing standards"
+    ],
+    migratedFrom: {
+      scope: "outdoor_dock_lake",
+      slotId: "dock_lines",
+      tier: "budget"
+    }
+  },
+  {
+    universeId: "dock_lines__new_england_ropes_5_8_double_braid_dock_lines_4_pack_25_ft",
+    rank: 100,
+    variant: {
+      productName: "New England Ropes 5/8\" double-braid dock lines (4-pack, 25 ft)",
+      priceLow: 95,
+      priceHigh: 145,
+      affiliateUrl: "https://www.amazon.com/s?k=new+england+ropes+dock+line+5+8+inch+4+pack&tag=alderprojects-20",
+      productSpec: "5/8\" diameter premium-grade marine rope. 25 ft length with eye-spliced loops. 4-pack covers a typical boat (bow, stern, two springs). New England Ropes is the marine industry standard. Resists UV, mildew, and stretching."
+    },
+    tags: {
+      topics: [
+        "outdoor"
+      ],
+      roles: [
+        "hardware",
+        "safety_item"
+      ],
+      functions: [
+        "dock_lines"
+      ],
+      seasons: [
+        "summer",
+        "opening_season",
+        "spring"
+      ],
+      propertyTypes: [
+        "lake"
+      ],
+      conditions: [],
+      alreadyHaveFlag: "has_dock_lines",
+      tier: "sweet_spot"
+    },
+    citations: [
+      "New England Ropes product documentation",
+      "Marine line sizing standards"
+    ],
+    migratedFrom: {
+      scope: "outdoor_dock_lake",
+      slotId: "dock_lines",
+      tier: "sweet_spot"
+    }
+  },
+  {
+    universeId: "dock_lines__yale_cordage_sterling_lite_high_modulus_dock_line_set",
+    rank: 100,
+    variant: {
+      productName: "Yale Cordage Sterling Lite High-Modulus Dock Line set",
+      priceLow: 220,
+      priceHigh: 380,
+      affiliateUrl: "https://www.amazon.com/s?k=yale+cordage+sterling+lite+dock+line&tag=alderprojects-20",
+      productSpec: "Pro-grade marine cordage. Dyneema-core for minimum stretch. Used on commercial boats and racing yachts. ~5x cost of standard nylon for ~3x the lifespan plus precise mooring."
+    },
+    tags: {
+      topics: [
+        "outdoor"
+      ],
+      roles: [
+        "hardware",
+        "safety_item"
+      ],
+      functions: [
+        "dock_lines"
+      ],
+      seasons: [
+        "summer",
+        "opening_season",
+        "spring"
+      ],
+      propertyTypes: [
+        "lake"
+      ],
+      conditions: [],
+      alreadyHaveFlag: "has_dock_lines",
+      tier: "premium"
+    },
+    citations: [
+      "New England Ropes product documentation",
+      "Marine line sizing standards"
+    ],
+    migratedFrom: {
+      scope: "outdoor_dock_lake",
+      slotId: "dock_lines",
+      tier: "premium"
+    }
+  },
+  {
+    universeId: "generic_vinyl_boat_fenders_4_pack",
+    rank: 100,
+    variant: {
+      productName: "Generic vinyl boat fenders (4-pack)",
+      priceLow: 35,
+      priceHigh: 65,
+      affiliateUrl: "https://www.amazon.com/s?k=boat+fenders+vinyl+4+pack&tag=alderprojects-20",
+      productSpec: "Inflatable vinyl fenders, ~6.5\" x 23\". 4-pack with hanging lines. Adequate for small boats; ~3-5 year life in Vermont sun."
+    },
+    tags: {
+      topics: [
+        "outdoor"
+      ],
+      roles: [
+        "hardware",
+        "safety_item"
+      ],
+      functions: [
+        "dock_bumpers"
+      ],
+      seasons: [
+        "summer",
+        "opening_season",
+        "spring"
+      ],
+      propertyTypes: [
+        "lake"
+      ],
+      conditions: [],
+      alreadyHaveFlag: "has_dock_bumpers",
+      tier: "budget"
+    },
+    citations: [
+      "Taylor Made marine product documentation",
+      "Boat fender material durability"
+    ],
+    migratedFrom: {
+      scope: "outdoor_dock_lake",
+      slotId: "dock_bumpers",
+      tier: "budget"
+    }
+  },
+  {
+    universeId: "dock_bumpers__taylor_made_hull_bumper_dock_bumper_combo",
+    rank: 100,
+    variant: {
+      productName: "Taylor Made hull bumper / dock bumper combo",
+      priceLow: 80,
+      priceHigh: 145,
+      affiliateUrl: "https://www.amazon.com/s?k=taylor+made+hull+bumper+dock&tag=alderprojects-20",
+      productSpec: "Marine-grade closed-cell vinyl. UV-stable. 6\"-8\" diameter sizes available. Mounts on boat or dock. Lasts 8-10 years in normal use. Taylor Made is the marine standard."
+    },
+    tags: {
+      topics: [
+        "outdoor"
+      ],
+      roles: [
+        "hardware",
+        "safety_item"
+      ],
+      functions: [
+        "dock_bumpers"
+      ],
+      seasons: [
+        "summer",
+        "opening_season",
+        "spring"
+      ],
+      propertyTypes: [
+        "lake"
+      ],
+      conditions: [],
+      alreadyHaveFlag: "has_dock_bumpers",
+      tier: "sweet_spot"
+    },
+    citations: [
+      "Taylor Made marine product documentation",
+      "Boat fender material durability"
+    ],
+    migratedFrom: {
+      scope: "outdoor_dock_lake",
+      slotId: "dock_bumpers",
+      tier: "sweet_spot"
+    }
+  },
+  {
+    universeId: "dock_bumpers__polyform_g_series_fender_set_with_line_bag",
+    rank: 100,
+    variant: {
+      productName: "Polyform G-series fender set with line bag",
+      priceLow: 200,
+      priceHigh: 320,
+      affiliateUrl: "https://www.amazon.com/s?k=polyform+g+series+fender+set&tag=alderprojects-20",
+      productSpec: "Premium marine fenders. Highly UV-resistant. Inflatable for storage. Used on commercial and high-end recreational boats."
+    },
+    tags: {
+      topics: [
+        "outdoor"
+      ],
+      roles: [
+        "hardware",
+        "safety_item"
+      ],
+      functions: [
+        "dock_bumpers"
+      ],
+      seasons: [
+        "summer",
+        "opening_season",
+        "spring"
+      ],
+      propertyTypes: [
+        "lake"
+      ],
+      conditions: [],
+      alreadyHaveFlag: "has_dock_bumpers",
+      tier: "premium"
+    },
+    citations: [
+      "Taylor Made marine product documentation",
+      "Boat fender material durability"
+    ],
+    migratedFrom: {
+      scope: "outdoor_dock_lake",
+      slotId: "dock_bumpers",
+      tier: "premium"
+    }
+  },
+  {
+    universeId: "dock_marine_hardware__316_stainless_steel_marine_bolts_nuts_washers_assortment",
+    rank: 100,
+    variant: {
+      productName: "316 stainless steel marine bolts + nuts + washers (assortment)",
+      priceLow: 38,
+      priceHigh: 65,
+      affiliateUrl: "https://www.amazon.com/s?k=316+stainless+steel+marine+hardware+bolt+nut+washer&tag=alderprojects-20",
+      productSpec: "316 marine-grade stainless steel. ~50-piece assortment of common sizes (1/4\", 5/16\", 3/8\" diameter, 1\" to 4\" lengths). Fits most cleats, eye bolts, dock hardware. 316 is the marine standard — does NOT corrode in freshwater or saltwater."
+    },
+    tags: {
+      topics: [
+        "outdoor"
+      ],
+      roles: [
+        "hardware"
+      ],
+      functions: [
+        "marine_hardware"
+      ],
+      seasons: [
+        "summer",
+        "opening_season",
+        "spring"
+      ],
+      propertyTypes: [
+        "lake"
+      ],
+      conditions: [],
+      alreadyHaveFlag: "has_marine_hardware",
+      tier: "sweet_spot"
+    },
+    citations: [
+      "316 stainless steel marine corrosion testing",
+      "Dock hardware standards"
+    ],
+    migratedFrom: {
+      scope: "outdoor_dock_lake",
+      slotId: "dock_marine_hardware",
+      tier: "sweet_spot"
+    }
+  },
+  {
+    universeId: "generic_solar_dock_lights_4_pack",
+    rank: 100,
+    variant: {
+      productName: "Generic solar dock lights (4-pack)",
+      priceLow: 25,
+      priceHigh: 50,
+      affiliateUrl: "https://www.amazon.com/s?k=solar+dock+lights+4+pack&tag=alderprojects-20",
+      productSpec: "Solar-powered LED dock edge lights. Adhesive or screw mount. Auto-on at dusk. Battery degrades within 1-2 seasons. Cheap, but high replacement frequency."
+    },
+    tags: {
+      topics: [
+        "outdoor"
+      ],
+      roles: [
+        "lighting"
+      ],
+      functions: [
+        "dock_lighting"
+      ],
+      seasons: [
+        "summer",
+        "opening_season",
+        "spring"
+      ],
+      propertyTypes: [
+        "lake"
+      ],
+      conditions: [],
+      alreadyHaveFlag: "has_dock_lighting",
+      tier: "budget"
+    },
+    citations: [
+      "Dock Edge product documentation",
+      "Marine LED lighting durability"
+    ],
+    migratedFrom: {
+      scope: "outdoor_dock_lake",
+      slotId: "dock_lighting",
+      tier: "budget"
+    }
+  },
+  {
+    universeId: "dock_lighting__dock_edge_led_rope_lighting_kit_low_voltage_50_ft",
+    rank: 100,
+    variant: {
+      productName: "Dock Edge LED rope lighting kit (low-voltage, 50 ft)",
+      priceLow: 95,
+      priceHigh: 165,
+      affiliateUrl: "https://www.amazon.com/s?k=dock+edge+led+rope+lighting+50+ft&tag=alderprojects-20",
+      productSpec: "Low-voltage 12V LED rope. 50 ft length. Marine-rated waterproof connectors. Plug-in transformer. Dusk-to-dawn timer included. 5-7 year life. Dock Edge is the marine industry standard for residential dock lighting."
+    },
+    tags: {
+      topics: [
+        "outdoor"
+      ],
+      roles: [
+        "lighting"
+      ],
+      functions: [
+        "dock_lighting"
+      ],
+      seasons: [
+        "summer",
+        "opening_season",
+        "spring"
+      ],
+      propertyTypes: [
+        "lake"
+      ],
+      conditions: [],
+      alreadyHaveFlag: "has_dock_lighting",
+      tier: "sweet_spot"
+    },
+    citations: [
+      "Dock Edge product documentation",
+      "Marine LED lighting durability"
+    ],
+    migratedFrom: {
+      scope: "outdoor_dock_lake",
+      slotId: "dock_lighting",
+      tier: "sweet_spot"
+    }
+  },
+  {
+    universeId: "dock_lighting__hardwired_marine_led_dock_lights_with_motion_sensor",
+    rank: 100,
+    variant: {
+      productName: "Hardwired marine LED dock lights with motion sensor",
+      priceLow: 280,
+      priceHigh: 480,
+      affiliateUrl: "https://www.amazon.com/s?k=hardwired+marine+led+dock+lights+motion+sensor&tag=alderprojects-20",
+      productSpec: "Hardwired (requires electrician), motion-activated marine LED fixtures. Used on commercial docks. ~10-year service life."
+    },
+    tags: {
+      topics: [
+        "outdoor"
+      ],
+      roles: [
+        "lighting"
+      ],
+      functions: [
+        "dock_lighting"
+      ],
+      seasons: [
+        "summer",
+        "opening_season",
+        "spring"
+      ],
+      propertyTypes: [
+        "lake"
+      ],
+      conditions: [],
+      alreadyHaveFlag: "has_dock_lighting",
+      tier: "premium"
+    },
+    citations: [
+      "Dock Edge product documentation",
+      "Marine LED lighting durability"
+    ],
+    migratedFrom: {
+      scope: "outdoor_dock_lake",
+      slotId: "dock_lighting",
+      tier: "premium"
+    }
+  },
+  {
+    universeId: "generic_4_step_dock_ladder_telescoping",
+    rank: 100,
+    variant: {
+      productName: "Generic 4-step dock ladder (telescoping)",
+      priceLow: 65,
+      priceHigh: 110,
+      affiliateUrl: "https://www.amazon.com/s?k=dock+ladder+4+step+telescoping&tag=alderprojects-20",
+      productSpec: "Aluminum 4-step telescoping ladder. ~150 lb capacity. Mounts to dock edge. Adequate for kids and adult use; flex under load."
+    },
+    tags: {
+      topics: [
+        "outdoor"
+      ],
+      roles: [
+        "hardware",
+        "safety_item"
+      ],
+      functions: [
+        "dock_ladder"
+      ],
+      seasons: [
+        "summer",
+        "opening_season",
+        "spring"
+      ],
+      propertyTypes: [
+        "lake"
+      ],
+      conditions: [],
+      alreadyHaveFlag: "has_dock_ladder",
+      tier: "budget"
+    },
+    citations: [
+      "JIF Marine product documentation",
+      "Dock ladder safety standards"
+    ],
+    migratedFrom: {
+      scope: "outdoor_dock_lake",
+      slotId: "dock_ladder",
+      tier: "budget"
+    }
+  },
+  {
+    universeId: "dock_ladder__jif_marine_5_step_heavy_duty_ladder_with_poly_steps",
+    rank: 100,
+    variant: {
+      productName: "JIF Marine 5-step heavy-duty ladder with poly steps",
+      priceLow: 185,
+      priceHigh: 270,
+      affiliateUrl: "https://www.amazon.com/s?k=jif+marine+5+step+heavy+duty+dock+ladder&tag=alderprojects-20",
+      productSpec: "Welded aluminum frame, polyethylene steps (warmer underfoot than aluminum), 350 lb capacity, 5-step depth handles deeper water. Lifetime warranty on frame. JIF Marine is the marine industry standard."
+    },
+    tags: {
+      topics: [
+        "outdoor"
+      ],
+      roles: [
+        "hardware",
+        "safety_item"
+      ],
+      functions: [
+        "dock_ladder"
+      ],
+      seasons: [
+        "summer",
+        "opening_season",
+        "spring"
+      ],
+      propertyTypes: [
+        "lake"
+      ],
+      conditions: [],
+      alreadyHaveFlag: "has_dock_ladder",
+      tier: "sweet_spot"
+    },
+    citations: [
+      "JIF Marine product documentation",
+      "Dock ladder safety standards"
+    ],
+    migratedFrom: {
+      scope: "outdoor_dock_lake",
+      slotId: "dock_ladder",
+      tier: "sweet_spot"
+    }
+  },
+  {
+    universeId: "dock_ladder__custom_welded_stainless_steel_ladder_with_grab_handles",
+    rank: 100,
+    variant: {
+      productName: "Custom welded stainless steel ladder with grab handles",
+      priceLow: 450,
+      priceHigh: 800,
+      affiliateUrl: "https://www.amazon.com/s?k=stainless+steel+dock+ladder+custom+grab+handle&tag=alderprojects-20",
+      productSpec: "Custom-fabricated marine stainless. Premium aesthetic and lifespan. 30+ year service life."
+    },
+    tags: {
+      topics: [
+        "outdoor"
+      ],
+      roles: [
+        "hardware",
+        "safety_item"
+      ],
+      functions: [
+        "dock_ladder"
+      ],
+      seasons: [
+        "summer",
+        "opening_season",
+        "spring"
+      ],
+      propertyTypes: [
+        "lake"
+      ],
+      conditions: [],
+      alreadyHaveFlag: "has_dock_ladder",
+      tier: "premium"
+    },
+    citations: [
+      "JIF Marine product documentation",
+      "Dock ladder safety standards"
+    ],
+    migratedFrom: {
+      scope: "outdoor_dock_lake",
+      slotId: "dock_ladder",
+      tier: "premium"
+    }
+  },
+  {
+    universeId: "dock_mildew_cleaner__30_hydrogen_peroxide_outdoor_cleaner_or_wet_forget_concentrate",
+    rank: 100,
+    variant: {
+      productName: "30% Hydrogen peroxide outdoor cleaner OR Wet & Forget concentrate",
+      priceLow: 22,
+      priceHigh: 40,
+      affiliateUrl: "https://www.amazon.com/s?k=wet+and+forget+outdoor+cleaner+concentrate&tag=alderprojects-20",
+      productSpec: "Wet & Forget is a no-rinse outdoor cleaner. 32 oz concentrate makes ~5 gallons of usable solution. Apply, walk away, rain rinses it. Effective on dock boards, vinyl furniture, fabric. ~$30 covers full dock area."
+    },
+    tags: {
+      topics: [
+        "outdoor"
+      ],
+      roles: [
+        "cleaner",
+        "consumable_material"
+      ],
+      functions: [
+        "mildew_cleaner"
+      ],
+      seasons: [
+        "summer",
+        "opening_season",
+        "spring"
+      ],
+      propertyTypes: [
+        "lake"
+      ],
+      conditions: [],
+      alreadyHaveFlag: "has_mildew_cleaner",
+      tier: "sweet_spot"
+    },
+    citations: [
+      "Wet & Forget product documentation",
+      "Dock surface mildew prevention guidance"
+    ],
+    migratedFrom: {
+      scope: "outdoor_dock_lake",
+      slotId: "dock_mildew_cleaner",
+      tier: "sweet_spot"
+    }
+  },
+  {
+    universeId: "dock_storage_bin__suncast_50_gallon_resin_deck_box",
+    rank: 100,
+    variant: {
+      productName: "Suncast 50-gallon resin deck box",
+      priceLow: 65,
+      priceHigh: 110,
+      affiliateUrl: "https://www.amazon.com/s?k=suncast+50+gallon+resin+deck+box&tag=alderprojects-20",
+      productSpec: "50-gallon capacity. Resin construction, weather-resistant. Lockable lid. ~$80. Adequate for life jackets, fishing tackle, dock essentials."
+    },
+    tags: {
+      topics: [
+        "outdoor"
+      ],
+      roles: [
+        "organizer"
+      ],
+      functions: [
+        "weatherproof_bin"
+      ],
+      seasons: [
+        "summer",
+        "opening_season",
+        "spring"
+      ],
+      propertyTypes: [
+        "lake"
+      ],
+      conditions: [],
+      alreadyHaveFlag: "has_dock_storage",
+      tier: "budget"
+    },
+    citations: [
+      "Suncast product line documentation"
+    ],
+    migratedFrom: {
+      scope: "outdoor_dock_lake",
+      slotId: "dock_storage_bin",
+      tier: "budget"
+    }
+  },
+  {
+    universeId: "dock_storage_bin__suncast_73_gallon_premium_resin_storage_bench_with_seating",
+    rank: 100,
+    variant: {
+      productName: "Suncast 73-gallon premium resin storage bench (with seating)",
+      priceLow: 145,
+      priceHigh: 220,
+      affiliateUrl: "https://www.amazon.com/s?k=suncast+73+gallon+resin+storage+bench&tag=alderprojects-20",
+      productSpec: "73-gallon capacity. Doubles as bench seating (350 lb capacity). Resin construction with darker UV-resistant pigment. Lockable. Holds 4 life jackets, 2 paddles, fishing gear, dock cleaner, tools. ~$170."
+    },
+    tags: {
+      topics: [
+        "outdoor"
+      ],
+      roles: [
+        "organizer"
+      ],
+      functions: [
+        "weatherproof_bin"
+      ],
+      seasons: [
+        "summer",
+        "opening_season",
+        "spring"
+      ],
+      propertyTypes: [
+        "lake"
+      ],
+      conditions: [],
+      alreadyHaveFlag: "has_dock_storage",
+      tier: "sweet_spot"
+    },
+    citations: [
+      "Suncast product line documentation"
+    ],
+    migratedFrom: {
+      scope: "outdoor_dock_lake",
+      slotId: "dock_storage_bin",
+      tier: "sweet_spot"
+    }
+  },
+  {
+    universeId: "dock_non_slip_strips__marine_grade_anti_slip_tape_4_inch_x_60_ft",
+    rank: 100,
+    variant: {
+      productName: "Marine-grade anti-slip tape (4 inch x 60 ft)",
+      priceLow: 32,
+      priceHigh: 55,
+      affiliateUrl: "https://www.amazon.com/s?k=marine+anti+slip+tape+4+inch+60+ft&tag=alderprojects-20",
+      productSpec: "Same product family as outdoor_deck_refresh stair grip — universe entry reused via additive tag merge. Marine-rated extra-coarse grit. 60 ft covers full dock plus stairs."
+    },
+    tags: {
+      topics: [
+        "outdoor"
+      ],
+      roles: [
+        "safety_item",
+        "consumable_material"
+      ],
+      functions: [
+        "non_slip_strips"
+      ],
+      seasons: [
+        "summer",
+        "opening_season",
+        "spring"
+      ],
+      propertyTypes: [
+        "lake"
+      ],
+      conditions: [],
+      alreadyHaveFlag: "has_non_slip_strips",
+      tier: "sweet_spot"
+    },
+    citations: [
+      "Cross-scope universe reuse pattern"
+    ],
+    migratedFrom: {
+      scope: "outdoor_dock_lake",
+      slotId: "dock_non_slip_strips",
+      tier: "sweet_spot"
+    }
+  },
+  {
+    universeId: "safety_fire_extinguisher__first_alert_home1_1_a_10_b_c_compliance_extinguisher",
+    rank: 100,
+    variant: {
+      productName: "First Alert HOME1 1-A:10-B:C compliance extinguisher",
+      priceLow: 25,
+      priceHigh: 45,
+      affiliateUrl: "https://www.amazon.com/s?k=first+alert+home1+1A10BC+fire+extinguisher&tag=alderprojects-20",
+      productSpec: "Compliance-grade rechargeable fire extinguisher. UL rated 1-A:10-B:C. Meets minimum residential code. Single point in single location only."
+    },
+    tags: {
+      topics: [
+        "home_repair"
+      ],
+      roles: [
+        "safety_item"
+      ],
+      functions: [
+        "fire_extinguisher"
+      ],
+      seasons: [
+        "year_round"
+      ],
+      propertyTypes: [],
+      conditions: [],
+      alreadyHaveFlag: "has_extinguisher_current",
+      tier: "budget"
+    },
+    citations: [
+      "First Alert PRO5 Amazon listing (B000M2QR8U)",
+      "NFPA residential fire extinguisher guidance",
+      "UL fire extinguisher rating standards"
+    ],
+    migratedFrom: {
+      scope: "home_safety_kit",
+      slotId: "safety_fire_extinguisher",
+      tier: "budget"
+    }
+  },
+  {
+    universeId: "safety_fire_extinguisher__first_alert_pro5_heavy_duty_plus_3_a_40_b_c_single",
+    rank: 100,
+    variant: {
+      productName: "First Alert PRO5 Heavy Duty Plus 3-A:40-B:C (single)",
+      priceLow: 55,
+      priceHigh: 85,
+      amazonAsin: "B000M2QR8U",
+      affiliateUrl: "https://www.amazon.com/dp/B000M2QR8U?tag=alderprojects-20",
+      productSpec: "UL rated 3-A:40-B:C — exceeds minimum residential code. Heavy-duty all-metal construction with commercial-grade valve. Mounting bracket included. Color-coded gauge. Rechargeable by certified professionals after use. First Alert is the trusted home-safety brand."
+    },
+    tags: {
+      topics: [
+        "home_repair"
+      ],
+      roles: [
+        "safety_item"
+      ],
+      functions: [
+        "fire_extinguisher"
+      ],
+      seasons: [
+        "year_round"
+      ],
+      propertyTypes: [],
+      conditions: [],
+      alreadyHaveFlag: "has_extinguisher_current",
+      tier: "sweet_spot"
+    },
+    citations: [
+      "First Alert PRO5 Amazon listing (B000M2QR8U)",
+      "NFPA residential fire extinguisher guidance",
+      "UL fire extinguisher rating standards"
+    ],
+    migratedFrom: {
+      scope: "home_safety_kit",
+      slotId: "safety_fire_extinguisher",
+      tier: "sweet_spot"
+    }
+  },
+  {
+    universeId: "safety_fire_extinguisher__amerex_b500_5_lb_abc_dry_chemical_fire_extinguisher_2_pack",
+    rank: 100,
+    variant: {
+      productName: "Amerex B500 5-lb ABC Dry Chemical Fire Extinguisher 2-pack",
+      priceLow: 145,
+      priceHigh: 220,
+      affiliateUrl: "https://www.amazon.com/s?k=amerex+b500+5+lb+abc+dry+chemical+fire+extinguisher+2+pack&tag=alderprojects-20",
+      productSpec: "Pro-grade. UL rated 2-A:10-B:C. 5-lb dry chemical capacity, 12-18 ft range, 14-second discharge. Made in USA. Used by fire departments. 2-pack covers two zones (kitchen + garage typical)."
+    },
+    tags: {
+      topics: [
+        "home_repair"
+      ],
+      roles: [
+        "safety_item"
+      ],
+      functions: [
+        "fire_extinguisher"
+      ],
+      seasons: [
+        "year_round"
+      ],
+      propertyTypes: [],
+      conditions: [],
+      alreadyHaveFlag: "has_extinguisher_current",
+      tier: "premium"
+    },
+    citations: [
+      "First Alert PRO5 Amazon listing (B000M2QR8U)",
+      "NFPA residential fire extinguisher guidance",
+      "UL fire extinguisher rating standards"
+    ],
+    migratedFrom: {
+      scope: "home_safety_kit",
+      slotId: "safety_fire_extinguisher",
+      tier: "premium"
+    }
+  },
+  {
+    universeId: "safety_smoke_co_detector__first_alert_sco5cn_battery_powered_smoke_co_detector_single",
+    rank: 100,
+    variant: {
+      productName: "First Alert SCO5CN battery-powered smoke + CO detector (single)",
+      priceLow: 25,
+      priceHigh: 40,
+      affiliateUrl: "https://www.amazon.com/s?k=first+alert+sco5cn+battery+smoke+carbon+monoxide&tag=alderprojects-20",
+      productSpec: "Battery-powered (2 AA). Ionization smoke + electrochemical CO sensors. ~$30. Replace battery annually, replace unit every 5-7 years. Single zone."
+    },
+    tags: {
+      topics: [
+        "home_repair"
+      ],
+      roles: [
+        "sensor",
+        "monitor",
+        "safety_item"
+      ],
+      functions: [
+        "smoke_co_detector"
+      ],
+      seasons: [
+        "year_round"
+      ],
+      propertyTypes: [],
+      conditions: [],
+      alreadyHaveFlag: "has_combo_detectors_current",
+      tier: "budget"
+    },
+    citations: [
+      "First Alert sealed-battery product line documentation",
+      "NFPA smoke detector placement standards",
+      "Nest Protect product specifications"
+    ],
+    migratedFrom: {
+      scope: "home_safety_kit",
+      slotId: "safety_smoke_co_detector",
+      tier: "budget"
+    }
+  },
+  {
+    universeId: "safety_smoke_co_detector__first_alert_10_year_sealed_battery_smoke_co_detectors_3_pack",
+    rank: 100,
+    variant: {
+      productName: "First Alert 10-year sealed battery smoke + CO detectors (3-pack)",
+      priceLow: 75,
+      priceHigh: 120,
+      affiliateUrl: "https://www.amazon.com/s?k=first+alert+10+year+sealed+battery+smoke+carbon+monoxide+3+pack&tag=alderprojects-20",
+      productSpec: "Sealed 10-year lithium battery (no replacement needed). Smoke + CO combo. 3-pack covers most homes (one per floor + bedroom area). Replace entire unit at year 10. Industry shift to sealed-battery is the right call for absentee homes — no mid-winter dead battery chirps."
+    },
+    tags: {
+      topics: [
+        "home_repair"
+      ],
+      roles: [
+        "sensor",
+        "monitor",
+        "safety_item"
+      ],
+      functions: [
+        "smoke_co_detector"
+      ],
+      seasons: [
+        "year_round"
+      ],
+      propertyTypes: [],
+      conditions: [],
+      alreadyHaveFlag: "has_combo_detectors_current",
+      tier: "sweet_spot"
+    },
+    citations: [
+      "First Alert sealed-battery product line documentation",
+      "NFPA smoke detector placement standards",
+      "Nest Protect product specifications"
+    ],
+    migratedFrom: {
+      scope: "home_safety_kit",
+      slotId: "safety_smoke_co_detector",
+      tier: "sweet_spot"
+    }
+  },
+  {
+    universeId: "safety_smoke_co_detector__google_nest_protect_smart_smoke_co_detector_3_pack",
+    rank: 100,
+    variant: {
+      productName: "Google Nest Protect smart smoke + CO detector (3-pack)",
+      priceLow: 280,
+      priceHigh: 380,
+      affiliateUrl: "https://www.amazon.com/s?k=google+nest+protect+smoke+carbon+monoxide+3+pack&tag=alderprojects-20",
+      productSpec: "WiFi connected. Phone alerts when alarm triggers. Self-test every 200 seconds. ~10-year service life. Voice alerts (which room is on fire). Best for absentee homes where remote alerts matter."
+    },
+    tags: {
+      topics: [
+        "home_repair"
+      ],
+      roles: [
+        "sensor",
+        "monitor",
+        "safety_item"
+      ],
+      functions: [
+        "smoke_co_detector"
+      ],
+      seasons: [
+        "year_round"
+      ],
+      propertyTypes: [],
+      conditions: [],
+      alreadyHaveFlag: "has_combo_detectors_current",
+      tier: "premium"
+    },
+    citations: [
+      "First Alert sealed-battery product line documentation",
+      "NFPA smoke detector placement standards",
+      "Nest Protect product specifications"
+    ],
+    migratedFrom: {
+      scope: "home_safety_kit",
+      slotId: "safety_smoke_co_detector",
+      tier: "premium"
+    }
+  },
+  {
+    universeId: "generic_100_piece_first_aid_kit",
+    rank: 100,
+    variant: {
+      productName: "Generic 100-piece first aid kit",
+      priceLow: 22,
+      priceHigh: 38,
+      affiliateUrl: "https://www.amazon.com/s?k=first+aid+kit+100+piece+home&tag=alderprojects-20",
+      productSpec: "100-piece assortment in plastic case. Adhesive bandages, gauze, antiseptic wipes, basic medications. Adequate for minor injuries. Many filler items (varied bandage sizes you don't use)."
+    },
+    tags: {
+      topics: [
+        "home_repair"
+      ],
+      roles: [
+        "safety_item"
+      ],
+      functions: [
+        "first_aid_kit"
+      ],
+      seasons: [
+        "year_round"
+      ],
+      propertyTypes: [],
+      conditions: [],
+      alreadyHaveFlag: "has_first_aid_kit_current",
+      tier: "budget"
+    },
+    citations: [
+      "First Aid Only OSHA-compliant kit documentation",
+      "ANSI first aid kit standards"
+    ],
+    migratedFrom: {
+      scope: "home_safety_kit",
+      slotId: "safety_first_aid_kit",
+      tier: "budget"
+    }
+  },
+  {
+    universeId: "safety_first_aid_kit__first_aid_only_osha_compliant_250_piece_kit_50_person",
+    rank: 100,
+    variant: {
+      productName: "First Aid Only OSHA-Compliant 250-piece kit (50-person)",
+      priceLow: 45,
+      priceHigh: 75,
+      affiliateUrl: "https://www.amazon.com/s?k=first+aid+only+osha+250+piece+50+person&tag=alderprojects-20",
+      productSpec: "OSHA-compliant. 250+ pieces. ANSI standard supplies (real gauze, real bandage variety, eye wash, burn cream, CPR mask). First Aid Only is the workplace-safety standard. 50-person kit is right-sized for a household + guests."
+    },
+    tags: {
+      topics: [
+        "home_repair"
+      ],
+      roles: [
+        "safety_item"
+      ],
+      functions: [
+        "first_aid_kit"
+      ],
+      seasons: [
+        "year_round"
+      ],
+      propertyTypes: [],
+      conditions: [],
+      alreadyHaveFlag: "has_first_aid_kit_current",
+      tier: "sweet_spot"
+    },
+    citations: [
+      "First Aid Only OSHA-compliant kit documentation",
+      "ANSI first aid kit standards"
+    ],
+    migratedFrom: {
+      scope: "home_safety_kit",
+      slotId: "safety_first_aid_kit",
+      tier: "sweet_spot"
+    }
+  },
+  {
+    universeId: "safety_first_aid_kit__my_medic_the_medic_emergency_kit",
+    rank: 100,
+    variant: {
+      productName: "My Medic The Medic emergency kit",
+      priceLow: 130,
+      priceHigh: 220,
+      affiliateUrl: "https://www.amazon.com/s?k=my+medic+the+medic+emergency+first+aid+kit&tag=alderprojects-20",
+      productSpec: "Modular emergency kit with trauma supplies (tourniquet, hemostatic gauze, chest seal). Includes EMT-grade items for serious injury response. Used by outdoor/wilderness families. Worth it for remote properties where EMS response is 30+ minutes."
+    },
+    tags: {
+      topics: [
+        "home_repair"
+      ],
+      roles: [
+        "safety_item"
+      ],
+      functions: [
+        "first_aid_kit"
+      ],
+      seasons: [
+        "year_round"
+      ],
+      propertyTypes: [],
+      conditions: [],
+      alreadyHaveFlag: "has_first_aid_kit_current",
+      tier: "premium"
+    },
+    citations: [
+      "First Aid Only OSHA-compliant kit documentation",
+      "ANSI first aid kit standards"
+    ],
+    migratedFrom: {
+      scope: "home_safety_kit",
+      slotId: "safety_first_aid_kit",
+      tier: "premium"
+    }
+  },
+  {
+    universeId: "safety_flashlight_lantern__aaa_battery_led_flashlight_4_pack",
+    rank: 100,
+    variant: {
+      productName: "AAA-battery LED flashlight 4-pack",
+      priceLow: 18,
+      priceHigh: 32,
+      affiliateUrl: "https://www.amazon.com/s?k=aaa+battery+led+flashlight+4+pack&tag=alderprojects-20",
+      productSpec: "4 AAA-battery LED flashlights. ~$25. Place one in each bedroom and one in kitchen. Battery-replaceable (carry spare AAA in safety kit)."
+    },
+    tags: {
+      topics: [
+        "home_repair"
+      ],
+      roles: [
+        "lighting",
+        "safety_item"
+      ],
+      functions: [
+        "flashlight_lantern"
+      ],
+      seasons: [
+        "year_round"
+      ],
+      propertyTypes: [],
+      conditions: [],
+      alreadyHaveFlag: "has_emergency_lighting",
+      tier: "budget"
+    },
+    citations: [
+      "Coast HP1 product documentation",
+      "Streamlight Siege specifications"
+    ],
+    migratedFrom: {
+      scope: "home_safety_kit",
+      slotId: "safety_flashlight_lantern",
+      tier: "budget"
+    }
+  },
+  {
+    universeId: "safety_flashlight_lantern__coast_led_flashlight_2_pack_streamlight_led_lantern",
+    rank: 100,
+    variant: {
+      productName: "Coast LED flashlight 2-pack + Streamlight LED lantern",
+      priceLow: 60,
+      priceHigh: 95,
+      affiliateUrl: "https://www.amazon.com/s?k=coast+led+flashlight+streamlight+lantern&tag=alderprojects-20",
+      productSpec: "Coast HP1 LED flashlights (1 in bedroom, 1 in kitchen) + Streamlight Siege LED lantern for area lighting (3-mode: low/high/red). All battery-powered with replaceable batteries."
+    },
+    tags: {
+      topics: [
+        "home_repair"
+      ],
+      roles: [
+        "lighting",
+        "safety_item"
+      ],
+      functions: [
+        "flashlight_lantern"
+      ],
+      seasons: [
+        "year_round"
+      ],
+      propertyTypes: [],
+      conditions: [],
+      alreadyHaveFlag: "has_emergency_lighting",
+      tier: "sweet_spot"
+    },
+    citations: [
+      "Coast HP1 product documentation",
+      "Streamlight Siege specifications"
+    ],
+    migratedFrom: {
+      scope: "home_safety_kit",
+      slotId: "safety_flashlight_lantern",
+      tier: "sweet_spot"
+    }
+  },
+  {
+    universeId: "safety_flashlight_lantern__goal_zero_anker_rechargeable_lanterns_headlamps",
+    rank: 100,
+    variant: {
+      productName: "Goal Zero / Anker rechargeable lanterns + headlamps",
+      priceLow: 165,
+      priceHigh: 280,
+      affiliateUrl: "https://www.amazon.com/s?k=goal+zero+rechargeable+lantern+anker+headlamp&tag=alderprojects-20",
+      productSpec: "USB-rechargeable lanterns + headlamps. Solar-charge compatible. 50+ hour runtime. Used for camping, glamping. Worth the upgrade if you also use them for outdoor activities."
+    },
+    tags: {
+      topics: [
+        "home_repair"
+      ],
+      roles: [
+        "lighting",
+        "safety_item"
+      ],
+      functions: [
+        "flashlight_lantern"
+      ],
+      seasons: [
+        "year_round"
+      ],
+      propertyTypes: [],
+      conditions: [],
+      alreadyHaveFlag: "has_emergency_lighting",
+      tier: "premium"
+    },
+    citations: [
+      "Coast HP1 product documentation",
+      "Streamlight Siege specifications"
+    ],
+    migratedFrom: {
+      scope: "home_safety_kit",
+      slotId: "safety_flashlight_lantern",
+      tier: "premium"
+    }
+  },
+  {
+    universeId: "safety_emergency_power__anker_521_powerhouse_256wh_portable_power_station",
+    rank: 100,
+    variant: {
+      productName: "Anker 521 PowerHouse 256Wh portable power station",
+      priceLow: 165,
+      priceHigh: 240,
+      affiliateUrl: "https://www.amazon.com/s?k=anker+521+powerhouse+256wh&tag=alderprojects-20",
+      productSpec: "256 Wh capacity. AC + USB outputs. Charges via wall outlet or solar panel. Adequate for charging phones, laptops, running CPAP for one night. ~$200."
+    },
+    tags: {
+      topics: [
+        "home_repair"
+      ],
+      roles: [
+        "appliance",
+        "safety_item"
+      ],
+      functions: [
+        "emergency_power"
+      ],
+      seasons: [
+        "year_round"
+      ],
+      propertyTypes: [],
+      conditions: [],
+      alreadyHaveFlag: "has_emergency_power",
+      tier: "budget"
+    },
+    citations: [
+      "Jackery Explorer 1000 product documentation",
+      "Battery backup capacity sizing guidance"
+    ],
+    migratedFrom: {
+      scope: "home_safety_kit",
+      slotId: "safety_emergency_power",
+      tier: "budget"
+    }
+  },
+  {
+    universeId: "safety_emergency_power__jackery_explorer_1000_1002_wh",
+    rank: 100,
+    variant: {
+      productName: "Jackery Explorer 1000 (1002 Wh)",
+      priceLow: 580,
+      priceHigh: 850,
+      affiliateUrl: "https://www.amazon.com/s?k=jackery+explorer+1000+1002+wh&tag=alderprojects-20",
+      productSpec: "1002 Wh capacity. Multiple AC outlets, USB-C, USB-A. Powers fridge for 12+ hours, runs CPAP for 2 nights, charges phones for a week. Solar input. Industry-standard for residential backup. Jackery is the verified mid-tier brand."
+    },
+    tags: {
+      topics: [
+        "home_repair"
+      ],
+      roles: [
+        "appliance",
+        "safety_item"
+      ],
+      functions: [
+        "emergency_power"
+      ],
+      seasons: [
+        "year_round"
+      ],
+      propertyTypes: [],
+      conditions: [],
+      alreadyHaveFlag: "has_emergency_power",
+      tier: "sweet_spot"
+    },
+    citations: [
+      "Jackery Explorer 1000 product documentation",
+      "Battery backup capacity sizing guidance"
+    ],
+    migratedFrom: {
+      scope: "home_safety_kit",
+      slotId: "safety_emergency_power",
+      tier: "sweet_spot"
+    }
+  },
+  {
+    universeId: "safety_emergency_power__ecoflow_delta_2_max_2048_wh_with_expansion_battery",
+    rank: 100,
+    variant: {
+      productName: "EcoFlow DELTA 2 Max (2048 Wh) with expansion battery",
+      priceLow: 1400,
+      priceHigh: 2200,
+      affiliateUrl: "https://www.amazon.com/s?k=ecoflow+delta+2+max+2048wh&tag=alderprojects-20",
+      productSpec: "2048 Wh + expandable to 6kWh. Fast-charge via wall (30 min). Powers most home essentials (fridge, well pump, lighting) during multi-day outages. Premium tier."
+    },
+    tags: {
+      topics: [
+        "home_repair"
+      ],
+      roles: [
+        "appliance",
+        "safety_item"
+      ],
+      functions: [
+        "emergency_power"
+      ],
+      seasons: [
+        "year_round"
+      ],
+      propertyTypes: [],
+      conditions: [],
+      alreadyHaveFlag: "has_emergency_power",
+      tier: "premium"
+    },
+    citations: [
+      "Jackery Explorer 1000 product documentation",
+      "Battery backup capacity sizing guidance"
+    ],
+    migratedFrom: {
+      scope: "home_safety_kit",
+      slotId: "safety_emergency_power",
+      tier: "premium"
+    }
+  },
+  {
+    universeId: "safety_emergency_docs__document_holder_printed_emergency_info_template",
+    rank: 100,
+    variant: {
+      productName: "Document holder + printed emergency info template",
+      priceLow: 12,
+      priceHigh: 25,
+      affiliateUrl: "https://www.amazon.com/s?k=document+holder+wall+mount+emergency+info&tag=alderprojects-20",
+      productSpec: "Wall-mounted clear acrylic document holder ($8-15). Printable emergency info template: insurance contacts, plumber/electrician/septic pro contacts, utility shutoff diagram, neighbor with key, fire/police/EMS, water test results, well info."
+    },
+    tags: {
+      topics: [
+        "home_repair"
+      ],
+      roles: [
+        "document_aid",
+        "safety_item"
+      ],
+      functions: [
+        "emergency_docs"
+      ],
+      seasons: [
+        "year_round"
+      ],
+      propertyTypes: [],
+      conditions: [],
+      alreadyHaveFlag: "has_emergency_docs",
+      tier: "sweet_spot"
+    },
+    citations: [
+      "Emergency preparedness documentation guidance"
+    ],
+    migratedFrom: {
+      scope: "home_safety_kit",
+      slotId: "safety_emergency_docs",
+      tier: "sweet_spot"
+    }
+  },
+  {
+    universeId: "prep_laser_measure__bosch_glm_20_blaze_65_foot_laser_distance_measure",
+    rank: 100,
+    variant: {
+      productName: "Bosch GLM 20 Blaze 65-foot laser distance measure",
+      priceLow: 38,
+      priceHigh: 58,
+      affiliateUrl: "https://www.amazon.com/s?k=bosch+glm+20+blaze+laser+distance+measure&tag=alderprojects-20",
+      productSpec: "65-foot range, +/- 1/8 inch accuracy. Single-button operation. ~$45. Bosch is the consumer-pro standard."
+    },
+    tags: {
+      topics: [
+        "universal"
+      ],
+      roles: [
+        "measurement_tool",
+        "tool"
+      ],
+      functions: [
+        "laser_measure"
+      ],
+      seasons: [
+        "year_round"
+      ],
+      propertyTypes: [],
+      conditions: [],
+      alreadyHaveFlag: "has_laser_measure",
+      tier: "budget"
+    },
+    citations: [
+      "Bosch GLM product documentation",
+      "Wirecutter best laser distance measure review"
+    ],
+    migratedFrom: {
+      scope: "universal_project_prep",
+      slotId: "prep_laser_measure",
+      tier: "budget"
+    }
+  },
+  {
+    universeId: "prep_laser_measure__bosch_glm_165_27_165_foot_laser_measure_with_bluetooth",
+    rank: 100,
+    variant: {
+      productName: "Bosch GLM 165-27 165-foot laser measure with Bluetooth",
+      priceLow: 95,
+      priceHigh: 145,
+      affiliateUrl: "https://www.amazon.com/s?k=bosch+glm+165+laser+measure+bluetooth&tag=alderprojects-20",
+      productSpec: "165-foot range. Area, volume, length calculations. Bluetooth syncs with Bosch app for measurement logging. Pythagoras mode for indirect measurement. ~$120."
+    },
+    tags: {
+      topics: [
+        "universal"
+      ],
+      roles: [
+        "measurement_tool",
+        "tool"
+      ],
+      functions: [
+        "laser_measure"
+      ],
+      seasons: [
+        "year_round"
+      ],
+      propertyTypes: [],
+      conditions: [],
+      alreadyHaveFlag: "has_laser_measure",
+      tier: "sweet_spot"
+    },
+    citations: [
+      "Bosch GLM product documentation",
+      "Wirecutter best laser distance measure review"
+    ],
+    migratedFrom: {
+      scope: "universal_project_prep",
+      slotId: "prep_laser_measure",
+      tier: "sweet_spot"
+    }
+  },
+  {
+    universeId: "prep_graph_paper_kit__engineering_graph_paper_pad_architectural_scale_ruler",
+    rank: 100,
+    variant: {
+      productName: "Engineering graph paper pad + architectural scale ruler",
+      priceLow: 18,
+      priceHigh: 32,
+      affiliateUrl: "https://www.amazon.com/s?k=engineering+graph+paper+architectural+scale+ruler&tag=alderprojects-20",
+      productSpec: "8.5\"x11\" 1/4\" engineering graph paper pad (50+ sheets) + Mr. Pen architectural scale ruler ($8) + clipboard. ~$25 total. Sketch room layouts at scale (1 square = 1 ft)."
+    },
+    tags: {
+      topics: [
+        "universal"
+      ],
+      roles: [
+        "document_aid",
+        "measurement_tool"
+      ],
+      functions: [
+        "graph_paper_kit"
+      ],
+      seasons: [
+        "year_round"
+      ],
+      propertyTypes: [],
+      conditions: [],
+      alreadyHaveFlag: "has_graph_paper",
+      tier: "sweet_spot"
+    },
+    citations: [
+      "Architectural scale standards"
+    ],
+    migratedFrom: {
+      scope: "universal_project_prep",
+      slotId: "prep_graph_paper_kit",
+      tier: "sweet_spot"
+    }
+  },
+  {
+    universeId: "prep_painters_tape__frogtape_1_41_multi_surface_4_pack_60_yd_each",
+    rank: 100,
+    variant: {
+      productName: "FrogTape 1.41\" multi-surface 4-pack (60 yd each)",
+      priceLow: 28,
+      priceHigh: 42,
+      affiliateUrl: "https://www.amazon.com/s?k=frogtape+multi+surface+1.41+inch+4+pack&tag=alderprojects-20",
+      productSpec: "Green FrogTape multi-surface, 1.41\" wide, 60 yards per roll, 4-pack. PaintBlock technology prevents bleed-through. Multi-purpose: painting, marking layout on-site, labeling boxes, masking trim."
+    },
+    tags: {
+      topics: [
+        "universal"
+      ],
+      roles: [
+        "consumable_material",
+        "finish"
+      ],
+      functions: [
+        "painters_tape"
+      ],
+      seasons: [
+        "year_round"
+      ],
+      propertyTypes: [],
+      conditions: [],
+      alreadyHaveFlag: "has_painters_tape",
+      tier: "sweet_spot"
+    },
+    citations: [
+      "FrogTape product documentation",
+      "Wirecutter painter's tape review"
+    ],
+    migratedFrom: {
+      scope: "universal_project_prep",
+      slotId: "prep_painters_tape",
+      tier: "sweet_spot"
+    }
+  },
+  {
+    universeId: "prep_label_maker__brother_p_touch_pt_d210_label_maker",
+    rank: 100,
+    variant: {
+      productName: "Brother P-touch PT-D210 label maker",
+      priceLow: 38,
+      priceHigh: 58,
+      affiliateUrl: "https://www.amazon.com/s?k=brother+p+touch+pt+d210+label+maker&tag=alderprojects-20",
+      productSpec: "Handheld thermal label maker. Multiple font sizes, frames, symbols. Uses standard TZe-tape (laminated, water-resistant). 6 AAA batteries. ~$45 + tape refills. Brother P-touch is the consumer-pro label maker standard."
+    },
+    tags: {
+      topics: [
+        "universal"
+      ],
+      roles: [
+        "tool",
+        "document_aid"
+      ],
+      functions: [
+        "label_maker"
+      ],
+      seasons: [
+        "year_round"
+      ],
+      propertyTypes: [],
+      conditions: [],
+      alreadyHaveFlag: "has_label_maker",
+      tier: "sweet_spot"
+    },
+    citations: [
+      "Brother P-touch product line documentation"
+    ],
+    migratedFrom: {
+      scope: "universal_project_prep",
+      slotId: "prep_label_maker",
+      tier: "sweet_spot"
+    }
+  },
+  {
+    universeId: "prep_sample_boards__pre_primed_white_sample_boards_12_pack_11_x14",
+    rank: 100,
+    variant: {
+      productName: "Pre-primed white sample boards (12-pack, 11\"x14\")",
+      priceLow: 22,
+      priceHigh: 38,
+      affiliateUrl: "https://www.amazon.com/s?k=pre+primed+sample+boards+11x14+12+pack&tag=alderprojects-20",
+      productSpec: "Pre-primed plywood or hardboard sample boards. 11\"x14\". 12-pack. Use for testing paint colors, stain colors, sample finishes. Movable around the room to test in different lighting."
+    },
+    tags: {
+      topics: [
+        "universal"
+      ],
+      roles: [
+        "consumable_material",
+        "document_aid"
+      ],
+      functions: [
+        "sample_boards"
+      ],
+      seasons: [
+        "year_round"
+      ],
+      propertyTypes: [],
+      conditions: [],
+      alreadyHaveFlag: "has_sample_boards",
+      tier: "sweet_spot"
+    },
+    citations: [
+      "Paint sample testing best practices"
+    ],
+    migratedFrom: {
+      scope: "universal_project_prep",
+      slotId: "prep_sample_boards",
+      tier: "sweet_spot"
+    }
+  },
+  {
+    universeId: "prep_phone_tripod__manfrotto_pixi_mini_tripod_clip_on_led_ring_light",
+    rank: 100,
+    variant: {
+      productName: "Manfrotto PIXI mini tripod + clip-on LED ring light",
+      priceLow: 35,
+      priceHigh: 60,
+      affiliateUrl: "https://www.amazon.com/s?k=manfrotto+pixi+mini+tripod+clip+on+led+ring+light&tag=alderprojects-20",
+      productSpec: "Manfrotto PIXI mini tabletop tripod ($25) + clip-on LED ring light ($15-25). Tripod holds phone steady for room photos and video walkthroughs. Ring light fills shadows in dark rooms (basements, closets, under sinks)."
+    },
+    tags: {
+      topics: [
+        "universal"
+      ],
+      roles: [
+        "tool",
+        "document_aid"
+      ],
+      functions: [
+        "phone_tripod"
+      ],
+      seasons: [
+        "year_round"
+      ],
+      propertyTypes: [],
+      conditions: [],
+      alreadyHaveFlag: "has_phone_tripod",
+      tier: "sweet_spot"
+    },
+    citations: [
+      "Manfrotto PIXI product documentation"
+    ],
+    migratedFrom: {
+      scope: "universal_project_prep",
+      slotId: "prep_phone_tripod",
+      tier: "sweet_spot"
+    }
+  },
+  {
+    universeId: "prep_inspection_mirror__telescoping_inspection_mirror_usb_endoscope_camera",
+    rank: 100,
+    variant: {
+      productName: "Telescoping inspection mirror + USB endoscope camera",
+      priceLow: 28,
+      priceHigh: 50,
+      affiliateUrl: "https://www.amazon.com/s?k=telescoping+inspection+mirror+usb+endoscope+camera&tag=alderprojects-20",
+      productSpec: "Telescoping inspection mirror (extends to 25\") for under-cabinet, around-corner, and tight-space visual inspection. USB endoscope camera ($15-25) for going around bends — connects to phone via USB-C, shows live image of pipe interiors, wall cavities, drains."
+    },
+    tags: {
+      topics: [
+        "universal"
+      ],
+      roles: [
+        "tool",
+        "measurement_tool"
+      ],
+      functions: [
+        "inspection_mirror"
+      ],
+      seasons: [
+        "year_round"
+      ],
+      propertyTypes: [],
+      conditions: [],
+      alreadyHaveFlag: "has_inspection_mirror",
+      tier: "sweet_spot"
+    },
+    citations: [
+      "Inspection tool product comparisons"
+    ],
+    migratedFrom: {
+      scope: "universal_project_prep",
+      slotId: "prep_inspection_mirror",
+      tier: "sweet_spot"
+    }
+  },
 ]

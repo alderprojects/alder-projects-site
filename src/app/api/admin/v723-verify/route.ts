@@ -60,6 +60,10 @@ const EXPECTED_STATS: Record<string, { slotCount: number; skipCount: number }> =
   outdoor_deck_refresh: { slotCount: 8, skipCount: 10 },
   outdoor_seasonal_opening: { slotCount: 8, skipCount: 9 },
   outdoor_freeze_prevention: { slotCount: 9, skipCount: 10 },
+  // V7.2.5 paste 3 — home_repair + universal catalogs. Matches
+  // spec exactly. mudroom_entry_reset pending source file.
+  home_moisture_control: { slotCount: 7, skipCount: 8 },
+  universal_owner_kit: { slotCount: 10, skipCount: 9 },
 }
 
 // V7.2.5 — destinations a catalog can route a buyer to instead of

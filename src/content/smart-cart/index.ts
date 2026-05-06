@@ -22,16 +22,23 @@ import { OUTDOOR_LAKE_SEASON } from './scope-catalogs/outdoor-lake-season'
 import { OUTDOOR_DECK_REFRESH } from './scope-catalogs/outdoor-deck-refresh'
 import { OUTDOOR_SEASONAL_OPENING } from './scope-catalogs/outdoor-seasonal-opening'
 import { OUTDOOR_FREEZE_PREVENTION } from './scope-catalogs/outdoor-freeze-prevention'
+import { HOME_MOISTURE_CONTROL } from './scope-catalogs/home-moisture-control'
+import { UNIVERSAL_OWNER_KIT } from './scope-catalogs/universal-owner-kit'
+// MUDROOM_ENTRY_RESET pending — paste 3 source file not yet provided.
 
 const CATALOGS: ScopeCatalog[] = [
   KITCHEN_ORGANIZERS,
   KITCHEN_COSMETIC_REFRESH,
   KITCHEN_CABINET_HARDWARE_SWAP,
   OUTDOOR_LAKE_SEASON,
-  // V7.2.5
+  // V7.2.5 paste 2
   OUTDOOR_DECK_REFRESH,
   OUTDOOR_SEASONAL_OPENING,
   OUTDOOR_FREEZE_PREVENTION,
+  // V7.2.5 paste 3
+  HOME_MOISTURE_CONTROL,
+  UNIVERSAL_OWNER_KIT,
+  // MUDROOM_ENTRY_RESET — pending source file
 ]
 
 // ---------- Catalog lookup ------------------------------------------

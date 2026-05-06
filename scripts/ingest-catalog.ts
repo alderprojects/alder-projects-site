@@ -202,6 +202,37 @@ function deriveRoles(slotId: string): string[] {
   if (/deck_pressure_washer/.test(slotId)) return ['tool']
   if (/deck_board_repair/.test(slotId)) return ['tool', 'hardware']
 
+  // ===== V7.2.5 — universal_owner_kit =====
+  if (/owner_drill_driver/.test(slotId)) return ['tool', 'appliance']
+  if (/owner_drill_bits/.test(slotId)) return ['tool', 'consumable_material']
+  if (/owner_level$/.test(slotId)) return ['measurement_tool', 'tool']
+  if (/owner_stud_finder/.test(slotId)) return ['sensor', 'measurement_tool']
+  if (/owner_tape_measure/.test(slotId)) return ['measurement_tool', 'tool']
+  if (/owner_utility_knife/.test(slotId)) return ['tool']
+  if (/owner_caulk_gun/.test(slotId)) return ['tool']
+  if (/owner_multitool/.test(slotId)) return ['tool', 'appliance']
+  if (/owner_fastener_kit/.test(slotId)) return ['hardware', 'consumable_material']
+  if (/owner_work_light/.test(slotId)) return ['lighting', 'tool']
+
+  // ===== V7.2.5 — home_moisture_control =====
+  if (/moisture_hygrometer/.test(slotId)) return ['sensor', 'monitor', 'measurement_tool']
+  if (/moisture_dehumidifier/.test(slotId)) return ['appliance', 'preventer']
+  if (/^moisture_meter$/.test(slotId)) return ['measurement_tool']
+  if (/moisture_mold_test/.test(slotId)) return ['measurement_tool', 'safety_item']
+  if (/moisture_odor_absorber/.test(slotId)) return ['consumable_material', 'cleaner']
+  if (/moisture_air_mover/.test(slotId)) return ['appliance']
+  if (/moisture_leak_sensor/.test(slotId)) return ['sensor']
+
+  // ===== V7.2.5 — mudroom_entry_reset (paste 3 pending) =====
+  if (/mudroom_boot_tray/.test(slotId)) return ['accessory', 'preventer']
+  if (/mudroom_entry_mat/.test(slotId)) return ['textile', 'preventer']
+  if (/mudroom_wall_hooks/.test(slotId)) return ['hardware', 'organizer']
+  if (/mudroom_entry_bench/.test(slotId)) return ['furniture', 'organizer']
+  if (/mudroom_wet_gear_rack/.test(slotId)) return ['organizer']
+  if (/mudroom_gear_bins/.test(slotId)) return ['organizer']
+  if (/mudroom_towel_station/.test(slotId)) return ['textile', 'accessory']
+  if (/mudroom_floor_protection/.test(slotId)) return ['textile', 'preventer']
+
   return []
 }
 
@@ -269,6 +300,43 @@ function deriveFunctions(slotId: string): string[] {
   if (/^deck_pressure_washer$/.test(slotId)) return ['pressure_washer']
   if (/^deck_board_repair$/.test(slotId)) return ['board_repair_tools']
 
+  // ===== V7.2.5 — universal_owner_kit =====
+  if (/^owner_drill_driver$/.test(slotId)) return ['drill_driver']
+  if (/^owner_drill_bits$/.test(slotId)) return ['drill_bit_set']
+  if (/^owner_level$/.test(slotId)) return ['level']
+  if (/^owner_stud_finder$/.test(slotId)) return ['stud_finder']
+  if (/^owner_tape_measure$/.test(slotId)) return ['tape_measure']
+  if (/^owner_utility_knife$/.test(slotId)) return ['utility_knife']
+  if (/^owner_caulk_gun$/.test(slotId)) return ['caulk_gun']
+  if (/^owner_multitool$/.test(slotId)) return ['oscillating_multitool']
+  if (/^owner_fastener_kit$/.test(slotId)) return ['fastener_kit']
+  if (/^owner_work_light$/.test(slotId)) return ['work_light']
+
+  // ===== V7.2.5 — home_moisture_control =====
+  if (/^moisture_hygrometer$/.test(slotId)) return ['hygrometer']
+  // Cross-scope reuse: moisture_dehumidifier reuses the function
+  // tag from outdoor_seasonal_opening's opening_dehumidifier.
+  if (/^moisture_dehumidifier$/.test(slotId)) return ['dehumidifier_entry', 'dehumidifier_whole']
+  // Cross-scope reuse: moisture_meter reuses the function tag from
+  // outdoor_deck_refresh's deck_moisture_meter.
+  if (/^moisture_meter$/.test(slotId)) return ['moisture_meter']
+  if (/^moisture_mold_test$/.test(slotId)) return ['mold_test_kit']
+  if (/^moisture_odor_absorber$/.test(slotId)) return ['odor_absorber']
+  if (/^moisture_air_mover$/.test(slotId)) return ['air_mover']
+  // Cross-scope reuse: moisture_leak_sensor reuses the function
+  // tag from outdoor_freeze_prevention's freeze_leak_sensor.
+  if (/^moisture_leak_sensor$/.test(slotId)) return ['leak_detector']
+
+  // ===== V7.2.5 — mudroom_entry_reset (paste 3 pending) =====
+  if (/^mudroom_boot_tray$/.test(slotId)) return ['boot_tray']
+  if (/^mudroom_entry_mat$/.test(slotId)) return ['entry_mat']
+  if (/^mudroom_wall_hooks$/.test(slotId)) return ['wall_hooks']
+  if (/^mudroom_entry_bench$/.test(slotId)) return ['entry_bench']
+  if (/^mudroom_wet_gear_rack$/.test(slotId)) return ['wet_gear_rack']
+  if (/^mudroom_gear_bins$/.test(slotId)) return ['gear_bins']
+  if (/^mudroom_towel_station$/.test(slotId)) return ['towel_station']
+  if (/^mudroom_floor_protection$/.test(slotId)) return ['floor_protection']
+
   return []
 }
 
@@ -281,6 +349,11 @@ function deriveSeasons(scopeId: string): string[] {
   if (/freeze_prevention/.test(scopeId)) return ['fall', 'pre_winter', 'closing_season']
   if (/seasonal_opening/.test(scopeId)) return ['spring', 'opening_season', 'pre_summer']
   if (/deck_refresh/.test(scopeId)) return ['spring', 'pre_summer', 'summer']
+  // Universal / home repair / mudroom — year-round.
+  if (/owner_kit|moisture_control|water_quality|safety_kit|project_prep/.test(scopeId)) {
+    return ['year_round']
+  }
+  if (/mudroom_entry_reset/.test(scopeId)) return ['mud_season', 'spring', 'year_round']
 
   return []
 }
@@ -431,11 +504,21 @@ function buildTierQuery(
   source: SourceCatalog,
   tier: CartTier,
 ): UniverseQuery {
-  void product
+  // V7.2.5 — use the resolved product's actual tags rather than the
+  // source-scope-derived tags. For NEW products the two are equivalent
+  // (the product was built from the same derivations). For EXISTING
+  // products that this scope is REUSING, mergeProductTags has already
+  // unioned the new scope's tags into the in-memory product, so the
+  // resulting query (e.g. mustHaveTopics: ['outdoor', 'home_repair'])
+  // OR-matches the existing on-disk entry's tags. Without this, the
+  // generated query asks only for the new scope's topic and the on-
+  // disk entry (still tagged with the original scope's topic) doesn't
+  // match -- breaking cross-scope reuse at runtime.
+  void source
   return {
-    mustHaveTopics: [source.topic] as UniverseQuery['mustHaveTopics'],
-    mustHaveFunctions: deriveFunctions(slot.slotId),
-    mustHaveRoles: deriveRoles(slot.slotId) as UniverseQuery['mustHaveRoles'],
+    mustHaveTopics: product.tags.topics as UniverseQuery['mustHaveTopics'],
+    mustHaveFunctions: product.tags.functions,
+    mustHaveRoles: product.tags.roles as UniverseQuery['mustHaveRoles'],
     excludeAlreadyHaveFlag: slot.conditionalOn?.[0],
     tier,
     limit: 1,

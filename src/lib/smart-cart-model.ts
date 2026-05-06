@@ -147,6 +147,54 @@ export interface ScopeCatalogSlot {
   contextNote?: string
   warnings?: string[]
   citations: string[]
+
+  // ===================================================================
+  // v7.2.5 — optional slot-level metadata. The builder forwards these
+  // through CartSlot onto SmartCartV2Output for the result page.
+  // ===================================================================
+
+  /**
+   * Slot-level purpose. Shown above the product card.
+   * Example: "Detect leaks before they cause damage."
+   */
+  slotPurpose?: string
+
+  /**
+   * Why this slot matters. Customer-facing.
+   * Example: "An undetected leak in a second home can flood for
+   * weeks before discovery."
+   */
+  whyItMatters?: string
+
+  /**
+   * Common mistakes buyers make at this slot.
+   * Example: "Buying a non-WiFi alarm for an absentee property."
+   */
+  commonMistake?: string
+
+  /**
+   * What to recommend if buyer already has the product satisfying
+   * this slot.
+   */
+  nextBestIfAlreadyHave?: {
+    /**
+     * Universal-friendly description: which next-best slot to
+     * recommend, or function tag to query.
+     */
+    targetSlotOrFunction: string
+    /** Why this is the next-best move. */
+    reason: string
+  }
+
+  /** When to skip this slot entirely. */
+  whenToSkip?: string[]
+
+  /** When this slot should route the buyer out of Smart Cart. */
+  routeOutOfSmartCartIf?: Array<{
+    condition: string
+    destination: 'worth_it' | 'small_pro' | 'contractor' | 'verify_first'
+    reason: string
+  }>
 }
 
 /**
@@ -163,6 +211,25 @@ export interface ScopeCatalogSkipItem {
   amountSaved?: { low: number; high: number }
   appliesToScope: string[]
   citations: string[]
+
+  // ===================================================================
+  // v7.2.5 — optional skip-card refinements.
+  // ===================================================================
+
+  /**
+   * When skipping might actually be wrong — i.e., the edge case where
+   * the marketed product IS appropriate.
+   */
+  whenItMayBeOkay?: string
+
+  /** What to buy instead. Function tag or universeId. */
+  betterAlternative?: string
+
+  /**
+   * Customer-facing copy. Used directly on the skip card if present;
+   * otherwise composed from realReason.
+   */
+  customerFacingCopy?: string
 }
 
 /**
@@ -187,5 +254,54 @@ export interface ScopeCatalog {
   slots: ScopeCatalogSlot[]
   skipList: ScopeCatalogSkipItem[]
   scenarioDefaults: ScopeCatalogScenarioDefaults
+
+  // ===================================================================
+  // v7.2.5 — optional scope-level value-prop and route-out fields.
+  // The builder forwards these onto SmartCartV2Output so the result
+  // page can render the scope's promise banner, route-out screen, and
+  // seasonal urgency callout.
+  // ===================================================================
+
+  /**
+   * Customer-facing promise. The "spend X to prevent/defer Y" framing.
+   * Shown at the top of the result page. Example:
+   *   "Spend $100-$500 to reduce risk of frozen pipes, water damage,
+   *    and emergency calls."
+   */
+  smartCartPromise?: string
+
+  /** Customer pain this scope addresses. */
+  primaryCustomerPain?: string
+
+  /** Why this scope earns the $19.99. */
+  valueProposition?: string
+
+  /**
+   * Route-out conditions — when the cart should redirect the buyer
+   * to Worth-It Plan, a small pro, or a contractor rather than
+   * synthesize a Smart Cart.
+   */
+  routeOutRules?: Array<{
+    /**
+     * Condition (state-probe flag, scenario, or text-match pattern
+     * on the buyer's intent input).
+     */
+    condition: string
+    /** Where to route. */
+    destination: 'worth_it' | 'small_pro' | 'contractor' | 'verify_first'
+    /** Customer-facing reason. */
+    reason: string
+  }>
+
+  /**
+   * Seasonal urgency for the scope as a whole. Drives the "buy by"
+   * banner at the top of the result page.
+   */
+  seasonalUrgency?: {
+    season: string
+    /** MM-DD format (no year). */
+    deadline: string
+    label: string
+  }
 }
 

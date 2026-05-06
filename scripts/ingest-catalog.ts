@@ -233,6 +233,43 @@ function deriveRoles(slotId: string): string[] {
   if (/mudroom_towel_station/.test(slotId)) return ['textile', 'accessory']
   if (/mudroom_floor_protection/.test(slotId)) return ['textile', 'preventer']
 
+  // ===== V7.2.5 — home_water_quality =====
+  if (/water_basic_test_strips/.test(slotId)) return ['measurement_tool', 'safety_item']
+  if (/water_lab_test/.test(slotId)) return ['measurement_tool', 'safety_item']
+  if (/water_bacteria_test/.test(slotId)) return ['measurement_tool', 'safety_item']
+  if (/water_sediment_filter/.test(slotId)) return ['consumable_material']
+  if (/water_fridge_filter/.test(slotId)) return ['consumable_material']
+  if (/water_drinking_filter/.test(slotId)) return ['appliance', 'consumable_material']
+  if (/water_filter_wrench/.test(slotId)) return ['tool']
+  if (/water_pressure_gauge/.test(slotId)) return ['measurement_tool', 'tool']
+
+  // ===== V7.2.5 — outdoor_dock_lake =====
+  if (/^dock_lines$/.test(slotId)) return ['hardware', 'safety_item']
+  if (/^dock_bumpers$/.test(slotId)) return ['hardware', 'safety_item']
+  if (/^dock_marine_hardware$/.test(slotId)) return ['hardware']
+  if (/^dock_lighting$/.test(slotId)) return ['lighting', 'safety_item']
+  if (/^dock_ladder$/.test(slotId)) return ['hardware', 'safety_item']
+  if (/^dock_mildew_cleaner$/.test(slotId)) return ['cleaner', 'consumable_material']
+  if (/^dock_storage_bin$/.test(slotId)) return ['organizer']
+  if (/^dock_non_slip_strips$/.test(slotId)) return ['safety_item', 'consumable_material']
+
+  // ===== V7.2.5 — home_safety_kit =====
+  if (/safety_fire_extinguisher/.test(slotId)) return ['safety_item']
+  if (/safety_smoke_co_detector/.test(slotId)) return ['sensor', 'monitor', 'safety_item']
+  if (/safety_first_aid_kit/.test(slotId)) return ['safety_item']
+  if (/safety_flashlight_lantern/.test(slotId)) return ['lighting', 'safety_item']
+  if (/safety_emergency_power/.test(slotId)) return ['appliance', 'safety_item']
+  if (/safety_emergency_docs/.test(slotId)) return ['document_aid', 'safety_item']
+
+  // ===== V7.2.5 — universal_project_prep =====
+  if (/prep_laser_measure/.test(slotId)) return ['measurement_tool', 'tool']
+  if (/prep_graph_paper_kit/.test(slotId)) return ['document_aid', 'measurement_tool']
+  if (/prep_painters_tape/.test(slotId)) return ['consumable_material', 'tool']
+  if (/prep_label_maker/.test(slotId)) return ['tool', 'document_aid']
+  if (/prep_sample_boards/.test(slotId)) return ['consumable_material', 'document_aid']
+  if (/prep_phone_tripod/.test(slotId)) return ['tool', 'document_aid']
+  if (/prep_inspection_mirror/.test(slotId)) return ['tool', 'measurement_tool']
+
   return []
 }
 
@@ -337,6 +374,43 @@ function deriveFunctions(slotId: string): string[] {
   if (/^mudroom_towel_station$/.test(slotId)) return ['towel_station']
   if (/^mudroom_floor_protection$/.test(slotId)) return ['floor_protection']
 
+  // ===== V7.2.5 — home_water_quality =====
+  if (/^water_basic_test_strips$/.test(slotId)) return ['basic_test_strips']
+  if (/^water_lab_test$/.test(slotId)) return ['lab_water_test']
+  if (/^water_bacteria_test$/.test(slotId)) return ['bacteria_test_kit']
+  if (/^water_sediment_filter$/.test(slotId)) return ['sediment_filter']
+  if (/^water_fridge_filter$/.test(slotId)) return ['fridge_filter']
+  if (/^water_drinking_filter$/.test(slotId)) return ['drinking_water_filter']
+  if (/^water_filter_wrench$/.test(slotId)) return ['filter_wrench']
+  if (/^water_pressure_gauge$/.test(slotId)) return ['pressure_gauge']
+
+  // ===== V7.2.5 — outdoor_dock_lake =====
+  if (/^dock_lines$/.test(slotId)) return ['dock_lines']
+  if (/^dock_bumpers$/.test(slotId)) return ['dock_bumpers']
+  if (/^dock_marine_hardware$/.test(slotId)) return ['marine_hardware']
+  if (/^dock_lighting$/.test(slotId)) return ['dock_lighting']
+  if (/^dock_ladder$/.test(slotId)) return ['dock_ladder']
+  if (/^dock_mildew_cleaner$/.test(slotId)) return ['mildew_cleaner']
+  if (/^dock_storage_bin$/.test(slotId)) return ['weatherproof_bin']
+  if (/^dock_non_slip_strips$/.test(slotId)) return ['non_slip_strips']
+
+  // ===== V7.2.5 — home_safety_kit =====
+  if (/^safety_fire_extinguisher$/.test(slotId)) return ['fire_extinguisher']
+  if (/^safety_smoke_co_detector$/.test(slotId)) return ['smoke_co_detector']
+  if (/^safety_first_aid_kit$/.test(slotId)) return ['first_aid_kit']
+  if (/^safety_flashlight_lantern$/.test(slotId)) return ['flashlight_lantern']
+  if (/^safety_emergency_power$/.test(slotId)) return ['emergency_power']
+  if (/^safety_emergency_docs$/.test(slotId)) return ['emergency_docs']
+
+  // ===== V7.2.5 — universal_project_prep =====
+  if (/^prep_laser_measure$/.test(slotId)) return ['laser_measure']
+  if (/^prep_graph_paper_kit$/.test(slotId)) return ['graph_paper_kit']
+  if (/^prep_painters_tape$/.test(slotId)) return ['painters_tape']
+  if (/^prep_label_maker$/.test(slotId)) return ['label_maker']
+  if (/^prep_sample_boards$/.test(slotId)) return ['sample_boards']
+  if (/^prep_phone_tripod$/.test(slotId)) return ['phone_tripod']
+  if (/^prep_inspection_mirror$/.test(slotId)) return ['inspection_mirror']
+
   return []
 }
 
@@ -354,6 +428,7 @@ function deriveSeasons(scopeId: string): string[] {
     return ['year_round']
   }
   if (/mudroom_entry_reset/.test(scopeId)) return ['mud_season', 'spring', 'year_round']
+  if (/dock_lake/.test(scopeId)) return ['summer', 'opening_season', 'spring']
 
   return []
 }
@@ -514,13 +589,23 @@ function buildTierQuery(
   // generated query asks only for the new scope's topic and the on-
   // disk entry (still tagged with the original scope's topic) doesn't
   // match -- breaking cross-scope reuse at runtime.
+  //
+  // V7.2.5 paste 4 — same logic for tier. mergeProductTags preserves
+  // the original tier on the universe entry (one product can be the
+  // budget pick in scope A and the sweet_spot pick in scope B; tier
+  // is editorial). The query must ask for the entry's canonical
+  // tier, not the new scope's editorial tier, so the strict-equality
+  // tier check at runtime still matches. The slot's CartSlot.tiers.X
+  // assignment then presents the resolved product as the X-tier pick
+  // for the new scope, regardless of its canonical storage tier.
+  void tier
   void source
   return {
     mustHaveTopics: product.tags.topics as UniverseQuery['mustHaveTopics'],
     mustHaveFunctions: product.tags.functions,
     mustHaveRoles: product.tags.roles as UniverseQuery['mustHaveRoles'],
     excludeAlreadyHaveFlag: slot.conditionalOn?.[0],
-    tier,
+    tier: product.tags.tier,
     limit: 1,
   }
 }

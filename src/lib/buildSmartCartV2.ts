@@ -32,6 +32,11 @@ const SCENARIO_LABEL: Record<BriefScenarioId, string> = {
   tight_budget: 'Tight budget',
   premium: 'Premium',
   lake_property: 'Lake property',
+  // v7.2.5 — second-home and seasonal-window scenarios.
+  absentee_owner: 'Absentee owner',
+  pre_winter_prep: 'Pre-winter prep',
+  spring_opening: 'Spring opening',
+  mud_season: 'Mud season',
 }
 
 export interface BuildSmartCartV2Input {

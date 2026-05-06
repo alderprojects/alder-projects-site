@@ -41,6 +41,11 @@ export type TopicId =
   | 'general_orientation'
   | 'mud_season'
   | 'well_septic'
+  // v7.2.5 — cross-project tools, project prep, safety basics, and
+  // owner-kit catalogs that are not pinned to a single project area.
+  | 'mudroom'
+  | 'home_repair'
+  | 'universal'
 
 export const TOPICS: readonly TopicId[] = [
   'heat_pump',
@@ -58,6 +63,9 @@ export const TOPICS: readonly TopicId[] = [
   'general_orientation',
   'mud_season',
   'well_septic',
+  'mudroom',
+  'home_repair',
+  'universal',
 ] as const
 
 export type VisitorSignals = {
@@ -1212,6 +1220,9 @@ function topicLabelFor(t: TopicId | null): string {
     general_orientation: 'general orientation',
     mud_season: 'mud-season prep',
     well_septic: 'a well or septic job',
+    mudroom: 'a mudroom or entry reset',
+    home_repair: 'home repair work',
+    universal: 'a small project',
   }
   return map[t]
 }

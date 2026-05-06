@@ -206,6 +206,53 @@ export const SCENARIOS: Record<BriefScenarioId, ScenarioContent> = {
       'patio-furniture-peak-pricing',
     ],
   },
+
+  // ---------- v7.2.5 placeholder scenarios -----------------------------
+  // These are implicit scenarios introduced for v7.2.5 scopes (freeze
+  // prevention, spring opening, mud-season entry reset, absentee owner).
+  // Pastes 2-4 fill in the prose hooks alongside the catalog content
+  // they target. Paste 1 ships them as minimal placeholders so the
+  // BriefScenarioId Record stays exhaustive.
+
+  absentee_owner: {
+    id: 'absentee_owner',
+    openerHook:
+      "Absentee-owner cart leans on remote monitoring (WiFi sensors, smart shutoffs, cellular alerts) over comfort items. The goal is detecting trouble before the next visit, not making the kitchen nicer.",
+    topicHooks: {},
+    seasonHooks: {},
+    verifyBeforeBuying: [],
+    additionalTraps: [],
+  },
+
+  pre_winter_prep: {
+    id: 'pre_winter_prep',
+    openerHook:
+      "Pre-winter prep is the October freeze-prevention pass: pipe insulation, hose-bib covers, draft sealing, and the smart-shutoff or freeze sensor that pages you at 35°F.",
+    topicHooks: {},
+    seasonHooks: {},
+    verifyBeforeBuying: [],
+    additionalTraps: [],
+  },
+
+  spring_opening: {
+    id: 'spring_opening',
+    openerHook:
+      "Spring opening cart: the test kits, filters, consumables, and reset gear that turn the first weekend back from a punch list into a coffee-on-the-deck weekend.",
+    topicHooks: {},
+    seasonHooks: {},
+    verifyBeforeBuying: [],
+    additionalTraps: [],
+  },
+
+  mud_season: {
+    id: 'mud_season',
+    openerHook:
+      "Mud-season cart: boot trays, contractor-grade entry mats, gear bins, and the towel station that keeps the rest of the house dry between March and May.",
+    topicHooks: {},
+    seasonHooks: {},
+    verifyBeforeBuying: [],
+    additionalTraps: [],
+  },
 }
 
 // ---------- Helpers ---------------------------------------------------

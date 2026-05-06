@@ -213,7 +213,7 @@ export const SCOPE_VARIANTS: Record<TopicId, ScopeVariant[]> = {
       label: 'Dock & lake practical maintenance',
       description:
         'Make the dock and lake setup safer and more usable without turning every issue into a rebuild.',
-      smartCartReady: false, // flips to true in paste 4
+      smartCartReady: true, // v7.2.5 paste 4 — catalog ingested
       defaultLane: 'diy',
       estCostRange: { low: 150, high: 800 },
       relevantKitIds: ['outdoor_dock_lake'],
@@ -310,7 +310,7 @@ export const SCOPE_VARIANTS: Record<TopicId, ScopeVariant[]> = {
       label: 'Water quality & filtration',
       description:
         'Test before treating. Avoid buying the wrong filter for the wrong water problem.',
-      smartCartReady: false, // flips to true in paste 4
+      smartCartReady: true, // v7.2.5 paste 4 — catalog ingested
       defaultLane: 'diy',
       estCostRange: { low: 50, high: 350 },
       relevantKitIds: ['home_water_quality'],
@@ -324,7 +324,7 @@ export const SCOPE_VARIANTS: Record<TopicId, ScopeVariant[]> = {
       label: 'Seasonal home safety kit',
       description:
         'Cover the basics that are easy to forget when a home is used seasonally.',
-      smartCartReady: false, // flips to true in paste 4
+      smartCartReady: true, // v7.2.5 paste 4 — catalog ingested
       defaultLane: 'diy',
       estCostRange: { low: 120, high: 450 },
       relevantKitIds: ['home_safety_kit'],
@@ -360,7 +360,7 @@ export const SCOPE_VARIANTS: Record<TopicId, ScopeVariant[]> = {
       label: 'Project prep, measure, document',
       description:
         'Get the measurements, photos, and notes right before buying materials or calling someone.',
-      smartCartReady: false, // flips to true in paste 4
+      smartCartReady: true, // v7.2.5 paste 4 — catalog ingested
       defaultLane: 'diy',
       estCostRange: { low: 40, high: 200 },
       relevantKitIds: ['universal_project_prep'],

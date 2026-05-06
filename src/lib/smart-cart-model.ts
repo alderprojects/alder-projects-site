@@ -78,6 +78,26 @@ export interface CartSlot {
     label?: string
     daysRemaining?: number
   }
+
+  // ===================================================================
+  // v7.2.5 — source-file authoring carryover. These fields properly
+  // belong on ScopeCatalogSlot (they describe catalog editorial
+  // intent, not runtime cart state). They're declared optional on
+  // CartSlot so source-file authors can write a single CartSlot[] in
+  // the v7.2.2-shape source files and have the ingestion script
+  // normalize them into ScopeCatalogSlot. Runtime cart output leaves
+  // them undefined.
+  // ===================================================================
+  nextBestIfAlreadyHave?: {
+    targetSlotOrFunction: string
+    reason: string
+  }
+  whenToSkip?: string[]
+  routeOutOfSmartCartIf?: Array<{
+    condition: string
+    destination: 'worth_it' | 'small_pro' | 'contractor' | 'verify_first'
+    reason: string
+  }>
 }
 
 export type SkipReasonType =

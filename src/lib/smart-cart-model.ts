@@ -46,6 +46,38 @@ export interface CartSlot {
   // (research notes, reviewer rankings). Optional for back-compat
   // with v7.2.1/v7.2.2 carts that didn't carry citations.
   citations?: string[]
+
+  // ===================================================================
+  // v7.2.5 — slot-level metadata forwarded by the builder onto the
+  // cart output for the result page. All optional so v1-shaped carts
+  // and v7.2.1-7.2.4 v2 carts in KV continue to render unchanged.
+  // ===================================================================
+
+  /** Slot purpose (forwarded from ScopeCatalogSlot.slotPurpose). */
+  slotPurpose?: string
+
+  /** Why-it-matters copy (forwarded from ScopeCatalogSlot). */
+  whyItMatters?: string
+
+  /** Common buyer mistake (forwarded from ScopeCatalogSlot). */
+  commonMistake?: string
+
+  /**
+   * Cost-benefit claim from the resolved sweet-spot product.
+   * Builder copies from UniverseProduct.costBenefitClaim.
+   */
+  costBenefitClaim?: string
+
+  /** Vermont reasoning from the resolved sweet-spot product. */
+  vermontReasoning?: string
+
+  /** Slot-level urgency window from the sweet-spot product. */
+  urgencyWindow?: {
+    buyByDate?: string
+    earliestUseful?: string
+    label?: string
+    daysRemaining?: number
+  }
 }
 
 export type SkipReasonType =
@@ -95,6 +127,54 @@ export interface SmartCartV2Output {
   respinCount?: number
   refunded?: boolean
   configVersion: string
+
+  // ===================================================================
+  // v7.2.5 — optional output extensions forwarded from the catalog +
+  // universe. Result page can render these when present; carts saved
+  // before v7.2.5 simply omit them.
+  // ===================================================================
+
+  /** Scope-level promise to surface at top of result page. */
+  smartCartPromise?: string
+
+  /** Scope-level value proposition. */
+  valueProposition?: string
+
+  /**
+   * Route-out triggered. If set, the cart is suppressed and the
+   * buyer sees the route-out message instead of the slot list.
+   */
+  routedOut?: {
+    destination: 'worth_it' | 'small_pro' | 'contractor' | 'verify_first'
+    reason: string
+  }
+
+  /**
+   * Bundle prompts — pairs of universeIds where the cart can surface
+   * "buy these together" callouts.
+   */
+  bundlePrompts?: Array<{
+    primaryUniverseId: string
+    bundleUniverseIds: string[]
+    bundleReason: string
+  }>
+
+  /**
+   * Next-best gap fillers — products to recommend based on alreadyHave
+   * flags. Built from slots' nextBestIfAlreadyHave entries.
+   */
+  nextBestGaps?: Array<{
+    triggeredByFlag: string
+    recommendedSlot: string
+    reason: string
+  }>
+
+  /** Urgency banner — top-of-page "buy by" callout. */
+  urgencyBanner?: {
+    deadline: string
+    label: string
+    daysRemaining?: number
+  }
 }
 
 export const TIER_LABEL: Record<CartTier, string> = {

@@ -202,6 +202,13 @@ export type BriefScenarioId =
   | 'tight_budget'
   | 'premium'
   | 'lake_property'
+  // v7.2.5 — additional implicit scenarios for v7.2.5 scopes. Not yet
+  // surfaced in CurationModal; pastes 2-4 may bring them in via
+  // intent-config when scope-specific.
+  | 'absentee_owner'
+  | 'pre_winter_prep'
+  | 'spring_opening'
+  | 'mud_season'
 
 export type BriefScenario = {
   id: BriefScenarioId

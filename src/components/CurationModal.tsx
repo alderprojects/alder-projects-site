@@ -40,6 +40,12 @@ const SCENARIO_LABELS: Record<BriefScenarioId, string> = {
   tight_budget: 'Tight budget',
   premium: 'Premium',
   lake_property: 'Lake property',
+  // v7.2.5 — implicit scenarios; surfaced by intent-config when
+  // scope-specific (pastes 2-4).
+  absentee_owner: 'Absentee owner',
+  pre_winter_prep: 'Pre-winter prep',
+  spring_opening: 'Spring opening',
+  mud_season: 'Mud season',
 }
 
 export default function CurationModal() {

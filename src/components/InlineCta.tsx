@@ -265,6 +265,9 @@ function topicLabel(t: TopicId | null): string {
     general_orientation: 'general orientation',
     mud_season: 'mud-season prep',
     well_septic: 'a well or septic job',
+    mudroom: 'a mudroom or entry reset',
+    home_repair: 'home repair work',
+    universal: 'a project',
   }
   return map[t]
 }

@@ -222,6 +222,13 @@ export const SCOPE_VARIANTS: Record<TopicId, ScopeVariant[]> = {
   general_orientation: [],
   mud_season: [],
   well_septic: [],
+
+  // v7.2.5 — placeholders for new topics introduced this release.
+  // Section 7 of paste 1 populates these. Pastes 2-4 add catalog
+  // content + flip smartCartReady to true.
+  mudroom: [],
+  home_repair: [],
+  universal: [],
 }
 
 // ---------- Helpers ---------------------------------------------------

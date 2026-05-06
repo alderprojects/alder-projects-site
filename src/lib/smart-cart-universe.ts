@@ -23,6 +23,10 @@ import type { CartTierVariant, CartTier } from './smart-cart-model'
  * Topic categories — high-level project areas. A product can belong
  * to multiple (a magnetic spice rack is kitchen; an outdoor mat is
  * outdoor + mudroom).
+ *
+ * v7.2.5 — added 'universal' for cross-project tools (owner kit,
+ * project prep, safety basics) that show up across multiple scope
+ * contexts.
  */
 export type UniverseTopic =
   | 'kitchen'
@@ -31,10 +35,15 @@ export type UniverseTopic =
   | 'bathroom'
   | 'weatherization'
   | 'home_repair'
+  | 'universal'
 
 /**
  * Roles within a project — the "what is this thing" facet. Loose
  * ontology used by scope catalogs to compose visual sections.
+ *
+ * v7.2.5 — added sensor/monitor/cleaner/preventer/document_aid/
+ * measurement_tool to cover freeze-prevention, water-quality,
+ * project-prep scopes.
  */
 export type UniverseRole =
   | 'tool'
@@ -50,9 +59,18 @@ export type UniverseRole =
   | 'textile'
   | 'appliance'
   | 'plant_material'
+  | 'sensor'
+  | 'monitor'
+  | 'cleaner'
+  | 'preventer'
+  | 'document_aid'
+  | 'measurement_tool'
 
 /**
  * Seasonal relevance. Empty array = year-round.
+ *
+ * v7.2.5 — added pre_winter/pre_summer/year_round for freeze prep
+ * and opening windows that don't map cleanly to a single season.
  */
 export type UniverseSeason =
   | 'spring'
@@ -62,6 +80,9 @@ export type UniverseSeason =
   | 'mud_season'
   | 'opening_season'
   | 'closing_season'
+  | 'pre_winter'
+  | 'pre_summer'
+  | 'year_round'
 
 /**
  * Property characteristics — used by outdoor / lake / mountain etc.
@@ -101,6 +122,82 @@ export interface UniverseTags {
   tier: CartTier
   /** Property characteristics this product is appropriate for. */
   propertyTypes: UniversePropertyType[]
+
+  // ===================================================================
+  // v7.2.5 — optional metadata layer used by the result page to
+  // surface "why this slot" context, route-out logic, and seasonal
+  // urgency. All optional so existing 82 universe entries continue
+  // to validate without modification.
+  // ===================================================================
+
+  /**
+   * What value the product creates. Used by builder to surface the
+   * "why this slot" callout on the result page.
+   */
+  valueMechanism?: Array<
+    | 'prevents_damage'
+    | 'avoids_overbuying'
+    | 'defers_larger_project'
+    | 'reduces_extra_trips'
+    | 'improves_livability'
+    | 'improves_safety'
+    | 'preserves_season_readiness'
+    | 'fills_ownership_gap'
+    | 'supports_project_prep'
+    | 'improves_remote_monitoring'
+  >
+
+  /** How the buyer should approach this purchase. */
+  executionLane?:
+    | 'diy_first'
+    | 'small_pro'
+    | 'contractor_worthy'
+    | 'verify_first'
+    | 'hold'
+
+  /** Replacement frequency. Drives lifecycle messaging. */
+  replacementCycle?:
+    | 'one_time'
+    | 'seasonal'
+    | 'annual'
+    | 'every_3_5_years'
+    | 'as_needed'
+
+  /**
+   * Affiliate revenue likelihood. Used internally for catalog
+   * prioritization, not shown to buyer.
+   */
+  affiliateFit?: 'high' | 'medium' | 'low'
+
+  /**
+   * Trust risk if buyer chooses wrong product. high = real damage
+   * potential, medium = wasted money, low = aesthetic.
+   */
+  trustRisk?: 'low' | 'medium' | 'high'
+
+  /**
+   * Urgency window — when this product is most relevant. Drives
+   * "buy by" callouts on the result page when the current date is
+   * approaching the window deadline.
+   */
+  urgencyWindow?: {
+    /**
+     * Latest useful purchase date in MM-DD format (no year). Builder
+     * compares against current date to determine urgency badges.
+     */
+    buyByDate?: string
+    /** Earliest purchase date that makes sense. */
+    earliestUseful?: string
+    /** Display label, e.g. "Best by November 1". */
+    label?: string
+  }
+
+  /**
+   * Bundle mechanism — products that are MORE valuable when bought
+   * together. References universeIds of paired products. Result page
+   * surfaces these as "buy this with..." prompts.
+   */
+  bundleWith?: string[]
 }
 
 // ---------- Universe entry ------------------------------------------
@@ -138,6 +235,58 @@ export interface UniverseProduct {
   /** Citations describing the product (research, reviewer rankings). */
   citations: string[]
   migratedFrom?: MigrationProvenance
+
+  // ===================================================================
+  // v7.2.5 — optional product-level value-prop and route-out fields.
+  // The builder forwards these through CartSlot onto SmartCartV2Output
+  // so the result page can render the cost/benefit framing, Vermont
+  // reasoning, and next-best-if-already-have prompts.
+  // ===================================================================
+
+  /**
+   * Cost-benefit claim — short, customer-facing, structured. Examples:
+   *   "Spend $40 to detect a leak before it ruins drywall."
+   *   "Spend $150 to defer a $15k cosmetic remodel by 5 years."
+   * Used on the result page as the primary value-prop callout for
+   * the slot.
+   */
+  costBenefitClaim?: string
+
+  /**
+   * Vermont-specific reasoning. Soft phrasing — public-data claims
+   * only (frost depth, growing season dates, mud season timing).
+   * NO contractor-specific claims until verified. Examples:
+   *   "Vermont frost line is ~48 inches in northern counties.
+   *    Pipe insulation matters more in unconditioned crawlspaces."
+   *   "Mud season runs March-May; entry mats see 10x normal use."
+   */
+  vermontReasoning?: string
+
+  /**
+   * What customer intent this product serves. Used for routing
+   * buyers to the right scope when intent is ambiguous.
+   */
+  customerIntent?: string
+
+  /**
+   * If buyer already has this product, what to recommend instead.
+   * Reference to another universeId or a function tag. Powers the
+   * next-best-if-already-have logic.
+   */
+  ifAlreadyHaveNextBest?: {
+    /** Reference style — universeId for direct, function for query-based. */
+    type: 'universeId' | 'function'
+    /** The universeId or function tag to recommend instead. */
+    target: string
+    /** Why this is the next-best. */
+    reason: string
+  }
+
+  /**
+   * When the buyer should NOT use this product. Examples:
+   *   ["if WiFi unreliable", "if owner present > 50% of time"]
+   */
+  doNotRecommendIf?: string[]
 }
 
 // ---------- Query --------------------------------------------------

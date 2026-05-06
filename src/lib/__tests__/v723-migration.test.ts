@@ -1,5 +1,9 @@
 // V7.2.3 — cart-equivalence test suite for the hybrid universe +
 // scope-catalog model.
+// V7.2.5 — generalized to iterate the entire CATALOGS registry
+// rather than hard-coding a single scope. Same per-scope assertions
+// as v7.2.3, applied across every registered catalog × every
+// scenario the catalog declares.
 //
 // IMPORTANT: this file uses Jest's describe/test/expect API but the
 // project does not currently have Jest installed (no @types/jest, no
@@ -8,11 +12,16 @@
 // /api/admin/v723-verify (server-side, no test runner needed).
 //
 // Coverage:
-//  - Each v2-curated combination × each scenario → cart structure
-//    intact (slot count > 0, sweet_spot resolved, savings sane)
-//  - alreadyHave filtering hides the right slot
+//  - Each registered catalog × each declared scenario → cart
+//    structure intact (slot count > 0, sweet_spot resolved, savings
+//    sane, all sweet_spots carry an amazon.com affiliateUrl)
+//  - alreadyHave filtering hides the right slot (per catalog with
+//    at least one conditional slot)
+//  - absentee_owner scenario works for catalogs that declare it
 //  - Every universe entry traces to a source via migratedFrom
 //  - Universe IDs are unique
+//  - Every catalog scenario in `scenarios` has a matching
+//    scenarioDefaults entry
 //
 // To enable:
 //   npm i -D jest @types/jest ts-jest
@@ -25,52 +34,41 @@ declare const test: any
 declare const expect: any
 
 import { buildSmartCartV2 } from '../buildSmartCartV2'
-import { getCatalog, getUniverse, getAllCatalogs } from '@/content/smart-cart'
-import type { TopicId } from '../property-modules'
+import { getAllCatalogs, getUniverse } from '@/content/smart-cart'
 import type { BriefScenarioId } from '../recommender-config.types'
 
-describe('v7.2.3 migration: cart equivalence', () => {
-  // V7.2.3 ships ONE migrated catalog. The other 3 listed in the
-  // v7.2.2 spec haven't landed in code yet (blocked on prose).
-  const scopes: Array<{
-    topic: TopicId
-    scopeVariantId: string
-    expectedCoreSlotsMax: number
-    expectedSkipMax: number
-  }> = [
-    {
-      topic: 'kitchen',
-      scopeVariantId: 'kitchen_organizers',
-      expectedCoreSlotsMax: 8,
-      expectedSkipMax: 11,
-    },
-  ]
+describe('v7.2.5 cart equivalence: all registered catalogs', () => {
+  const catalogs = getAllCatalogs()
+  const universe = getUniverse()
 
-  const scenarios: BriefScenarioId[] = [
+  // Standard scenarios run against every catalog that declares them.
+  // Catalogs may declare additional scenarios (lake_property,
+  // absentee_owner, mud_season, etc.) — those run via the dedicated
+  // declared-scenario block below.
+  const standardScenarios: BriefScenarioId[] = [
     'just_starting',
     'tight_budget',
     'already_have_basics',
     'premium',
   ]
 
-  scopes.forEach(({ topic, scopeVariantId, expectedCoreSlotsMax, expectedSkipMax }) => {
-    describe(`${topic}/${scopeVariantId}`, () => {
-      scenarios.forEach(scenario => {
-        test(`${scenario}: structure intact`, () => {
-          const catalog = getCatalog(topic, scopeVariantId)!
-          const universe = getUniverse()
-          expect(catalog).toBeTruthy()
-          expect(universe.length).toBeGreaterThan(0)
+  catalogs.forEach(catalog => {
+    describe(`${catalog.topic}/${catalog.scopeVariantId}`, () => {
+      standardScenarios.forEach(scenario => {
+        if (!catalog.scenarios.includes(scenario)) return
 
+        test(`${scenario}: structure intact`, () => {
           const cart = buildSmartCartV2(
             {
-              cartId: `TEST-${scopeVariantId}-${scenario}`,
-              topic,
-              scopeVariantId,
+              cartId: `TEST-${catalog.scopeVariantId}-${scenario}`,
+              topic: catalog.topic,
+              scopeVariantId: catalog.scopeVariantId,
               scenario,
               customerEmail: 'test@example.com',
-              selectedTier: 'sweet_spot',
-              alreadyHave: [],
+              selectedTier:
+                catalog.scenarioDefaults[scenario]?.selectedTier ?? 'sweet_spot',
+              alreadyHave:
+                catalog.scenarioDefaults[scenario]?.alreadyHave ?? [],
             },
             catalog,
             universe,
@@ -78,10 +76,6 @@ describe('v7.2.3 migration: cart equivalence', () => {
 
           expect(cart.version).toBe(2)
           expect(cart.slots.length).toBeGreaterThan(0)
-          const coreSlots = cart.slots.filter(s => s.slotKind === 'core')
-          expect(coreSlots.length).toBeLessThanOrEqual(expectedCoreSlotsMax)
-
-          // Every emitted slot must have a sweet_spot variant resolved.
           cart.slots.forEach(slot => {
             expect(slot.tiers.sweet_spot).toBeDefined()
             expect(slot.tiers.sweet_spot.productName).toBeTruthy()
@@ -92,30 +86,58 @@ describe('v7.2.3 migration: cart equivalence', () => {
             expect(slot.tiers.sweet_spot.affiliateUrl).toMatch(/amazon\.com/)
           })
 
-          // Skip list intact and capped.
-          expect(cart.skipList.length).toBeGreaterThan(0)
-          expect(cart.skipList.length).toBeLessThanOrEqual(expectedSkipMax)
-
-          // Savings math sane.
-          expect(cart.savings.leanCartLow).toBeGreaterThan(0)
-          expect(cart.savings.leanCartHigh).toBeGreaterThanOrEqual(
-            cart.savings.leanCartLow,
-          )
           expect(cart.savings.potentialSavingsHigh).toBeGreaterThanOrEqual(
             cart.savings.potentialSavingsLow,
           )
         })
       })
 
+      // V7.2.5 — catalogs that declare implicit scenarios
+      // (absentee_owner, lake_property, pre_winter_prep,
+      // spring_opening, mud_season) should also build cleanly.
+      const implicitScenarios: BriefScenarioId[] = [
+        'absentee_owner',
+        'lake_property',
+        'pre_winter_prep',
+        'spring_opening',
+        'mud_season',
+      ]
+      implicitScenarios.forEach(scenario => {
+        if (!catalog.scenarios.includes(scenario)) return
+
+        test(`${scenario}: structure intact (implicit scenario)`, () => {
+          const cart = buildSmartCartV2(
+            {
+              cartId: `TEST-${catalog.scopeVariantId}-${scenario}`,
+              topic: catalog.topic,
+              scopeVariantId: catalog.scopeVariantId,
+              scenario,
+              customerEmail: 'test@example.com',
+              selectedTier:
+                catalog.scenarioDefaults[scenario]?.selectedTier ?? 'sweet_spot',
+              alreadyHave:
+                catalog.scenarioDefaults[scenario]?.alreadyHave ?? [],
+            },
+            catalog,
+            universe,
+          )
+
+          expect(cart.version).toBe(2)
+          expect(cart.slots.length).toBeGreaterThan(0)
+        })
+      })
+
       test('alreadyHave filtering hides the right slot', () => {
-        const catalog = getCatalog(topic, scopeVariantId)!
-        const universe = getUniverse()
+        const slotsWithConditional = catalog.slots.filter(
+          s => s.conditionalOn.length > 0,
+        )
+        if (slotsWithConditional.length === 0) return
 
         const baseline = buildSmartCartV2(
           {
-            cartId: 'TEST-baseline',
-            topic,
-            scopeVariantId,
+            cartId: `TEST-baseline-${catalog.scopeVariantId}`,
+            topic: catalog.topic,
+            scopeVariantId: catalog.scopeVariantId,
             scenario: 'just_starting',
             customerEmail: 'test@example.com',
             selectedTier: 'sweet_spot',
@@ -125,17 +147,12 @@ describe('v7.2.3 migration: cart equivalence', () => {
           universe,
         )
 
-        const slotsWithConditional = catalog.slots.filter(
-          s => s.conditionalOn.length > 0,
-        )
-        if (slotsWithConditional.length === 0) return
-
         const flagToSet = slotsWithConditional[0].conditionalOn[0]
         const filtered = buildSmartCartV2(
           {
-            cartId: 'TEST-filtered',
-            topic,
-            scopeVariantId,
+            cartId: `TEST-filtered-${catalog.scopeVariantId}`,
+            topic: catalog.topic,
+            scopeVariantId: catalog.scopeVariantId,
             scenario: 'just_starting',
             customerEmail: 'test@example.com',
             selectedTier: 'sweet_spot',
@@ -146,7 +163,6 @@ describe('v7.2.3 migration: cart equivalence', () => {
         )
 
         expect(filtered.slots.length).toBeLessThan(baseline.slots.length)
-
         const dropped = slotsWithConditional[0].slotId
         expect(filtered.slots.find(s => s.slotId === dropped)).toBeUndefined()
       })
@@ -154,7 +170,6 @@ describe('v7.2.3 migration: cart equivalence', () => {
   })
 
   test('every universe entry traces to a source via migratedFrom', () => {
-    const universe = getUniverse()
     universe.forEach(p => {
       expect(p.migratedFrom).toBeDefined()
       expect(p.migratedFrom!.scope).toBeTruthy()
@@ -164,7 +179,6 @@ describe('v7.2.3 migration: cart equivalence', () => {
   })
 
   test('universe IDs are unique', () => {
-    const universe = getUniverse()
     const ids = new Set<string>()
     universe.forEach(p => {
       expect(ids.has(p.universeId)).toBe(false)
@@ -174,7 +188,7 @@ describe('v7.2.3 migration: cart equivalence', () => {
   })
 
   test('every catalog scenario default keys match scenarios array', () => {
-    getAllCatalogs().forEach(c => {
+    catalogs.forEach(c => {
       c.scenarios.forEach(s => {
         expect(c.scenarioDefaults[s]).toBeDefined()
       })

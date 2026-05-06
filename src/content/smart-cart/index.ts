@@ -24,6 +24,10 @@ import { OUTDOOR_SEASONAL_OPENING } from './scope-catalogs/outdoor-seasonal-open
 import { OUTDOOR_FREEZE_PREVENTION } from './scope-catalogs/outdoor-freeze-prevention'
 import { HOME_MOISTURE_CONTROL } from './scope-catalogs/home-moisture-control'
 import { UNIVERSAL_OWNER_KIT } from './scope-catalogs/universal-owner-kit'
+import { HOME_WATER_QUALITY } from './scope-catalogs/home-water-quality'
+import { OUTDOOR_DOCK_LAKE } from './scope-catalogs/outdoor-dock-lake'
+import { HOME_SAFETY_KIT } from './scope-catalogs/home-safety-kit'
+import { UNIVERSAL_PROJECT_PREP } from './scope-catalogs/universal-project-prep'
 // MUDROOM_ENTRY_RESET pending — paste 3 source file not yet provided.
 
 const CATALOGS: ScopeCatalog[] = [
@@ -38,6 +42,11 @@ const CATALOGS: ScopeCatalog[] = [
   // V7.2.5 paste 3
   HOME_MOISTURE_CONTROL,
   UNIVERSAL_OWNER_KIT,
+  // V7.2.5 paste 4
+  HOME_WATER_QUALITY,
+  OUTDOOR_DOCK_LAKE,
+  HOME_SAFETY_KIT,
+  UNIVERSAL_PROJECT_PREP,
   // MUDROOM_ENTRY_RESET — pending source file
 ]
 

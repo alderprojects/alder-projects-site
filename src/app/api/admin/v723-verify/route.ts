@@ -64,6 +64,11 @@ const EXPECTED_STATS: Record<string, { slotCount: number; skipCount: number }> =
   // spec exactly. mudroom_entry_reset pending source file.
   home_moisture_control: { slotCount: 7, skipCount: 8 },
   universal_owner_kit: { slotCount: 10, skipCount: 9 },
+  // V7.2.5 paste 4 — final 4 scopes. All match spec exactly.
+  home_water_quality: { slotCount: 8, skipCount: 8 },
+  outdoor_dock_lake: { slotCount: 8, skipCount: 8 },
+  home_safety_kit: { slotCount: 6, skipCount: 8 },
+  universal_project_prep: { slotCount: 7, skipCount: 7 },
 }
 
 // V7.2.5 — destinations a catalog can route a buyer to instead of

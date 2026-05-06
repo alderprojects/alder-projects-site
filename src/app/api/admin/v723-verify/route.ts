@@ -54,6 +54,12 @@ const EXPECTED_STATS: Record<string, { slotCount: number; skipCount: number }> =
   kitchen_cosmetic_refresh: { slotCount: 9, skipCount: 11 },
   kitchen_cabinet_hardware_swap: { slotCount: 6, skipCount: 10 },
   outdoor_lake_season: { slotCount: 12, skipCount: 14 },
+  // V7.2.5 paste 2 — outdoor catalogs. Spec listed
+  // freeze_prevention skipCount: 11 but the source ships 10 skip
+  // items as authored; using actual.
+  outdoor_deck_refresh: { slotCount: 8, skipCount: 10 },
+  outdoor_seasonal_opening: { slotCount: 8, skipCount: 9 },
+  outdoor_freeze_prevention: { slotCount: 9, skipCount: 10 },
 }
 
 // V7.2.5 — destinations a catalog can route a buyer to instead of

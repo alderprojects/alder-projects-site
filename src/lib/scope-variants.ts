@@ -169,7 +169,7 @@ export const SCOPE_VARIANTS: Record<TopicId, ScopeVariant[]> = {
       topic: 'outdoor',
       label: 'Deck refresh — stain, hardware, soft goods',
       description: 'Spring-to-summer cosmetic refresh of an existing deck. Ships structurally for V7.',
-      smartCartReady: false,
+      smartCartReady: true, // v7.2.5 paste 2 — catalog ingested
       defaultLane: 'diy',
       estCostRange: { low: 120, high: 450 },
       relevantKitIds: ['outdoor_furniture', 'outdoor_textiles', 'outdoor_storage'],
@@ -185,7 +185,7 @@ export const SCOPE_VARIANTS: Record<TopicId, ScopeVariant[]> = {
       label: 'Winterization & freeze prevention',
       description:
         'Detect, prevent, and contain frozen-pipe risk before the season.',
-      smartCartReady: false, // flips to true in paste 2
+      smartCartReady: true, // v7.2.5 paste 2 — catalog ingested
       defaultLane: 'diy',
       estCostRange: { low: 100, high: 500 },
       relevantKitIds: ['outdoor_freeze_prevention', 'home_freeze_kit'],
@@ -199,7 +199,7 @@ export const SCOPE_VARIANTS: Record<TopicId, ScopeVariant[]> = {
       label: 'Spring opening & water startup',
       description:
         'Open a seasonal home without losing the first weekend to leaks, missing supplies, and reset work.',
-      smartCartReady: false, // flips to true in paste 2
+      smartCartReady: true, // v7.2.5 paste 2 — catalog ingested
       defaultLane: 'diy',
       estCostRange: { low: 80, high: 300 },
       relevantKitIds: ['outdoor_seasonal_opening', 'home_water_startup'],

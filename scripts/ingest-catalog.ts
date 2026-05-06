@@ -1,4 +1,5 @@
 // V7.2.4 — generalized catalog ingestion tool.
+// V7.2.5 — extended for new metadata + auto-append to universe.ts.
 //
 // Purpose:
 //   Take a v7.2.2-shape source catalog (slots with embedded
@@ -31,21 +32,33 @@
 //   3. Write the trimmed scope catalog to
 //      scope-catalogs/{name}.ts with verbatim editorial prose
 //      from the source.
-//   4. Print a diff-like summary (new entries vs merged) and
-//      verify by re-running queryUniverse against each slot's
-//      tierQueries.
+//   4. Auto-append new universe entries to universe.ts before
+//      the closing `]` of the UNIVERSE export. Idempotent: existing
+//      entries dedup via ASIN/productName match.
+//   5. Print a diff-like summary (new entries vs merged).
 //
 // Idempotent: running twice produces the same files (modulo
 // timestamps in comments).
 //
-// Notes:
-//   - This tool was added in v7.2.4 alongside the manual
-//     ingestion of three catalogs (kitchen_cabinet_hardware_swap,
-//     kitchen_cosmetic_refresh, outdoor_lake_season). The v7.2.4
-//     output was verified by hand because tsx wasn't installed at
-//     the time of the PR. Future scope additions (v7.2.5+) should
-//     `npm i -D tsx` and run this tool to produce machine-
-//     verifiable output.
+// V7.2.5 additions:
+//   - {SCOPE}_METADATA export (smartCartPromise, valueProposition,
+//     routeOutRules, seasonalUrgency) is loaded and written to the
+//     scope catalog.
+//   - Slot-level new fields (slotPurpose, whyItMatters,
+//     commonMistake, nextBestIfAlreadyHave, whenToSkip,
+//     routeOutOfSmartCartIf) are forwarded from source slots to
+//     ScopeCatalogSlot.
+//   - Skip-list new fields (whenItMayBeOkay, betterAlternative,
+//     customerFacingCopy) are forwarded.
+//   - KNOWN_BRANDS expanded for v7.2.5 (Govee, YoLink, Frost King,
+//     Honeywell, Ecobee, Pentair, Pentek, Cabot, Behr, Sun Joe,
+//     Generac, Marcell, hOmeLabs, Sterilite, Method, Quickie,
+//     General Tools, Sherwin-Williams, Restore-A-Deck, Moen,
+//     Deckmate, GRK, EasyHeat).
+//   - deriveRoles / deriveFunctions / deriveSeasons cover the new
+//     freeze_*, opening_*, deck_* slot-id prefixes.
+//   - Universe entries are now auto-appended to universe.ts (no
+//     manual paste step required).
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import * as fs from 'node:fs'
@@ -91,6 +104,19 @@ function parseArgs(argv: string[]): CliArgs {
 // ---------- Source contract -----------------------------------------
 // Source files export {SCOPE}_TOPIC, {SCOPE}_SCOPE, {SCOPE}_SCENARIOS,
 // {SCOPE}_SLOTS, {SCOPE}_SKIP_LIST, {SCOPE}_SCENARIO_DEFAULTS.
+// V7.2.5 sources also export {SCOPE}_METADATA (optional).
+
+interface SourceMetadata {
+  smartCartPromise?: string
+  primaryCustomerPain?: string
+  valueProposition?: string
+  routeOutRules?: Array<{
+    condition: string
+    destination: 'worth_it' | 'small_pro' | 'contractor' | 'verify_first'
+    reason: string
+  }>
+  seasonalUrgency?: { season: string; deadline: string; label: string }
+}
 
 interface SourceCatalog {
   topic: string
@@ -99,6 +125,8 @@ interface SourceCatalog {
   slots: CartSlot[]
   skipList: SkipItemV2[]
   scenarioDefaults: Record<string, { selectedTier: CartTier; alreadyHave: string[] }>
+  /** V7.2.5 — optional scope-level metadata. */
+  metadata?: SourceMetadata
 }
 
 async function loadSource(sourcePath: string): Promise<SourceCatalog> {
@@ -116,6 +144,7 @@ async function loadSource(sourcePath: string): Promise<SourceCatalog> {
     slots: mod[`${upper}_SLOTS`],
     skipList: mod[`${upper}_SKIP_LIST`],
     scenarioDefaults: mod[`${upper}_SCENARIO_DEFAULTS`],
+    metadata: mod[`${upper}_METADATA`],
   }
 }
 
@@ -129,7 +158,8 @@ function deriveTopics(sourceTopic: string): string[] {
 
 function deriveRoles(slotId: string): string[] {
   if (/paint|primer/.test(slotId)) return ['consumable_material', 'finish']
-  if (/pull|knob|hinge|screw/.test(slotId)) return ['hardware']
+  if (/_screw|^deck_exterior_screws$|^freeze_smart_shutoff_valve$/.test(slotId)) return ['hardware']
+  if (/pull|knob|hinge/.test(slotId)) return ['hardware']
   if (/jig/.test(slotId)) return ['tool']
   if (/lighting|string_lights/.test(slotId)) return ['lighting']
   if (/caulk|wood_putty/.test(slotId)) return ['consumable_material']
@@ -142,6 +172,36 @@ function deriveRoles(slotId: string): string[] {
   if (/floats|essentials/.test(slotId)) return ['accessory']
   if (/bug_control/.test(slotId)) return ['accessory']
   if (/organizer/.test(slotId)) return ['organizer']
+
+  // ===== V7.2.5 — outdoor_freeze_prevention =====
+  if (/freeze_leak_sensor/.test(slotId)) return ['sensor']
+  if (/freeze_pipe_insulation/.test(slotId)) return ['consumable_material', 'preventer']
+  if (/freeze_heat_tape/.test(slotId)) return ['preventer']
+  if (/freeze_smart_thermostat/.test(slotId)) return ['monitor', 'preventer']
+  if (/freeze_hose_bib_cover/.test(slotId)) return ['accessory', 'preventer']
+  if (/freeze_draft_sealing/.test(slotId)) return ['consumable_material', 'preventer']
+  if (/freeze_shutoff_labels/.test(slotId)) return ['document_aid', 'safety_item']
+  if (/freeze_alarm_non_wifi/.test(slotId)) return ['sensor', 'monitor']
+
+  // ===== V7.2.5 — outdoor_seasonal_opening =====
+  if (/opening_water_test_kit/.test(slotId)) return ['measurement_tool', 'safety_item']
+  if (/opening_leak_check/.test(slotId)) return ['measurement_tool', 'tool']
+  if (/opening_filter_replacement/.test(slotId)) return ['consumable_material']
+  if (/opening_cleaning_kit/.test(slotId)) return ['cleaner', 'consumable_material']
+  if (/opening_dehumidifier/.test(slotId)) return ['appliance', 'preventer']
+  if (/opening_tote/.test(slotId)) return ['organizer']
+  if (/opening_consumables/.test(slotId)) return ['consumable_material']
+  if (/opening_shutoff_labels/.test(slotId)) return ['document_aid', 'safety_item']
+
+  // ===== V7.2.5 — outdoor_deck_refresh =====
+  if (/deck_cleaner/.test(slotId)) return ['cleaner', 'consumable_material']
+  if (/deck_brush/.test(slotId)) return ['tool']
+  if (/deck_moisture_meter/.test(slotId)) return ['measurement_tool']
+  if (/deck_stain_sealer/.test(slotId)) return ['consumable_material', 'finish']
+  if (/deck_stair_grip/.test(slotId)) return ['safety_item', 'consumable_material']
+  if (/deck_pressure_washer/.test(slotId)) return ['tool']
+  if (/deck_board_repair/.test(slotId)) return ['tool', 'hardware']
+
   return []
 }
 
@@ -157,7 +217,9 @@ function deriveFunctions(slotId: string): string[] {
   if (/caulk_kit/.test(slotId)) return ['kitchen_caulk']
   if (/painting_supplies/.test(slotId)) return ['painting_supplies']
   if (/drawer_slides/.test(slotId)) return ['drawer_slide']
-  if (/screws/.test(slotId)) return ['hardware_screws']
+  // Match the kitchen cabinet-hardware screw slot, but not the
+  // v7.2.5 deck_exterior_screws slot (handled below).
+  if (/^hardware_swap_screws$|kitchen.*screws/.test(slotId)) return ['hardware_screws']
   if (/jig/.test(slotId)) return ['cabinet_hardware_jig']
   if (/wood_putty/.test(slotId)) return ['wood_putty']
   if (/adirondack/.test(slotId)) return ['adirondack_chair']
@@ -172,6 +234,41 @@ function deriveFunctions(slotId: string): string[] {
   if (/cooler/.test(slotId)) return ['outdoor_cooler']
   if (/floats/.test(slotId)) return ['lake_floats']
   if (/bug_control/.test(slotId)) return ['mosquito_control']
+
+  // ===== V7.2.5 — outdoor_freeze_prevention =====
+  if (/freeze_leak_sensor/.test(slotId)) return ['leak_detector']
+  if (/freeze_pipe_insulation/.test(slotId)) return ['pipe_insulation']
+  if (/freeze_heat_tape/.test(slotId)) return ['heat_tape']
+  if (/freeze_smart_thermostat/.test(slotId)) return ['smart_thermostat']
+  if (/freeze_hose_bib_cover/.test(slotId)) return ['hose_bib_cover']
+  if (/freeze_draft_sealing/.test(slotId)) return ['draft_sealer']
+  if (/freeze_shutoff_labels/.test(slotId)) return ['shutoff_labels']
+  if (/freeze_smart_shutoff_valve/.test(slotId)) return ['smart_shutoff_valve']
+  if (/freeze_alarm_non_wifi/.test(slotId)) return ['pipe_freeze_alarm']
+
+  // ===== V7.2.5 — outdoor_seasonal_opening =====
+  if (/opening_water_test_kit/.test(slotId)) return ['water_test_kit']
+  if (/opening_leak_check/.test(slotId)) return ['pressure_gauge', 'leak_detector']
+  if (/opening_filter_replacement/.test(slotId)) return ['filter_replacement']
+  if (/opening_cleaning_kit/.test(slotId)) return ['cleaning_reset_kit']
+  if (/opening_dehumidifier/.test(slotId)) return ['dehumidifier_entry']
+  if (/opening_tote/.test(slotId)) return ['opening_tote']
+  if (/opening_consumables/.test(slotId)) return ['basic_consumables']
+  // Cross-scope reuse: opening_shutoff_labels uses the same function
+  // tag as freeze_shutoff_labels so the tier-query against the
+  // universe finds either entry.
+  if (/opening_shutoff_labels/.test(slotId)) return ['shutoff_labels']
+
+  // ===== V7.2.5 — outdoor_deck_refresh =====
+  if (/^deck_cleaner$/.test(slotId)) return ['deck_cleaner']
+  if (/^deck_brush$/.test(slotId)) return ['deck_brush']
+  if (/^deck_moisture_meter$/.test(slotId)) return ['moisture_meter']
+  if (/^deck_stain_sealer$/.test(slotId)) return ['deck_stain_sealer']
+  if (/^deck_exterior_screws$/.test(slotId)) return ['exterior_screws']
+  if (/^deck_stair_grip$/.test(slotId)) return ['stair_grip_strips']
+  if (/^deck_pressure_washer$/.test(slotId)) return ['pressure_washer']
+  if (/^deck_board_repair$/.test(slotId)) return ['board_repair_tools']
+
   return []
 }
 
@@ -179,6 +276,12 @@ function deriveSeasons(scopeId: string): string[] {
   if (/lake_season/.test(scopeId)) return ['summer', 'opening_season']
   if (/mud_season/.test(scopeId)) return ['mud_season', 'spring']
   if (/fall|pre_winter/.test(scopeId)) return ['fall', 'closing_season']
+
+  // V7.2.5
+  if (/freeze_prevention/.test(scopeId)) return ['fall', 'pre_winter', 'closing_season']
+  if (/seasonal_opening/.test(scopeId)) return ['spring', 'opening_season', 'pre_summer']
+  if (/deck_refresh/.test(scopeId)) return ['spring', 'pre_summer', 'summer']
+
   return []
 }
 
@@ -198,6 +301,14 @@ const KNOWN_BRANDS = [
   'thermacell', 'frontgate', 'pottery_barn', 'restoration_hardware',
   'treasure_garden', 'everie', 'whizz', 'ge', 'cabot',
   'char_broil', 'nexgrill', 'walmart',
+  // V7.2.5
+  'govee', 'yolink', 'frost_king', 'honeywell', 'ecobee',
+  'pentair', 'pentek', 'sun_joe', 'generac', 'marcell',
+  'temp_stick', 'homelabs', 'sterilite', 'method', 'mrs_meyer_s',
+  'mrs_meyers', 'quickie', 'general_tools', 'sherwin_williams',
+  'restore_a_deck', 'moen', 'deckmate', 'grk', 'easyheat',
+  'tap_score', 'watersafe', 'aprilaire', 'foam', 'home_depot',
+  'big_blue',
 ]
 
 function generateUniverseId(slot: CartSlot, tier: CartTier, productName: string): string {
@@ -398,6 +509,16 @@ function ingestSource(
       contextNote: slot.contextNote,
       warnings: slot.warnings,
       citations: (slot as any).citations ?? [],
+      // V7.2.5 — forward optional editorial / route-out / next-best
+      // metadata from the source slot. These are authoring-only
+      // fields the source files declare on CartSlot[]; the ingestion
+      // script lifts them into ScopeCatalogSlot.
+      slotPurpose: slot.slotPurpose,
+      whyItMatters: slot.whyItMatters,
+      commonMistake: slot.commonMistake,
+      nextBestIfAlreadyHave: slot.nextBestIfAlreadyHave,
+      whenToSkip: slot.whenToSkip,
+      routeOutOfSmartCartIf: slot.routeOutOfSmartCartIf,
     })
   }
 
@@ -411,8 +532,56 @@ function ingestSource(
 
 // ---------- Output writers ------------------------------------------
 
+/**
+ * Convert an object to a TypeScript object-literal string. JSON.stringify
+ * with indent=2, then de-quote any property key that's a valid JS
+ * identifier so the output matches the existing universe.ts hand-
+ * written style. String values stay double-quoted (TS-valid).
+ */
+function tsLiteralFromObject(obj: unknown): string {
+  const json = JSON.stringify(obj, null, 2)
+  return json.replace(/"([a-zA-Z_$][a-zA-Z_$0-9]*)":/g, '$1:')
+}
+
 function emitUniverseEntry(p: UniverseProduct): string {
-  return `  ${JSON.stringify(p, null, 2).replace(/\n/g, '\n  ')},\n`
+  return `  ${tsLiteralFromObject(p).replace(/\n/g, '\n  ')},\n`
+}
+
+/**
+ * V7.2.5 — auto-append new universe entries to
+ * src/content/smart-cart/universe.ts before the closing `]` of the
+ * UNIVERSE array. Idempotent because findExistingProduct dedups on
+ * subsequent runs.
+ *
+ * Returns the number of entries appended.
+ */
+function appendUniverseEntries(newProducts: UniverseProduct[]): number {
+  if (newProducts.length === 0) return 0
+  const universePath = path.resolve('src/content/smart-cart/universe.ts')
+  const original = fs.readFileSync(universePath, 'utf8')
+  // Match the closing `]` of the UNIVERSE array — the last `\n]` in
+  // the file. If something else lands after the array (a helper, an
+  // export), this needs revisiting.
+  const closingIdx = original.lastIndexOf('\n]')
+  if (closingIdx === -1) {
+    throw new Error(
+      "Couldn't locate closing `]` of UNIVERSE array in universe.ts",
+    )
+  }
+  const before = original.slice(0, closingIdx)
+  const after = original.slice(closingIdx)
+  const insertion = newProducts
+    .map(p => {
+      const lit = tsLiteralFromObject(p)
+      const indented = lit
+        .split('\n')
+        .map(l => '  ' + l)
+        .join('\n')
+      return '\n' + indented + ','
+    })
+    .join('')
+  fs.writeFileSync(universePath, before + insertion + after, 'utf8')
+  return newProducts.length
 }
 
 function writeScopeCatalogFile(
@@ -424,7 +593,37 @@ function writeScopeCatalogFile(
   const filepath = path.join(outDir, 'scope-catalogs', filename)
   const exportName = source.scopeVariantId.toUpperCase()
 
-  const body = `// V7.2.4 — Trimmed ${source.scopeVariantId} scope catalog.
+  // V7.2.5 — forward source-level metadata into the catalog. Skip-
+  // list items also accept the new optional editorial fields
+  // (whenItMayBeOkay, betterAlternative, customerFacingCopy) which
+  // JSON.stringify carries through transparently.
+  const catalogObject: any = {
+    topic: source.topic,
+    scopeVariantId: source.scopeVariantId,
+    scenarios: source.scenarios,
+    slots: scopeSlots,
+    skipList: source.skipList,
+    scenarioDefaults: source.scenarioDefaults,
+  }
+  if (source.metadata) {
+    if (source.metadata.smartCartPromise) {
+      catalogObject.smartCartPromise = source.metadata.smartCartPromise
+    }
+    if (source.metadata.primaryCustomerPain) {
+      catalogObject.primaryCustomerPain = source.metadata.primaryCustomerPain
+    }
+    if (source.metadata.valueProposition) {
+      catalogObject.valueProposition = source.metadata.valueProposition
+    }
+    if (source.metadata.routeOutRules?.length) {
+      catalogObject.routeOutRules = source.metadata.routeOutRules
+    }
+    if (source.metadata.seasonalUrgency) {
+      catalogObject.seasonalUrgency = source.metadata.seasonalUrgency
+    }
+  }
+
+  const body = `// V7.2.5 — Trimmed ${source.scopeVariantId} scope catalog.
 //
 // Generated by scripts/ingest-catalog.ts from
 // scripts/source-catalogs/${filename}.
@@ -433,18 +632,7 @@ function writeScopeCatalogFile(
 
 import type { ScopeCatalog } from '@/lib/smart-cart-model'
 
-export const ${exportName}: ScopeCatalog = ${JSON.stringify(
-    {
-      topic: source.topic,
-      scopeVariantId: source.scopeVariantId,
-      scenarios: source.scenarios,
-      slots: scopeSlots,
-      skipList: source.skipList,
-      scenarioDefaults: source.scenarioDefaults,
-    },
-    null,
-    2,
-  )}
+export const ${exportName}: ScopeCatalog = ${JSON.stringify(catalogObject, null, 2)}
 `
   fs.writeFileSync(filepath, body, 'utf8')
   return filepath
@@ -477,14 +665,18 @@ async function main() {
   const scopePath = writeScopeCatalogFile(args.outDir, source, result.scopeSlots)
   console.log(`Wrote ${scopePath}`)
 
-  // Append to universe.ts
-  // (Real implementation would parse the existing file's array and
-  // append cleanly. For this v7.2.4 deliverable, the tool prints a
-  // diff that the operator pastes manually. v7.2.5+ should upgrade
-  // to AST-based modification.)
-  console.log('\nNew universe entries to append (paste before the closing `]` in universe.ts):\n')
-  for (const p of result.newProducts) {
-    process.stdout.write(emitUniverseEntry(p))
+  // V7.2.5 — auto-append new entries to universe.ts. Replaces the
+  // v7.2.4 manual-paste workflow.
+  const appended = appendUniverseEntries(result.newProducts)
+  console.log(`Appended ${appended} new entries to src/content/smart-cart/universe.ts`)
+
+  // Keep the diff output around for operator visibility (logged
+  // after the file write so the operator can spot-check what landed).
+  if (result.newProducts.length > 0) {
+    console.log('\nNew universe entries (also written to universe.ts):\n')
+    for (const p of result.newProducts) {
+      process.stdout.write(emitUniverseEntry(p))
+    }
   }
 }
 

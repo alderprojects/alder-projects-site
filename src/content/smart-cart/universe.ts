@@ -66,6 +66,111 @@ export const FN = {
   outdoorCooler: 'outdoor_cooler',
   lakeFloats: 'lake_floats',
   mosquitoControl: 'mosquito_control',
+
+  // ===================================================================
+  // V7.2.5 — function tags for the 10 new scopes ingested in
+  // pastes 2-4. Constants are declared here so scope-catalog
+  // tierQueries can reference them by name; product entries arrive
+  // alongside catalog content.
+  // ===================================================================
+
+  // outdoor_freeze_prevention
+  freezeSensor: 'freeze_sensor',
+  pipeInsulation: 'pipe_insulation',
+  heatTape: 'heat_tape',
+  smartThermostat: 'smart_thermostat',
+  leakDetector: 'leak_detector',
+  hoseBibCover: 'hose_bib_cover',
+  draftSealer: 'draft_sealer',
+  shutoffLabels: 'shutoff_labels',
+  pipeFreezeAlarm: 'pipe_freeze_alarm',
+  smartShutoffValve: 'smart_shutoff_valve',
+  freezeKitDocs: 'freeze_kit_docs',
+
+  // outdoor_seasonal_opening
+  waterTestKit: 'water_test_kit',
+  bacteriaTestKit: 'bacteria_test_kit',
+  filterReplacement: 'filter_replacement',
+  cleaningResetKit: 'cleaning_reset_kit',
+  dehumidifierEntry: 'dehumidifier_entry',
+  openingTote: 'opening_tote',
+  basicConsumables: 'basic_consumables',
+  filterWrench: 'filter_wrench',
+
+  // outdoor_deck_refresh
+  deckCleaner: 'deck_cleaner',
+  deckBrightener: 'deck_brightener',
+  deckBrush: 'deck_brush',
+  moistureMeter: 'moisture_meter',
+  exteriorScrews: 'exterior_screws',
+  boardRepairTools: 'board_repair_tools',
+  deckStainSealer: 'deck_stain_sealer',
+  stairGripStrips: 'stair_grip_strips',
+  pressureWasher: 'pressure_washer',
+
+  // mudroom_entry_reset
+  bootTray: 'boot_tray',
+  entryMat: 'entry_mat',
+  wallHooks: 'wall_hooks',
+  entryBench: 'entry_bench',
+  wetGearRack: 'wet_gear_rack',
+  gearBins: 'gear_bins',
+  towelStation: 'towel_station',
+  floorProtection: 'floor_protection',
+
+  // universal_owner_kit
+  drillDriver: 'drill_driver',
+  drillBitSet: 'drill_bit_set',
+  level: 'level',
+  studFinder: 'stud_finder',
+  tapeMeasure: 'tape_measure',
+  utilityKnife: 'utility_knife',
+  caulkGun: 'caulk_gun',
+  oscillatingMultitool: 'oscillating_multitool',
+  fastenerKit: 'fastener_kit',
+  workLight: 'work_light',
+
+  // home_moisture_control
+  hygrometer: 'hygrometer',
+  dehumidifierWhole: 'dehumidifier_whole',
+  moldTestKit: 'mold_test_kit',
+  odorAbsorber: 'odor_absorber',
+  airMover: 'air_mover',
+
+  // home_water_quality
+  basicTestStrips: 'basic_test_strips',
+  labWaterTest: 'lab_water_test',
+  sedimentFilter: 'sediment_filter',
+  fridgeFilter: 'fridge_filter',
+  drinkingWaterFilter: 'drinking_water_filter',
+  pressureGauge: 'pressure_gauge',
+
+  // outdoor_dock_lake
+  dockLines: 'dock_lines',
+  dockBumpers: 'dock_bumpers',
+  marineHardware: 'marine_hardware',
+  dockLighting: 'dock_lighting',
+  dockLadder: 'dock_ladder',
+  mildewCleaner: 'mildew_cleaner',
+  weatherproofBin: 'weatherproof_bin',
+  nonSlipStrips: 'non_slip_strips',
+
+  // home_safety_kit
+  fireExtinguisher: 'fire_extinguisher',
+  smokeCoDetector: 'smoke_co_detector',
+  firstAidKit: 'first_aid_kit',
+  flashlightLantern: 'flashlight_lantern',
+  emergencyPower: 'emergency_power',
+  emergencyDocs: 'emergency_docs',
+
+  // universal_project_prep
+  laserMeasure: 'laser_measure',
+  graphPaperKit: 'graph_paper_kit',
+  paintersTape: 'painters_tape',
+  labelMaker: 'label_maker',
+  sampleBoards: 'sample_boards',
+  phoneTripod: 'phone_tripod',
+  inspectionMirror: 'inspection_mirror',
 } as const
 
 // ---------- Migration source ----------------------------------------

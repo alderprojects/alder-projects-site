@@ -42,12 +42,30 @@ interface Failure {
 // V7.2.4 — per-catalog expected slot/skip counts. Source of truth
 // for "did the migration preserve information." Update when new
 // catalogs land or when a catalog adds/removes slots.
+//
+// V7.2.5 — paste 1 leaves this table unchanged. Pastes 2-4 register
+// the 10 new scopes here as their catalogs ingest:
+//   outdoor_freeze_prevention, outdoor_seasonal_opening,
+//   outdoor_deck_refresh, mudroom_entry_reset, universal_owner_kit,
+//   home_moisture_control, home_water_quality, outdoor_dock_lake,
+//   home_safety_kit, universal_project_prep
 const EXPECTED_STATS: Record<string, { slotCount: number; skipCount: number }> = {
   kitchen_organizers: { slotCount: 11, skipCount: 11 },         // 8 core + 3 add-ons
   kitchen_cosmetic_refresh: { slotCount: 9, skipCount: 11 },
   kitchen_cabinet_hardware_swap: { slotCount: 6, skipCount: 10 },
   outdoor_lake_season: { slotCount: 12, skipCount: 14 },
 }
+
+// V7.2.5 — destinations a catalog can route a buyer to instead of
+// synthesizing a Smart Cart. Mirrors the union in
+// ScopeCatalog.routeOutRules; kept as a literal array here so
+// runtime validation doesn't require importing the type.
+const VALID_ROUTE_OUT_DESTINATIONS = [
+  'worth_it',
+  'small_pro',
+  'contractor',
+  'verify_first',
+] as const
 
 export async function GET(req: NextRequest) {
   if (!authorized(req)) {
@@ -133,6 +151,36 @@ export async function GET(req: NextRequest) {
           detail: `${c.scopeVariantId}: skip count ${c.skipList.length} !== expected ${expected.skipCount}`,
         })
       }
+    }
+
+    // V7.2.5 — route-out rule validation. Catalogs that opt into
+    // route-out must use one of the four declared destinations.
+    if (c.routeOutRules?.length) {
+      for (const rule of c.routeOutRules) {
+        const valid = (VALID_ROUTE_OUT_DESTINATIONS as readonly string[]).includes(
+          rule.destination,
+        )
+        if (!valid) {
+          failures.push({
+            check: 'route_out_destination_valid',
+            detail: `${c.scopeVariantId}: invalid route-out destination "${rule.destination}"`,
+          })
+        }
+      }
+    }
+
+    // V7.2.5 — informational notice: outdoor scopes that don't
+    // declare an absentee_owner default suggest authoring drift, but
+    // do not fail the gate. Filter on `informational` substring when
+    // gating merges.
+    if (
+      c.topic === 'outdoor' &&
+      !Object.keys(c.scenarioDefaults).includes('absentee_owner')
+    ) {
+      failures.push({
+        check: 'outdoor_absentee_owner_default',
+        detail: `${c.scopeVariantId}: outdoor scope without absentee_owner scenario default (informational)`,
+      })
     }
   }
 
@@ -268,15 +316,38 @@ export async function GET(req: NextRequest) {
     scopeStats.push(stat)
   }
 
+  // V7.2.5 — informational failures (route-out drift, absentee-owner
+  // notices, schema audit hints) do not block the merge gate. Hard
+  // failures still 422.
+  const hardFailures = failures.filter(f => !f.detail.includes('informational'))
+
+  // V7.2.5 — universe schema audit. In paste 1, the existing 82
+  // entries don't carry costBenefitClaim or vermontReasoning yet;
+  // the counts shrink as pastes 2-4 land richer entries.
+  const productsWithoutCostBenefit = universe.filter(
+    p => !p.costBenefitClaim,
+  ).length
+  const productsWithoutVermontReasoning = universe.filter(
+    p => !p.vermontReasoning,
+  ).length
+  const universalProductCount = universe.filter(p =>
+    p.tags.topics.includes('universal'),
+  ).length
+
   const body = {
-    pass: failures.length === 0,
+    pass: hardFailures.length === 0,
     universeSize: universe.length,
     catalogCount: catalogs.length,
     scopeStats,
     failures,
+    schemaAudit: {
+      productsWithoutCostBenefit,
+      productsWithoutVermontReasoning,
+      universalProductCount,
+    },
   }
 
   return NextResponse.json(body, {
-    status: failures.length === 0 ? 200 : 422,
+    status: hardFailures.length === 0 ? 200 : 422,
   })
 }

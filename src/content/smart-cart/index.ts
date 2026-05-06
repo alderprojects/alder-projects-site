@@ -18,12 +18,20 @@ import { KITCHEN_ORGANIZERS } from './scope-catalogs/kitchen-organizers'
 import { KITCHEN_COSMETIC_REFRESH } from './scope-catalogs/kitchen-cosmetic-refresh'
 import { KITCHEN_CABINET_HARDWARE_SWAP } from './scope-catalogs/kitchen-cabinet-hardware-swap'
 import { OUTDOOR_LAKE_SEASON } from './scope-catalogs/outdoor-lake-season'
+// V7.2.5
+import { OUTDOOR_DECK_REFRESH } from './scope-catalogs/outdoor-deck-refresh'
+import { OUTDOOR_SEASONAL_OPENING } from './scope-catalogs/outdoor-seasonal-opening'
+import { OUTDOOR_FREEZE_PREVENTION } from './scope-catalogs/outdoor-freeze-prevention'
 
 const CATALOGS: ScopeCatalog[] = [
   KITCHEN_ORGANIZERS,
   KITCHEN_COSMETIC_REFRESH,
   KITCHEN_CABINET_HARDWARE_SWAP,
   OUTDOOR_LAKE_SEASON,
+  // V7.2.5
+  OUTDOOR_DECK_REFRESH,
+  OUTDOOR_SEASONAL_OPENING,
+  OUTDOOR_FREEZE_PREVENTION,
 ]
 
 // ---------- Catalog lookup ------------------------------------------

@@ -296,7 +296,7 @@ export const SCOPE_VARIANTS: Record<TopicId, ScopeVariant[]> = {
       label: 'Moisture & smell prevention',
       description:
         'Catch moisture problems before they become smell, mold, or repair issues.',
-      smartCartReady: false, // flips to true in paste 3
+      smartCartReady: true, // v7.2.5 paste 3 — catalog ingested
       defaultLane: 'diy',
       estCostRange: { low: 80, high: 450 },
       relevantKitIds: ['home_moisture_control'],
@@ -346,7 +346,7 @@ export const SCOPE_VARIANTS: Record<TopicId, ScopeVariant[]> = {
       label: 'Small repair owner kit',
       description:
         'The minimal kit that prevents extra trips and avoids buying contractor-grade tools.',
-      smartCartReady: false, // flips to true in paste 3
+      smartCartReady: true, // v7.2.5 paste 3 — catalog ingested
       defaultLane: 'diy',
       estCostRange: { low: 120, high: 500 },
       relevantKitIds: ['universal_owner_kit'],

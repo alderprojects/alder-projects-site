@@ -2300,4 +2300,2146 @@ export const UNIVERSE: UniverseProduct[] = [
     citations: [],
     migratedFrom: { scope: 'outdoor_lake_season', slotId: 'lake_bug_control', tier: 'premium' },
   },
+  {
+    universeId: "generic_oxalic_acid_wood_deck_cleaner_1_gallon",
+    rank: 100,
+    variant: {
+      productName: "Generic oxalic acid wood deck cleaner (1 gallon)",
+      priceLow: 18,
+      priceHigh: 28,
+      affiliateUrl: "https://www.amazon.com/s?k=oxalic+acid+deck+cleaner+gallon&tag=alderprojects-20",
+      productSpec: "Oxalic acid concentrate. Dilute with water. Cleans and brightens wood. ~$20/gallon. Treat 200-400 sq ft."
+    },
+    tags: {
+      topics: [
+        "outdoor"
+      ],
+      roles: [
+        "cleaner",
+        "consumable_material"
+      ],
+      functions: [
+        "deck_cleaner"
+      ],
+      seasons: [
+        "spring",
+        "pre_summer",
+        "summer"
+      ],
+      propertyTypes: [],
+      conditions: [],
+      alreadyHaveFlag: "has_clean_deck",
+      tier: "budget"
+    },
+    citations: [
+      "Cabot Wood Brightener product documentation",
+      "Restore-A-Deck product line",
+      "Wood deck preparation guidance"
+    ],
+    migratedFrom: {
+      scope: "outdoor_deck_refresh",
+      slotId: "deck_cleaner",
+      tier: "budget"
+    }
+  },
+  {
+    universeId: "cabot_wood_brightener_1_gallon",
+    rank: 100,
+    variant: {
+      productName: "Cabot Wood Brightener (1 gallon)",
+      priceLow: 22,
+      priceHigh: 35,
+      affiliateUrl: "https://www.amazon.com/s?k=cabot+wood+brightener+gallon&tag=alderprojects-20",
+      productSpec: "Two-part cleaner: oxalic-acid based brightener that neutralizes weather-grayed wood and prepares for stain. Pairs with Cabot stains. Treats 300-500 sq ft per gallon."
+    },
+    tags: {
+      topics: [
+        "outdoor"
+      ],
+      roles: [
+        "cleaner",
+        "consumable_material"
+      ],
+      functions: [
+        "deck_cleaner"
+      ],
+      seasons: [
+        "spring",
+        "pre_summer",
+        "summer"
+      ],
+      propertyTypes: [],
+      conditions: [],
+      alreadyHaveFlag: "has_clean_deck",
+      tier: "sweet_spot"
+    },
+    citations: [
+      "Cabot Wood Brightener product documentation",
+      "Restore-A-Deck product line",
+      "Wood deck preparation guidance"
+    ],
+    migratedFrom: {
+      scope: "outdoor_deck_refresh",
+      slotId: "deck_cleaner",
+      tier: "sweet_spot"
+    }
+  },
+  {
+    universeId: "restore_a_deck_two_step_cleaner_brightener_kit",
+    rank: 100,
+    variant: {
+      productName: "Restore-A-Deck two-step cleaner + brightener kit",
+      priceLow: 60,
+      priceHigh: 90,
+      affiliateUrl: "https://www.amazon.com/s?k=restore-a-deck+cleaner+brightener+kit&tag=alderprojects-20",
+      productSpec: "Professional 2-step kit: cleaner first (removes mildew, dirt), brightener second (restores wood color). Kit pricing covers ~500 sq ft. Pro-grade results."
+    },
+    tags: {
+      topics: [
+        "outdoor"
+      ],
+      roles: [
+        "cleaner",
+        "consumable_material"
+      ],
+      functions: [
+        "deck_cleaner"
+      ],
+      seasons: [
+        "spring",
+        "pre_summer",
+        "summer"
+      ],
+      propertyTypes: [],
+      conditions: [],
+      alreadyHaveFlag: "has_clean_deck",
+      tier: "premium"
+    },
+    citations: [
+      "Cabot Wood Brightener product documentation",
+      "Restore-A-Deck product line",
+      "Wood deck preparation guidance"
+    ],
+    migratedFrom: {
+      scope: "outdoor_deck_refresh",
+      slotId: "deck_cleaner",
+      tier: "premium"
+    }
+  },
+  {
+    universeId: "quickie_18_deck_scrub_brush_with_telescoping_handle",
+    rank: 100,
+    variant: {
+      productName: "Quickie 18\" deck scrub brush with telescoping handle",
+      priceLow: 22,
+      priceHigh: 35,
+      affiliateUrl: "https://www.amazon.com/s?k=quickie+deck+scrub+brush+telescoping+handle&tag=alderprojects-20",
+      productSpec: "18\" bristle head, stiff bristles for paint/stain removal. Telescoping handle to 60\". Threaded for extension poles. Dishwasher-handle compatible."
+    },
+    tags: {
+      topics: [
+        "outdoor"
+      ],
+      roles: [
+        "tool"
+      ],
+      functions: [
+        "deck_brush"
+      ],
+      seasons: [
+        "spring",
+        "pre_summer",
+        "summer"
+      ],
+      propertyTypes: [],
+      conditions: [],
+      alreadyHaveFlag: "has_deck_brush",
+      tier: "sweet_spot"
+    },
+    citations: [
+      "Quickie product line documentation"
+    ],
+    migratedFrom: {
+      scope: "outdoor_deck_refresh",
+      slotId: "deck_brush",
+      tier: "sweet_spot"
+    }
+  },
+  {
+    universeId: "generic_pin_type_moisture_meter",
+    rank: 100,
+    variant: {
+      productName: "Generic pin-type moisture meter",
+      priceLow: 15,
+      priceHigh: 28,
+      affiliateUrl: "https://www.amazon.com/s?k=pin+type+moisture+meter+wood&tag=alderprojects-20",
+      productSpec: "Two-pin contact meter. Reads 0-100% wood moisture. Inexpensive, generally accurate above 5%. ~$20."
+    },
+    tags: {
+      topics: [
+        "outdoor"
+      ],
+      roles: [
+        "measurement_tool"
+      ],
+      functions: [
+        "moisture_meter"
+      ],
+      seasons: [
+        "spring",
+        "pre_summer",
+        "summer"
+      ],
+      propertyTypes: [],
+      conditions: [],
+      alreadyHaveFlag: "has_moisture_meter",
+      tier: "budget"
+    },
+    citations: [
+      "General Tools MMD4E documentation",
+      "Deck staining moisture standards"
+    ],
+    migratedFrom: {
+      scope: "outdoor_deck_refresh",
+      slotId: "deck_moisture_meter",
+      tier: "budget"
+    }
+  },
+  {
+    universeId: "general_tools_mmd4e_pin_and_pinless_moisture_meter",
+    rank: 100,
+    variant: {
+      productName: "General Tools MMD4E pin-and-pinless moisture meter",
+      priceLow: 38,
+      priceHigh: 55,
+      affiliateUrl: "https://www.amazon.com/s?k=general+tools+mmd4e+moisture+meter&tag=alderprojects-20",
+      productSpec: "Both pin-type (contact) and pinless (surface scan) modes. LCD display with color coding. ~$40. Long-loved by reviewers."
+    },
+    tags: {
+      topics: [
+        "outdoor"
+      ],
+      roles: [
+        "measurement_tool"
+      ],
+      functions: [
+        "moisture_meter"
+      ],
+      seasons: [
+        "spring",
+        "pre_summer",
+        "summer"
+      ],
+      propertyTypes: [],
+      conditions: [],
+      alreadyHaveFlag: "has_moisture_meter",
+      tier: "sweet_spot"
+    },
+    citations: [
+      "General Tools MMD4E documentation",
+      "Deck staining moisture standards"
+    ],
+    migratedFrom: {
+      scope: "outdoor_deck_refresh",
+      slotId: "deck_moisture_meter",
+      tier: "sweet_spot"
+    }
+  },
+  {
+    universeId: "behr_premium_semi_transparent_weatherproofing_stain_5_gallon",
+    rank: 100,
+    variant: {
+      productName: "Behr Premium Semi-Transparent Weatherproofing Stain (5 gallon)",
+      priceLow: 175,
+      priceHigh: 230,
+      affiliateUrl: "https://www.amazon.com/s?k=behr+premium+semi+transparent+deck+stain+5+gallon&tag=alderprojects-20",
+      productSpec: "Semi-transparent oil-based weatherproofing stain. ~$190/5gal. Covers 300-450 sq ft per gallon. 3-year warranty in shaded areas; less in direct sun."
+    },
+    tags: {
+      topics: [
+        "outdoor"
+      ],
+      roles: [
+        "consumable_material",
+        "finish"
+      ],
+      functions: [
+        "deck_stain_sealer"
+      ],
+      seasons: [
+        "spring",
+        "pre_summer",
+        "summer"
+      ],
+      propertyTypes: [],
+      conditions: [],
+      alreadyHaveFlag: "has_recent_stain",
+      tier: "budget"
+    },
+    citations: [
+      "Cabot Australian Timber Oil product documentation",
+      "Sherwin-Williams SuperDeck product line",
+      "Behr Premium Weatherproofing documentation",
+      "Reviewer aggregations on deck stain durability in Northeast climate"
+    ],
+    migratedFrom: {
+      scope: "outdoor_deck_refresh",
+      slotId: "deck_stain_sealer",
+      tier: "budget"
+    }
+  },
+  {
+    universeId: "cabot_australian_timber_oil_1_gallon",
+    rank: 100,
+    variant: {
+      productName: "Cabot Australian Timber Oil (1 gallon)",
+      priceLow: 65,
+      priceHigh: 90,
+      amazonAsin: "B000K6HBKG",
+      affiliateUrl: "https://www.amazon.com/dp/B000K6HBKG?tag=alderprojects-20",
+      productSpec: "Penetrating oil + alkyd hybrid. 3-way oil protection. Covers 350-500 sq ft per gallon. Multiple natural-toned colors. 2-3 year recoat cycle in Vermont. Reviewer favorite for cedar and pressure-treated."
+    },
+    tags: {
+      topics: [
+        "outdoor"
+      ],
+      roles: [
+        "consumable_material",
+        "finish"
+      ],
+      functions: [
+        "deck_stain_sealer"
+      ],
+      seasons: [
+        "spring",
+        "pre_summer",
+        "summer"
+      ],
+      propertyTypes: [],
+      conditions: [],
+      alreadyHaveFlag: "has_recent_stain",
+      tier: "sweet_spot"
+    },
+    citations: [
+      "Cabot Australian Timber Oil product documentation",
+      "Sherwin-Williams SuperDeck product line",
+      "Behr Premium Weatherproofing documentation",
+      "Reviewer aggregations on deck stain durability in Northeast climate"
+    ],
+    migratedFrom: {
+      scope: "outdoor_deck_refresh",
+      slotId: "deck_stain_sealer",
+      tier: "sweet_spot"
+    }
+  },
+  {
+    universeId: "sherwin_williams_superdeck_solid_color_5_gallon",
+    rank: 100,
+    variant: {
+      productName: "Sherwin-Williams SuperDeck Solid Color (5 gallon)",
+      priceLow: 220,
+      priceHigh: 320,
+      affiliateUrl: "https://www.amazon.com/s?k=sherwin+williams+superdeck+solid+5+gallon&tag=alderprojects-20",
+      productSpec: "Acrylic solid-color deck stain. Highest opacity, longest-lasting (4-6 year recoat). Hides imperfections and old stain bleed-through. Heavy-bodied; requires brushing and back-rolling for proper coverage."
+    },
+    tags: {
+      topics: [
+        "outdoor"
+      ],
+      roles: [
+        "consumable_material",
+        "finish"
+      ],
+      functions: [
+        "deck_stain_sealer"
+      ],
+      seasons: [
+        "spring",
+        "pre_summer",
+        "summer"
+      ],
+      propertyTypes: [],
+      conditions: [],
+      alreadyHaveFlag: "has_recent_stain",
+      tier: "premium"
+    },
+    citations: [
+      "Cabot Australian Timber Oil product documentation",
+      "Sherwin-Williams SuperDeck product line",
+      "Behr Premium Weatherproofing documentation",
+      "Reviewer aggregations on deck stain durability in Northeast climate"
+    ],
+    migratedFrom: {
+      scope: "outdoor_deck_refresh",
+      slotId: "deck_stain_sealer",
+      tier: "premium"
+    }
+  },
+  {
+    universeId: "deckmate_or_grk_exterior_deck_screws_2_5_3_5_1_lb",
+    rank: 100,
+    variant: {
+      productName: "Deckmate or GRK exterior deck screws, 2.5\"-3.5\", 1 lb",
+      priceLow: 22,
+      priceHigh: 38,
+      affiliateUrl: "https://www.amazon.com/s?k=deckmate+grk+deck+screws+exterior+coated&tag=alderprojects-20",
+      productSpec: "Coated exterior deck screws. T25 star drive (less stripping than Phillips). Self-countersinking head. ~$25/lb (200 screws). Sized 2.5\" for board attachment, 3\" for joist hangers."
+    },
+    tags: {
+      topics: [
+        "outdoor"
+      ],
+      roles: [
+        "hardware"
+      ],
+      functions: [
+        "exterior_screws"
+      ],
+      seasons: [
+        "spring",
+        "pre_summer",
+        "summer"
+      ],
+      propertyTypes: [],
+      conditions: [],
+      alreadyHaveFlag: "",
+      tier: "sweet_spot"
+    },
+    citations: [
+      "Deckmate, GRK fastener documentation"
+    ],
+    migratedFrom: {
+      scope: "outdoor_deck_refresh",
+      slotId: "deck_exterior_screws",
+      tier: "sweet_spot"
+    }
+  },
+  {
+    universeId: "deck_stair_grip__heavy_duty_anti_slip_black_tape_4_inch_x_30_ft",
+    rank: 100,
+    variant: {
+      productName: "Heavy-duty anti-slip black tape (4 inch x 30 ft)",
+      priceLow: 22,
+      priceHigh: 38,
+      affiliateUrl: "https://www.amazon.com/s?k=anti+slip+stair+tread+tape+4+inch+30+ft&tag=alderprojects-20",
+      productSpec: "4\" wide adhesive grit tape. ~30 ft roll. Cut to fit each tread. Black. 5-7 year typical life on covered stairs; 3-4 on exposed. Coarse PEVA grit; high-friction."
+    },
+    tags: {
+      topics: [
+        "outdoor"
+      ],
+      roles: [
+        "safety_item",
+        "consumable_material"
+      ],
+      functions: [
+        "stair_grip_strips"
+      ],
+      seasons: [
+        "spring",
+        "pre_summer",
+        "summer"
+      ],
+      propertyTypes: [],
+      conditions: [],
+      alreadyHaveFlag: "has_stair_grip",
+      tier: "sweet_spot"
+    },
+    citations: [
+      "Anti-slip stair products documentation"
+    ],
+    migratedFrom: {
+      scope: "outdoor_deck_refresh",
+      slotId: "deck_stair_grip",
+      tier: "sweet_spot"
+    }
+  },
+  {
+    universeId: "home_depot_rental_2_500_psi_gas_pressure_washer_4_hour",
+    rank: 100,
+    variant: {
+      productName: "Home Depot rental: 2,500 PSI gas pressure washer (4-hour)",
+      priceLow: 65,
+      priceHigh: 95,
+      affiliateUrl: "https://www.homedepot.com/c/SF_Pressure_Washer_Rental?tag=alderprojects-20",
+      productSpec: "Rental from Home Depot Tool Rental Center. ~$80/4 hours. Includes nozzles. Bring fuel; return clean."
+    },
+    tags: {
+      topics: [
+        "outdoor"
+      ],
+      roles: [
+        "tool"
+      ],
+      functions: [
+        "pressure_washer"
+      ],
+      seasons: [
+        "spring",
+        "pre_summer",
+        "summer"
+      ],
+      propertyTypes: [],
+      conditions: [],
+      alreadyHaveFlag: "has_pressure_washer",
+      tier: "budget"
+    },
+    citations: [
+      "Sun Joe SPX3000 reviews",
+      "Home Depot tool rental pricing",
+      "Pressure washer technique guidance"
+    ],
+    migratedFrom: {
+      scope: "outdoor_deck_refresh",
+      slotId: "deck_pressure_washer",
+      tier: "budget"
+    }
+  },
+  {
+    universeId: "sun_joe_spx3000_electric_pressure_washer_2_030_psi",
+    rank: 100,
+    variant: {
+      productName: "Sun Joe SPX3000 electric pressure washer (2,030 PSI)",
+      priceLow: 145,
+      priceHigh: 195,
+      affiliateUrl: "https://www.amazon.com/s?k=sun+joe+spx3000+electric+pressure+washer&tag=alderprojects-20",
+      productSpec: "Electric, 2,030 PSI, 1.76 GPM. Sufficient for residential decks. 35 ft cord, 5 nozzles. Storage on the unit. ~$160. Reviewer-validated for occasional use."
+    },
+    tags: {
+      topics: [
+        "outdoor"
+      ],
+      roles: [
+        "tool"
+      ],
+      functions: [
+        "pressure_washer"
+      ],
+      seasons: [
+        "spring",
+        "pre_summer",
+        "summer"
+      ],
+      propertyTypes: [],
+      conditions: [],
+      alreadyHaveFlag: "has_pressure_washer",
+      tier: "sweet_spot"
+    },
+    citations: [
+      "Sun Joe SPX3000 reviews",
+      "Home Depot tool rental pricing",
+      "Pressure washer technique guidance"
+    ],
+    migratedFrom: {
+      scope: "outdoor_deck_refresh",
+      slotId: "deck_pressure_washer",
+      tier: "sweet_spot"
+    }
+  },
+  {
+    universeId: "generac_speedwash_3_200_psi_gas_pressure_washer",
+    rank: 100,
+    variant: {
+      productName: "Generac SpeedWash 3,200 PSI gas pressure washer",
+      priceLow: 380,
+      priceHigh: 520,
+      affiliateUrl: "https://www.amazon.com/s?k=generac+3200+psi+pressure+washer&tag=alderprojects-20",
+      productSpec: "Gas, 3,200 PSI, 2.7 GPM. Pro-grade for serious deck/siding work. ~$450. Worth it if you have a large property and use 4+ times per year."
+    },
+    tags: {
+      topics: [
+        "outdoor"
+      ],
+      roles: [
+        "tool"
+      ],
+      functions: [
+        "pressure_washer"
+      ],
+      seasons: [
+        "spring",
+        "pre_summer",
+        "summer"
+      ],
+      propertyTypes: [],
+      conditions: [],
+      alreadyHaveFlag: "has_pressure_washer",
+      tier: "premium"
+    },
+    citations: [
+      "Sun Joe SPX3000 reviews",
+      "Home Depot tool rental pricing",
+      "Pressure washer technique guidance"
+    ],
+    migratedFrom: {
+      scope: "outdoor_deck_refresh",
+      slotId: "deck_pressure_washer",
+      tier: "premium"
+    }
+  },
+  {
+    universeId: "deck_board_repair__cat_s_paw_nail_puller_multi_tool_blade_spare_deck_boards",
+    rank: 100,
+    variant: {
+      productName: "Cat's paw (nail puller) + multi-tool blade + spare deck boards",
+      priceLow: 35,
+      priceHigh: 65,
+      affiliateUrl: "https://www.amazon.com/s?k=cats+paw+nail+puller+oscillating+multi+tool+blade&tag=alderprojects-20",
+      productSpec: "Cat's paw / pry bar (~$15) + oscillating multi-tool blade for flush cuts (~$15) + 1-2 replacement deck boards (varies by deck width, $20-30). Tools for selective board replacement during refresh."
+    },
+    tags: {
+      topics: [
+        "outdoor"
+      ],
+      roles: [
+        "tool",
+        "hardware"
+      ],
+      functions: [
+        "board_repair_tools"
+      ],
+      seasons: [
+        "spring",
+        "pre_summer",
+        "summer"
+      ],
+      propertyTypes: [],
+      conditions: [],
+      alreadyHaveFlag: "has_repair_tools",
+      tier: "sweet_spot"
+    },
+    citations: [
+      "Selective deck board replacement guidance"
+    ],
+    migratedFrom: {
+      scope: "outdoor_deck_refresh",
+      slotId: "deck_board_repair",
+      tier: "sweet_spot"
+    }
+  },
+  {
+    universeId: "watersafe_all_in_one_basic_test_strips",
+    rank: 100,
+    variant: {
+      productName: "Watersafe All-in-One basic test strips",
+      priceLow: 12,
+      priceHigh: 22,
+      affiliateUrl: "https://www.amazon.com/s?k=watersafe+all+in+one+test+kit&tag=alderprojects-20",
+      productSpec: "Quick-dip test strips for chlorine, hardness, lead, pesticides, bacteria, nitrates. Results in minutes. Useful for screening; not a substitute for lab analysis on bacteria."
+    },
+    tags: {
+      topics: [
+        "outdoor"
+      ],
+      roles: [
+        "measurement_tool",
+        "safety_item"
+      ],
+      functions: [
+        "water_test_kit"
+      ],
+      seasons: [
+        "spring",
+        "opening_season",
+        "pre_summer"
+      ],
+      propertyTypes: [],
+      conditions: [],
+      alreadyHaveFlag: "has_recent_water_test",
+      tier: "budget"
+    },
+    citations: [
+      "Vermont Department of Health well water testing guidance",
+      "Tap Score by SimpleLab product documentation",
+      "EPA private well water testing recommendations"
+    ],
+    migratedFrom: {
+      scope: "outdoor_seasonal_opening",
+      slotId: "opening_water_test_kit",
+      tier: "budget"
+    }
+  },
+  {
+    universeId: "tap_score_by_simplelab_essential_well_water_mail_in_lab_test",
+    rank: 100,
+    variant: {
+      productName: "Tap Score by SimpleLab — Essential Well Water mail-in lab test",
+      priceLow: 165,
+      priceHigh: 195,
+      affiliateUrl: "https://www.amazon.com/s?k=tap+score+simplelab+well+water+test&tag=alderprojects-20",
+      productSpec: "Mail-in lab analysis. Tests for 50+ contaminants including bacteria, lead, arsenic, radon-in-water (Vermont-specific concern), nitrates, hardness, pH. Results in 5-10 days. Includes interpretation guidance."
+    },
+    tags: {
+      topics: [
+        "outdoor"
+      ],
+      roles: [
+        "measurement_tool",
+        "safety_item"
+      ],
+      functions: [
+        "water_test_kit"
+      ],
+      seasons: [
+        "spring",
+        "opening_season",
+        "pre_summer"
+      ],
+      propertyTypes: [],
+      conditions: [],
+      alreadyHaveFlag: "has_recent_water_test",
+      tier: "sweet_spot"
+    },
+    citations: [
+      "Vermont Department of Health well water testing guidance",
+      "Tap Score by SimpleLab product documentation",
+      "EPA private well water testing recommendations"
+    ],
+    migratedFrom: {
+      scope: "outdoor_seasonal_opening",
+      slotId: "opening_water_test_kit",
+      tier: "sweet_spot"
+    }
+  },
+  {
+    universeId: "tap_score_advanced_well_water_test_95_analytes",
+    rank: 100,
+    variant: {
+      productName: "Tap Score Advanced Well Water test (95+ analytes)",
+      priceLow: 280,
+      priceHigh: 360,
+      affiliateUrl: "https://www.amazon.com/s?k=tap+score+advanced+well+water&tag=alderprojects-20",
+      productSpec: "Comprehensive panel including pesticides, herbicides, VOCs, full metals panel. Worth it for new property purchase or known contamination concerns. Overkill for routine annual testing."
+    },
+    tags: {
+      topics: [
+        "outdoor"
+      ],
+      roles: [
+        "measurement_tool",
+        "safety_item"
+      ],
+      functions: [
+        "water_test_kit"
+      ],
+      seasons: [
+        "spring",
+        "opening_season",
+        "pre_summer"
+      ],
+      propertyTypes: [],
+      conditions: [],
+      alreadyHaveFlag: "has_recent_water_test",
+      tier: "premium"
+    },
+    citations: [
+      "Vermont Department of Health well water testing guidance",
+      "Tap Score by SimpleLab product documentation",
+      "EPA private well water testing recommendations"
+    ],
+    migratedFrom: {
+      scope: "outdoor_seasonal_opening",
+      slotId: "opening_water_test_kit",
+      tier: "premium"
+    }
+  },
+  {
+    universeId: "opening_leak_check__pressure_gauge_dye_tablets_paper_towels_kit",
+    rank: 100,
+    variant: {
+      productName: "Pressure gauge + dye tablets + paper towels kit",
+      priceLow: 18,
+      priceHigh: 30,
+      affiliateUrl: "https://www.amazon.com/s?k=water+pressure+gauge+toilet+dye+leak+detection&tag=alderprojects-20",
+      productSpec: "Hose-bib pressure gauge ($10) + toilet dye tablets ($6) + paper towels for visual inspection. Manual leak detection in 30 minutes covering toilets, supply pressure, visible-leak inspection of all fixtures."
+    },
+    tags: {
+      topics: [
+        "outdoor"
+      ],
+      roles: [
+        "measurement_tool",
+        "tool"
+      ],
+      functions: [
+        "pressure_gauge",
+        "leak_detector"
+      ],
+      seasons: [
+        "spring",
+        "opening_season",
+        "pre_summer"
+      ],
+      propertyTypes: [],
+      conditions: [],
+      alreadyHaveFlag: "has_leak_detector_installed",
+      tier: "sweet_spot"
+    },
+    citations: [
+      "EPA WaterSense leak detection guide",
+      "Toilet dye tablet test methodology"
+    ],
+    migratedFrom: {
+      scope: "outdoor_seasonal_opening",
+      slotId: "opening_leak_check",
+      tier: "sweet_spot"
+    }
+  },
+  {
+    universeId: "generic_10_sediment_filter_5_micron_single",
+    rank: 100,
+    variant: {
+      productName: "Generic 10\" sediment filter (5-micron, single)",
+      priceLow: 6,
+      priceHigh: 12,
+      affiliateUrl: "https://www.amazon.com/s?k=10+inch+sediment+filter+5+micron&tag=alderprojects-20",
+      productSpec: "Standard 10-inch housing filter, 5-micron sediment. Covers most basic whole-house sediment filtration. Replace every 3-6 months in active use."
+    },
+    tags: {
+      topics: [
+        "outdoor"
+      ],
+      roles: [
+        "consumable_material"
+      ],
+      functions: [
+        "filter_replacement"
+      ],
+      seasons: [
+        "spring",
+        "opening_season",
+        "pre_summer"
+      ],
+      propertyTypes: [],
+      conditions: [],
+      alreadyHaveFlag: "has_no_filter_system",
+      tier: "budget"
+    },
+    citations: [
+      "Pentek product documentation",
+      "EPA Drinking Water filter selection guidance"
+    ],
+    migratedFrom: {
+      scope: "outdoor_seasonal_opening",
+      slotId: "opening_filter_replacement",
+      tier: "budget"
+    }
+  },
+  {
+    universeId: "pentek_10_sediment_carbon_block_2_pack",
+    rank: 100,
+    variant: {
+      productName: "Pentek 10\" sediment + carbon block 2-pack",
+      priceLow: 28,
+      priceHigh: 45,
+      affiliateUrl: "https://www.amazon.com/s?k=pentek+sediment+carbon+block+10+inch&tag=alderprojects-20",
+      productSpec: "Pentek-brand 10\" filters: 1 sediment (5-micron) + 1 carbon block. Sediment removes silt and rust; carbon removes chlorine, taste, odor. Covers most Vermont well systems running 6 months. Pentek is the industry standard, longer-lasting than generic."
+    },
+    tags: {
+      topics: [
+        "outdoor"
+      ],
+      roles: [
+        "consumable_material"
+      ],
+      functions: [
+        "filter_replacement"
+      ],
+      seasons: [
+        "spring",
+        "opening_season",
+        "pre_summer"
+      ],
+      propertyTypes: [],
+      conditions: [],
+      alreadyHaveFlag: "has_no_filter_system",
+      tier: "sweet_spot"
+    },
+    citations: [
+      "Pentek product documentation",
+      "EPA Drinking Water filter selection guidance"
+    ],
+    migratedFrom: {
+      scope: "outdoor_seasonal_opening",
+      slotId: "opening_filter_replacement",
+      tier: "sweet_spot"
+    }
+  },
+  {
+    universeId: "big_blue_4_5_x_20_filter_housing_premium_media",
+    rank: 100,
+    variant: {
+      productName: "Big Blue 4.5\" x 20\" filter housing + premium media",
+      priceLow: 95,
+      priceHigh: 160,
+      affiliateUrl: "https://www.amazon.com/s?k=big+blue+water+filter+housing+4.5+20&tag=alderprojects-20",
+      productSpec: "Big Blue housing for high-flow whole-house filtration. Required for homes with high water demand or known sediment loads. More expensive media but lasts much longer (12+ months)."
+    },
+    tags: {
+      topics: [
+        "outdoor"
+      ],
+      roles: [
+        "consumable_material"
+      ],
+      functions: [
+        "filter_replacement"
+      ],
+      seasons: [
+        "spring",
+        "opening_season",
+        "pre_summer"
+      ],
+      propertyTypes: [],
+      conditions: [],
+      alreadyHaveFlag: "has_no_filter_system",
+      tier: "premium"
+    },
+    citations: [
+      "Pentek product documentation",
+      "EPA Drinking Water filter selection guidance"
+    ],
+    migratedFrom: {
+      scope: "outdoor_seasonal_opening",
+      slotId: "opening_filter_replacement",
+      tier: "premium"
+    }
+  },
+  {
+    universeId: "opening_cleaning_kit__basic_cleaning_consumables_lysol_mr_clean_comet_sponges",
+    rank: 100,
+    variant: {
+      productName: "Basic cleaning consumables (Lysol, Mr Clean, Comet, sponges)",
+      priceLow: 25,
+      priceHigh: 45,
+      affiliateUrl: "https://www.amazon.com/s?k=cleaning+supplies+kit+all+purpose+sponges&tag=alderprojects-20",
+      productSpec: "Multi-surface cleaner, scrubbing cleanser, sponges, paper towels. Covers a 2-bath, 1-kitchen, basic-living-room cleaning reset."
+    },
+    tags: {
+      topics: [
+        "outdoor"
+      ],
+      roles: [
+        "cleaner",
+        "consumable_material"
+      ],
+      functions: [
+        "cleaning_reset_kit"
+      ],
+      seasons: [
+        "spring",
+        "opening_season",
+        "pre_summer"
+      ],
+      propertyTypes: [],
+      conditions: [],
+      alreadyHaveFlag: "has_full_cleaning_supplies",
+      tier: "budget"
+    },
+    citations: [
+      "CDC mold cleanup guidance",
+      "Method, Mrs. Meyer's product documentation"
+    ],
+    migratedFrom: {
+      scope: "outdoor_seasonal_opening",
+      slotId: "opening_cleaning_kit",
+      tier: "budget"
+    }
+  },
+  {
+    universeId: "method_tier_cleaning_kit_microfiber_mrs_meyer_s_bleach",
+    rank: 100,
+    variant: {
+      productName: "Method-tier cleaning kit + microfiber + Mrs. Meyer's + bleach",
+      priceLow: 60,
+      priceHigh: 95,
+      affiliateUrl: "https://www.amazon.com/s?k=method+mrs+meyers+microfiber+cleaning+kit&tag=alderprojects-20",
+      productSpec: "Better-quality cleaners that don't leave residue. Includes microfiber for streak-free surfaces. Mrs. Meyer's for non-toxic surfaces; bleach (Concrobium or 30% hydrogen peroxide) for mold/mildew on grout and bathrooms."
+    },
+    tags: {
+      topics: [
+        "outdoor"
+      ],
+      roles: [
+        "cleaner",
+        "consumable_material"
+      ],
+      functions: [
+        "cleaning_reset_kit"
+      ],
+      seasons: [
+        "spring",
+        "opening_season",
+        "pre_summer"
+      ],
+      propertyTypes: [],
+      conditions: [],
+      alreadyHaveFlag: "has_full_cleaning_supplies",
+      tier: "sweet_spot"
+    },
+    citations: [
+      "CDC mold cleanup guidance",
+      "Method, Mrs. Meyer's product documentation"
+    ],
+    migratedFrom: {
+      scope: "outdoor_seasonal_opening",
+      slotId: "opening_cleaning_kit",
+      tier: "sweet_spot"
+    }
+  },
+  {
+    universeId: "generic_30_pint_dehumidifier",
+    rank: 100,
+    variant: {
+      productName: "Generic 30-pint dehumidifier",
+      priceLow: 130,
+      priceHigh: 200,
+      affiliateUrl: "https://www.amazon.com/s?k=30+pint+dehumidifier+basement&tag=alderprojects-20",
+      productSpec: "30-pint capacity. Covers ~1,500 sq ft. Manual drain bucket or hose attachment. 3-5 year typical lifespan."
+    },
+    tags: {
+      topics: [
+        "outdoor"
+      ],
+      roles: [
+        "appliance",
+        "preventer"
+      ],
+      functions: [
+        "dehumidifier_entry"
+      ],
+      seasons: [
+        "spring",
+        "opening_season",
+        "pre_summer"
+      ],
+      propertyTypes: [],
+      conditions: [],
+      alreadyHaveFlag: "has_dehumidifier",
+      tier: "budget"
+    },
+    citations: [
+      "hOmeLabs product documentation",
+      "EPA basement moisture control guidance"
+    ],
+    migratedFrom: {
+      scope: "outdoor_seasonal_opening",
+      slotId: "opening_dehumidifier",
+      tier: "budget"
+    }
+  },
+  {
+    universeId: "homelabs_50_pint_dehumidifier_with_continuous_drain",
+    rank: 100,
+    variant: {
+      productName: "hOmeLabs 50-pint dehumidifier with continuous drain",
+      priceLow: 220,
+      priceHigh: 320,
+      affiliateUrl: "https://www.amazon.com/s?k=homelabs+50+pint+dehumidifier+continuous+drain&tag=alderprojects-20",
+      productSpec: "50-pint capacity. Covers ~3,000 sq ft. Built-in pump for continuous drain over distance. Energy Star rated. Best for damp Vermont basements that need long-running coverage."
+    },
+    tags: {
+      topics: [
+        "outdoor"
+      ],
+      roles: [
+        "appliance",
+        "preventer"
+      ],
+      functions: [
+        "dehumidifier_entry"
+      ],
+      seasons: [
+        "spring",
+        "opening_season",
+        "pre_summer"
+      ],
+      propertyTypes: [],
+      conditions: [],
+      alreadyHaveFlag: "has_dehumidifier",
+      tier: "sweet_spot"
+    },
+    citations: [
+      "hOmeLabs product documentation",
+      "EPA basement moisture control guidance"
+    ],
+    migratedFrom: {
+      scope: "outdoor_seasonal_opening",
+      slotId: "opening_dehumidifier",
+      tier: "sweet_spot"
+    }
+  },
+  {
+    universeId: "aprilaire_whole_house_dehumidifier_1850_1830",
+    rank: 100,
+    variant: {
+      productName: "Aprilaire whole-house dehumidifier (1850, 1830)",
+      priceLow: 1100,
+      priceHigh: 1900,
+      affiliateUrl: "https://www.amazon.com/s?k=aprilaire+whole+house+dehumidifier+1850&tag=alderprojects-20",
+      productSpec: "Whole-house unit ducted into HVAC system. Requires professional install. Best for chronic moisture problems or radon mitigation pairing. ~$2,500 installed."
+    },
+    tags: {
+      topics: [
+        "outdoor"
+      ],
+      roles: [
+        "appliance",
+        "preventer"
+      ],
+      functions: [
+        "dehumidifier_entry"
+      ],
+      seasons: [
+        "spring",
+        "opening_season",
+        "pre_summer"
+      ],
+      propertyTypes: [],
+      conditions: [],
+      alreadyHaveFlag: "has_dehumidifier",
+      tier: "premium"
+    },
+    citations: [
+      "hOmeLabs product documentation",
+      "EPA basement moisture control guidance"
+    ],
+    migratedFrom: {
+      scope: "outdoor_seasonal_opening",
+      slotId: "opening_dehumidifier",
+      tier: "premium"
+    }
+  },
+  {
+    universeId: "sterilite_27_quart_latching_tote_label_maker_labels",
+    rank: 100,
+    variant: {
+      productName: "Sterilite 27-quart latching tote + label maker labels",
+      priceLow: 22,
+      priceHigh: 35,
+      affiliateUrl: "https://www.amazon.com/s?k=sterilite+latching+tote+27+quart+labels&tag=alderprojects-20",
+      productSpec: "Latching plastic tote, ~14\"x18\"x10\". Holds opening kit consumables: water test, leak check, cleaning supplies, filter replacements, fresh batteries, light bulbs, dead-bulb spares. Label clearly on outside."
+    },
+    tags: {
+      topics: [
+        "outdoor"
+      ],
+      roles: [
+        "organizer"
+      ],
+      functions: [
+        "opening_tote"
+      ],
+      seasons: [
+        "spring",
+        "opening_season",
+        "pre_summer"
+      ],
+      propertyTypes: [],
+      conditions: [],
+      alreadyHaveFlag: "has_organized_supplies",
+      tier: "sweet_spot"
+    },
+    citations: [
+      "Sterilite product line documentation"
+    ],
+    migratedFrom: {
+      scope: "outdoor_seasonal_opening",
+      slotId: "opening_tote",
+      tier: "sweet_spot"
+    }
+  },
+  {
+    universeId: "opening_consumables__aa_aaa_battery_24_pack_6_led_bulbs_lighter_duct_tape",
+    rank: 100,
+    variant: {
+      productName: "AA/AAA battery 24-pack + 6 LED bulbs + lighter + duct tape",
+      priceLow: 35,
+      priceHigh: 55,
+      affiliateUrl: "https://www.amazon.com/s?k=aa+aaa+battery+pack+led+bulbs+duct+tape+lighter&tag=alderprojects-20",
+      productSpec: "24-pack mixed AA/AAA batteries (Amazon Basics or Energizer). 6 LED bulbs (60W equivalent, soft white). Long-stem lighter. Roll of duct tape. Covers smoke detectors, remote controls, flashlights, light fixtures."
+    },
+    tags: {
+      topics: [
+        "outdoor"
+      ],
+      roles: [
+        "consumable_material"
+      ],
+      functions: [
+        "basic_consumables"
+      ],
+      seasons: [
+        "spring",
+        "opening_season",
+        "pre_summer"
+      ],
+      propertyTypes: [],
+      conditions: [],
+      alreadyHaveFlag: "has_consumables_stocked",
+      tier: "sweet_spot"
+    },
+    citations: [
+      "Smoke detector battery replacement standards"
+    ],
+    migratedFrom: {
+      scope: "outdoor_seasonal_opening",
+      slotId: "opening_consumables",
+      tier: "sweet_spot"
+    }
+  },
+  {
+    universeId: "opening_shutoff_labels__adhesive_shutoff_valve_identification_labels",
+    rank: 100,
+    variant: {
+      productName: "Adhesive shutoff valve identification labels",
+      priceLow: 8,
+      priceHigh: 15,
+      affiliateUrl: "https://www.amazon.com/s?k=plumbing+shutoff+valve+labels+adhesive&tag=alderprojects-20",
+      productSpec: "Same product as outdoor_freeze_prevention slot — universe entry reused via additive tag merge."
+    },
+    tags: {
+      topics: [
+        "outdoor"
+      ],
+      roles: [
+        "document_aid",
+        "safety_item"
+      ],
+      functions: [
+        "shutoff_labels"
+      ],
+      seasons: [
+        "spring",
+        "opening_season",
+        "pre_summer"
+      ],
+      propertyTypes: [],
+      conditions: [],
+      alreadyHaveFlag: "has_shutoff_labels",
+      tier: "sweet_spot"
+    },
+    citations: [
+      "Cross-scope universe reuse pattern (v7.2.4 architecture)"
+    ],
+    migratedFrom: {
+      scope: "outdoor_seasonal_opening",
+      slotId: "opening_shutoff_labels",
+      tier: "sweet_spot"
+    }
+  },
+  {
+    universeId: "govee_water_leak_detector_5_pack_audible_only_no_wifi",
+    rank: 100,
+    variant: {
+      productName: "Govee Water Leak Detector 5-Pack (audible only, no WiFi)",
+      priceLow: 22,
+      priceHigh: 32,
+      amazonAsin: "B07QSFRSJX",
+      affiliateUrl: "https://www.amazon.com/dp/B07QSFRSJX?tag=alderprojects-20",
+      productSpec: "Audible-only 100dB alarm, no WiFi or remote alerts. Battery-powered. Useful only when someone is in the house to hear it."
+    },
+    tags: {
+      topics: [
+        "outdoor"
+      ],
+      roles: [
+        "sensor"
+      ],
+      functions: [
+        "leak_detector"
+      ],
+      seasons: [
+        "fall",
+        "pre_winter",
+        "closing_season"
+      ],
+      propertyTypes: [],
+      conditions: [],
+      alreadyHaveFlag: "has_leak_detection",
+      tier: "budget"
+    },
+    citations: [
+      "Govee H5054 + H5040 gateway product documentation",
+      "YoLink LoRa product specs (1/4 mile open-air range)",
+      "Insurance industry data on water damage as the most common non-weather homeowner claim"
+    ],
+    migratedFrom: {
+      scope: "outdoor_freeze_prevention",
+      slotId: "freeze_leak_sensor",
+      tier: "budget"
+    }
+  },
+  {
+    universeId: "govee_wifi_water_leak_detector_3_pack_with_gateway_h5054",
+    rank: 100,
+    variant: {
+      productName: "Govee WiFi Water Leak Detector 3-Pack with Gateway (H5054)",
+      priceLow: 45,
+      priceHigh: 65,
+      amazonAsin: "B07J9HZ5VN",
+      affiliateUrl: "https://www.amazon.com/dp/B07J9HZ5VN?tag=alderprojects-20",
+      productSpec: "WiFi gateway + 3 sensors. App and email alerts within seconds of leak. 100dB local siren. Gateway requires 2.4GHz WiFi only (not 5GHz). 5-year battery on sensors. Place at water heater, washing machine, under sinks, near sump pump."
+    },
+    tags: {
+      topics: [
+        "outdoor"
+      ],
+      roles: [
+        "sensor"
+      ],
+      functions: [
+        "leak_detector"
+      ],
+      seasons: [
+        "fall",
+        "pre_winter",
+        "closing_season"
+      ],
+      propertyTypes: [],
+      conditions: [],
+      alreadyHaveFlag: "has_leak_detection",
+      tier: "sweet_spot"
+    },
+    citations: [
+      "Govee H5054 + H5040 gateway product documentation",
+      "YoLink LoRa product specs (1/4 mile open-air range)",
+      "Insurance industry data on water damage as the most common non-weather homeowner claim"
+    ],
+    migratedFrom: {
+      scope: "outdoor_freeze_prevention",
+      slotId: "freeze_leak_sensor",
+      tier: "sweet_spot"
+    }
+  },
+  {
+    universeId: "yolink_water_leak_starter_kit_hub_2_leak_sensor_4",
+    rank: 100,
+    variant: {
+      productName: "YoLink Water Leak Starter Kit (Hub + 2 Leak Sensor 4)",
+      priceLow: 80,
+      priceHigh: 120,
+      amazonAsin: "B0DWWXJ4MY",
+      affiliateUrl: "https://www.amazon.com/dp/B0DWWXJ4MY?tag=alderprojects-20",
+      productSpec: "LoRa long-range (1/4 mile open air). Works where WiFi is spotty. Hub options include cellular (no internet required). 105dB built-in siren on each sensor. Freeze warning in addition to leak. SMS, email, app alerts. Compatible with Alexa, IFTTT, Home Assistant. Best for properties with marginal WiFi or large outbuildings."
+    },
+    tags: {
+      topics: [
+        "outdoor"
+      ],
+      roles: [
+        "sensor"
+      ],
+      functions: [
+        "leak_detector"
+      ],
+      seasons: [
+        "fall",
+        "pre_winter",
+        "closing_season"
+      ],
+      propertyTypes: [],
+      conditions: [],
+      alreadyHaveFlag: "has_leak_detection",
+      tier: "premium"
+    },
+    citations: [
+      "Govee H5054 + H5040 gateway product documentation",
+      "YoLink LoRa product specs (1/4 mile open-air range)",
+      "Insurance industry data on water damage as the most common non-weather homeowner claim"
+    ],
+    migratedFrom: {
+      scope: "outdoor_freeze_prevention",
+      slotId: "freeze_leak_sensor",
+      tier: "premium"
+    }
+  },
+  {
+    universeId: "frost_king_1_2_copper_foam_pipe_insulation_6_ft_single",
+    rank: 100,
+    variant: {
+      productName: "Frost King 1/2\" copper foam pipe insulation, 6 ft (single)",
+      priceLow: 4,
+      priceHigh: 7,
+      amazonAsin: "B07XLQ5TPG",
+      affiliateUrl: "https://www.amazon.com/dp/B07XLQ5TPG?tag=alderprojects-20",
+      productSpec: "Polyethylene foam, pre-slit, 6 ft length. For 1/2\" copper pipe (which is 5/8\" OD). Single tube. Slip on, no taping needed for short runs."
+    },
+    tags: {
+      topics: [
+        "outdoor"
+      ],
+      roles: [
+        "consumable_material",
+        "preventer"
+      ],
+      functions: [
+        "pipe_insulation"
+      ],
+      seasons: [
+        "fall",
+        "pre_winter",
+        "closing_season"
+      ],
+      propertyTypes: [],
+      conditions: [],
+      alreadyHaveFlag: "has_pipe_insulation",
+      tier: "budget"
+    },
+    citations: [
+      "Frost King Amazon listing (B000BQLSBI, B07XLQ5TPG, B003A0YX82)",
+      "EPA pipe insulation guidance for cold-climate residential",
+      "NFPA freeze prevention recommendations"
+    ],
+    migratedFrom: {
+      scope: "outdoor_freeze_prevention",
+      slotId: "freeze_pipe_insulation",
+      tier: "budget"
+    }
+  },
+  {
+    universeId: "frost_king_3_4_copper_foam_pipe_insulation_3_ft_4_pack",
+    rank: 100,
+    variant: {
+      productName: "Frost King 3/4\" copper foam pipe insulation, 3 ft 4-pack",
+      priceLow: 12,
+      priceHigh: 18,
+      amazonAsin: "B000BQLSBI",
+      affiliateUrl: "https://www.amazon.com/dp/B000BQLSBI?tag=alderprojects-20",
+      productSpec: "Polyethylene foam, pre-slit, 3/8\" wall thickness, 3 ft length × 4 tubes. For 3/4\" copper or 1/2\" iron pipe. Most common size for Vermont residential supply lines. Black color."
+    },
+    tags: {
+      topics: [
+        "outdoor"
+      ],
+      roles: [
+        "consumable_material",
+        "preventer"
+      ],
+      functions: [
+        "pipe_insulation"
+      ],
+      seasons: [
+        "fall",
+        "pre_winter",
+        "closing_season"
+      ],
+      propertyTypes: [],
+      conditions: [],
+      alreadyHaveFlag: "has_pipe_insulation",
+      tier: "sweet_spot"
+    },
+    citations: [
+      "Frost King Amazon listing (B000BQLSBI, B07XLQ5TPG, B003A0YX82)",
+      "EPA pipe insulation guidance for cold-climate residential",
+      "NFPA freeze prevention recommendations"
+    ],
+    migratedFrom: {
+      scope: "outdoor_freeze_prevention",
+      slotId: "freeze_pipe_insulation",
+      tier: "sweet_spot"
+    }
+  },
+  {
+    universeId: "frost_king_1_rubber_tubular_pipe_insulation_6_ft",
+    rank: 100,
+    variant: {
+      productName: "Frost King 1\" rubber tubular pipe insulation, 6 ft",
+      priceLow: 14,
+      priceHigh: 22,
+      amazonAsin: "B003A0YX82",
+      affiliateUrl: "https://www.amazon.com/dp/B003A0YX82?tag=alderprojects-20",
+      productSpec: "Closed-cell rubber, 1/2\" wall thickness, 6 ft length. For 1\" pipe ID. Higher R-value than polyethylene foam. Use on pipes in unconditioned spaces or where temperature drops below 20°F. More flexible at cold temperatures."
+    },
+    tags: {
+      topics: [
+        "outdoor"
+      ],
+      roles: [
+        "consumable_material",
+        "preventer"
+      ],
+      functions: [
+        "pipe_insulation"
+      ],
+      seasons: [
+        "fall",
+        "pre_winter",
+        "closing_season"
+      ],
+      propertyTypes: [],
+      conditions: [],
+      alreadyHaveFlag: "has_pipe_insulation",
+      tier: "premium"
+    },
+    citations: [
+      "Frost King Amazon listing (B000BQLSBI, B07XLQ5TPG, B003A0YX82)",
+      "EPA pipe insulation guidance for cold-climate residential",
+      "NFPA freeze prevention recommendations"
+    ],
+    migratedFrom: {
+      scope: "outdoor_freeze_prevention",
+      slotId: "freeze_pipe_insulation",
+      tier: "premium"
+    }
+  },
+  {
+    universeId: "generic_constant_wattage_heat_cable_6_ft",
+    rank: 100,
+    variant: {
+      productName: "Generic constant-wattage heat cable, 6 ft",
+      priceLow: 18,
+      priceHigh: 30,
+      affiliateUrl: "https://www.amazon.com/s?k=heat+cable+6ft+constant+wattage&tag=alderprojects-20",
+      productSpec: "Constant-wattage cable. Requires separate thermostat outlet to avoid running constantly. NOT recommended without a thermostat — fire risk."
+    },
+    tags: {
+      topics: [
+        "outdoor"
+      ],
+      roles: [
+        "preventer"
+      ],
+      functions: [
+        "heat_tape"
+      ],
+      seasons: [
+        "fall",
+        "pre_winter",
+        "closing_season"
+      ],
+      propertyTypes: [],
+      conditions: [],
+      alreadyHaveFlag: "has_heat_tape",
+      tier: "budget"
+    },
+    citations: [
+      "NFPA fire risk documentation on heat tape",
+      "Frost King product line documentation",
+      "Pentair / Raychem self-regulating heat cable specifications"
+    ],
+    migratedFrom: {
+      scope: "outdoor_freeze_prevention",
+      slotId: "freeze_heat_tape",
+      tier: "budget"
+    }
+  },
+  {
+    universeId: "frost_king_6_ft_self_regulating_heat_cable_with_built_in_thermos",
+    rank: 100,
+    variant: {
+      productName: "Frost King 6 ft self-regulating heat cable with built-in thermostat",
+      priceLow: 32,
+      priceHigh: 48,
+      affiliateUrl: "https://www.amazon.com/s?k=frost+king+self+regulating+heat+cable+thermostat+6ft&tag=alderprojects-20",
+      productSpec: "Self-regulating cable adjusts wattage based on pipe temperature. Built-in thermostat turns on at 38°F, off at 50°F. UL listed. Plug-in (no hardwiring required). 6 ft covers a single run; longer cables available in 12, 24, and 50 ft."
+    },
+    tags: {
+      topics: [
+        "outdoor"
+      ],
+      roles: [
+        "preventer"
+      ],
+      functions: [
+        "heat_tape"
+      ],
+      seasons: [
+        "fall",
+        "pre_winter",
+        "closing_season"
+      ],
+      propertyTypes: [],
+      conditions: [],
+      alreadyHaveFlag: "has_heat_tape",
+      tier: "sweet_spot"
+    },
+    citations: [
+      "NFPA fire risk documentation on heat tape",
+      "Frost King product line documentation",
+      "Pentair / Raychem self-regulating heat cable specifications"
+    ],
+    migratedFrom: {
+      scope: "outdoor_freeze_prevention",
+      slotId: "freeze_heat_tape",
+      tier: "sweet_spot"
+    }
+  },
+  {
+    universeId: "easyheat_or_pentair_self_regulating_heat_cable_kit_with_insulati",
+    rank: 100,
+    variant: {
+      productName: "EasyHeat or Pentair self-regulating heat cable kit with insulation",
+      priceLow: 75,
+      priceHigh: 130,
+      affiliateUrl: "https://www.amazon.com/s?k=easyheat+self+regulating+pipe+heating+cable+kit&tag=alderprojects-20",
+      productSpec: "Pro-grade self-regulating cable + matching pipe insulation sleeve. Higher watt density. Used by plumbers for permanent installations. Often hardwired."
+    },
+    tags: {
+      topics: [
+        "outdoor"
+      ],
+      roles: [
+        "preventer"
+      ],
+      functions: [
+        "heat_tape"
+      ],
+      seasons: [
+        "fall",
+        "pre_winter",
+        "closing_season"
+      ],
+      propertyTypes: [],
+      conditions: [],
+      alreadyHaveFlag: "has_heat_tape",
+      tier: "premium"
+    },
+    citations: [
+      "NFPA fire risk documentation on heat tape",
+      "Frost King product line documentation",
+      "Pentair / Raychem self-regulating heat cable specifications"
+    ],
+    migratedFrom: {
+      scope: "outdoor_freeze_prevention",
+      slotId: "freeze_heat_tape",
+      tier: "premium"
+    }
+  },
+  {
+    universeId: "honeywell_home_programmable_thermostat_non_smart",
+    rank: 100,
+    variant: {
+      productName: "Honeywell Home Programmable Thermostat (non-smart)",
+      priceLow: 30,
+      priceHigh: 50,
+      affiliateUrl: "https://www.amazon.com/s?k=honeywell+home+programmable+thermostat&tag=alderprojects-20",
+      productSpec: "7-day programmable. No WiFi, no remote control, no temperature alerts. Useful for setting a vacation hold, but you cannot check temp remotely or adjust if heat fails."
+    },
+    tags: {
+      topics: [
+        "outdoor"
+      ],
+      roles: [
+        "monitor",
+        "preventer"
+      ],
+      functions: [
+        "smart_thermostat"
+      ],
+      seasons: [
+        "fall",
+        "pre_winter",
+        "closing_season"
+      ],
+      propertyTypes: [],
+      conditions: [],
+      alreadyHaveFlag: "has_smart_thermostat",
+      tier: "budget"
+    },
+    citations: [
+      "Honeywell Home T9 product documentation",
+      "Ecobee Premium product documentation",
+      "Vermont residential heating systems compatibility data"
+    ],
+    migratedFrom: {
+      scope: "outdoor_freeze_prevention",
+      slotId: "freeze_smart_thermostat",
+      tier: "budget"
+    }
+  },
+  {
+    universeId: "honeywell_home_t9_smart_thermostat_with_wifi",
+    rank: 100,
+    variant: {
+      productName: "Honeywell Home T9 Smart Thermostat with WiFi",
+      priceLow: 130,
+      priceHigh: 200,
+      affiliateUrl: "https://www.amazon.com/s?k=honeywell+home+t9+smart+thermostat&tag=alderprojects-20",
+      productSpec: "WiFi connected, app-controlled, geofencing. Works with most C-wire-equipped systems. Sends alerts if home temperature drops below set threshold. Compatible with most 24V residential HVAC systems including heat pumps, gas furnaces, and many oil/propane systems. Verify compatibility with your system before buying."
+    },
+    tags: {
+      topics: [
+        "outdoor"
+      ],
+      roles: [
+        "monitor",
+        "preventer"
+      ],
+      functions: [
+        "smart_thermostat"
+      ],
+      seasons: [
+        "fall",
+        "pre_winter",
+        "closing_season"
+      ],
+      propertyTypes: [],
+      conditions: [],
+      alreadyHaveFlag: "has_smart_thermostat",
+      tier: "sweet_spot"
+    },
+    citations: [
+      "Honeywell Home T9 product documentation",
+      "Ecobee Premium product documentation",
+      "Vermont residential heating systems compatibility data"
+    ],
+    migratedFrom: {
+      scope: "outdoor_freeze_prevention",
+      slotId: "freeze_smart_thermostat",
+      tier: "sweet_spot"
+    }
+  },
+  {
+    universeId: "ecobee_smart_thermostat_premium_with_sensors",
+    rank: 100,
+    variant: {
+      productName: "Ecobee Smart Thermostat Premium with sensors",
+      priceLow: 230,
+      priceHigh: 290,
+      affiliateUrl: "https://www.amazon.com/s?k=ecobee+smart+thermostat+premium&tag=alderprojects-20",
+      productSpec: "WiFi, voice control, room sensors included. Air quality monitoring, smoke detection alerts. Best for multi-zone homes or properties wanting whole-house intelligence beyond freeze prevention."
+    },
+    tags: {
+      topics: [
+        "outdoor"
+      ],
+      roles: [
+        "monitor",
+        "preventer"
+      ],
+      functions: [
+        "smart_thermostat"
+      ],
+      seasons: [
+        "fall",
+        "pre_winter",
+        "closing_season"
+      ],
+      propertyTypes: [],
+      conditions: [],
+      alreadyHaveFlag: "has_smart_thermostat",
+      tier: "premium"
+    },
+    citations: [
+      "Honeywell Home T9 product documentation",
+      "Ecobee Premium product documentation",
+      "Vermont residential heating systems compatibility data"
+    ],
+    migratedFrom: {
+      scope: "outdoor_freeze_prevention",
+      slotId: "freeze_smart_thermostat",
+      tier: "premium"
+    }
+  },
+  {
+    universeId: "foam_hose_bib_cover_single",
+    rank: 100,
+    variant: {
+      productName: "Foam hose bib cover (single)",
+      priceLow: 3,
+      priceHigh: 6,
+      affiliateUrl: "https://www.amazon.com/s?k=foam+hose+bib+cover+outdoor+faucet&tag=alderprojects-20",
+      productSpec: "Closed-cell foam, slip-on. Single bib. ~$3 each. Useful for moderate climates or short cold snaps. Less effective below 15°F."
+    },
+    tags: {
+      topics: [
+        "outdoor"
+      ],
+      roles: [
+        "accessory",
+        "preventer"
+      ],
+      functions: [
+        "hose_bib_cover"
+      ],
+      seasons: [
+        "fall",
+        "pre_winter",
+        "closing_season"
+      ],
+      propertyTypes: [],
+      conditions: [],
+      alreadyHaveFlag: "has_hose_bib_covers",
+      tier: "budget"
+    },
+    citations: [
+      "Frost King hose bib cover documentation",
+      "Vermont residential plumbing freeze data"
+    ],
+    migratedFrom: {
+      scope: "outdoor_freeze_prevention",
+      slotId: "freeze_hose_bib_cover",
+      tier: "budget"
+    }
+  },
+  {
+    universeId: "frost_king_insulated_thermal_hose_bib_cover_2_pack",
+    rank: 100,
+    variant: {
+      productName: "Frost King insulated thermal hose bib cover (2-pack)",
+      priceLow: 10,
+      priceHigh: 18,
+      affiliateUrl: "https://www.amazon.com/s?k=frost+king+thermal+hose+bib+cover&tag=alderprojects-20",
+      productSpec: "Hard plastic shell with foam interior. Strap or stake mount. Effective to ~10°F. 2-pack covers most homes."
+    },
+    tags: {
+      topics: [
+        "outdoor"
+      ],
+      roles: [
+        "accessory",
+        "preventer"
+      ],
+      functions: [
+        "hose_bib_cover"
+      ],
+      seasons: [
+        "fall",
+        "pre_winter",
+        "closing_season"
+      ],
+      propertyTypes: [],
+      conditions: [],
+      alreadyHaveFlag: "has_hose_bib_covers",
+      tier: "sweet_spot"
+    },
+    citations: [
+      "Frost King hose bib cover documentation",
+      "Vermont residential plumbing freeze data"
+    ],
+    migratedFrom: {
+      scope: "outdoor_freeze_prevention",
+      slotId: "freeze_hose_bib_cover",
+      tier: "sweet_spot"
+    }
+  },
+  {
+    universeId: "freeze_hose_bib_cover__frost_proof_outdoor_faucet_replacement_sillcock_12",
+    rank: 100,
+    variant: {
+      productName: "Frost-proof outdoor faucet replacement (sillcock, 12\")",
+      priceLow: 35,
+      priceHigh: 65,
+      affiliateUrl: "https://www.amazon.com/s?k=frost+proof+outdoor+faucet+sillcock+12+inch&tag=alderprojects-20",
+      productSpec: "Permanent solution: replaces the faucet entirely with a frost-proof sillcock that has the shutoff valve inside the heated wall. Requires plumbing skill or pro install. Permanent fix vs. seasonal cover."
+    },
+    tags: {
+      topics: [
+        "outdoor"
+      ],
+      roles: [
+        "accessory",
+        "preventer"
+      ],
+      functions: [
+        "hose_bib_cover"
+      ],
+      seasons: [
+        "fall",
+        "pre_winter",
+        "closing_season"
+      ],
+      propertyTypes: [],
+      conditions: [],
+      alreadyHaveFlag: "has_hose_bib_covers",
+      tier: "premium"
+    },
+    citations: [
+      "Frost King hose bib cover documentation",
+      "Vermont residential plumbing freeze data"
+    ],
+    migratedFrom: {
+      scope: "outdoor_freeze_prevention",
+      slotId: "freeze_hose_bib_cover",
+      tier: "premium"
+    }
+  },
+  {
+    universeId: "generic_foam_weatherstripping_tape_17_ft",
+    rank: 100,
+    variant: {
+      productName: "Generic foam weatherstripping tape, 17 ft",
+      priceLow: 5,
+      priceHigh: 10,
+      affiliateUrl: "https://www.amazon.com/s?k=foam+weatherstripping+tape+door+window&tag=alderprojects-20",
+      productSpec: "Foam compression tape with adhesive backing. 17-30 ft roll. Compresses under door/window. Effective for 1-2 seasons before degradation."
+    },
+    tags: {
+      topics: [
+        "outdoor"
+      ],
+      roles: [
+        "consumable_material",
+        "preventer"
+      ],
+      functions: [
+        "draft_sealer"
+      ],
+      seasons: [
+        "fall",
+        "pre_winter",
+        "closing_season"
+      ],
+      propertyTypes: [],
+      conditions: [],
+      alreadyHaveFlag: "has_weatherstripping_recent",
+      tier: "budget"
+    },
+    citations: [
+      "M-D Building Products and Frost King weatherstripping product lines",
+      "DOE residential weatherstripping guidance"
+    ],
+    migratedFrom: {
+      scope: "outdoor_freeze_prevention",
+      slotId: "freeze_draft_sealing",
+      tier: "budget"
+    }
+  },
+  {
+    universeId: "frost_king_v_strip_door_sweep_draft_stoppers_kit",
+    rank: 100,
+    variant: {
+      productName: "Frost King V-strip + door sweep + draft stoppers kit",
+      priceLow: 25,
+      priceHigh: 40,
+      affiliateUrl: "https://www.amazon.com/s?k=frost+king+v+strip+door+sweep+draft+stopper&tag=alderprojects-20",
+      productSpec: "V-shaped vinyl weatherstripping for door jambs (longer-lasting than foam). Door sweep for under-door gap. Foam draft stoppers for window sills. Covers a typical 3-door, 8-window Vermont home."
+    },
+    tags: {
+      topics: [
+        "outdoor"
+      ],
+      roles: [
+        "consumable_material",
+        "preventer"
+      ],
+      functions: [
+        "draft_sealer"
+      ],
+      seasons: [
+        "fall",
+        "pre_winter",
+        "closing_season"
+      ],
+      propertyTypes: [],
+      conditions: [],
+      alreadyHaveFlag: "has_weatherstripping_recent",
+      tier: "sweet_spot"
+    },
+    citations: [
+      "M-D Building Products and Frost King weatherstripping product lines",
+      "DOE residential weatherstripping guidance"
+    ],
+    migratedFrom: {
+      scope: "outdoor_freeze_prevention",
+      slotId: "freeze_draft_sealing",
+      tier: "sweet_spot"
+    }
+  },
+  {
+    universeId: "freeze_draft_sealing__door_silicone_bulb_weatherstripping_storm_windows_assessment",
+    rank: 100,
+    variant: {
+      productName: "Door silicone bulb weatherstripping + storm windows assessment",
+      priceLow: 80,
+      priceHigh: 150,
+      affiliateUrl: "https://www.amazon.com/s?k=silicone+bulb+door+weatherstripping&tag=alderprojects-20",
+      productSpec: "Silicone bulb seal for doors (premium durability). For windows, the premium answer is replacement or storm windows, not weatherstripping — at this point you should be looking at the next renovation."
+    },
+    tags: {
+      topics: [
+        "outdoor"
+      ],
+      roles: [
+        "consumable_material",
+        "preventer"
+      ],
+      functions: [
+        "draft_sealer"
+      ],
+      seasons: [
+        "fall",
+        "pre_winter",
+        "closing_season"
+      ],
+      propertyTypes: [],
+      conditions: [],
+      alreadyHaveFlag: "has_weatherstripping_recent",
+      tier: "premium"
+    },
+    citations: [
+      "M-D Building Products and Frost King weatherstripping product lines",
+      "DOE residential weatherstripping guidance"
+    ],
+    migratedFrom: {
+      scope: "outdoor_freeze_prevention",
+      slotId: "freeze_draft_sealing",
+      tier: "premium"
+    }
+  },
+  {
+    universeId: "freeze_shutoff_labels__adhesive_shutoff_valve_identification_labels_assortment",
+    rank: 100,
+    variant: {
+      productName: "Adhesive shutoff valve identification labels (assortment)",
+      priceLow: 8,
+      priceHigh: 15,
+      affiliateUrl: "https://www.amazon.com/s?k=plumbing+shutoff+valve+labels+adhesive&tag=alderprojects-20",
+      productSpec: "Pre-printed adhesive labels for water main, hot water, cold water, gas, individual fixture shutoffs. Weather-resistant. ~30 labels per pack."
+    },
+    tags: {
+      topics: [
+        "outdoor"
+      ],
+      roles: [
+        "document_aid",
+        "safety_item"
+      ],
+      functions: [
+        "shutoff_labels"
+      ],
+      seasons: [
+        "fall",
+        "pre_winter",
+        "closing_season"
+      ],
+      propertyTypes: [],
+      conditions: [],
+      alreadyHaveFlag: "has_shutoff_labels",
+      tier: "sweet_spot"
+    },
+    citations: [
+      "NFPA fire and safety labeling standards",
+      "Insurance industry water damage minimization guidance"
+    ],
+    migratedFrom: {
+      scope: "outdoor_freeze_prevention",
+      slotId: "freeze_shutoff_labels",
+      tier: "sweet_spot"
+    }
+  },
+  {
+    universeId: "moen_flo_smart_water_shutoff_3_4",
+    rank: 100,
+    variant: {
+      productName: "Moen Flo Smart Water Shutoff (3/4\")",
+      priceLow: 380,
+      priceHigh: 530,
+      affiliateUrl: "https://www.amazon.com/s?k=moen+flo+smart+water+shutoff+3+4&tag=alderprojects-20",
+      productSpec: "WiFi-connected automatic shutoff valve installed at the main supply line. Detects abnormal flow patterns and shuts off water automatically. Manual control via app. Requires professional plumber install (1-3 hours, ~$200-400 labor)."
+    },
+    tags: {
+      topics: [
+        "outdoor"
+      ],
+      roles: [
+        "hardware"
+      ],
+      functions: [
+        "smart_shutoff_valve"
+      ],
+      seasons: [
+        "fall",
+        "pre_winter",
+        "closing_season"
+      ],
+      propertyTypes: [],
+      conditions: [],
+      alreadyHaveFlag: "has_smart_shutoff",
+      tier: "sweet_spot"
+    },
+    citations: [
+      "Moen Flo product documentation",
+      "YoLink smart water shutoff specifications",
+      "Insurance industry data on auto-shutoff premium discounts"
+    ],
+    migratedFrom: {
+      scope: "outdoor_freeze_prevention",
+      slotId: "freeze_smart_shutoff_valve",
+      tier: "sweet_spot"
+    }
+  },
+  {
+    universeId: "yolink_smart_water_shutoff_valve_with_lora_hub",
+    rank: 100,
+    variant: {
+      productName: "YoLink Smart Water Shutoff Valve with LoRa hub",
+      priceLow: 250,
+      priceHigh: 400,
+      affiliateUrl: "https://www.amazon.com/s?k=yolink+smart+water+shutoff+valve&tag=alderprojects-20",
+      productSpec: "LoRa-based shutoff valve. Works without WiFi via cellular hub option. Pairs with YoLink leak sensors for automatic shutoff on leak detection. Better for properties with marginal WiFi."
+    },
+    tags: {
+      topics: [
+        "outdoor"
+      ],
+      roles: [
+        "hardware"
+      ],
+      functions: [
+        "smart_shutoff_valve"
+      ],
+      seasons: [
+        "fall",
+        "pre_winter",
+        "closing_season"
+      ],
+      propertyTypes: [],
+      conditions: [],
+      alreadyHaveFlag: "has_smart_shutoff",
+      tier: "premium"
+    },
+    citations: [
+      "Moen Flo product documentation",
+      "YoLink smart water shutoff specifications",
+      "Insurance industry data on auto-shutoff premium discounts"
+    ],
+    migratedFrom: {
+      scope: "outdoor_freeze_prevention",
+      slotId: "freeze_smart_shutoff_valve",
+      tier: "premium"
+    }
+  },
+  {
+    universeId: "marcell_or_temp_stick_cellular_temperature_monitor",
+    rank: 100,
+    variant: {
+      productName: "Marcell or Temp Stick cellular temperature monitor",
+      priceLow: 130,
+      priceHigh: 220,
+      affiliateUrl: "https://www.amazon.com/s?k=marcell+cellular+temperature+monitor&tag=alderprojects-20",
+      productSpec: "Cellular-connected temperature monitor with built-in SIM. No WiFi required. Sends alert when temperature drops below threshold. Subscription required for cellular service ($5-12/month)."
+    },
+    tags: {
+      topics: [
+        "outdoor"
+      ],
+      roles: [
+        "sensor",
+        "monitor"
+      ],
+      functions: [
+        "pipe_freeze_alarm"
+      ],
+      seasons: [
+        "fall",
+        "pre_winter",
+        "closing_season"
+      ],
+      propertyTypes: [],
+      conditions: [],
+      alreadyHaveFlag: "has_freeze_alarm",
+      tier: "sweet_spot"
+    },
+    citations: [
+      "Marcell and Temp Stick product documentation",
+      "Cellular monitoring service comparisons"
+    ],
+    migratedFrom: {
+      scope: "outdoor_freeze_prevention",
+      slotId: "freeze_alarm_non_wifi",
+      tier: "sweet_spot"
+    }
+  },
 ]

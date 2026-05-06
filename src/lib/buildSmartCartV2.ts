@@ -82,6 +82,42 @@ export function buildSmartCartV2(
   const selectedTier = input.selectedTier ?? 'sweet_spot'
   const alreadyHave = input.alreadyHave ?? []
 
+  const createdAt = input.createdAt ?? new Date().toISOString()
+  const expiresAt =
+    input.expiresAt ?? new Date(Date.now() + TTL_MS).toISOString()
+
+  // v7.2.5 — Route-out check first. If a catalog rule matches the
+  // buyer's scenario or alreadyHave, short-circuit: emit an empty
+  // cart with `routedOut` set so the result page renders the
+  // route-out message instead of the slot list.
+  const routedOut = evaluateRouteOut(catalog, input, alreadyHave)
+  if (routedOut) {
+    return {
+      cartId: input.cartId,
+      version: 2,
+      product: 'smart_cart',
+      topic: input.topic,
+      scopeVariantId: input.scopeVariantId,
+      scopeLabel,
+      scenario: input.scenario,
+      scenarioLabel,
+      selectedTier,
+      alreadyHave,
+      slots: [],
+      skipList: [],
+      savings: emptySavings(),
+      customerEmail: input.customerEmail,
+      customerProvidedAddress: input.customerProvidedAddress,
+      createdAt,
+      expiresAt,
+      respinCount: 0,
+      configVersion: CONFIG.version,
+      smartCartPromise: catalog.smartCartPromise,
+      valueProposition: catalog.valueProposition,
+      routedOut,
+    }
+  }
+
   // 1. Filter scope-catalog slots whose conditionalOn intersects
   //    alreadyHave. Empty conditionalOn = always visible.
   const visibleScopeSlots = catalog.slots.filter(slot => {
@@ -119,9 +155,10 @@ export function buildSmartCartV2(
   // 4. Compute savings (same math as v7.2.1).
   const savings = computeSavings(slots, skipList, selectedTier)
 
-  const createdAt = input.createdAt ?? new Date().toISOString()
-  const expiresAt =
-    input.expiresAt ?? new Date(Date.now() + TTL_MS).toISOString()
+  // v7.2.5 — Build derived fields from new schema metadata.
+  const nextBestGaps = buildNextBestGaps(catalog, alreadyHave)
+  const bundlePrompts = buildBundlePrompts(slots, universe)
+  const urgencyBanner = computeUrgencyBanner(catalog.seasonalUrgency)
 
   return {
     cartId: input.cartId,
@@ -143,6 +180,12 @@ export function buildSmartCartV2(
     expiresAt,
     respinCount: 0,
     configVersion: CONFIG.version,
+    // v7.2.5 — pass-through fields. All omitted when undefined.
+    smartCartPromise: catalog.smartCartPromise,
+    valueProposition: catalog.valueProposition,
+    nextBestGaps,
+    bundlePrompts,
+    urgencyBanner,
   }
 }
 
@@ -153,14 +196,14 @@ function composeSlot(
   universe: UniverseProduct[],
   alreadyHave: string[],
 ): CartSlot | null {
-  const sweetSpot = resolveVariant(
+  const sweetSpotProduct = resolveProduct(
     scopeSlot.tierQueries.sweet_spot,
     universe,
     alreadyHave,
   )
-  if (!sweetSpot) return null  // defensive — sweet_spot is required
+  if (!sweetSpotProduct) return null  // defensive — sweet_spot is required
 
-  const tiers: CartSlot['tiers'] = { sweet_spot: sweetSpot }
+  const tiers: CartSlot['tiers'] = { sweet_spot: sweetSpotProduct.variant }
 
   if (scopeSlot.tierQueries.budget) {
     const v = resolveVariant(scopeSlot.tierQueries.budget, universe, alreadyHave)
@@ -169,6 +212,19 @@ function composeSlot(
   if (scopeSlot.tierQueries.premium) {
     const v = resolveVariant(scopeSlot.tierQueries.premium, universe, alreadyHave)
     if (v) tiers.premium = v
+  }
+
+  // v7.2.5 — forward urgency window from sweet-spot product, with
+  // a computed daysRemaining alongside the raw MM-DD buyByDate.
+  let urgencyWindow: CartSlot['urgencyWindow']
+  const productUrgency = sweetSpotProduct.tags.urgencyWindow
+  if (productUrgency) {
+    urgencyWindow = {
+      buyByDate: productUrgency.buyByDate,
+      earliestUseful: productUrgency.earliestUseful,
+      label: productUrgency.label,
+      daysRemaining: computeDaysRemaining(productUrgency.buyByDate),
+    }
   }
 
   return {
@@ -183,6 +239,13 @@ function composeSlot(
     contextNote: scopeSlot.contextNote,
     warnings: scopeSlot.warnings,
     citations: scopeSlot.citations,
+    // v7.2.5 — slot-level metadata pass-through.
+    slotPurpose: scopeSlot.slotPurpose,
+    whyItMatters: scopeSlot.whyItMatters,
+    commonMistake: scopeSlot.commonMistake,
+    costBenefitClaim: sweetSpotProduct.costBenefitClaim,
+    vermontReasoning: sweetSpotProduct.vermontReasoning,
+    urgencyWindow,
   }
 }
 
@@ -194,6 +257,119 @@ function resolveVariant(
   const results = queryUniverse(universe, query, alreadyHave)
   if (results.length === 0) return undefined
   return results[0].variant
+}
+
+function resolveProduct(
+  query: UniverseQuery,
+  universe: UniverseProduct[],
+  alreadyHave: string[],
+): UniverseProduct | undefined {
+  const results = queryUniverse(universe, query, alreadyHave)
+  if (results.length === 0) return undefined
+  return results[0]
+}
+
+// ---------- v7.2.5 — route-out, bundles, next-best, urgency ----------
+
+function evaluateRouteOut(
+  catalog: ScopeCatalog,
+  input: BuildSmartCartV2Input,
+  alreadyHave: string[],
+): SmartCartV2Output['routedOut'] | undefined {
+  if (!catalog.routeOutRules?.length) return undefined
+  for (const rule of catalog.routeOutRules) {
+    // Match condition against alreadyHave flags (substring) or
+    // scenario id (exact-or-substring). Loose matching is intentional
+    // — catalog authors write conditions like "absentee_owner" or
+    // "no_wifi" without needing structured operators.
+    const matchedFlag = alreadyHave.some(flag => rule.condition.includes(flag))
+    const matchedScenario = rule.condition.includes(input.scenario)
+    if (matchedFlag || matchedScenario) {
+      return { destination: rule.destination, reason: rule.reason }
+    }
+  }
+  return undefined
+}
+
+function buildNextBestGaps(
+  catalog: ScopeCatalog,
+  alreadyHave: string[],
+): SmartCartV2Output['nextBestGaps'] {
+  const gaps: NonNullable<SmartCartV2Output['nextBestGaps']> = []
+  for (const slot of catalog.slots) {
+    if (!slot.nextBestIfAlreadyHave) continue
+    const triggered = slot.conditionalOn.find(flag =>
+      alreadyHave.includes(flag),
+    )
+    if (!triggered) continue
+    gaps.push({
+      triggeredByFlag: triggered,
+      recommendedSlot: slot.nextBestIfAlreadyHave.targetSlotOrFunction,
+      reason: slot.nextBestIfAlreadyHave.reason,
+    })
+  }
+  return gaps.length > 0 ? gaps : undefined
+}
+
+function buildBundlePrompts(
+  slots: CartSlot[],
+  universe: UniverseProduct[],
+): SmartCartV2Output['bundlePrompts'] {
+  const prompts: NonNullable<SmartCartV2Output['bundlePrompts']> = []
+  for (const slot of slots) {
+    const sweetSpotName = slot.tiers.sweet_spot.productName
+    const product = universe.find(
+      p => p.variant.productName === sweetSpotName,
+    )
+    if (!product?.tags.bundleWith?.length) continue
+    prompts.push({
+      primaryUniverseId: product.universeId,
+      bundleUniverseIds: product.tags.bundleWith,
+      bundleReason: 'Buy these together for full coverage.',
+    })
+  }
+  return prompts.length > 0 ? prompts : undefined
+}
+
+function computeUrgencyBanner(
+  urgency: ScopeCatalog['seasonalUrgency'],
+): SmartCartV2Output['urgencyBanner'] {
+  if (!urgency) return undefined
+  return {
+    deadline: urgency.deadline,
+    label: urgency.label,
+    daysRemaining: computeDaysRemaining(urgency.deadline),
+  }
+}
+
+/**
+ * Days remaining until the next occurrence of an MM-DD date. If the
+ * date has already passed for the current year, returns days until
+ * the same date next year. Returns undefined for malformed input.
+ */
+function computeDaysRemaining(dateStr: string | undefined): number | undefined {
+  if (!dateStr) return undefined
+  const parts = dateStr.split('-').map(Number)
+  if (parts.length !== 2) return undefined
+  const [month, day] = parts
+  if (!month || !day) return undefined
+  const now = new Date()
+  const target = new Date(now.getFullYear(), month - 1, day)
+  if (target.getTime() < now.getTime()) {
+    target.setFullYear(target.getFullYear() + 1)
+  }
+  return Math.floor((target.getTime() - now.getTime()) / 86_400_000)
+}
+
+function emptySavings(): SmartCartV2Savings {
+  return {
+    leanCartLow: 0,
+    leanCartHigh: 0,
+    typicalOverbuyLow: 0,
+    typicalOverbuyHigh: 0,
+    potentialSavingsLow: 0,
+    potentialSavingsHigh: 0,
+  }
 }
 
 // ---------- Savings math (verbatim from v7.2.1) ---------------------

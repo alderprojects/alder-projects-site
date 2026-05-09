@@ -10,6 +10,7 @@ import type { SmartCartV2Output } from '@/lib/smart-cart-model'
 import { getGeneralSkipPrinciples } from '@/content/skip-list'
 import CartActions from '@/components/smartCart/CartActions'
 import V2ResultLayout from '@/components/smartCart/V2ResultLayout'
+import { enrichCartWithCurrentImages } from '@/lib/smart-cart-images'
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
@@ -28,7 +29,9 @@ export default async function SmartCartResultPage({ params }: Props) {
     if (new Date(cart.expiresAt).getTime() < Date.now()) {
       return <V2Expired cart={cart} />
     }
-    return <V2ResultLayout cart={cart} />
+    // V7.2.10 — backfill imageUrl from current universe for carts
+    // saved before the image pipeline existed.
+    return <V2ResultLayout cart={enrichCartWithCurrentImages(cart)} />
   }
 
   if (cart.refunded) {

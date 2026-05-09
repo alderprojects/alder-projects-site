@@ -1,15 +1,12 @@
 // v7.2.7 — runtime helpers for product images.
 // v7.2.9 — added image-source classification + per-source labels.
-//
-// V2ResultLayout calls resolveImageUrl(variant) to get the path. If
-// the variant has imageUrl populated (universe.ts), use that. Otherwise
-// fall back to the default icon. The 404 fallback is handled at the
-// component layer via <img onError>.
-//
-// CategoryTag calls getImageSource(universeId) to classify the image
-// for display labeling.
+// v7.2.10 — enrichCartWithCurrentImages: backfill imageUrl on carts
+//   persisted in KV before the image pipeline existed. Result page
+//   calls this before render so old carts inherit current imagery
+//   without re-saving.
 
-import type { CartTierVariant } from './smart-cart-model'
+import { UNIVERSE } from '@/content/smart-cart/universe'
+import type { CartSlot, CartTierVariant, SmartCartV2Output } from './smart-cart-model'
 import manifest from './image-source-manifest.json'
 
 export const DEFAULT_IMAGE_URL = '/product-images/categories/_package.svg'
@@ -50,4 +47,53 @@ export function getImageSourceLabel(source: ImageSource): string | null {
     case 'svg_fallback':
       return 'Category'
   }
+}
+
+// ---------- Cart-level enrichment (v7.2.10) -------------------------
+//
+// Carts persisted in KV before v7.2.7-v7.2.9 have empty/stale
+// variant.imageUrl values. Result page reads from KV verbatim, so
+// historical carts don't pick up later image work without help.
+//
+// At render time we walk each slot's tiers and look up the current
+// imageUrl from UNIVERSE by productName. If the persisted variant
+// already has a non-empty imageUrl, leave it alone — only backfill
+// missing data.
+
+const PRODUCT_NAME_TO_IMAGE_URL: Record<string, string> = (() => {
+  const map: Record<string, string> = {}
+  for (const p of UNIVERSE) {
+    if (p.variant.imageUrl && p.variant.productName) {
+      map[p.variant.productName] = p.variant.imageUrl
+    }
+  }
+  return map
+})()
+
+function enrichVariant(variant: CartTierVariant): CartTierVariant {
+  if (variant.imageUrl && variant.imageUrl.length > 0) return variant
+  const fromUniverse = PRODUCT_NAME_TO_IMAGE_URL[variant.productName]
+  if (!fromUniverse) return variant
+  return { ...variant, imageUrl: fromUniverse }
+}
+
+function enrichSlot(slot: CartSlot): CartSlot {
+  return {
+    ...slot,
+    tiers: {
+      budget: slot.tiers.budget ? enrichVariant(slot.tiers.budget) : undefined,
+      sweet_spot: enrichVariant(slot.tiers.sweet_spot),
+      premium: slot.tiers.premium ? enrichVariant(slot.tiers.premium) : undefined,
+    },
+  }
+}
+
+/**
+ * Backfill imageUrl on every variant in the cart from the current
+ * universe. Pure: returns a shallow copy with enriched slots.
+ */
+export function enrichCartWithCurrentImages(
+  cart: SmartCartV2Output,
+): SmartCartV2Output {
+  return { ...cart, slots: cart.slots.map(enrichSlot) }
 }

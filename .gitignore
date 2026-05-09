@@ -37,3 +37,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# v7.2.7 image-pipeline working dir; processed webp/jpg are committed
+public/product-images/_raw/

@@ -526,10 +526,17 @@ function buildUniverseProduct(
     alreadyHaveFlag: slot.conditionalOn?.[0] ?? '',
     tier,
   }
+  const universeId = generateUniverseId(slot, tier, variant.productName)
+  // V7.2.7 — auto-populate imageUrl so newly ingested entries land
+  // with at least a category fallback. The image-sourcing pipeline
+  // (scripts/images/) overwrites with a real photo when one is
+  // sourced. Resolution priority: function-tag SVG → topic SVG →
+  // default _package.svg.
+  const imageUrl = resolveDefaultImageUrl(tags.functions, tags.topics)
   return {
-    universeId: generateUniverseId(slot, tier, variant.productName),
+    universeId,
     rank: 100,
-    variant,
+    variant: { ...variant, imageUrl },
     tags,
     citations: (slot as any).citations ?? [],
     migratedFrom: {
@@ -538,6 +545,22 @@ function buildUniverseProduct(
       tier,
     },
   }
+}
+
+function resolveDefaultImageUrl(functions: string[], topics: string[]): string {
+  const fs = require('node:fs') as typeof import('node:fs')
+  const CATEGORIES = 'public/product-images/categories'
+  for (const fn of functions) {
+    if (fs.existsSync(`${CATEGORIES}/${fn}.svg`)) {
+      return `/product-images/categories/${fn}.svg`
+    }
+  }
+  for (const t of topics) {
+    if (fs.existsSync(`${CATEGORIES}/_topic-${t}.svg`)) {
+      return `/product-images/categories/_topic-${t}.svg`
+    }
+  }
+  return '/product-images/categories/_package.svg'
 }
 
 function mergeProductTags(

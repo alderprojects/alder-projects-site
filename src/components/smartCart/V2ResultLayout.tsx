@@ -18,7 +18,9 @@ import type {
   SkipItemV2,
   SmartCartV2Output,
 } from '@/lib/smart-cart-model'
+import { resolveImageUrl } from '@/lib/smart-cart-images'
 import CartActions from './CartActions'
+import ProductImage from './ProductImage'
 
 type Props = { cart: SmartCartV2Output }
 
@@ -137,6 +139,7 @@ function SlotCard({
 }) {
   const variant: CartTierVariant = slot.tiers[tier] ?? slot.tiers.sweet_spot
   const usedTier: CartTier = slot.tiers[tier] ? tier : 'sweet_spot'
+  const imageUrl = resolveImageUrl(variant)
   return (
     <article className="border border-[#e8e3d4] rounded-lg p-5">
       <div className="flex items-baseline gap-3 mb-2">
@@ -148,23 +151,33 @@ function SlotCard({
         </h3>
       </div>
 
-      <div className="flex flex-col sm:flex-row sm:items-baseline sm:justify-between gap-1 mb-2 ml-10">
-        <a
-          href={variant.affiliateUrl}
-          target="_blank"
-          rel="noopener nofollow sponsored"
-          className="text-[#1f3a2e] underline-offset-2 hover:underline font-medium"
-        >
-          {variant.productName}
-        </a>
-        <span className="text-sm text-[#1a1f1a]/85 whitespace-nowrap">
-          {TIER_LABEL[usedTier]} · {formatPriceRange(variant.priceLow, variant.priceHigh)}
-        </span>
+      <div className="ml-10 flex gap-4 mb-3">
+        <div className="flex-shrink-0">
+          <ProductImage
+            src={imageUrl}
+            alt={variant.productName}
+            className="w-24 h-24 sm:w-28 sm:h-28 object-contain rounded-md bg-white border border-[#e8e3d4]"
+          />
+        </div>
+        <div className="flex-1 min-w-0">
+          <div className="flex flex-col sm:flex-row sm:items-baseline sm:justify-between gap-1 mb-2">
+            <a
+              href={variant.affiliateUrl}
+              target="_blank"
+              rel="noopener nofollow sponsored"
+              className="text-[#1f3a2e] underline-offset-2 hover:underline font-medium"
+            >
+              {variant.productName}
+            </a>
+            <span className="text-sm text-[#1a1f1a]/85 whitespace-nowrap">
+              {TIER_LABEL[usedTier]} · {formatPriceRange(variant.priceLow, variant.priceHigh)}
+            </span>
+          </div>
+          <p className="text-sm italic text-[#1a1f1a]/75">
+            {variant.productSpec}
+          </p>
+        </div>
       </div>
-
-      <p className="ml-10 text-sm italic text-[#1a1f1a]/75 mb-3">
-        {variant.productSpec}
-      </p>
 
       <p className="ml-10 text-sm text-[#1a1f1a]/85 mb-3">{slot.whyThis}</p>
 
@@ -225,25 +238,33 @@ function AddOnSection({ slots, tier }: { slots: CartSlot[]; tier: CartTier }) {
       <ul className="space-y-3">
         {slots.map(slot => {
           const variant = slot.tiers[tier] ?? slot.tiers.sweet_spot
+          const imageUrl = resolveImageUrl(variant)
           return (
             <li
               key={slot.slotId}
-              className="flex flex-col sm:flex-row sm:items-baseline sm:justify-between gap-1 border-b border-[#e8e3d4] pb-3"
+              className="flex items-start gap-3 border-b border-[#e8e3d4] pb-3"
             >
-              <div className="flex-1">
-                <a
-                  href={variant.affiliateUrl}
-                  target="_blank"
-                  rel="noopener nofollow sponsored"
-                  className="font-medium text-[#1f3a2e] hover:underline"
-                >
-                  {variant.productName}
-                </a>
-                <p className="text-sm text-[#1a1f1a]/80 mt-1">{slot.whyThis}</p>
+              <ProductImage
+                src={imageUrl}
+                alt={variant.productName}
+                className="w-14 h-14 object-contain rounded bg-white border border-[#e8e3d4] flex-shrink-0"
+              />
+              <div className="flex-1 min-w-0 flex flex-col sm:flex-row sm:items-baseline sm:justify-between gap-1">
+                <div className="flex-1 min-w-0">
+                  <a
+                    href={variant.affiliateUrl}
+                    target="_blank"
+                    rel="noopener nofollow sponsored"
+                    className="font-medium text-[#1f3a2e] hover:underline"
+                  >
+                    {variant.productName}
+                  </a>
+                  <p className="text-sm text-[#1a1f1a]/80 mt-1">{slot.whyThis}</p>
+                </div>
+                <span className="text-sm font-medium whitespace-nowrap">
+                  {formatPriceRange(variant.priceLow, variant.priceHigh)}
+                </span>
               </div>
-              <span className="text-sm font-medium whitespace-nowrap">
-                {formatPriceRange(variant.priceLow, variant.priceHigh)}
-              </span>
             </li>
           )
         })}

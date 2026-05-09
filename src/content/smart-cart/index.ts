@@ -28,7 +28,8 @@ import { HOME_WATER_QUALITY } from './scope-catalogs/home-water-quality'
 import { OUTDOOR_DOCK_LAKE } from './scope-catalogs/outdoor-dock-lake'
 import { HOME_SAFETY_KIT } from './scope-catalogs/home-safety-kit'
 import { UNIVERSAL_PROJECT_PREP } from './scope-catalogs/universal-project-prep'
-// MUDROOM_ENTRY_RESET pending — paste 3 source file not yet provided.
+// V7.2.6
+import { MUDROOM_ENTRY_RESET } from './scope-catalogs/mudroom-entry-reset'
 
 const CATALOGS: ScopeCatalog[] = [
   KITCHEN_ORGANIZERS,
@@ -47,7 +48,8 @@ const CATALOGS: ScopeCatalog[] = [
   OUTDOOR_DOCK_LAKE,
   HOME_SAFETY_KIT,
   UNIVERSAL_PROJECT_PREP,
-  // MUDROOM_ENTRY_RESET — pending source file
+  // V7.2.6
+  MUDROOM_ENTRY_RESET,
 ]
 
 // ---------- Catalog lookup ------------------------------------------

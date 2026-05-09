@@ -278,7 +278,7 @@ export const SCOPE_VARIANTS: Record<TopicId, ScopeVariant[]> = {
       label: 'Mudroom & entry reset',
       description:
         'Keep mud, boots, wet gear, and lake stuff from taking over the house.',
-      smartCartReady: false, // flips to true in paste 3
+      smartCartReady: true,
       defaultLane: 'diy',
       estCostRange: { low: 80, high: 400 },
       relevantKitIds: ['mudroom_entry_reset'],

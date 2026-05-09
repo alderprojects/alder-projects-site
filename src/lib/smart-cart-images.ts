@@ -71,10 +71,14 @@ const PRODUCT_NAME_TO_IMAGE_URL: Record<string, string> = (() => {
 })()
 
 function enrichVariant(variant: CartTierVariant): CartTierVariant {
-  if (variant.imageUrl && variant.imageUrl.length > 0) return variant
+  // v7.2.10 — universe is source of truth. Persisted carts have
+  // imageUrl values that are snapshots at cart-generation time;
+  // when the universe has new imagery, prefer the universe value.
+  // Only fall back to the persisted value when the productName isn't
+  // in the current universe (e.g., a slot whose product was renamed).
   const fromUniverse = PRODUCT_NAME_TO_IMAGE_URL[variant.productName]
-  if (!fromUniverse) return variant
-  return { ...variant, imageUrl: fromUniverse }
+  if (fromUniverse) return { ...variant, imageUrl: fromUniverse }
+  return variant
 }
 
 function enrichSlot(slot: CartSlot): CartSlot {

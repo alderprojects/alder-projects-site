@@ -13,7 +13,8 @@ import { formatPriceRange } from '@/lib/format'
 import { TIER_LABEL } from '@/lib/smart-cart-model'
 import type { CartSlot, CartTier, CartTierVariant } from '@/lib/smart-cart-model'
 import { resolveImageUrl } from '@/lib/smart-cart-images'
-import { extractSpecCallouts } from '@/lib/spec-callouts'
+import { extractSpecCallouts, sanitizeProductSpec } from '@/lib/spec-callouts'
+import { computePerSlotSavings } from '@/lib/per-slot-savings'
 import ProductImage from '../ProductImage'
 import CategoryTag from '../chips/CategoryTag'
 import BenefitChip from '../chips/BenefitChip'
@@ -29,7 +30,9 @@ export default function RecommendedPickCard({ slot, tier, index }: Props) {
   const variant: CartTierVariant = slot.tiers[tier] ?? slot.tiers.sweet_spot
   const usedTier: CartTier = slot.tiers[tier] ? tier : 'sweet_spot'
   const imageUrl = resolveImageUrl(variant)
+  const cleanSpec = sanitizeProductSpec(variant.productSpec)
   const callouts = extractSpecCallouts(variant.productSpec)
+  const perSlotSavings = computePerSlotSavings(slot)
   const hasBudget = !!slot.tiers.budget
   const hasPremium = !!slot.tiers.premium
 
@@ -68,9 +71,9 @@ export default function RecommendedPickCard({ slot, tier, index }: Props) {
             </span>
           </div>
 
-          <p className="text-sm italic text-[#1a1f1a]/75 mb-2">
-            {variant.productSpec}
-          </p>
+          {cleanSpec && (
+            <p className="text-sm italic text-[#1a1f1a]/75 mb-2">{cleanSpec}</p>
+          )}
 
           {callouts.length > 0 && (
             <div className="flex flex-wrap gap-1.5 mb-2">
@@ -86,6 +89,11 @@ export default function RecommendedPickCard({ slot, tier, index }: Props) {
           )}
 
           <div className="flex flex-wrap gap-1.5 mb-2">
+            {perSlotSavings && (
+              <BenefitChip
+                label={`Saved ${formatPriceRange(perSlotSavings.low, perSlotSavings.high)} ${perSlotSavings.comparedTo}`}
+              />
+            )}
             {hasBudget && <BenefitChip label="Better than the cheapest" />}
             {hasPremium && slot.whyNotPremium && (
               <WarningChip label="Skip premium for most homes" />

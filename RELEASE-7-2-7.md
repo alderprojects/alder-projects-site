@@ -1,95 +1,141 @@
-# v7.2.7 — Product images across the universe
+# v7.2.7 — Product images + cost/benefit-forward result page
 
-Smart Cart result pages now render with images on every product card.
-Closes the "wall of text" feedback from the v7.2.6 paid-cart smoke
-test.
+Two-PR release that takes the Smart Cart result page from a text-list
+to a visual cost/benefit decision document. Closes the wall-of-text
+feedback from the v7.2.6 paid-cart smoke test.
 
-## What changed for buyers
+## Part A — Image pipeline (PR #10, merged)
 
-- Lean cart slot cards: 96–112px product thumbnail to the left of
-  product name + price + spec.
-- Add-on list rows: 56px thumbnail.
-- Missing/broken images fall back to a per-topic SVG icon (no
-  broken-image rendering).
+Every product in the cart now renders with an image.
 
-## Coverage
+**Coverage on 222 universe entries:**
 
 | Tier | Source | Count | Share |
 |---|---|---|---|
 | Tier 1 | Manufacturer product pages (real photos) | 29 | 13.1% |
-| Tier 3 | Pexels stock (CATEGORY_GENERIC entries) | 35 | 15.8% |
+| Tier 3 | Pexels stock (CATEGORY_GENERIC entries only) | 35 | 15.8% |
 | Tier 4 | Per-function SVG icons (Lucide MIT) | 77 | 34.7% |
 | Tier 4 | Per-topic SVG icons (Lucide MIT) | 81 | 36.5% |
-| **Total real photos** | | **64** | **28.8%** |
-| **Total fallback icons** | | **158** | **71.2%** |
+| **Real photos** | | **64** | **28.8%** |
+| **Fallback icons** | | **158** | **71.2%** |
 
 100% of products have an image. The 158 fallback-icon entries are
-split between brand-prominent products on Amazon-only brands
-(Pipishell, Ryqtop, DIOLOVE, etc., which have no public corporate
-catalog) and entries whose manufacturer pages don't expose `og:image`.
-A v7.3+ workstream will source vendor-licensed photography for these.
+mostly brand-prominent products on Amazon-only brands (Pipishell,
+Ryqtop, DIOLOVE, etc., which have no public corporate catalog with
+`og:image`); v7.3+ vendor outreach will source licensed photography
+to replace them.
 
-## Architecture
+**What got dropped from the original plan:**
 
-New scripts (`scripts/images/`):
-- `01-audit-products.ts` — classifies entries SPECIFIC / CATEGORY_BRAND
-  / CATEGORY_GENERIC / SERVICE
-- `02-source-manufacturer.ts` — Tier 1 scraper (robots.txt-respecting,
-  identifying User-Agent, per-domain rate limit, og:image / schema.org
-  Product image extraction)
-- `04-source-pexels.ts` — Tier 3 Pexels client
-- `05-source-svg-fallback.ts` — Tier 4 SVG generator (Lucide path data)
-- `06-process-images.ts` — sharp resize/WebP/JPG pipeline
-- `07-update-universe.ts` — populates `variant.imageUrl` across
-  `universe.ts` (idempotent)
-- `99-coverage-report.ts` — per-tier + per-topic coverage report
+- Tier 2 (Wikimedia Commons) — realistic hit rate against this catalog
+  would be 3–5 of 222; not worth the pipeline complexity. Defer.
+- Manufacturer-scraping legal framing — the original plan invoked
+  "nominative fair use" (a trademark doctrine, wrong for copyright).
+  ATTRIBUTION.md instead documents each fetch with source URL + date
+  and a one-business-day takedown contact (`hello@alderprojects.com`).
+  No claim of license; rights holders can request removal directly.
 
-Runtime:
-- `src/lib/smart-cart-images.ts` — `resolveImageUrl(variant)` returns
-  `variant.imageUrl ?? DEFAULT_IMAGE_URL`
-- `src/components/smartCart/ProductImage.tsx` — client component with
-  onError fallback to default icon
+**Pipeline (`scripts/images/`):** audit, manufacturer scraper with
+robots.txt + identifying User-Agent + per-domain rate limit, Pexels
+client, SVG generator, sharp resize/WebP/JPG, idempotent universe
+updater, coverage report. `ingest-catalog.ts` auto-populates
+`imageUrl` on newly ingested entries.
 
-Schema: `CartTierVariant.imageUrl` was already declared in v7.2.1; this
-release populates it.
+## Part B — Result-page UI refinement (this PR)
 
-## Ingest pipeline forward-compatibility
+Refactor `V2ResultLayout` into a cost/benefit-forward layout with a
+two-column desktop shell.
 
-`scripts/ingest-catalog.ts` now auto-populates `variant.imageUrl` on
-newly ingested entries based on function/topic SVG fallbacks. The image
-sourcing pipeline overwrites with a real photo when one is found.
+**Structure:**
 
-## Attribution
+- Header (unchanged) → TitleBlock → conditional banners (Urgency,
+  Route-out)
+- ValueProofBar (top-of-body savings strip)
+- Two-column body (mobile collapses to single column):
+  - **Main column (2/3):** RecommendedPicks → Add-ons → Bundle
+    prompts → Skip-for-now → Already-have
+  - **Sticky sidebar (1/3):** CartSummary → WhyThesePicks →
+    NotQuiteRight (respin)
+- CrossSellComingSoon (unchanged)
 
-`ATTRIBUTION.md` documents every image source. Includes a takedown
-contact (`hello@alderprojects.com`, one-business-day removal) for
-manufacturer-sourced images.
+**RecommendedPickCard** is the new core component. Per pick:
+- Numbered badge + image with Category tag overlay (when image is an
+  SVG fallback)
+- Product name, price range, tier label
+- Italic productSpec line + parsed callout chips (≤3 short fragments
+  via `extractSpecCallouts`)
+- Benefit chips: "Better than the cheapest" (when budget tier
+  exists), "Skip premium for most homes" (when premium tier exists
+  and `whyNotPremium` is authored), `costBenefitClaim` chip (when
+  present)
+- Why-this prose
+- Why-not-cheaper / why-not-premium expandables (data-gated)
+- Warnings, contextNote, vermontReasoning (data-gated)
 
-## What is NOT in v7.2.7
+**Sidebar:**
 
-- Vendor-licensed photography for Amazon-only brands (~120 entries
-  remain on SVG fallback) — separate workstream
-- Multiple images per product
-- User-uploaded photos
-- AI-generated product illustrations
-- Amazon PA-API integration (out of scope per Tier 1 cost/benefit)
+- **CartSummary:** items count, estimated total range, estimated
+  savings range. Prominent "Estimates only" footnote.
+- **WhyThesePicks:** the catalog's `smartCartPromise` (when present)
+  + 4 always-true Smart Cart chips (Right size for most homes /
+  Better quality, better value / Avoids early remodel spending /
+  Saves time and extra trips). The mockup's per-scope chip set was
+  trimmed back: catalog `valueProposition` is authored as narrative,
+  not 4 parallel claims, so we don't fabricate chip text.
+- **NotQuiteRight:** uses the existing CartActions component for
+  respin (already shipped).
 
-## Operational notes
+## Compliance commitments held throughout
 
-- Image assets live at `public/product-images/{universeId}.{webp,jpg}`
-- Per-function SVGs at `public/product-images/categories/{fn}.svg`
-- Total static-asset weight added: ~3MB (64 × 800×800 WebP @ q85,
-  76 small SVGs)
-- Re-running the pipeline is idempotent; only changed assets are
-  rewritten
+- **No invented review counts, ratings, popularity numbers.** The
+  mockup showed "4.7 · 42,000+ reviews" — we don't have that data.
+  Cut entirely.
+- **No promised home valuation impact.** Requires v7.3.5+ photo +
+  property-graph integration. Not in scope.
+- **No fake urgency or stock counts.** UrgencyBanner only renders
+  from public-data deadlines (frost dates, opening seasons) at
+  `cart.urgencyBanner.daysRemaining < 30`.
+- **Estimated savings always shown as range, never as guarantee.**
+  ValueProofBar suppresses entirely when `potentialSavingsHigh`
+  doesn't exceed the $19.99 product price.
+- **Vermont reasoning stays at catalog level.** Personalized "for
+  your Vermont home at X elevation" is v7.3.x (PropertyProfile
+  attachment).
+- **Manufacturer images include a takedown contact.** Documented per
+  source in `ATTRIBUTION.md`. No "fair use" overclaim.
 
-## Pre-flight checklist for the PR
+## What's NOT in v7.2.7
 
-- [x] Audit reconciled (222 entries, not 203)
-- [x] All 222 entries have non-empty `imageUrl`
-- [x] No entries fall to default `_package.svg`
-- [x] `ATTRIBUTION.md` covers every Tier 1 + Tier 3 image
-- [x] V2ResultLayout renders thumbnails with onError fallback
-- [x] Ingest script auto-populates imageUrl for future catalogs
-- [ ] `npx tsc --noEmit` clean
-- [ ] Visual spot-check (10 random product cards on local dev)
+- Product reviews / ratings (no review-data integration)
+- Save-for-later persistence (no real account state — stays a v7.3.1
+  feature)
+- Live lead routing to pros/contractors (route-out CTAs in
+  RouteOutBanner are mailto placeholders for now; wires up in v7.4)
+- A/B testing infrastructure
+- Property-graph-personalized Vermont reasoning
+
+## Files added (Part B)
+
+- `src/lib/result-page-content.ts` — Smart Cart value-prop chips
+- `src/lib/spec-callouts.ts` — productSpec → callout fragments
+- `src/components/smartCart/chips/{BenefitChip,WarningChip,CategoryTag}.tsx`
+- `src/components/smartCart/sections/{ValueProofBar,RecommendedPicksSection,RecommendedPickCard,AddOnSection,SkipForNowSection,AlreadyHaveSection,CartSummary,WhyThesePicks,NotQuiteRight,RouteOutBanner,UrgencyBanner,BundlePromptsSection}.tsx`
+
+## Verification
+
+- `npx tsc --noEmit` — clean
+- `npm run build` — clean (next build + voice regression test)
+- Production smoke (Part A): images deliver 200 from
+  `/product-images/{universeId}.webp` and category fallbacks from
+  `/product-images/categories/_*.svg`
+- Visual review (Part B): pending human eyes on
+  `https://alderprojects.com/smart-cart/result/{cartId}` after merge
+
+## Tag
+
+After Part B merges:
+
+```
+git tag v7.2.7
+git push origin v7.2.7
+```

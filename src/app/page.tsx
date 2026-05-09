@@ -1,33 +1,23 @@
 import type { Metadata } from 'next'
+import Link from 'next/link'
 import Nav from '@/components/Nav'
-import Hero from '@/components/Hero'
-import HomepageIntentCards from '@/components/HomepageIntentCards'
-import HomepageProductStrip from '@/components/HomepageProductStrip'
-import HomepageSeasonalStrip from '@/components/HomepageSeasonalStrip'
-import HomepageCostWidget from '@/components/HomepageCostWidget'
-import HomepageTownGrid from '@/components/HomepageTownGrid'
-import HomepageEmailCapture from '@/components/HomepageEmailCapture'
-import HomepageTrustStrip from '@/components/HomepageTrustStrip'
 import Footer from '@/components/Footer'
-import SmartCartGuideFooterCta from '@/components/SmartCartGuideFooterCta'
-import CurationModal from '@/components/CurationModal'
+import EmailCaptureV8 from '@/components/EmailCaptureV8'
 
-// V5 homepage. Server-rendered shell — Hero owns address-search and the
-// homepage_hero_view tracker; everything below is config-driven from
-// CONFIG.homepage. The marketplace-era FAQ block, the project-tile
-// section, the affiliate-disclosure footer line, and the "matching
-// service" framing are all gone. Every interaction here funnels toward
-// an address entry, a topic-specific demo URL, an affiliate click, or
-// an email capture.
+// V8 homepage — "The Receipt." Conversion-focused single-funnel page
+// for the $19.99 Smart Cart. Single primary CTA above the fold; the
+// math is the pitch; receipt graphic is the visual hook. Replaces the
+// V5 multi-section homepage. The 60+ SEO landing pages still rank on
+// their own and deep-link into the project grid below the fold.
 
 export const metadata: Metadata = {
-  title: 'Alder Projects — Vermont property tool by address',
+  title: 'Alder Projects — The shopping list for your next Vermont home project',
   description:
-    'Vermont permits, rebates, contractor costs, lake/flood/septic context — synthesized by address. Built for Vermont homeowners and buyers.',
+    'A $19.99 Smart Cart tells you what to buy and what to skip for one Vermont home project. Built in Montpelier. 30-day refund, no form.',
   openGraph: {
-    title: 'Alder Projects — Vermont property tool by address',
+    title: 'Alder Projects — Smart Cart for Vermont home projects',
     description:
-      'Vermont permits, rebates, contractor costs, lake/flood/septic context — synthesized by address. Free, no account.',
+      'Tell us the project. We send back the buy list, the skip list, and the two or three things that are different here than in the box-store guide. $19.99.',
     url: 'https://alderprojects.com',
     siteName: 'Alder Projects',
     locale: 'en_US',
@@ -35,9 +25,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Alder Projects — Vermont property tool by address',
+    title: 'Alder Projects — Smart Cart for Vermont home projects',
     description:
-      'Vermont permits, rebates, contractor costs, lake/flood/septic context — synthesized by address.',
+      'Buy this. Skip that. One project, one fee, $19.99. 30-day refund, no form.',
   },
   alternates: { canonical: 'https://alderprojects.com/' },
 }
@@ -47,14 +37,6 @@ const websiteJsonLd = {
   '@type': 'WebSite',
   name: 'Alder Projects',
   url: 'https://alderprojects.com/',
-  potentialAction: {
-    '@type': 'SearchAction',
-    target: {
-      '@type': 'EntryPoint',
-      urlTemplate: 'https://alderprojects.com/property/{search_term_string}',
-    },
-    'query-input': 'required name=search_term_string',
-  },
 }
 
 const orgJsonLd = {
@@ -65,23 +47,8 @@ const orgJsonLd = {
   logo: 'https://alderprojects.com/favicon.ico',
   foundingLocation: {
     '@type': 'Place',
-    address: {
-      '@type': 'PostalAddress',
-      addressRegion: 'VT',
-      addressCountry: 'US',
-    },
+    address: { '@type': 'PostalAddress', addressRegion: 'VT', addressCountry: 'US' },
   },
-  knowsAbout: [
-    'Vermont permits',
-    'Vermont rebates',
-    'Efficiency Vermont weatherization',
-    'Vermont property tax',
-    'Vermont lake setbacks',
-    'Vermont mud season',
-    'Vermont contractor vetting',
-    'Vermont flood zones',
-    'Vermont well and septic',
-  ],
   contactPoint: {
     '@type': 'ContactPoint',
     contactType: 'customer support',
@@ -90,9 +57,232 @@ const orgJsonLd = {
   },
 }
 
+const productJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Product',
+  name: 'Smart Cart',
+  description:
+    'A curated buy/skip shopping list for one Vermont home project. Tells you what to buy, what to skip, and the Vermont-specific gotchas.',
+  brand: { '@type': 'Brand', name: 'Alder Projects' },
+  offers: {
+    '@type': 'Offer',
+    price: '19.99',
+    priceCurrency: 'USD',
+    availability: 'https://schema.org/InStock',
+    url: 'https://alderprojects.com/smart-cart',
+  },
+}
+
+// ── Tokens ───────────────────────────────────────────────────────────
+const C = {
+  ink: '#1C2B1A',
+  inkSoft: 'rgba(28,43,26,0.65)',
+  inkFaint: 'rgba(28,43,26,0.45)',
+  line: 'rgba(28,43,26,0.1)',
+  lineSoft: 'rgba(28,43,26,0.06)',
+  bg: '#FAF7F2',
+  paper: '#F2EBDB',
+  card: '#ffffff',
+  accent: '#C8732A',
+  green: '#3F6B3A',
+  red: '#9B3F3F',
+  sage: '#7A9B6F',
+  forest: '#1f3a2e',
+}
+const FS = "'Playfair Display', Georgia, serif"
+const FB = "'DM Sans', system-ui, sans-serif"
+const FM = "'DM Mono', 'Courier New', monospace"
+
+// ── Tiny icons ───────────────────────────────────────────────────────
+function IconCheck() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
+      <path
+        d="M3 8.5l3 3 7-7"
+        stroke={C.green}
+        strokeWidth="2"
+        fill="none"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  )
+}
+function IconX() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
+      <path
+        d="M4 4l8 8M12 4l-8 8"
+        stroke={C.red}
+        strokeWidth="2"
+        fill="none"
+        strokeLinecap="round"
+      />
+    </svg>
+  )
+}
+function IconWarn() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
+      <path
+        d="M8 1.5L15 14H1L8 1.5z"
+        stroke={C.accent}
+        strokeWidth="1.6"
+        fill="none"
+        strokeLinejoin="round"
+      />
+      <path d="M8 6v4" stroke={C.accent} strokeWidth="1.6" strokeLinecap="round" />
+      <circle cx="8" cy="12" r="0.9" fill={C.accent} />
+    </svg>
+  )
+}
+
+// ── Receipt card ─────────────────────────────────────────────────────
+function ReceiptCard() {
+  const row: React.CSSProperties = {
+    display: 'grid',
+    gridTemplateColumns: '20px 1fr',
+    gap: 10,
+    alignItems: 'baseline',
+    fontFamily: FM,
+    fontSize: 13,
+    color: C.ink,
+    padding: '7px 0',
+  }
+  return (
+    <div
+      style={{
+        background: C.paper,
+        border: `1px solid ${C.line}`,
+        borderRadius: 6,
+        padding: '24px 22px',
+        boxShadow: '0 1px 0 rgba(28,43,26,0.04), 0 8px 24px rgba(28,43,26,0.06)',
+        position: 'relative',
+      }}
+    >
+      <div
+        style={{
+          fontFamily: FM,
+          fontSize: 11,
+          letterSpacing: '0.12em',
+          color: C.inkSoft,
+          textTransform: 'uppercase',
+          paddingBottom: 10,
+          borderBottom: `1px dashed ${C.line}`,
+          marginBottom: 6,
+        }}
+      >
+        Kitchen backsplash · 4 sq ft
+      </div>
+
+      <div style={row}>
+        <span style={{ paddingTop: 3 }}>
+          <IconCheck />
+        </span>
+        <span>
+          Buy: notched trowel <span style={{ color: C.inkSoft }}>— $9</span>
+        </span>
+      </div>
+      <div style={row}>
+        <span style={{ paddingTop: 3 }}>
+          <IconCheck />
+        </span>
+        <span>
+          Buy: pre-mixed mastic, not thinset <span style={{ color: C.inkSoft }}>— $22</span>
+        </span>
+      </div>
+      <div style={row}>
+        <span style={{ paddingTop: 3 }}>
+          <IconX />
+        </span>
+        <span style={{ textDecoration: 'line-through', color: C.inkSoft }}>
+          Skip: spacer kit. Use nickels.
+        </span>
+      </div>
+      <div style={row}>
+        <span style={{ paddingTop: 3 }}>
+          <IconWarn />
+        </span>
+        <span>Worth a pro: outlet relocation</span>
+      </div>
+
+      <div
+        style={{
+          marginTop: 10,
+          paddingTop: 12,
+          borderTop: `1px dashed ${C.line}`,
+          fontFamily: FM,
+          fontSize: 14,
+          fontWeight: 600,
+          color: C.ink,
+        }}
+      >
+        You did not spend $184.
+      </div>
+    </div>
+  )
+}
+
+// ── Stat tile ────────────────────────────────────────────────────────
+function StatTile({ number, label }: { number: string; label: string }) {
+  return (
+    <div
+      style={{
+        border: `1px solid ${C.line}`,
+        borderRadius: 6,
+        padding: '22px 20px',
+        background: C.bg,
+        textAlign: 'center',
+      }}
+    >
+      <div
+        style={{
+          fontFamily: FS,
+          fontSize: 'clamp(1.8rem, 3.6vw, 2.4rem)',
+          fontWeight: 600,
+          color: C.ink,
+          lineHeight: 1,
+          marginBottom: 8,
+          letterSpacing: '-0.02em',
+        }}
+      >
+        {number}
+      </div>
+      <div
+        style={{
+          fontFamily: FM,
+          fontSize: 11,
+          letterSpacing: '0.08em',
+          textTransform: 'uppercase',
+          color: C.inkSoft,
+        }}
+      >
+        {label}
+      </div>
+    </div>
+  )
+}
+
+// ── Project grid ─────────────────────────────────────────────────────
+const PROJECTS: Array<{ label: string; href: string }> = [
+  { label: 'Kitchen refresh', href: '/kitchen-remodeling-vermont' },
+  { label: 'Bathroom remodel', href: '/bathroom-remodeling-vermont' },
+  { label: 'Deck repair', href: '/deck-builders-vermont' },
+  { label: 'Roofing', href: '/roofing-contractors-vermont' },
+  { label: 'Window replacement', href: '/window-replacement-vermont' },
+  { label: 'Painting', href: '/painting-contractors-vermont' },
+  { label: 'Basement finishing', href: '/basement-finishing-vermont' },
+  { label: 'Home additions', href: '/home-additions-vermont' },
+  { label: 'Electrical', href: '/electrical-contractors-vermont' },
+  { label: 'Plumbing', href: '/plumbing-contractors-vermont' },
+  { label: 'HVAC + heat pumps', href: '/hvac-contractors-vermont' },
+  { label: 'General contractors', href: '/general-contractors-vermont' },
+]
+
+// ── Page ─────────────────────────────────────────────────────────────
 export default function Home() {
   return (
-    <main>
+    <main style={{ backgroundColor: C.bg }}>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }}
@@ -101,20 +291,699 @@ export default function Home() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(orgJsonLd) }}
       />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd) }}
+      />
       <Nav />
-      <Hero />
-      <div className="max-w-5xl mx-auto px-4">
-        <SmartCartGuideFooterCta variant="compact" />
-      </div>
-      <HomepageIntentCards />
-      <HomepageProductStrip />
-      <HomepageSeasonalStrip />
-      <HomepageCostWidget />
-      <HomepageTownGrid />
-      <HomepageEmailCapture />
-      <HomepageTrustStrip />
-      <CurationModal />
+
+      {/* ── Hero ─────────────────────────────────────────────────── */}
+      <section
+        style={{
+          padding: 'clamp(56px,8vw,112px) 24px clamp(40px,6vw,64px)',
+          borderBottom: `1px solid ${C.lineSoft}`,
+        }}
+      >
+        <div
+          style={{
+            maxWidth: 1120,
+            margin: '0 auto',
+            display: 'grid',
+            gridTemplateColumns: 'minmax(0,1fr)',
+            gap: 'clamp(32px, 5vw, 64px)',
+            alignItems: 'center',
+          }}
+          className="v8-hero-grid"
+        >
+          {/* Left: copy column */}
+          <div>
+            <div
+              style={{
+                fontFamily: FM,
+                fontSize: 11,
+                letterSpacing: '0.14em',
+                textTransform: 'uppercase',
+                color: C.sage,
+                marginBottom: 22,
+              }}
+            >
+              Smart Cart · Vermont edition
+            </div>
+            <h1
+              style={{
+                fontFamily: FS,
+                fontWeight: 600,
+                fontSize: 'clamp(2.2rem, 5vw, 3.6rem)',
+                lineHeight: 1.05,
+                letterSpacing: '-0.02em',
+                color: C.ink,
+                margin: '0 0 18px',
+              }}
+            >
+              The shopping list for your{' '}
+              <em style={{ fontStyle: 'italic', color: C.accent }}>next</em>{' '}
+              Vermont home project.
+            </h1>
+            <p
+              style={{
+                fontFamily: FB,
+                fontSize: 17,
+                fontWeight: 400,
+                lineHeight: 1.55,
+                color: C.inkSoft,
+                margin: '0 0 28px',
+                maxWidth: 560,
+              }}
+            >
+              Tell us the project. We send back the buy list, the skip list, and the two
+              or three things that are different here than in the box-store guide.
+            </p>
+
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 16, alignItems: 'center' }}>
+              <Link
+                href="/smart-cart"
+                style={{
+                  display: 'inline-block',
+                  padding: '14px 26px',
+                  background: C.accent,
+                  color: '#FAF7F2',
+                  fontFamily: FB,
+                  fontSize: 15,
+                  fontWeight: 600,
+                  letterSpacing: '0.01em',
+                  borderRadius: 4,
+                  border: 'none',
+                  cursor: 'pointer',
+                }}
+              >
+                Get the Smart Cart — $19.99
+              </Link>
+              <a
+                href="#sample-cart"
+                style={{
+                  fontFamily: FB,
+                  fontSize: 14,
+                  color: C.ink,
+                  textDecoration: 'underline',
+                  textUnderlineOffset: 4,
+                }}
+              >
+                See a sample cart
+              </a>
+            </div>
+
+            <p
+              style={{
+                fontFamily: FB,
+                fontSize: 13,
+                fontStyle: 'italic',
+                color: C.inkSoft,
+                margin: '18px 0 0',
+              }}
+            >
+              One skipped cabinet pull pays for the cart twice.
+            </p>
+
+            <p
+              style={{
+                fontFamily: FM,
+                fontSize: 12,
+                letterSpacing: '0.06em',
+                color: C.inkFaint,
+                margin: '22px 0 0',
+              }}
+            >
+              Built in Montpelier · 30-day refund · No subscription · No account
+            </p>
+          </div>
+
+          {/* Right: receipt */}
+          <div style={{ maxWidth: 460, justifySelf: 'center', width: '100%' }}>
+            <ReceiptCard />
+          </div>
+        </div>
+      </section>
+
+      {/* ── Stat tiles ───────────────────────────────────────────── */}
+      <section
+        style={{
+          padding: 'clamp(40px,6vw,64px) 24px',
+          borderBottom: `1px solid ${C.lineSoft}`,
+        }}
+      >
+        <div
+          style={{
+            maxWidth: 1000,
+            margin: '0 auto',
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+            gap: 16,
+          }}
+        >
+          <StatTile number="$19.99" label="One project, one fee" />
+          <StatTile number="$184" label="Average skipped purchase" />
+          <StatTile number="30 days" label="Refund, no form" />
+        </div>
+      </section>
+
+      {/* ── Five things, every cart ──────────────────────────────── */}
+      <section style={{ padding: 'clamp(56px,8vw,96px) 24px' }}>
+        <div style={{ maxWidth: 920, margin: '0 auto' }}>
+          <p
+            style={{
+              fontFamily: FM,
+              fontSize: 11,
+              letterSpacing: '0.12em',
+              textTransform: 'uppercase',
+              color: C.accent,
+              margin: '0 0 14px',
+            }}
+          >
+            What you get
+          </p>
+          <h2
+            style={{
+              fontFamily: FS,
+              fontSize: 'clamp(1.8rem, 4vw, 2.6rem)',
+              fontWeight: 600,
+              color: C.ink,
+              margin: '0 0 28px',
+              lineHeight: 1.15,
+            }}
+          >
+            Five things, every cart.
+          </h2>
+          <ol
+            style={{
+              listStyle: 'none',
+              padding: 0,
+              margin: 0,
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
+              gap: 22,
+            }}
+          >
+            {[
+              {
+                t: 'The buy list.',
+                b: 'With sizes, quantities, and the brand we would actually pick.',
+              },
+              {
+                t: 'The skip list.',
+                b: 'What the YouTube video told you to buy that you do not need.',
+              },
+              {
+                t: 'The wait-until list.',
+                b: 'Stuff that is cheaper in October. Or April.',
+              },
+              {
+                t: 'The licensed-pro line.',
+                b: 'Drawn the way Vermont draws it. So you do not get fined.',
+              },
+              {
+                t: 'One Efficiency Vermont rebate.',
+                b: 'If there is one to catch on this project, it is in the cart.',
+              },
+            ].map(({ t, b }, i) => (
+              <li
+                key={i}
+                style={{
+                  borderTop: `1px solid ${C.line}`,
+                  paddingTop: 16,
+                  fontFamily: FB,
+                }}
+              >
+                <div
+                  style={{
+                    fontFamily: FS,
+                    fontSize: 18,
+                    color: C.ink,
+                    fontWeight: 600,
+                    marginBottom: 6,
+                  }}
+                >
+                  {t}
+                </div>
+                <div style={{ fontSize: 14, color: C.inkSoft, lineHeight: 1.55 }}>{b}</div>
+              </li>
+            ))}
+          </ol>
+        </div>
+      </section>
+
+      {/* ── Sample cart, full ────────────────────────────────────── */}
+      <section
+        id="sample-cart"
+        style={{
+          padding: 'clamp(56px,8vw,96px) 24px',
+          background: C.paper,
+          borderTop: `1px solid ${C.line}`,
+          borderBottom: `1px solid ${C.line}`,
+        }}
+      >
+        <div style={{ maxWidth: 760, margin: '0 auto' }}>
+          <p
+            style={{
+              fontFamily: FM,
+              fontSize: 11,
+              letterSpacing: '0.12em',
+              textTransform: 'uppercase',
+              color: C.accent,
+              margin: '0 0 14px',
+            }}
+          >
+            Sample cart · open
+          </p>
+          <h2
+            style={{
+              fontFamily: FS,
+              fontSize: 'clamp(1.8rem, 4vw, 2.6rem)',
+              fontWeight: 600,
+              color: C.ink,
+              margin: '0 0 8px',
+              lineHeight: 1.15,
+            }}
+          >
+            Kitchen backsplash, 4 sq ft.
+          </h2>
+          <p
+            style={{
+              fontFamily: FB,
+              fontSize: 15,
+              color: C.inkSoft,
+              lineHeight: 1.55,
+              margin: '0 0 28px',
+              maxWidth: 540,
+            }}
+          >
+            Real cart, real prices, real Vermont notes. This is what arrives in your inbox
+            the same day you order.
+          </p>
+
+          <div
+            style={{
+              background: C.card,
+              border: `1px solid ${C.line}`,
+              borderRadius: 6,
+              padding: 'clamp(20px,3vw,32px)',
+            }}
+          >
+            <SampleCartRow icon="check" label="Buy: 1/8 in. notched trowel" price="$9" />
+            <SampleCartRow
+              icon="check"
+              label="Buy: pre-mixed mastic, not thinset"
+              price="$22"
+            />
+            <SampleCartRow
+              icon="check"
+              label="Buy: 1/4 in. caulk for the sink edge"
+              price="$6"
+            />
+            <SampleCartRow
+              icon="check"
+              label="Buy: peel-and-stick mosaic sheets, 4 ct"
+              price="$72"
+            />
+            <SampleCartRow
+              icon="x"
+              strike
+              label="Skip: tile spacer kit. Use nickels."
+              price="-$14"
+            />
+            <SampleCartRow
+              icon="x"
+              strike
+              label="Skip: full thinset bag for 4 sq ft."
+              price="-$28"
+            />
+            <SampleCartRow
+              icon="x"
+              strike
+              label="Skip: branded grout sealer pen."
+              price="-$11"
+            />
+            <SampleCartRow
+              icon="warn"
+              label="Worth a pro: outlet relocation behind the range. Vermont electrical permit."
+              note
+            />
+            <SampleCartRow
+              icon="warn"
+              label="Wait until October: contractor-grade sponges, half off at Aubuchon."
+              note
+            />
+            <div
+              style={{
+                marginTop: 18,
+                paddingTop: 16,
+                borderTop: `1px dashed ${C.line}`,
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'baseline',
+                fontFamily: FM,
+                fontSize: 15,
+                color: C.ink,
+              }}
+            >
+              <span style={{ fontWeight: 600 }}>You did not spend</span>
+              <span style={{ fontWeight: 600, fontSize: 18 }}>$184</span>
+            </div>
+            <p
+              style={{
+                fontFamily: FB,
+                fontSize: 12,
+                color: C.inkSoft,
+                margin: '14px 0 0',
+                lineHeight: 1.6,
+              }}
+            >
+              <em>Vermont note:</em> ask the hardware store to cut the tile. Most will,
+              for free, if you bring a sketch on a napkin.
+            </p>
+          </div>
+
+          <div style={{ marginTop: 28, textAlign: 'center' }}>
+            <Link
+              href="/smart-cart"
+              style={{
+                display: 'inline-block',
+                padding: '14px 26px',
+                background: C.accent,
+                color: '#FAF7F2',
+                fontFamily: FB,
+                fontSize: 15,
+                fontWeight: 600,
+                borderRadius: 4,
+              }}
+            >
+              Build my Smart Cart — $19.99
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Why $19.99 ───────────────────────────────────────────── */}
+      <section style={{ padding: 'clamp(56px,8vw,96px) 24px' }}>
+        <div style={{ maxWidth: 720, margin: '0 auto' }}>
+          <p
+            style={{
+              fontFamily: FM,
+              fontSize: 11,
+              letterSpacing: '0.12em',
+              textTransform: 'uppercase',
+              color: C.accent,
+              margin: '0 0 14px',
+            }}
+          >
+            Why $19.99
+          </p>
+          <h2
+            style={{
+              fontFamily: FS,
+              fontSize: 'clamp(1.8rem, 4vw, 2.6rem)',
+              fontWeight: 600,
+              color: C.ink,
+              margin: '0 0 18px',
+              lineHeight: 1.15,
+            }}
+          >
+            The math is the pitch.
+          </h2>
+          <p
+            style={{
+              fontFamily: FB,
+              fontSize: 16,
+              color: C.inkSoft,
+              lineHeight: 1.7,
+              margin: '0 0 14px',
+            }}
+          >
+            Most Vermont DIY projects have one $30-to-$80 purchase that is wrong for the
+            job. Wrong adhesive. Wrong fastener. Wrong-grade lumber for an unheated
+            mudroom. The cart&apos;s whole job is to catch that one.
+          </p>
+          <p
+            style={{
+              fontFamily: FB,
+              fontSize: 16,
+              color: C.inkSoft,
+              lineHeight: 1.7,
+              margin: 0,
+            }}
+          >
+            If it does not catch it, ask for your money back. We would rather you keep
+            the $19.99 than pretend it earned its keep.
+          </p>
+        </div>
+      </section>
+
+      {/* ── Refund block ─────────────────────────────────────────── */}
+      <section
+        style={{
+          padding: 'clamp(56px,8vw,96px) 24px',
+          background: C.forest,
+        }}
+      >
+        <div style={{ maxWidth: 760, margin: '0 auto', textAlign: 'center' }}>
+          <p
+            style={{
+              fontFamily: FM,
+              fontSize: 11,
+              letterSpacing: '0.14em',
+              textTransform: 'uppercase',
+              color: '#C8732A',
+              margin: '0 0 18px',
+            }}
+          >
+            Refund policy
+          </p>
+          <h2
+            style={{
+              fontFamily: FS,
+              fontSize: 'clamp(1.8rem, 4vw, 2.4rem)',
+              fontWeight: 600,
+              color: '#F5EFE0',
+              margin: '0 0 18px',
+              lineHeight: 1.2,
+            }}
+          >
+            Reply <em style={{ color: '#C8732A' }}>refund</em>. That is the whole process.
+          </h2>
+          <p
+            style={{
+              fontFamily: FB,
+              fontSize: 16,
+              color: 'rgba(245,239,224,0.78)',
+              lineHeight: 1.7,
+              maxWidth: 560,
+              margin: '0 auto',
+            }}
+          >
+            30-day refund, no form, no &quot;tell us why.&quot; Reply to the receipt with
+            the word &quot;refund&quot; and we send the $19.99 back the same day. We are
+            betting you will keep it.
+          </p>
+        </div>
+      </section>
+
+      {/* ── Project grid ─────────────────────────────────────────── */}
+      <section style={{ padding: 'clamp(56px,8vw,96px) 24px' }}>
+        <div style={{ maxWidth: 1120, margin: '0 auto' }}>
+          <p
+            style={{
+              fontFamily: FM,
+              fontSize: 11,
+              letterSpacing: '0.12em',
+              textTransform: 'uppercase',
+              color: C.accent,
+              margin: '0 0 14px',
+            }}
+          >
+            What you can ask for
+          </p>
+          <h2
+            style={{
+              fontFamily: FS,
+              fontSize: 'clamp(1.8rem, 4vw, 2.6rem)',
+              fontWeight: 600,
+              color: C.ink,
+              margin: '0 0 28px',
+              lineHeight: 1.15,
+            }}
+          >
+            Twelve project types we cover.
+          </h2>
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+              gap: 12,
+            }}
+          >
+            {PROJECTS.map(p => (
+              <Link
+                key={p.href}
+                href={p.href}
+                style={{
+                  display: 'block',
+                  padding: '18px 20px',
+                  border: `1px solid ${C.line}`,
+                  borderRadius: 6,
+                  background: C.card,
+                  color: C.ink,
+                  fontFamily: FB,
+                  fontSize: 15,
+                  fontWeight: 500,
+                }}
+              >
+                {p.label}
+                <span
+                  aria-hidden="true"
+                  style={{
+                    color: C.accent,
+                    fontFamily: FM,
+                    fontSize: 13,
+                    marginLeft: 8,
+                  }}
+                >
+                  →
+                </span>
+              </Link>
+            ))}
+          </div>
+          <p
+            style={{
+              fontFamily: FB,
+              fontSize: 13,
+              color: C.inkFaint,
+              margin: '20px 0 0',
+              fontStyle: 'italic',
+            }}
+          >
+            The big ones we will not sell you a cart for: roofs, panels, septic. We will
+            tell you who to call instead.
+          </p>
+        </div>
+      </section>
+
+      {/* ── Final CTA banner ─────────────────────────────────────── */}
+      <section
+        style={{
+          padding: 'clamp(56px,8vw,96px) 24px',
+          background: C.paper,
+          borderTop: `1px solid ${C.line}`,
+        }}
+      >
+        <div style={{ maxWidth: 760, margin: '0 auto', textAlign: 'center' }}>
+          <h2
+            style={{
+              fontFamily: FS,
+              fontSize: 'clamp(1.8rem, 4vw, 2.6rem)',
+              fontWeight: 600,
+              color: C.ink,
+              margin: '0 0 14px',
+              lineHeight: 1.15,
+            }}
+          >
+            Tell us the project. We will do the list.
+          </h2>
+          <p
+            style={{
+              fontFamily: FB,
+              fontSize: 15,
+              color: C.inkSoft,
+              fontStyle: 'italic',
+              margin: '0 0 24px',
+            }}
+          >
+            Average turnaround on a weekday: 47 minutes.
+          </p>
+          <Link
+            href="/smart-cart"
+            style={{
+              display: 'inline-block',
+              padding: '14px 28px',
+              background: C.accent,
+              color: '#FAF7F2',
+              fontFamily: FB,
+              fontSize: 15,
+              fontWeight: 600,
+              borderRadius: 4,
+            }}
+          >
+            Start a Smart Cart — $19.99
+          </Link>
+        </div>
+      </section>
+
+      <EmailCaptureV8 />
       <Footer />
+
+      {/* Hero responsive split (desktop only) */}
+      <style>{`
+        @media (min-width: 880px) {
+          .v8-hero-grid {
+            grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr) !important;
+          }
+        }
+      `}</style>
     </main>
+  )
+}
+
+// ── Sample-cart line ─────────────────────────────────────────────────
+function SampleCartRow({
+  icon,
+  label,
+  price,
+  strike,
+  note,
+}: {
+  icon: 'check' | 'x' | 'warn'
+  label: string
+  price?: string
+  strike?: boolean
+  note?: boolean
+}) {
+  return (
+    <div
+      style={{
+        display: 'grid',
+        gridTemplateColumns: '20px 1fr auto',
+        gap: 12,
+        alignItems: 'baseline',
+        padding: '10px 0',
+        borderBottom: `1px solid ${note ? 'transparent' : C.lineSoft}`,
+      }}
+    >
+      <span style={{ paddingTop: 3 }}>
+        {icon === 'check' && <IconCheck />}
+        {icon === 'x' && <IconX />}
+        {icon === 'warn' && <IconWarn />}
+      </span>
+      <span
+        style={{
+          fontFamily: FB,
+          fontSize: 14,
+          color: note ? C.ink : strike ? C.inkSoft : C.ink,
+          textDecoration: strike ? 'line-through' : 'none',
+          lineHeight: 1.55,
+        }}
+      >
+        {label}
+      </span>
+      {price && (
+        <span
+          style={{
+            fontFamily: FM,
+            fontSize: 13,
+            color: strike ? C.inkSoft : C.ink,
+            textDecoration: strike ? 'line-through' : 'none',
+          }}
+        >
+          {price}
+        </span>
+      )}
+    </div>
   )
 }

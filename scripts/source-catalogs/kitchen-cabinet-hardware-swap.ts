@@ -122,10 +122,10 @@ export const KITCHEN_CABINET_HARDWARE_SWAP_SLOTS: CartSlot[] = [
     tiers: {
       budget: {
         productName: 'Paper template + tape measure',
-        priceLow: 0,
+        priceLow: 1,
         priceHigh: 5,
         affiliateUrl: 'https://www.amazon.com/s?k=cabinet+pull+template+paper&tag=alderprojects-20',
-        productSpec: 'DIY paper templates for marking pull/knob hole locations. Free if you measure carefully; ~$5 for printed templates.'
+        productSpec: 'DIY paper templates for marking pull/knob hole locations. Print at home for ~$1; pre-printed templates run ~$5.'
       },
       sweet_spot: {
         productName: 'Kreg KHI-PULL Cabinet Hardware Jig',

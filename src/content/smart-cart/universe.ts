@@ -922,11 +922,11 @@ export const UNIVERSE: UniverseProduct[] = [
     rank: 100,
     variant: {
       productName: 'Paper template + tape measure',
-      priceLow: 0,
+      priceLow: 1,
       priceHigh: 5,
       affiliateUrl: 'https://www.amazon.com/s?k=cabinet+pull+template+paper&tag=alderprojects-20',
       productSpec:
-        'DIY paper templates for marking pull/knob hole locations. Free if you measure carefully; ~$5 for printed templates.',
+        'DIY paper templates for marking pull/knob hole locations. Print at home for ~$1; pre-printed templates run ~$5.',
     },
     tags: {
       topics: ['kitchen'],

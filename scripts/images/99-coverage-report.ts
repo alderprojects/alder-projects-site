@@ -37,22 +37,25 @@ function loadJsonOrNull<T>(path: string): T | null {
 function main() {
   const mfr = loadJsonOrNull<MfrResult[]>('scripts/images/manufacturer-results.json') ?? []
   const pex = loadJsonOrNull<PexelsResult[]>('scripts/images/pexels-results.json') ?? []
+  const ai = loadJsonOrNull<{ universeId: string; status: string }[]>('scripts/images/ai-illustrations-results.json') ?? []
   const mfrOk = new Set(mfr.filter(r => r.status === 'ok').map(r => r.universeId))
   const pexOk = new Set(pex.filter(r => r.status === 'ok').map(r => r.universeId))
+  const aiOk = new Set(ai.filter(r => r.status === 'ok').map(r => r.universeId))
 
   const tier: Record<string, string[]> = {
     tier1_manufacturer: [],
     tier3_pexels: [],
+    tier4_ai_illustration: [],
     tier4_fn_icon: [],
     tier4_topic_icon: [],
     tier4_default_icon: [],
   }
 
-  const byTopic: Record<string, { total: number; tier1: number; tier3: number; tier4: number }> = {}
+  const byTopic: Record<string, { total: number; tier1: number; tier3: number; ai: number; tier4: number }> = {}
 
   for (const p of UNIVERSE) {
     const topic = p.tags.topics[0] ?? 'unknown'
-    if (!byTopic[topic]) byTopic[topic] = { total: 0, tier1: 0, tier3: 0, tier4: 0 }
+    if (!byTopic[topic]) byTopic[topic] = { total: 0, tier1: 0, tier3: 0, ai: 0, tier4: 0 }
     byTopic[topic].total += 1
 
     if (mfrOk.has(p.universeId) && existsSync(join(PUBLIC_IMAGES, `${p.universeId}.webp`))) {
@@ -63,6 +66,11 @@ function main() {
     if (pexOk.has(p.universeId) && existsSync(join(PUBLIC_IMAGES, `${p.universeId}.webp`))) {
       tier.tier3_pexels.push(p.universeId)
       byTopic[topic].tier3 += 1
+      continue
+    }
+    if (aiOk.has(p.universeId) && existsSync(join(PUBLIC_IMAGES, `${p.universeId}.webp`))) {
+      tier.tier4_ai_illustration.push(p.universeId)
+      byTopic[topic].ai += 1
       continue
     }
     // Tier 4 split
@@ -96,6 +104,7 @@ function main() {
     coverage: {
       tier1_manufacturer: tier.tier1_manufacturer.length,
       tier3_pexels: tier.tier3_pexels.length,
+      tier4_ai_illustration: tier.tier4_ai_illustration.length,
       tier4_fn_icon: tier.tier4_fn_icon.length,
       tier4_topic_icon: tier.tier4_topic_icon.length,
       tier4_default_icon: tier.tier4_default_icon.length,
@@ -103,6 +112,7 @@ function main() {
     byTopic,
     defaultIconEntries: tier.tier4_default_icon,
     topicIconEntries: tier.tier4_topic_icon,
+    aiEntries: tier.tier4_ai_illustration,
   }
 
   writeFileSync('scripts/images/coverage-report.json', JSON.stringify(report, null, 2))
@@ -119,7 +129,7 @@ function main() {
   console.log('By topic:')
   for (const [topic, c] of Object.entries(byTopic).sort()) {
     console.log(
-      `  ${topic.padEnd(16)} total=${c.total}  t1=${c.tier1}  t3=${c.tier3}  t4=${c.tier4}`,
+      `  ${topic.padEnd(16)} total=${c.total}  t1=${c.tier1}  t3=${c.tier3}  ai=${c.ai}  t4=${c.tier4}`,
     )
   }
   if (report.coverage.tier4_default_icon > 0) {

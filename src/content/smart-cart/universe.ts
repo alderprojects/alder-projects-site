@@ -188,7 +188,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceLow: 12,
       priceHigh: 18,
       affiliateUrl: buildAmazonUrl('ryqtop bamboo drawer organizer expandable'),
-      imageUrl: '/product-images/categories/cutlery_drawer_organizer.svg',
+      imageUrl: '/product-images/ryqtop_bamboo_drawer_organizer.webp',
       productSpec:
         'Bamboo, fits drawers up to 17 inches. Springloaded ends. 8 compartments.',
     },
@@ -213,7 +213,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceLow: 22,
       priceHigh: 28,
       affiliateUrl: buildAmazonUrl('pipishell bamboo drawer organizer'),
-      imageUrl: '/product-images/categories/cutlery_drawer_organizer.svg',
+      imageUrl: '/product-images/pipishell_bamboo_drawer_organizer.webp',
       productSpec:
         'Expandable from 13 to 19.6 inches. Spring-loaded ends. 4.7 stars over 42,000+ reviews.',
     },
@@ -238,7 +238,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceLow: 50,
       priceHigh: 70,
       affiliateUrl: buildAmazonUrl('container store bamboo drawer organizer'),
-      imageUrl: '/product-images/categories/cutlery_drawer_organizer.svg',
+      imageUrl: '/product-images/container_store_bamboo_drawer_organizers.webp',
       productSpec: 'Premium bamboo, 18 to 22.25 inches expandable. Set of 2.',
     },
     tags: {
@@ -289,7 +289,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceLow: 45,
       priceHigh: 55,
       affiliateUrl: buildAmazonUrl('holdn storage pull out cabinet organizer'),
-      imageUrl: '/product-images/categories/pull_out_pantry_basket.svg',
+      imageUrl: '/product-images/holdn_storage_pull_out_cabinet_organizer_14w_21d.webp',
       productSpec:
         'Steel basket, full-extension slides, 50-pound capacity. Fits standard 15-1/4 inch cabinet opening. Lifetime limited warranty.',
     },
@@ -314,7 +314,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceLow: 85,
       priceHigh: 130,
       affiliateUrl: buildAmazonUrl('rev a shelf two tier kitchen cabinet'),
-      imageUrl: '/product-images/categories/pull_out_pantry_basket.svg',
+      imageUrl: '/product-images/rev_a_shelf_5wb2_2122cr_two_tier.webp',
       productSpec:
         'Cabinet-shop grade with soft close. Two tiers, 21 by 22 inches.',
     },
@@ -341,7 +341,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceLow: 12,
       priceHigh: 18,
       affiliateUrl: buildAmazonUrl('diolove plastic spice drawer organizer'),
-      imageUrl: '/product-images/categories/spice_drawer_organizer.svg',
+      imageUrl: '/product-images/diolove_plastic_3_tier_expandable_spice_organizer.webp',
       productSpec:
         'Plastic, 3 angled tiers, expandable 11 to 22 inches. Slip-resistant base.',
     },
@@ -366,7 +366,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceLow: 22,
       priceHigh: 30,
       affiliateUrl: buildAmazonUrl('spaceaid bamboo spice drawer organizer'),
-      imageUrl: '/product-images/categories/spice_drawer_organizer.svg',
+      imageUrl: '/product-images/spaceaid_bamboo_spice_drawer_organizer.webp',
       productSpec:
         '4-tier angled rack, expandable 12 to 23 inches. Holds about 48 standard spice jars. Needs 3 inch drawer depth.',
     },
@@ -391,7 +391,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceLow: 85,
       priceHigh: 110,
       affiliateUrl: buildAmazonUrl('kraftmaid wooden spice drawer insert'),
-      imageUrl: '/product-images/categories/spice_drawer_organizer.svg',
+      imageUrl: '/product-images/kraftmaid_wooden_spice_drawer_insert_kit.webp',
       productSpec:
         'Solid wood drop-in, custom-trimmable to drawer width. Cabinet-shop precision.',
     },
@@ -421,7 +421,7 @@ export const UNIVERSE: UniverseProduct[] = [
       affiliateUrl: buildAmazonUrl(
         'expandable under sink organizer carbon steel two tier',
       ),
-      imageUrl: '/product-images/categories/under_sink_organizer.svg',
+      imageUrl: '/product-images/expandable_2_tier_carbon_steel_under_sink_organizer.webp',
       productSpec:
         'Expands wide, 4 removable panels and 4 sliding baskets. Routes around P-trap and disposal. 100-ounce weight capacity.',
     },
@@ -446,7 +446,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceLow: 120,
       priceHigh: 200,
       affiliateUrl: buildAmazonUrl('rev a shelf under sink pullout kit'),
-      imageUrl: '/product-images/categories/under_sink_organizer.svg',
+      imageUrl: '/product-images/rev_a_shelf_custom_under_sink_pullout_kit.webp',
       productSpec:
         'Cabinet-shop install. Full extension on cabinet-grade hardware.',
     },
@@ -473,7 +473,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceLow: 24,
       priceHigh: 32,
       affiliateUrl: buildAmazonUrl('everie extendable lid organizer'),
-      imageUrl: '/product-images/categories/lid_organizer.svg',
+      imageUrl: '/product-images/everie_extendable_food_container_lid_organizer.webp',
       productSpec:
         'Adjustable length and dividers. Holds 8-12 lids vertically, sized small to large.',
     },
@@ -502,7 +502,7 @@ export const UNIVERSE: UniverseProduct[] = [
       affiliateUrl: buildAmazonUrl(
         'bamboo plastic bag organizer 4 pack drawer',
       ),
-      imageUrl: '/product-images/categories/bag_wrap_organizer.svg',
+      imageUrl: '/product-images/kitchen_bag_organizer__bamboo_plastic_bag_organizer_4_pack.webp',
       productSpec:
         'Holds gallon bags, sandwich bags, foil, plastic wrap, parchment in upright slots. Anchor clips included.',
     },
@@ -527,7 +527,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceLow: 60,
       priceHigh: 95,
       affiliateUrl: buildAmazonUrl('rev a shelf wrap drawer organizer'),
-      imageUrl: '/product-images/categories/bag_wrap_organizer.svg',
+      imageUrl: '/product-images/rev_a_shelf_drawer_mounted_wrap_organizer.webp',
       productSpec: 'Cabinet-shop grade with sliding cutter.',
     },
     tags: {
@@ -553,7 +553,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceLow: 28,
       priceHigh: 35,
       affiliateUrl: buildAmazonUrl('utoplike bamboo drawer dividers 4 pack'),
-      imageUrl: '/product-images/categories/drawer_divider.svg',
+      imageUrl: '/product-images/utoplike_bamboo_kitchen_drawer_dividers_4_pack.webp',
       productSpec:
         'Spring-loaded, adjustable 17 to 22 inches. Multipurpose — kitchen, bedroom, anywhere.',
     },
@@ -578,7 +578,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceLow: 80,
       priceHigh: 100,
       affiliateUrl: buildAmazonUrl('container store bamboo drawer divider'),
-      imageUrl: '/product-images/categories/drawer_divider.svg',
+      imageUrl: '/product-images/container_store_bamboo_drawer_dividers.webp',
       productSpec: 'Premium bamboo finish. Same spring-loaded mechanism.',
     },
     tags: {
@@ -628,7 +628,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceLow: 45,
       priceHigh: 65,
       affiliateUrl: buildAmazonUrl('rev a shelf two tier lazy susan 18 inch'),
-      imageUrl: '/product-images/categories/lazy_susan.svg',
+      imageUrl: '/product-images/rev_a_shelf_5bbsc_dm18_cr_two_tier_18_inch.webp',
       productSpec:
         'Two-tier, 18 inch diameter, ball-bearing rotation. Retrofit (no cabinet modification needed).',
     },
@@ -653,7 +653,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceLow: 220,
       priceHigh: 350,
       affiliateUrl: buildAmazonUrl('rev a shelf kidney corner pullout'),
-      imageUrl: '/product-images/categories/lazy_susan.svg',
+      imageUrl: '/product-images/rev_a_shelf_kidney_corner_pullout_system.webp',
       productSpec: 'Full pullout corner system. Cabinet retrofit.',
     },
     tags: {
@@ -733,7 +733,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceLow: 28,
       priceHigh: 50,
       affiliateUrl: buildAmazonUrl('clear fridge bin set variety pack'),
-      imageUrl: '/product-images/categories/fridge_organizer.svg',
+      imageUrl: '/product-images/kitchen_fridge_bins__clear_fridge_bin_set_variety_pack.webp',
       productSpec:
         'BPA-free clear bins in 4-6 sizes. Stackable, dishwasher safe.',
     },
@@ -790,7 +790,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceHigh: 45,
       amazonAsin: 'B0DLWN5QLH',
       affiliateUrl: 'https://www.amazon.com/dp/B0DLWN5QLH?tag=alderprojects-20',
-      imageUrl: '/product-images/categories/cabinet_pull.svg',
+      imageUrl: '/product-images/amerock_bar_pulls_5116_matte_black_10pk.webp',
       productSpec:
         'Zinc alloy with substantial weight. 7-3/8" overall length, 5-1/16" (128mm) center-to-center. Limited lifetime warranty. ~$3.34 per pull at Home Depot. 10+ finishes available (matte black, brushed nickel, champagne bronze, oil-rubbed bronze, satin nickel, polished chrome).',
     },
@@ -820,7 +820,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceLow: 160,
       priceHigh: 250,
       affiliateUrl: 'https://www.amazon.com/s?k=top+knobs+amwell+bar+pull&tag=alderprojects-20',
-      imageUrl: '/product-images/categories/cabinet_pull.svg',
+      imageUrl: '/product-images/top_knobs_amwell_bridgeport_bar_pulls.webp',
       productSpec:
         'Solid steel construction with optional knurled detail. Cabinet-shop grade. ~$16-25 per pull. Sold individually through Wayfair, designer hardware retailers.',
     },
@@ -900,7 +900,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceLow: 90,
       priceHigh: 150,
       affiliateUrl: 'https://www.amazon.com/s?k=top+knobs+aspen+round+knob&tag=alderprojects-20',
-      imageUrl: '/product-images/categories/cabinet_knob.svg',
+      imageUrl: '/product-images/top_knobs_aspen_collection_round_knobs.webp',
       productSpec:
         'Solid steel. Premium finishes. ~$15-25 per knob. Sold individually.',
     },
@@ -927,7 +927,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceLow: 8,
       priceHigh: 14,
       affiliateUrl: 'https://www.amazon.com/s?k=M4+machine+screws+assortment+kit&tag=alderprojects-20',
-      imageUrl: '/product-images/categories/hardware_screws.svg',
+      imageUrl: '/product-images/hardware_swap_screws__m4_machine_screws_assortment.webp',
       productSpec:
         'Standard M4 (8/32 thread) machine screws in 3/4", 1", and 1-1/4" lengths. ~50-100 piece variety pack. Slot mount, zinc-plated steel.',
     },
@@ -954,7 +954,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceLow: 1,
       priceHigh: 5,
       affiliateUrl: 'https://www.amazon.com/s?k=cabinet+pull+template+paper&tag=alderprojects-20',
-      imageUrl: '/product-images/categories/cabinet_hardware_jig.svg',
+      imageUrl: '/product-images/hardware_swap_jig__paper_template_tape_measure.webp',
       productSpec:
         'DIY paper templates for marking pull/knob hole locations. Print at home for ~$1; pre-printed templates run ~$5.',
     },
@@ -1092,7 +1092,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceLow: 5,
       priceHigh: 9,
       affiliateUrl: 'https://www.amazon.com/s?k=minwax+wood+putty+stainable&tag=alderprojects-20',
-      imageUrl: '/product-images/categories/wood_putty.svg',
+      imageUrl: '/product-images/minwax_wood_putty.webp',
       productSpec:
         '3.75 oz tub. Pre-tinted to match common wood finishes (cherry, maple, oak, walnut, white). Stainable. Air-dries.',
     },
@@ -1126,7 +1126,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceLow: 42,
       priceHigh: 55,
       affiliateUrl: 'https://www.amazon.com/s?k=behr+alkyd+enamel+semi+gloss+gallon&tag=alderprojects-20',
-      imageUrl: '/product-images/categories/cabinet_paint.svg',
+      imageUrl: '/product-images/behr_alkyd_semi_gloss_enamel_gallon.webp',
       productSpec:
         'Hybrid alkyd enamel formulated for cabinets and trim. Sold at Home Depot. Water-based cleanup. Fewer reviews than INSL-X but verified by professional painters as a budget alkyd that works.',
     },
@@ -1152,7 +1152,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceHigh: 95,
       amazonAsin: 'B07KXLPCG1',
       affiliateUrl: 'https://www.amazon.com/dp/B07KXLPCG1?tag=alderprojects-20',
-      imageUrl: '/product-images/categories/cabinet_paint.svg',
+      imageUrl: '/product-images/inslx_cabinet_coat_acrylic_urethane_satin_gallon.webp',
       productSpec:
         'Urethane-acrylic waterborne enamel made by Benjamin Moore. 350-450 sq ft per gallon. Adheres to polyurethane and varnish without primer. Resists chipping, scuffing, food stains, grease, and water. Apply between 50-90°F.',
     },
@@ -1182,7 +1182,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceLow: 80,
       priceHigh: 95,
       affiliateUrl: 'https://www.amazon.com/s?k=benjamin+moore+advance+gallon&tag=alderprojects-20',
-      imageUrl: '/product-images/categories/cabinet_paint.svg',
+      imageUrl: '/product-images/benjamin_moore_advance_waterborne_alkyd_satin.webp',
       productSpec:
         'Premium waterborne alkyd. Cures hard like oil-based, cleans up with water. Furniture-quality finish. 14-day cure window. Sold primarily through Benjamin Moore dealers; Amazon has limited inventory.',
     },
@@ -1209,7 +1209,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceLow: 22,
       priceHigh: 30,
       affiliateUrl: 'https://www.amazon.com/s?k=kilz+adhesion+primer+gallon&tag=alderprojects-20',
-      imageUrl: '/product-images/categories/bonding_primer.svg',
+      imageUrl: '/product-images/kilz_adhesion_bonding_primer_gallon.webp',
       productSpec:
         'Acrylic bonding primer. Works on glossy laminate, glass, tile. 300 sq ft per gallon coverage.',
     },
@@ -1234,7 +1234,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceLow: 38,
       priceHigh: 52,
       affiliateUrl: 'https://www.amazon.com/s?k=insl-x+stix+bonding+primer+gallon&tag=alderprojects-20',
-      imageUrl: '/product-images/categories/bonding_primer.svg',
+      imageUrl: '/product-images/inslx_stix_acrylic_waterborne_bonding_primer_gallon.webp',
       productSpec:
         'Acrylic-urethane bonding primer. Adheres to glossy tile, PVC, vinyl, plastic, glass, glazed block, glossy paint, fiberglass, galvanized metals. Coverage 300-400 sq ft per gallon. Cures in temps as low as 35°F.',
     },
@@ -1262,7 +1262,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceLow: 50,
       priceHigh: 65,
       affiliateUrl: 'https://www.amazon.com/s?k=zinsser+bin+shellac+primer+gallon&tag=alderprojects-20',
-      imageUrl: '/product-images/categories/bonding_primer.svg',
+      imageUrl: '/product-images/zinsser_bin_shellac_based_primer_gallon.webp',
       productSpec:
         'Shellac-based stain blocker. Best for cabinets bleeding tannins (oak, knotty pine). Solvent cleanup, strong odor.',
     },
@@ -1342,7 +1342,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceLow: 28,
       priceHigh: 45,
       affiliateUrl: 'https://www.amazon.com/s?k=wobane+under+cabinet+lighting&tag=alderprojects-20',
-      imageUrl: '/product-images/categories/undercabinet_lighting.svg',
+      imageUrl: '/product-images/wobane_under_cabinet_lighting_kit_10ft.webp',
       productSpec:
         '1100 lumens, warm white (3000K), thin profile fits under standard cabinets. Adhesive-back installation. Plugs into existing outlet. 30-minute install.',
     },
@@ -1371,7 +1371,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceLow: 110,
       priceHigh: 160,
       affiliateUrl: 'https://www.amazon.com/s?k=ge+direct+wire+led+under+cabinet&tag=alderprojects-20',
-      imageUrl: '/product-images/categories/undercabinet_lighting.svg',
+      imageUrl: '/product-images/ge_direct_wire_led_bar_10ft.webp',
       productSpec:
         'Linkable hardwired LED bars. Wall-switch control. Requires electrician or significant DIY electrical skill.',
     },
@@ -1398,7 +1398,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceLow: 15,
       priceHigh: 24,
       affiliateUrl: 'https://www.amazon.com/s?k=dap+alex+plus+kitchen+caulk+gun&tag=alderprojects-20',
-      imageUrl: '/product-images/categories/kitchen_caulk.svg',
+      imageUrl: '/product-images/dap_alex_plus_kitchen_caulk_kit.webp',
       productSpec:
         'Paintable, mildew-resistant, water cleanup. Standard pro choice for backsplash and trim seams. Steel skeleton caulking gun ~$10-15.',
     },
@@ -1430,7 +1430,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceHigh: 48,
       affiliateUrl:
         'https://www.amazon.com/s?k=wooster+shortcut+brush+foam+roller+canvas+drop+cloth&tag=alderprojects-20',
-      imageUrl: '/product-images/categories/painting_supplies.svg',
+      imageUrl: '/product-images/wooster_shortcut_painting_supplies_kit.webp',
       productSpec:
         'Wooster Shortcut 2.5" angled sash brush (~$8). Whizz 4" foam roller frame + covers (~$10). 9x12 canvas drop cloth (~$12). 220 + 320 grit sandpaper assortment (~$10).',
     },
@@ -1460,7 +1460,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceLow: 35,
       priceHigh: 55,
       affiliateUrl: 'https://www.amazon.com/s?k=cabinet+drawer+slides+21+inch+5+pair&tag=alderprojects-20',
-      imageUrl: '/product-images/categories/drawer_slide.svg',
+      imageUrl: '/product-images/kitchen_drawer_slides__side_mount_ball_bearing_slides_5pair.webp',
       productSpec:
         'Generic ball-bearing slides. 21" length. 75-100 lb capacity.',
     },
@@ -1571,7 +1571,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceHigh: 1400,
       amazonAsin: 'B001VNCJ36',
       affiliateUrl: 'https://www.amazon.com/dp/B001VNCJ36?tag=alderprojects-20',
-      imageUrl: '/product-images/categories/adirondack_chair.svg',
+      imageUrl: '/product-images/polywood_classic_folding_adirondack_chair.webp',
       productSpec:
         'Marine-grade HDPE recycled lumber (~30,000 milk jugs per hour). 34 lbs each. 250-lb weight capacity. 20-year warranty against splintering, cracking, chipping, peeling. ColorStay UV-inhibitor pigments. Folds flat for storage. Made in USA. ~$260-350 per chair. Available in white, sand, black, navy, slate grey.',
     },
@@ -1602,7 +1602,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceHigh: 1800,
       amazonAsin: 'B079Y5K6HX',
       affiliateUrl: 'https://www.amazon.com/dp/B079Y5K6HX?tag=alderprojects-20',
-      imageUrl: '/product-images/categories/adirondack_chair.svg',
+      imageUrl: '/product-images/polywood_modern_adirondack_curveback.webp',
       productSpec:
         'Same Polywood lumber + Solidcore durability. Modern silhouette with curved back, waterfall front, ergonomic seat. ClimateTuff marine-grade hardware (18/8 stainless). ~$350-450 per chair. Heavier base for stability in lake winds.',
     },
@@ -1680,7 +1680,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceLow: 400,
       priceHigh: 700,
       affiliateUrl: 'https://www.amazon.com/s?k=teak+outdoor+side+table+pair&tag=alderprojects-20',
-      imageUrl: '/product-images/categories/outdoor_side_table.svg',
+      imageUrl: '/product-images/lake_side_tables__solid_teak_outdoor_side_tables_pair.webp',
       productSpec:
         'Solid teak hardwood. Beautiful aged silver-grey patina if untreated. Annual oil/seal recommended for color retention.',
     },
@@ -1707,7 +1707,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceLow: 100,
       priceHigh: 180,
       affiliateUrl: 'https://www.amazon.com/s?k=hampton+bay+cushionguard+adirondack+cushion&tag=alderprojects-20',
-      imageUrl: '/product-images/categories/outdoor_cushion.svg',
+      imageUrl: '/product-images/hampton_bay_cushionguard_cushions_set_4.webp',
       productSpec: 'Solution-dyed polyester. 3-year warranty. ~$25-45 per cushion. Sold at Home Depot.',
     },
     tags: {
@@ -1731,7 +1731,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceLow: 280,
       priceHigh: 480,
       affiliateUrl: 'https://www.amazon.com/s?k=sunbrella+adirondack+cushion+set&tag=alderprojects-20',
-      imageUrl: '/product-images/categories/outdoor_cushion.svg',
+      imageUrl: '/product-images/sunbrella_replacement_cushions_adirondack_set_4.webp',
       productSpec:
         'Solution-dyed acrylic. Color built into the fiber, not surface-printed. 5-year fade warranty. Survives bleach cleaning. Dries in 1-2 hours after rain. ~$70-120 per cushion.',
     },
@@ -1760,7 +1760,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceLow: 600,
       priceHigh: 900,
       affiliateUrl: 'https://www.amazon.com/s?k=frontgate+sunbrella+cushion&tag=alderprojects-20',
-      imageUrl: '/product-images/categories/outdoor_cushion.svg',
+      imageUrl: '/product-images/frontgate_sunbrella_cushions_premium.webp',
       productSpec:
         'Same Sunbrella fabric. Tailored covers, custom welt detailing, higher fill density. ~$150-220 per cushion.',
     },
@@ -1787,7 +1787,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceLow: 80,
       priceHigh: 140,
       affiliateUrl: 'https://www.amazon.com/s?k=outdoor+patio+umbrella+9ft&tag=alderprojects-20',
-      imageUrl: '/product-images/categories/patio_umbrella.svg',
+      imageUrl: '/product-images/lake_umbrella__pole_and_base_9ft_umbrella_walmart_tier_polyester.webp',
       productSpec: 'Steel pole, polyester canopy. Crank-tilt mechanism. Standard ~50lb base.',
     },
     tags: {
@@ -1840,7 +1840,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceLow: 800,
       priceHigh: 1500,
       affiliateUrl: 'https://www.amazon.com/s?k=treasure+garden+cantilever+umbrella&tag=alderprojects-20',
-      imageUrl: '/product-images/categories/patio_umbrella.svg',
+      imageUrl: '/product-images/treasure_garden_cantilever_11ft.webp',
       productSpec:
         'Country-club tier. Solid arm, 8-direction tilt, wind-rated to 25+mph. Aluminum pole, premium hardware.',
     },
@@ -1891,7 +1891,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceLow: 80,
       priceHigh: 180,
       affiliateUrl: 'https://www.amazon.com/s?k=polypropylene+outdoor+rug+8x10+solution+dyed&tag=alderprojects-20',
-      imageUrl: '/product-images/categories/outdoor_rug.svg',
+      imageUrl: '/product-images/lake_outdoor_rug__solution_dyed_polypropylene_outdoor_rug_8x10.webp',
       productSpec:
         'Polypropylene fiber, solution-dyed. Survives rain, easy to hose off. UV-stable color. ~5-7 year service life with seasonal storage.',
     },
@@ -1916,7 +1916,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceLow: 280,
       priceHigh: 500,
       affiliateUrl: 'https://www.amazon.com/s?k=indoor+outdoor+jute+sisal+rug+8x10&tag=alderprojects-20',
-      imageUrl: '/product-images/categories/outdoor_rug.svg',
+      imageUrl: '/product-images/lake_outdoor_rug__indoor_outdoor_woven_rug_jute_sisal_blend.webp',
       productSpec: 'Natural fiber blend with synthetic backing. Indoor aesthetic.',
     },
     tags: {
@@ -1942,7 +1942,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceLow: 180,
       priceHigh: 320,
       affiliateUrl: 'https://www.amazon.com/s?k=char-broil+3+burner+gas+grill&tag=alderprojects-20',
-      imageUrl: '/product-images/categories/gas_grill.svg',
+      imageUrl: '/product-images/char_broil_or_nexgrill_3_burner.webp',
       productSpec:
         'Generic 3-burner gas grill. 1-year warranty typical. Burners corrode within 2-3 seasons.',
     },
@@ -1997,7 +1997,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceLow: 1100,
       priceHigh: 1800,
       affiliateUrl: 'https://www.amazon.com/s?k=weber+genesis+gas+grill&tag=alderprojects-20',
-      imageUrl: '/product-images/categories/gas_grill.svg',
+      imageUrl: '/product-images/weber_genesis_e325.webp',
       productSpec:
         'Premium 4-burner with sear station, side burner, more BTU output. Cast aluminum cookbox, larger cooking surface.',
     },
@@ -2048,7 +2048,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceLow: 45,
       priceHigh: 80,
       affiliateUrl: 'https://www.amazon.com/s?k=weber+premium+grill+cover+spirit&tag=alderprojects-20',
-      imageUrl: '/product-images/categories/grill_cover.svg',
+      imageUrl: '/product-images/weber_premium_grill_cover_spirit.webp',
       productSpec:
         "Heavy polyester with vinyl coating. Sized to specific Weber Spirit II model. Breathable so grill doesn't trap moisture. Weather-rated.",
     },
@@ -2099,7 +2099,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceLow: 30,
       priceHigh: 48,
       affiliateUrl: 'https://www.amazon.com/s?k=weber+3+piece+grilling+tool+set&tag=alderprojects-20',
-      imageUrl: '/product-images/categories/grill_tools.svg',
+      imageUrl: '/product-images/weber_grill_tools_3pc.webp',
       productSpec:
         'Stainless steel construction. Long handles for safe distance from grill. Dishwasher safe. ~$10-16 per tool.',
     },
@@ -2126,7 +2126,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceLow: 12,
       priceHigh: 25,
       affiliateUrl: 'https://www.amazon.com/s?k=outdoor+string+lights+50ft&tag=alderprojects-20',
-      imageUrl: '/product-images/categories/outdoor_string_lights.svg',
+      imageUrl: '/product-images/walmart_string_lights_50ft.webp',
       productSpec: 'Generic LED string with non-replaceable bulbs. 1-2 year service life.',
     },
     tags: {
@@ -2150,7 +2150,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceLow: 45,
       priceHigh: 70,
       affiliateUrl: 'https://www.amazon.com/s?k=brightech+ambience+pro+led+48ft&tag=alderprojects-20',
-      imageUrl: '/product-images/categories/outdoor_string_lights.svg',
+      imageUrl: '/product-images/brightech_ambience_pro_led_string_lights_48ft.webp',
       productSpec:
         'Commercial-grade. Weatherproof IP65. Dimmable. LED bulbs included and replaceable. 2W per bulb. Wirecutter pick.',
     },
@@ -2178,7 +2178,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceLow: 180,
       priceHigh: 280,
       affiliateUrl: 'https://www.amazon.com/s?k=pottery+barn+cafe+string+lights&tag=alderprojects-20',
-      imageUrl: '/product-images/categories/outdoor_string_lights.svg',
+      imageUrl: '/product-images/pottery_barn_west_elm_cafe_string_lights.webp',
       productSpec:
         'Same product class as Brightech with brand markup. Often single-source manufacturer (Brightech rebranded).',
     },
@@ -2205,7 +2205,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceLow: 50,
       priceHigh: 80,
       affiliateUrl: 'https://www.amazon.com/s?k=coleman+xtreme+5+day+cooler+70qt&tag=alderprojects-20',
-      imageUrl: '/product-images/categories/outdoor_cooler.svg',
+      imageUrl: '/product-images/coleman_xtreme_5day_70qt.webp',
       productSpec:
         '70qt capacity. 5-day ice retention claimed. Plastic walls, basic insulation. Steel-reinforced handles.',
     },
@@ -2230,7 +2230,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceLow: 200,
       priceHigh: 280,
       affiliateUrl: 'https://www.amazon.com/s?k=rtic+65+hard+cooler&tag=alderprojects-20',
-      imageUrl: '/product-images/categories/outdoor_cooler.svg',
+      imageUrl: '/product-images/rtic_65_hard_cooler.webp',
       productSpec:
         'Roto-molded construction. 7-day ice retention. 65qt capacity. Lifetime gasket warranty. Anti-skid feet, integrated lock points. Heavy enough to not blow off the dock.',
     },
@@ -2258,7 +2258,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceLow: 350,
       priceHigh: 480,
       affiliateUrl: 'https://www.amazon.com/s?k=yeti+tundra+65+cooler&tag=alderprojects-20',
-      imageUrl: '/product-images/categories/outdoor_cooler.svg',
+      imageUrl: '/product-images/yeti_tundra_65.webp',
       productSpec:
         'Roto-molded construction. 7-day ice retention. 65qt capacity. Premium brand. Most-stolen cooler at public docks.',
     },
@@ -2285,7 +2285,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceLow: 45,
       priceHigh: 80,
       affiliateUrl: 'https://www.amazon.com/s?k=inflatable+lake+float+3+pack+drink+holder&tag=alderprojects-20',
-      imageUrl: '/product-images/categories/lake_floats.svg',
+      imageUrl: '/product-images/lake_floats_essentials__inflatable_lake_floats_3pk_drink_holders_4pk.webp',
       productSpec:
         'Mid-grade vinyl floats with backrest. ~3-5 season durability with proper deflation/storage. Drink holders are foam, fit standard 12oz cans/bottles.',
     },
@@ -2312,7 +2312,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceLow: 15,
       priceHigh: 30,
       affiliateUrl: 'https://www.amazon.com/s?k=citronella+candles+lake+bug+repellent&tag=alderprojects-20',
-      imageUrl: '/product-images/categories/mosquito_control.svg',
+      imageUrl: '/product-images/lake_bug_control__citronella_candles_spray_repellent.webp',
       productSpec:
         'Citronella wax candles + DEET-based spray. Effective only within 2-3 ft of candle.',
     },
@@ -2433,7 +2433,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceLow: 22,
       priceHigh: 35,
       affiliateUrl: "https://www.amazon.com/s?k=cabot+wood+brightener+gallon&tag=alderprojects-20",
-      imageUrl: '/product-images/categories/deck_cleaner.svg',
+      imageUrl: '/product-images/cabot_wood_brightener_1_gallon.webp',
       productSpec: "Two-part cleaner: oxalic-acid based brightener that neutralizes weather-grayed wood and prepares for stain. Pairs with Cabot stains. Treats 300-500 sq ft per gallon."
     },
     tags: {
@@ -2476,7 +2476,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceLow: 60,
       priceHigh: 90,
       affiliateUrl: "https://www.amazon.com/s?k=restore-a-deck+cleaner+brightener+kit&tag=alderprojects-20",
-      imageUrl: '/product-images/categories/deck_cleaner.svg',
+      imageUrl: '/product-images/restore_a_deck_two_step_cleaner_brightener_kit.webp',
       productSpec: "Professional 2-step kit: cleaner first (removes mildew, dirt), brightener second (restores wood color). Kit pricing covers ~500 sq ft. Pro-grade results."
     },
     tags: {
@@ -2519,7 +2519,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceLow: 22,
       priceHigh: 35,
       affiliateUrl: "https://www.amazon.com/s?k=quickie+deck+scrub+brush+telescoping+handle&tag=alderprojects-20",
-      imageUrl: '/product-images/categories/_topic-outdoor.svg',
+      imageUrl: '/product-images/quickie_18_deck_scrub_brush_with_telescoping_handle.webp',
       productSpec: "18\" bristle head, stiff bristles for paint/stain removal. Telescoping handle to 60\". Threaded for extension poles. Dishwasher-handle compatible."
     },
     tags: {
@@ -2600,7 +2600,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceLow: 38,
       priceHigh: 55,
       affiliateUrl: "https://www.amazon.com/s?k=general+tools+mmd4e+moisture+meter&tag=alderprojects-20",
-      imageUrl: '/product-images/categories/moisture_meter.svg',
+      imageUrl: '/product-images/general_tools_mmd4e_pin_and_pinless_moisture_meter.webp',
       productSpec: "Both pin-type (contact) and pinless (surface scan) modes. LCD display with color coding. ~$40. Long-loved by reviewers."
     },
     tags: {
@@ -2641,7 +2641,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceLow: 175,
       priceHigh: 230,
       affiliateUrl: "https://www.amazon.com/s?k=behr+premium+semi+transparent+deck+stain+5+gallon&tag=alderprojects-20",
-      imageUrl: '/product-images/categories/_topic-outdoor.svg',
+      imageUrl: '/product-images/behr_premium_semi_transparent_weatherproofing_stain_5_gallon.webp',
       productSpec: "Semi-transparent oil-based weatherproofing stain. ~$190/5gal. Covers 300-450 sq ft per gallon. 3-year warranty in shaded areas; less in direct sun."
     },
     tags: {
@@ -2686,7 +2686,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceHigh: 90,
       amazonAsin: "B000K6HBKG",
       affiliateUrl: "https://www.amazon.com/dp/B000K6HBKG?tag=alderprojects-20",
-      imageUrl: '/product-images/categories/_topic-outdoor.svg',
+      imageUrl: '/product-images/cabot_australian_timber_oil_1_gallon.webp',
       productSpec: "Penetrating oil + alkyd hybrid. 3-way oil protection. Covers 350-500 sq ft per gallon. Multiple natural-toned colors. 2-3 year recoat cycle in Vermont. Reviewer favorite for cedar and pressure-treated."
     },
     tags: {
@@ -2730,7 +2730,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceLow: 220,
       priceHigh: 320,
       affiliateUrl: "https://www.amazon.com/s?k=sherwin+williams+superdeck+solid+5+gallon&tag=alderprojects-20",
-      imageUrl: '/product-images/categories/_topic-outdoor.svg',
+      imageUrl: '/product-images/sherwin_williams_superdeck_solid_color_5_gallon.webp',
       productSpec: "Acrylic solid-color deck stain. Highest opacity, longest-lasting (4-6 year recoat). Hides imperfections and old stain bleed-through. Heavy-bodied; requires brushing and back-rolling for proper coverage."
     },
     tags: {
@@ -2774,7 +2774,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceLow: 22,
       priceHigh: 38,
       affiliateUrl: "https://www.amazon.com/s?k=deckmate+grk+deck+screws+exterior+coated&tag=alderprojects-20",
-      imageUrl: '/product-images/categories/_topic-outdoor.svg',
+      imageUrl: '/product-images/deckmate_or_grk_exterior_deck_screws_2_5_3_5_1_lb.webp',
       productSpec: "Coated exterior deck screws. T25 star drive (less stripping than Phillips). Self-countersinking head. ~$25/lb (200 screws). Sized 2.5\" for board attachment, 3\" for joist hangers."
     },
     tags: {
@@ -2814,7 +2814,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceLow: 22,
       priceHigh: 38,
       affiliateUrl: "https://www.amazon.com/s?k=anti+slip+stair+tread+tape+4+inch+30+ft&tag=alderprojects-20",
-      imageUrl: '/product-images/categories/_topic-outdoor.svg',
+      imageUrl: '/product-images/deck_stair_grip__heavy_duty_anti_slip_black_tape_4_inch_x_30_ft.webp',
       productSpec: "4\" wide adhesive grit tape. ~30 ft roll. Cut to fit each tread. Black. 5-7 year typical life on covered stairs; 3-4 on exposed. Coarse PEVA grit; high-friction."
     },
     tags: {
@@ -2855,7 +2855,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceLow: 65,
       priceHigh: 95,
       affiliateUrl: "https://www.homedepot.com/c/SF_Pressure_Washer_Rental?tag=alderprojects-20",
-      imageUrl: '/product-images/categories/pressure_washer.svg',
+      imageUrl: '/product-images/home_depot_rental_2_500_psi_gas_pressure_washer_4_hour.webp',
       productSpec: "Rental from Home Depot Tool Rental Center. ~$80/4 hours. Includes nozzles. Bring fuel; return clean."
     },
     tags: {
@@ -2939,7 +2939,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceLow: 380,
       priceHigh: 520,
       affiliateUrl: "https://www.amazon.com/s?k=generac+3200+psi+pressure+washer&tag=alderprojects-20",
-      imageUrl: '/product-images/categories/pressure_washer.svg',
+      imageUrl: '/product-images/generac_speedwash_3_200_psi_gas_pressure_washer.webp',
       productSpec: "Gas, 3,200 PSI, 2.7 GPM. Pro-grade for serious deck/siding work. ~$450. Worth it if you have a large property and use 4+ times per year."
     },
     tags: {
@@ -2981,7 +2981,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceLow: 35,
       priceHigh: 65,
       affiliateUrl: "https://www.amazon.com/s?k=cats+paw+nail+puller+oscillating+multi+tool+blade&tag=alderprojects-20",
-      imageUrl: '/product-images/categories/_topic-outdoor.svg',
+      imageUrl: '/product-images/deck_board_repair__cat_s_paw_nail_puller_multi_tool_blade_spare_deck_boards.webp',
       productSpec: "Cat's paw / pry bar (~$15) + oscillating multi-tool blade for flush cuts (~$15) + 1-2 replacement deck boards (varies by deck width, $20-30). Tools for selective board replacement during refresh."
     },
     tags: {
@@ -3022,7 +3022,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceLow: 12,
       priceHigh: 22,
       affiliateUrl: "https://www.amazon.com/s?k=watersafe+all+in+one+test+kit&tag=alderprojects-20",
-      imageUrl: '/product-images/categories/_topic-outdoor.svg',
+      imageUrl: '/product-images/watersafe_all_in_one_basic_test_strips.webp',
       productSpec: "Quick-dip test strips for chlorine, hardness, lead, pesticides, bacteria, nitrates. Results in minutes. Useful for screening; not a substitute for lab analysis on bacteria."
     },
     tags: {
@@ -3065,7 +3065,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceLow: 165,
       priceHigh: 195,
       affiliateUrl: "https://www.amazon.com/s?k=tap+score+simplelab+well+water+test&tag=alderprojects-20",
-      imageUrl: '/product-images/categories/_topic-outdoor.svg',
+      imageUrl: '/product-images/tap_score_by_simplelab_essential_well_water_mail_in_lab_test.webp',
       productSpec: "Mail-in lab analysis. Tests for 50+ contaminants including bacteria, lead, arsenic, radon-in-water (Vermont-specific concern), nitrates, hardness, pH. Results in 5-10 days. Includes interpretation guidance."
     },
     tags: {
@@ -3108,7 +3108,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceLow: 280,
       priceHigh: 360,
       affiliateUrl: "https://www.amazon.com/s?k=tap+score+advanced+well+water&tag=alderprojects-20",
-      imageUrl: '/product-images/categories/_topic-outdoor.svg',
+      imageUrl: '/product-images/tap_score_advanced_well_water_test_95_analytes.webp',
       productSpec: "Comprehensive panel including pesticides, herbicides, VOCs, full metals panel. Worth it for new property purchase or known contamination concerns. Overkill for routine annual testing."
     },
     tags: {
@@ -3151,7 +3151,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceLow: 18,
       priceHigh: 30,
       affiliateUrl: "https://www.amazon.com/s?k=water+pressure+gauge+toilet+dye+leak+detection&tag=alderprojects-20",
-      imageUrl: '/product-images/categories/_topic-outdoor.svg',
+      imageUrl: '/product-images/opening_leak_check__pressure_gauge_dye_tablets_paper_towels_kit.webp',
       productSpec: "Hose-bib pressure gauge ($10) + toilet dye tablets ($6) + paper towels for visual inspection. Manual leak detection in 30 minutes covering toilets, supply pressure, visible-leak inspection of all fixtures."
     },
     tags: {
@@ -3235,7 +3235,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceLow: 28,
       priceHigh: 45,
       affiliateUrl: "https://www.amazon.com/s?k=pentek+sediment+carbon+block+10+inch&tag=alderprojects-20",
-      imageUrl: '/product-images/categories/_topic-outdoor.svg',
+      imageUrl: '/product-images/pentek_10_sediment_carbon_block_2_pack.webp',
       productSpec: "Pentek-brand 10\" filters: 1 sediment (5-micron) + 1 carbon block. Sediment removes silt and rust; carbon removes chlorine, taste, odor. Covers most Vermont well systems running 6 months. Pentek is the industry standard, longer-lasting than generic."
     },
     tags: {
@@ -3276,7 +3276,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceLow: 95,
       priceHigh: 160,
       affiliateUrl: "https://www.amazon.com/s?k=big+blue+water+filter+housing+4.5+20&tag=alderprojects-20",
-      imageUrl: '/product-images/categories/_topic-outdoor.svg',
+      imageUrl: '/product-images/big_blue_4_5_x_20_filter_housing_premium_media.webp',
       productSpec: "Big Blue housing for high-flow whole-house filtration. Required for homes with high water demand or known sediment loads. More expensive media but lasts much longer (12+ months)."
     },
     tags: {
@@ -3359,7 +3359,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceLow: 60,
       priceHigh: 95,
       affiliateUrl: "https://www.amazon.com/s?k=method+mrs+meyers+microfiber+cleaning+kit&tag=alderprojects-20",
-      imageUrl: '/product-images/categories/_topic-outdoor.svg',
+      imageUrl: '/product-images/method_tier_cleaning_kit_microfiber_mrs_meyer_s_bleach.webp',
       productSpec: "Better-quality cleaners that don't leave residue. Includes microfiber for streak-free surfaces. Mrs. Meyer's for non-toxic surfaces; bleach (Concrobium or 30% hydrogen peroxide) for mold/mildew on grout and bathrooms."
     },
     tags: {
@@ -3485,7 +3485,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceLow: 1100,
       priceHigh: 1900,
       affiliateUrl: "https://www.amazon.com/s?k=aprilaire+whole+house+dehumidifier+1850&tag=alderprojects-20",
-      imageUrl: '/product-images/categories/_topic-outdoor.svg',
+      imageUrl: '/product-images/aprilaire_whole_house_dehumidifier_1850_1830.webp',
       productSpec: "Whole-house unit ducted into HVAC system. Requires professional install. Best for chronic moisture problems or radon mitigation pairing. ~$2,500 installed."
     },
     tags: {
@@ -3527,7 +3527,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceLow: 22,
       priceHigh: 35,
       affiliateUrl: "https://www.amazon.com/s?k=sterilite+latching+tote+27+quart+labels&tag=alderprojects-20",
-      imageUrl: '/product-images/categories/_topic-outdoor.svg',
+      imageUrl: '/product-images/sterilite_27_quart_latching_tote_label_maker_labels.webp',
       productSpec: "Latching plastic tote, ~14\"x18\"x10\". Holds opening kit consumables: water test, leak check, cleaning supplies, filter replacements, fresh batteries, light bulbs, dead-bulb spares. Label clearly on outside."
     },
     tags: {
@@ -3567,7 +3567,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceLow: 35,
       priceHigh: 55,
       affiliateUrl: "https://www.amazon.com/s?k=aa+aaa+battery+pack+led+bulbs+duct+tape+lighter&tag=alderprojects-20",
-      imageUrl: '/product-images/categories/_topic-outdoor.svg',
+      imageUrl: '/product-images/opening_consumables__aa_aaa_battery_24_pack_6_led_bulbs_lighter_duct_tape.webp',
       productSpec: "24-pack mixed AA/AAA batteries (Amazon Basics or Energizer). 6 LED bulbs (60W equivalent, soft white). Long-stem lighter. Roll of duct tape. Covers smoke detectors, remote controls, flashlights, light fixtures."
     },
     tags: {
@@ -3607,7 +3607,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceLow: 8,
       priceHigh: 15,
       affiliateUrl: "https://www.amazon.com/s?k=plumbing+shutoff+valve+labels+adhesive&tag=alderprojects-20",
-      imageUrl: '/product-images/categories/_topic-outdoor.svg',
+      imageUrl: '/product-images/opening_shutoff_labels__adhesive_shutoff_valve_identification_labels.webp',
       productSpec: "Same product as outdoor_freeze_prevention slot — universe entry reused via additive tag merge."
     },
     tags: {
@@ -3649,7 +3649,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceHigh: 32,
       amazonAsin: "B07QSFRSJX",
       affiliateUrl: "https://www.amazon.com/dp/B07QSFRSJX?tag=alderprojects-20",
-      imageUrl: '/product-images/categories/_topic-outdoor.svg',
+      imageUrl: '/product-images/govee_water_leak_detector_5_pack_audible_only_no_wifi.webp',
       productSpec: "Audible-only 100dB alarm, no WiFi or remote alerts. Battery-powered. Useful only when someone is in the house to hear it."
     },
     tags: {
@@ -3692,7 +3692,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceHigh: 65,
       amazonAsin: "B07J9HZ5VN",
       affiliateUrl: "https://www.amazon.com/dp/B07J9HZ5VN?tag=alderprojects-20",
-      imageUrl: '/product-images/categories/_topic-outdoor.svg',
+      imageUrl: '/product-images/govee_wifi_water_leak_detector_3_pack_with_gateway_h5054.webp',
       productSpec: "WiFi gateway + 3 sensors. App and email alerts within seconds of leak. 100dB local siren. Gateway requires 2.4GHz WiFi only (not 5GHz). 5-year battery on sensors. Place at water heater, washing machine, under sinks, near sump pump."
     },
     tags: {
@@ -3735,7 +3735,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceHigh: 120,
       amazonAsin: "B0DWWXJ4MY",
       affiliateUrl: "https://www.amazon.com/dp/B0DWWXJ4MY?tag=alderprojects-20",
-      imageUrl: '/product-images/categories/_topic-outdoor.svg',
+      imageUrl: '/product-images/yolink_water_leak_starter_kit_hub_2_leak_sensor_4.webp',
       productSpec: "LoRa long-range (1/4 mile open air). Works where WiFi is spotty. Hub options include cellular (no internet required). 105dB built-in siren on each sensor. Freeze warning in addition to leak. SMS, email, app alerts. Compatible with Alexa, IFTTT, Home Assistant. Best for properties with marginal WiFi or large outbuildings."
     },
     tags: {
@@ -3778,7 +3778,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceHigh: 7,
       amazonAsin: "B07XLQ5TPG",
       affiliateUrl: "https://www.amazon.com/dp/B07XLQ5TPG?tag=alderprojects-20",
-      imageUrl: '/product-images/categories/pipe_insulation.svg',
+      imageUrl: '/product-images/frost_king_1_2_copper_foam_pipe_insulation_6_ft_single.webp',
       productSpec: "Polyethylene foam, pre-slit, 6 ft length. For 1/2\" copper pipe (which is 5/8\" OD). Single tube. Slip on, no taping needed for short runs."
     },
     tags: {
@@ -3822,7 +3822,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceHigh: 18,
       amazonAsin: "B000BQLSBI",
       affiliateUrl: "https://www.amazon.com/dp/B000BQLSBI?tag=alderprojects-20",
-      imageUrl: '/product-images/categories/pipe_insulation.svg',
+      imageUrl: '/product-images/frost_king_3_4_copper_foam_pipe_insulation_3_ft_4_pack.webp',
       productSpec: "Polyethylene foam, pre-slit, 3/8\" wall thickness, 3 ft length × 4 tubes. For 3/4\" copper or 1/2\" iron pipe. Most common size for Vermont residential supply lines. Black color."
     },
     tags: {
@@ -3866,7 +3866,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceHigh: 22,
       amazonAsin: "B003A0YX82",
       affiliateUrl: "https://www.amazon.com/dp/B003A0YX82?tag=alderprojects-20",
-      imageUrl: '/product-images/categories/pipe_insulation.svg',
+      imageUrl: '/product-images/frost_king_1_rubber_tubular_pipe_insulation_6_ft.webp',
       productSpec: "Closed-cell rubber, 1/2\" wall thickness, 6 ft length. For 1\" pipe ID. Higher R-value than polyethylene foam. Use on pipes in unconditioned spaces or where temperature drops below 20°F. More flexible at cold temperatures."
     },
     tags: {
@@ -3993,7 +3993,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceLow: 75,
       priceHigh: 130,
       affiliateUrl: "https://www.amazon.com/s?k=easyheat+self+regulating+pipe+heating+cable+kit&tag=alderprojects-20",
-      imageUrl: '/product-images/categories/heat_tape.svg',
+      imageUrl: '/product-images/easyheat_or_pentair_self_regulating_heat_cable_kit_with_insulati.webp',
       productSpec: "Pro-grade self-regulating cable + matching pipe insulation sleeve. Higher watt density. Used by plumbers for permanent installations. Often hardwired."
     },
     tags: {
@@ -4121,7 +4121,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceLow: 230,
       priceHigh: 290,
       affiliateUrl: "https://www.amazon.com/s?k=ecobee+smart+thermostat+premium&tag=alderprojects-20",
-      imageUrl: '/product-images/categories/_topic-outdoor.svg',
+      imageUrl: '/product-images/ecobee_smart_thermostat_premium_with_sensors.webp',
       productSpec: "WiFi, voice control, room sensors included. Air quality monitoring, smoke detection alerts. Best for multi-zone homes or properties wanting whole-house intelligence beyond freeze prevention."
     },
     tags: {
@@ -4248,7 +4248,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceLow: 35,
       priceHigh: 65,
       affiliateUrl: "https://www.amazon.com/s?k=frost+proof+outdoor+faucet+sillcock+12+inch&tag=alderprojects-20",
-      imageUrl: '/product-images/categories/hose_bib_cover.svg',
+      imageUrl: '/product-images/freeze_hose_bib_cover__frost_proof_outdoor_faucet_replacement_sillcock_12.webp',
       productSpec: "Permanent solution: replaces the faucet entirely with a frost-proof sillcock that has the shutoff valve inside the heated wall. Requires plumbing skill or pro install. Permanent fix vs. seasonal cover."
     },
     tags: {
@@ -4374,7 +4374,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceLow: 80,
       priceHigh: 150,
       affiliateUrl: "https://www.amazon.com/s?k=silicone+bulb+door+weatherstripping&tag=alderprojects-20",
-      imageUrl: '/product-images/categories/_topic-outdoor.svg',
+      imageUrl: '/product-images/freeze_draft_sealing__door_silicone_bulb_weatherstripping_storm_windows_assessment.webp',
       productSpec: "Silicone bulb seal for doors (premium durability). For windows, the premium answer is replacement or storm windows, not weatherstripping — at this point you should be looking at the next renovation."
     },
     tags: {
@@ -4416,7 +4416,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceLow: 8,
       priceHigh: 15,
       affiliateUrl: "https://www.amazon.com/s?k=plumbing+shutoff+valve+labels+adhesive&tag=alderprojects-20",
-      imageUrl: '/product-images/categories/_topic-outdoor.svg',
+      imageUrl: '/product-images/freeze_shutoff_labels__adhesive_shutoff_valve_identification_labels_assortment.webp',
       productSpec: "Pre-printed adhesive labels for water main, hot water, cold water, gas, individual fixture shutoffs. Weather-resistant. ~30 labels per pack."
     },
     tags: {
@@ -4458,7 +4458,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceLow: 380,
       priceHigh: 530,
       affiliateUrl: "https://www.amazon.com/s?k=moen+flo+smart+water+shutoff+3+4&tag=alderprojects-20",
-      imageUrl: '/product-images/categories/_topic-outdoor.svg',
+      imageUrl: '/product-images/moen_flo_smart_water_shutoff_3_4.webp',
       productSpec: "WiFi-connected automatic shutoff valve installed at the main supply line. Detects abnormal flow patterns and shuts off water automatically. Manual control via app. Requires professional plumber install (1-3 hours, ~$200-400 labor)."
     },
     tags: {
@@ -4542,7 +4542,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceLow: 130,
       priceHigh: 220,
       affiliateUrl: "https://www.amazon.com/s?k=marcell+cellular+temperature+monitor&tag=alderprojects-20",
-      imageUrl: '/product-images/categories/_topic-outdoor.svg',
+      imageUrl: '/product-images/marcell_or_temp_stick_cellular_temperature_monitor.webp',
       productSpec: "Cellular-connected temperature monitor with built-in SIM. No WiFi required. Sends alert when temperature drops below threshold. Subscription required for cellular service ($5-12/month)."
     },
     tags: {
@@ -4584,7 +4584,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceLow: 12,
       priceHigh: 22,
       affiliateUrl: "https://www.amazon.com/s?k=acurite+digital+hygrometer+thermometer&tag=alderprojects-20",
-      imageUrl: '/product-images/categories/_topic-home_repair.svg',
+      imageUrl: '/product-images/moisture_hygrometer__acurite_digital_hygrometer_single.webp',
       productSpec: "Battery-powered digital hygrometer. Reads temperature + humidity. ~$15. AcuRite is the consumer standard. Local readout only — no remote alerts."
     },
     tags: {
@@ -4627,7 +4627,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceLow: 35,
       priceHigh: 55,
       affiliateUrl: "https://www.amazon.com/s?k=govee+wifi+hygrometer+3+pack&tag=alderprojects-20",
-      imageUrl: '/product-images/categories/_topic-home_repair.svg',
+      imageUrl: '/product-images/govee_wifi_hygrometer_3_pack_with_app_alerts.webp',
       productSpec: "3 WiFi-connected hygrometers. App alerts when humidity exceeds threshold. Historical graphs over weeks/months. Place in basement, bedroom, kitchen for whole-house picture. Govee Home app."
     },
     tags: {
@@ -4670,7 +4670,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceLow: 145,
       priceHigh: 220,
       affiliateUrl: "https://www.amazon.com/s?k=sensorpush+wireless+hygrometer+gateway&tag=alderprojects-20",
-      imageUrl: '/product-images/categories/_topic-home_repair.svg',
+      imageUrl: '/product-images/moisture_hygrometer__sensorpush_htp_xw_outdoor_rated_wireless_hygrometer_kit.webp',
       productSpec: "Pro-grade hygrometers. SensorPush gateway for remote access. Long-range (~100 ft). Used by humidor and instrument-storage owners for precise humidity tracking. Better accuracy than Govee."
     },
     tags: {
@@ -4713,7 +4713,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceLow: 35,
       priceHigh: 55,
       affiliateUrl: "https://www.amazon.com/s?k=my+mold+detective+diy+test+kit&tag=alderprojects-20",
-      imageUrl: '/product-images/categories/_topic-home_repair.svg',
+      imageUrl: '/product-images/moisture_mold_test__my_mold_detective_diy_mold_test_kit.webp',
       productSpec: "DIY surface and air sampling. Mail-in lab analysis. Identifies common mold genera. Useful as a screening tool. NOT a substitute for professional mold inspection if you have visible mold."
     },
     tags: {
@@ -4753,7 +4753,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceLow: 18,
       priceHigh: 32,
       affiliateUrl: "https://www.amazon.com/s?k=moso+natural+bamboo+charcoal+air+purifying+bags+4+pack&tag=alderprojects-20",
-      imageUrl: '/product-images/categories/_topic-home_repair.svg',
+      imageUrl: '/product-images/moisture_odor_absorber__moso_natural_bamboo_charcoal_air_purifying_bags_4_pack_200g_each.webp',
       productSpec: "Activated bamboo charcoal in natural fabric bags. Adsorbs odors and excess moisture. 4 bags × 200g. Reactivate by sun-drying monthly. ~$25 for 2-year supply. Wirecutter-tier pick."
     },
     tags: {
@@ -4793,7 +4793,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceLow: 55,
       priceHigh: 85,
       affiliateUrl: "https://www.amazon.com/s?k=lasko+3300+wind+machine+air+circulator&tag=alderprojects-20",
-      imageUrl: '/product-images/categories/_topic-home_repair.svg',
+      imageUrl: '/product-images/moisture_air_mover__lasko_3300_wind_machine_3_speed_air_circulator.webp',
       productSpec: "20\" diameter pivoting fan with 3 speeds. Heavy-duty plastic frame. Used for drying spaces and rapid air circulation in basements. Lasko is the consumer standard."
     },
     tags: {
@@ -4831,7 +4831,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceLow: 55,
       priceHigh: 85,
       affiliateUrl: "https://www.amazon.com/s?k=black+decker+20v+cordless+drill+kit&tag=alderprojects-20",
-      imageUrl: '/product-images/categories/_topic-universal.svg',
+      imageUrl: '/product-images/owner_drill_driver__black_decker_20v_max_cordless_drill_kit_with_battery_charger.webp',
       productSpec: "20V MAX lithium-ion. 1 battery + charger. ~$65. Adequate torque for residential use; struggles on hardwood and large fasteners. 2-3 year typical battery life with regular use."
     },
     tags: {
@@ -4872,7 +4872,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceLow: 145,
       priceHigh: 195,
       affiliateUrl: "https://www.amazon.com/s?k=dewalt+dcd777+20v+max+brushless+drill+kit&tag=alderprojects-20",
-      imageUrl: '/product-images/categories/_topic-universal.svg',
+      imageUrl: '/product-images/owner_drill_driver__dewalt_dcd777_20v_max_brushless_drill_kit_2_batteries_charger.webp',
       productSpec: "Brushless motor (longer life than brushed). 20V MAX. 2 batteries + fast charger + bag. ~$160. The DeWalt DCD777 is the verified Wirecutter pick for homeowner use. Brushless = 50% longer motor life and runtime than brushed equivalents."
     },
     tags: {
@@ -4994,7 +4994,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceLow: 35,
       priceHigh: 60,
       affiliateUrl: "https://www.amazon.com/s?k=dewalt+titanium+drill+bit+set+driver+bit+set&tag=alderprojects-20",
-      imageUrl: '/product-images/categories/drill_bit_set.svg',
+      imageUrl: '/product-images/owner_drill_bits__dewalt_20_piece_titanium_drill_bit_set_30_piece_driver_bit_set.webp',
       productSpec: "Titanium-coated drill bits (longer life than uncoated). Pyramid-style driver bit set (Phillips, square, Torx). Pro-grade quality on the bits you actually use."
     },
     tags: {
@@ -5034,7 +5034,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceLow: 90,
       priceHigh: 150,
       affiliateUrl: "https://www.amazon.com/s?k=dewalt+cobalt+drill+bit+set+wera+driver+bits&tag=alderprojects-20",
-      imageUrl: '/product-images/categories/drill_bit_set.svg',
+      imageUrl: '/product-images/owner_drill_bits__dewalt_cobalt_drill_bit_set_wera_driver_bit_kit.webp',
       productSpec: "Cobalt steel drill bits (cuts hardened materials, longer life). Wera driver bits — German-made, the cabinet-shop standard. Premium."
     },
     tags: {
@@ -5114,7 +5114,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceLow: 45,
       priceHigh: 65,
       affiliateUrl: "https://www.amazon.com/s?k=franklin+sensors+prosensor+710+stud+finder&tag=alderprojects-20",
-      imageUrl: '/product-images/categories/_topic-universal.svg',
+      imageUrl: '/product-images/owner_stud_finder__franklin_sensors_prosensor_710_stud_finder.webp',
       productSpec: "Multi-sensor (no calibration required). Detects studs through standard drywall. Wirecutter pick for residential use. ~$50. Battery-powered (1 9V battery)."
     },
     tags: {
@@ -5231,7 +5231,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceLow: 18,
       priceHigh: 28,
       affiliateUrl: "https://www.amazon.com/s?k=newborn+brothers+250+caulk+gun&tag=alderprojects-20",
-      imageUrl: '/product-images/categories/_topic-universal.svg',
+      imageUrl: '/product-images/owner_caulk_gun__newborn_brothers_250_steel_skeleton_caulk_gun.webp',
       productSpec: "Steel skeleton frame, 10:1 thrust ratio. Drip-free design. Pro-grade construction. ~$22. Used by professional caulkers and tile setters."
     },
     tags: {
@@ -5269,7 +5269,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceLow: 130,
       priceHigh: 180,
       affiliateUrl: "https://www.amazon.com/s?k=dewalt+dcs354+20v+max+oscillating+multi+tool&tag=alderprojects-20",
-      imageUrl: '/product-images/categories/_topic-universal.svg',
+      imageUrl: '/product-images/owner_multitool__dewalt_dcs354_20v_max_brushless_oscillating_multi_tool_bare_tool.webp',
       productSpec: "Brushless oscillating multi-tool. Cuts, sands, scrapes, plunges. Universal blade interface. Bare tool (uses your existing DeWalt 20V battery). ~$150."
     },
     tags: {
@@ -5308,7 +5308,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceLow: 35,
       priceHigh: 55,
       affiliateUrl: "https://www.amazon.com/s?k=drywall+anchor+kit+screw+assortment+homeowner&tag=alderprojects-20",
-      imageUrl: '/product-images/categories/_topic-universal.svg',
+      imageUrl: '/product-images/owner_fastener_kit__drywall_anchor_kit_screw_assortment_deck_wood_sheetmetal_screws.webp',
       productSpec: "Plastic toggle anchors (50+), self-drilling drywall anchors (25+), wood screws (#6, #8 in various lengths), exterior deck screws, sheet metal screws. ~$40 for 200+ pieces. Covers residential mounting and small repair needs."
     },
     tags: {
@@ -5347,7 +5347,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceLow: 60,
       priceHigh: 100,
       affiliateUrl: "https://www.amazon.com/s?k=dewalt+20v+max+led+work+light+coast+headlamp&tag=alderprojects-20",
-      imageUrl: '/product-images/categories/_topic-universal.svg',
+      imageUrl: '/product-images/owner_work_light__dewalt_20v_max_led_work_light_coast_headlamp.webp',
       productSpec: "DeWalt LED work light (uses 20V MAX battery from your drill — no separate battery needed) ~$45. Coast HL7 or HL8 headlamp ~$30 — for hands-free work in dark spaces (basements, attics, under sinks)."
     },
     tags: {
@@ -5387,7 +5387,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceLow: 28,
       priceHigh: 45,
       affiliateUrl: "https://www.amazon.com/s?k=coliform+e+coli+well+water+bacteria+test+kit&tag=alderprojects-20",
-      imageUrl: '/product-images/categories/_topic-home_repair.svg',
+      imageUrl: '/product-images/water_bacteria_test__coliform_e_coli_well_water_bacteria_test_kit.webp',
       productSpec: "Mail-in or 48-hour incubation kit for total coliform and E. coli detection. Useful as standalone bacteria test between full lab panels (annual full + every 6 months bacteria)."
     },
     tags: {
@@ -5426,7 +5426,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceLow: 12,
       priceHigh: 25,
       affiliateUrl: "https://www.amazon.com/s?k=refrigerator+water+filter+compatible+samsung+lg+whirlpool&tag=alderprojects-20",
-      imageUrl: '/product-images/categories/_topic-home_repair.svg',
+      imageUrl: '/product-images/generic_brand_fridge_filter_compatible_with_major_brands.webp',
       productSpec: "Aftermarket fridge filter compatible with Samsung, LG, Whirlpool, and other brand-specific filter housings. Carbon-based filtration. ~50% cost of OEM."
     },
     tags: {
@@ -5464,7 +5464,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceLow: 35,
       priceHigh: 65,
       affiliateUrl: "https://www.amazon.com/s?k=samsung+haf+cin+lg+lt700p+oem+refrigerator+filter&tag=alderprojects-20",
-      imageUrl: '/product-images/categories/_topic-home_repair.svg',
+      imageUrl: '/product-images/water_fridge_filter__oem_fridge_filter_samsung_haf_cin_lg_lt700p_etc.webp',
       productSpec: "Original-equipment filter from your refrigerator manufacturer. NSF-certified for the specific contaminants the filter is designed to remove. Tested fit with no leaks. 6-month replacement cycle."
     },
     tags: {
@@ -5502,7 +5502,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceLow: 25,
       priceHigh: 38,
       affiliateUrl: "https://www.amazon.com/s?k=brita+standard+10+cup+pitcher&tag=alderprojects-20",
-      imageUrl: '/product-images/categories/_topic-home_repair.svg',
+      imageUrl: '/product-images/water_drinking_filter__brita_standard_10_cup_pitcher_with_filter.webp',
       productSpec: "Brita pitcher with standard activated carbon filter. NSF certified for chlorine, taste, odor, mercury, copper, zinc. Does NOT remove lead, arsenic, or bacteria. 40-gallon filter life."
     },
     tags: {
@@ -5543,7 +5543,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceLow: 38,
       priceHigh: 65,
       affiliateUrl: "https://www.amazon.com/s?k=zerowater+10+cup+pitcher+tds+meter&tag=alderprojects-20",
-      imageUrl: '/product-images/categories/_topic-home_repair.svg',
+      imageUrl: '/product-images/water_drinking_filter__zerowater_10_cup_pitcher_with_tds_meter.webp',
       productSpec: "5-stage ion exchange + activated carbon. Certified to reduce lead, chromium, mercury, fluoride, plus all the items Brita addresses. TDS meter included shows when filter is exhausted. 20-30 gallon filter life (shorter than Brita due to deeper filtration)."
     },
     tags: {
@@ -5584,7 +5584,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceLow: 130,
       priceHigh: 195,
       affiliateUrl: "https://www.amazon.com/s?k=aquasana+aq+5300+under+sink+filter+3+stage&tag=alderprojects-20",
-      imageUrl: '/product-images/categories/_topic-home_repair.svg',
+      imageUrl: '/product-images/water_drinking_filter__aquasana_aq_5300_3_stage_under_sink_filter_system.webp',
       productSpec: "Under-sink installation with dedicated faucet. 3-stage filtration. NSF certified for 77 contaminants including lead, asbestos, chlorine, chloramines, and more. 600-gallon filter life. Installation requires basic plumbing."
     },
     tags: {
@@ -5663,7 +5663,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceLow: 10,
       priceHigh: 18,
       affiliateUrl: "https://www.amazon.com/s?k=hose+bib+water+pressure+gauge&tag=alderprojects-20",
-      imageUrl: '/product-images/categories/_topic-home_repair.svg',
+      imageUrl: '/product-images/water_pressure_gauge__hose_bib_mount_water_pressure_gauge_0_200_psi.webp',
       productSpec: "3/4\" garden-hose-thread fitting. 0-200 PSI dial gauge. Screw onto any hose bib for instant pressure read. Lasts 10+ years."
     },
     tags: {
@@ -5746,7 +5746,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceLow: 95,
       priceHigh: 145,
       affiliateUrl: "https://www.amazon.com/s?k=new+england+ropes+dock+line+5+8+inch+4+pack&tag=alderprojects-20",
-      imageUrl: '/product-images/categories/_topic-outdoor.svg',
+      imageUrl: '/product-images/dock_lines__new_england_ropes_5_8_double_braid_dock_lines_4_pack_25_ft.webp',
       productSpec: "5/8\" diameter premium-grade marine rope. 25 ft length with eye-spliced loops. 4-pack covers a typical boat (bow, stern, two springs). New England Ropes is the marine industry standard. Resists UV, mildew, and stretching."
     },
     tags: {
@@ -5790,7 +5790,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceLow: 220,
       priceHigh: 380,
       affiliateUrl: "https://www.amazon.com/s?k=yale+cordage+sterling+lite+dock+line&tag=alderprojects-20",
-      imageUrl: '/product-images/categories/_topic-outdoor.svg',
+      imageUrl: '/product-images/dock_lines__yale_cordage_sterling_lite_high_modulus_dock_line_set.webp',
       productSpec: "Pro-grade marine cordage. Dyneema-core for minimum stretch. Used on commercial boats and racing yachts. ~5x cost of standard nylon for ~3x the lifespan plus precise mooring."
     },
     tags: {
@@ -5878,7 +5878,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceLow: 80,
       priceHigh: 145,
       affiliateUrl: "https://www.amazon.com/s?k=taylor+made+hull+bumper+dock&tag=alderprojects-20",
-      imageUrl: '/product-images/categories/_topic-outdoor.svg',
+      imageUrl: '/product-images/dock_bumpers__taylor_made_hull_bumper_dock_bumper_combo.webp',
       productSpec: "Marine-grade closed-cell vinyl. UV-stable. 6\"-8\" diameter sizes available. Mounts on boat or dock. Lasts 8-10 years in normal use. Taylor Made is the marine standard."
     },
     tags: {
@@ -5922,7 +5922,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceLow: 200,
       priceHigh: 320,
       affiliateUrl: "https://www.amazon.com/s?k=polyform+g+series+fender+set&tag=alderprojects-20",
-      imageUrl: '/product-images/categories/_topic-outdoor.svg',
+      imageUrl: '/product-images/dock_bumpers__polyform_g_series_fender_set_with_line_bag.webp',
       productSpec: "Premium marine fenders. Highly UV-resistant. Inflatable for storage. Used on commercial and high-end recreational boats."
     },
     tags: {
@@ -6052,7 +6052,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceLow: 95,
       priceHigh: 165,
       affiliateUrl: "https://www.amazon.com/s?k=dock+edge+led+rope+lighting+50+ft&tag=alderprojects-20",
-      imageUrl: '/product-images/categories/_topic-outdoor.svg',
+      imageUrl: '/product-images/dock_lighting__dock_edge_led_rope_lighting_kit_low_voltage_50_ft.webp',
       productSpec: "Low-voltage 12V LED rope. 50 ft length. Marine-rated waterproof connectors. Plug-in transformer. Dusk-to-dawn timer included. 5-7 year life. Dock Edge is the marine industry standard for residential dock lighting."
     },
     tags: {
@@ -6095,7 +6095,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceLow: 280,
       priceHigh: 480,
       affiliateUrl: "https://www.amazon.com/s?k=hardwired+marine+led+dock+lights+motion+sensor&tag=alderprojects-20",
-      imageUrl: '/product-images/categories/_topic-outdoor.svg',
+      imageUrl: '/product-images/dock_lighting__hardwired_marine_led_dock_lights_with_motion_sensor.webp',
       productSpec: "Hardwired (requires electrician), motion-activated marine LED fixtures. Used on commercial docks. ~10-year service life."
     },
     tags: {
@@ -6182,7 +6182,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceLow: 185,
       priceHigh: 270,
       affiliateUrl: "https://www.amazon.com/s?k=jif+marine+5+step+heavy+duty+dock+ladder&tag=alderprojects-20",
-      imageUrl: '/product-images/categories/dock_ladder.svg',
+      imageUrl: '/product-images/dock_ladder__jif_marine_5_step_heavy_duty_ladder_with_poly_steps.webp',
       productSpec: "Welded aluminum frame, polyethylene steps (warmer underfoot than aluminum), 350 lb capacity, 5-step depth handles deeper water. Lifetime warranty on frame. JIF Marine is the marine industry standard."
     },
     tags: {
@@ -6226,7 +6226,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceLow: 450,
       priceHigh: 800,
       affiliateUrl: "https://www.amazon.com/s?k=stainless+steel+dock+ladder+custom+grab+handle&tag=alderprojects-20",
-      imageUrl: '/product-images/categories/dock_ladder.svg',
+      imageUrl: '/product-images/dock_ladder__custom_welded_stainless_steel_ladder_with_grab_handles.webp',
       productSpec: "Custom-fabricated marine stainless. Premium aesthetic and lifespan. 30+ year service life."
     },
     tags: {
@@ -6314,7 +6314,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceLow: 65,
       priceHigh: 110,
       affiliateUrl: "https://www.amazon.com/s?k=suncast+50+gallon+resin+deck+box&tag=alderprojects-20",
-      imageUrl: '/product-images/categories/_topic-outdoor.svg',
+      imageUrl: '/product-images/dock_storage_bin__suncast_50_gallon_resin_deck_box.webp',
       productSpec: "50-gallon capacity. Resin construction, weather-resistant. Lockable lid. ~$80. Adequate for life jackets, fishing tackle, dock essentials."
     },
     tags: {
@@ -6356,7 +6356,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceLow: 145,
       priceHigh: 220,
       affiliateUrl: "https://www.amazon.com/s?k=suncast+73+gallon+resin+storage+bench&tag=alderprojects-20",
-      imageUrl: '/product-images/categories/_topic-outdoor.svg',
+      imageUrl: '/product-images/dock_storage_bin__suncast_73_gallon_premium_resin_storage_bench_with_seating.webp',
       productSpec: "73-gallon capacity. Doubles as bench seating (350 lb capacity). Resin construction with darker UV-resistant pigment. Lockable. Holds 4 life jackets, 2 paddles, fishing gear, dock cleaner, tools. ~$170."
     },
     tags: {
@@ -6398,7 +6398,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceLow: 32,
       priceHigh: 55,
       affiliateUrl: "https://www.amazon.com/s?k=marine+anti+slip+tape+4+inch+60+ft&tag=alderprojects-20",
-      imageUrl: '/product-images/categories/_topic-outdoor.svg',
+      imageUrl: '/product-images/dock_non_slip_strips__marine_grade_anti_slip_tape_4_inch_x_60_ft.webp',
       productSpec: "Same product family as outdoor_deck_refresh stair grip — universe entry reused via additive tag merge. Marine-rated extra-coarse grit. 60 ft covers full dock plus stairs."
     },
     tags: {
@@ -6441,7 +6441,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceLow: 25,
       priceHigh: 45,
       affiliateUrl: "https://www.amazon.com/s?k=first+alert+home1+1A10BC+fire+extinguisher&tag=alderprojects-20",
-      imageUrl: '/product-images/categories/fire_extinguisher.svg',
+      imageUrl: '/product-images/safety_fire_extinguisher__first_alert_home1_1_a_10_b_c_compliance_extinguisher.webp',
       productSpec: "Compliance-grade rechargeable fire extinguisher. UL rated 1-A:10-B:C. Meets minimum residential code. Single point in single location only."
     },
     tags: {
@@ -6482,7 +6482,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceHigh: 85,
       amazonAsin: "B000M2QR8U",
       affiliateUrl: "https://www.amazon.com/dp/B000M2QR8U?tag=alderprojects-20",
-      imageUrl: '/product-images/categories/fire_extinguisher.svg',
+      imageUrl: '/product-images/safety_fire_extinguisher__first_alert_pro5_heavy_duty_plus_3_a_40_b_c_single.webp',
       productSpec: "UL rated 3-A:40-B:C — exceeds minimum residential code. Heavy-duty all-metal construction with commercial-grade valve. Mounting bracket included. Color-coded gauge. Rechargeable by certified professionals after use. First Alert is the trusted home-safety brand."
     },
     tags: {
@@ -6522,7 +6522,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceLow: 145,
       priceHigh: 220,
       affiliateUrl: "https://www.amazon.com/s?k=amerex+b500+5+lb+abc+dry+chemical+fire+extinguisher+2+pack&tag=alderprojects-20",
-      imageUrl: '/product-images/categories/fire_extinguisher.svg',
+      imageUrl: '/product-images/safety_fire_extinguisher__amerex_b500_5_lb_abc_dry_chemical_fire_extinguisher_2_pack.webp',
       productSpec: "Pro-grade. UL rated 2-A:10-B:C. 5-lb dry chemical capacity, 12-18 ft range, 14-second discharge. Made in USA. Used by fire departments. 2-pack covers two zones (kitchen + garage typical)."
     },
     tags: {
@@ -6562,7 +6562,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceLow: 25,
       priceHigh: 40,
       affiliateUrl: "https://www.amazon.com/s?k=first+alert+sco5cn+battery+smoke+carbon+monoxide&tag=alderprojects-20",
-      imageUrl: '/product-images/categories/_topic-home_repair.svg',
+      imageUrl: '/product-images/safety_smoke_co_detector__first_alert_sco5cn_battery_powered_smoke_co_detector_single.webp',
       productSpec: "Battery-powered (2 AA). Ionization smoke + electrochemical CO sensors. ~$30. Replace battery annually, replace unit every 5-7 years. Single zone."
     },
     tags: {
@@ -6604,7 +6604,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceLow: 75,
       priceHigh: 120,
       affiliateUrl: "https://www.amazon.com/s?k=first+alert+10+year+sealed+battery+smoke+carbon+monoxide+3+pack&tag=alderprojects-20",
-      imageUrl: '/product-images/categories/_topic-home_repair.svg',
+      imageUrl: '/product-images/safety_smoke_co_detector__first_alert_10_year_sealed_battery_smoke_co_detectors_3_pack.webp',
       productSpec: "Sealed 10-year lithium battery (no replacement needed). Smoke + CO combo. 3-pack covers most homes (one per floor + bedroom area). Replace entire unit at year 10. Industry shift to sealed-battery is the right call for absentee homes — no mid-winter dead battery chirps."
     },
     tags: {
@@ -6646,7 +6646,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceLow: 280,
       priceHigh: 380,
       affiliateUrl: "https://www.amazon.com/s?k=google+nest+protect+smoke+carbon+monoxide+3+pack&tag=alderprojects-20",
-      imageUrl: '/product-images/categories/_topic-home_repair.svg',
+      imageUrl: '/product-images/safety_smoke_co_detector__google_nest_protect_smart_smoke_co_detector_3_pack.webp',
       productSpec: "WiFi connected. Phone alerts when alarm triggers. Self-test every 200 seconds. ~10-year service life. Voice alerts (which room is on fire). Best for absentee homes where remote alerts matter."
     },
     tags: {
@@ -6727,7 +6727,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceLow: 45,
       priceHigh: 75,
       affiliateUrl: "https://www.amazon.com/s?k=first+aid+only+osha+250+piece+50+person&tag=alderprojects-20",
-      imageUrl: '/product-images/categories/first_aid_kit.svg',
+      imageUrl: '/product-images/safety_first_aid_kit__first_aid_only_osha_compliant_250_piece_kit_50_person.webp',
       productSpec: "OSHA-compliant. 250+ pieces. ANSI standard supplies (real gauze, real bandage variety, eye wash, burn cream, CPR mask). First Aid Only is the workplace-safety standard. 50-person kit is right-sized for a household + guests."
     },
     tags: {
@@ -6766,7 +6766,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceLow: 130,
       priceHigh: 220,
       affiliateUrl: "https://www.amazon.com/s?k=my+medic+the+medic+emergency+first+aid+kit&tag=alderprojects-20",
-      imageUrl: '/product-images/categories/first_aid_kit.svg',
+      imageUrl: '/product-images/safety_first_aid_kit__my_medic_the_medic_emergency_kit.webp',
       productSpec: "Modular emergency kit with trauma supplies (tourniquet, hemostatic gauze, chest seal). Includes EMT-grade items for serious injury response. Used by outdoor/wilderness families. Worth it for remote properties where EMS response is 30+ minutes."
     },
     tags: {
@@ -6805,7 +6805,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceLow: 18,
       priceHigh: 32,
       affiliateUrl: "https://www.amazon.com/s?k=aaa+battery+led+flashlight+4+pack&tag=alderprojects-20",
-      imageUrl: '/product-images/categories/_topic-home_repair.svg',
+      imageUrl: '/product-images/safety_flashlight_lantern__aaa_battery_led_flashlight_4_pack.webp',
       productSpec: "4 AAA-battery LED flashlights. ~$25. Place one in each bedroom and one in kitchen. Battery-replaceable (carry spare AAA in safety kit)."
     },
     tags: {
@@ -6845,7 +6845,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceLow: 60,
       priceHigh: 95,
       affiliateUrl: "https://www.amazon.com/s?k=coast+led+flashlight+streamlight+lantern&tag=alderprojects-20",
-      imageUrl: '/product-images/categories/_topic-home_repair.svg',
+      imageUrl: '/product-images/safety_flashlight_lantern__coast_led_flashlight_2_pack_streamlight_led_lantern.webp',
       productSpec: "Coast HP1 LED flashlights (1 in bedroom, 1 in kitchen) + Streamlight Siege LED lantern for area lighting (3-mode: low/high/red). All battery-powered with replaceable batteries."
     },
     tags: {
@@ -6885,7 +6885,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceLow: 165,
       priceHigh: 280,
       affiliateUrl: "https://www.amazon.com/s?k=goal+zero+rechargeable+lantern+anker+headlamp&tag=alderprojects-20",
-      imageUrl: '/product-images/categories/_topic-home_repair.svg',
+      imageUrl: '/product-images/safety_flashlight_lantern__goal_zero_anker_rechargeable_lanterns_headlamps.webp',
       productSpec: "USB-rechargeable lanterns + headlamps. Solar-charge compatible. 50+ hour runtime. Used for camping, glamping. Worth the upgrade if you also use them for outdoor activities."
     },
     tags: {
@@ -6925,7 +6925,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceLow: 165,
       priceHigh: 240,
       affiliateUrl: "https://www.amazon.com/s?k=anker+521+powerhouse+256wh&tag=alderprojects-20",
-      imageUrl: '/product-images/categories/_topic-home_repair.svg',
+      imageUrl: '/product-images/safety_emergency_power__anker_521_powerhouse_256wh_portable_power_station.webp',
       productSpec: "256 Wh capacity. AC + USB outputs. Charges via wall outlet or solar panel. Adequate for charging phones, laptops, running CPAP for one night. ~$200."
     },
     tags: {
@@ -6965,7 +6965,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceLow: 580,
       priceHigh: 850,
       affiliateUrl: "https://www.amazon.com/s?k=jackery+explorer+1000+1002+wh&tag=alderprojects-20",
-      imageUrl: '/product-images/categories/_topic-home_repair.svg',
+      imageUrl: '/product-images/safety_emergency_power__jackery_explorer_1000_1002_wh.webp',
       productSpec: "1002 Wh capacity. Multiple AC outlets, USB-C, USB-A. Powers fridge for 12+ hours, runs CPAP for 2 nights, charges phones for a week. Solar input. Industry-standard for residential backup. Jackery is the verified mid-tier brand."
     },
     tags: {
@@ -7005,7 +7005,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceLow: 1400,
       priceHigh: 2200,
       affiliateUrl: "https://www.amazon.com/s?k=ecoflow+delta+2+max+2048wh&tag=alderprojects-20",
-      imageUrl: '/product-images/categories/_topic-home_repair.svg',
+      imageUrl: '/product-images/safety_emergency_power__ecoflow_delta_2_max_2048_wh_with_expansion_battery.webp',
       productSpec: "2048 Wh + expandable to 6kWh. Fast-charge via wall (30 min). Powers most home essentials (fridge, well pump, lighting) during multi-day outages. Premium tier."
     },
     tags: {
@@ -7045,7 +7045,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceLow: 12,
       priceHigh: 25,
       affiliateUrl: "https://www.amazon.com/s?k=document+holder+wall+mount+emergency+info&tag=alderprojects-20",
-      imageUrl: '/product-images/categories/_topic-home_repair.svg',
+      imageUrl: '/product-images/safety_emergency_docs__document_holder_printed_emergency_info_template.webp',
       productSpec: "Wall-mounted clear acrylic document holder ($8-15). Printable emergency info template: insurance contacts, plumber/electrician/septic pro contacts, utility shutoff diagram, neighbor with key, fire/police/EMS, water test results, well info."
     },
     tags: {
@@ -7164,7 +7164,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceLow: 18,
       priceHigh: 32,
       affiliateUrl: "https://www.amazon.com/s?k=engineering+graph+paper+architectural+scale+ruler&tag=alderprojects-20",
-      imageUrl: '/product-images/categories/_topic-universal.svg',
+      imageUrl: '/product-images/prep_graph_paper_kit__engineering_graph_paper_pad_architectural_scale_ruler.webp',
       productSpec: "8.5\"x11\" 1/4\" engineering graph paper pad (50+ sheets) + Mr. Pen architectural scale ruler ($8) + clipboard. ~$25 total. Sketch room layouts at scale (1 square = 1 ft)."
     },
     tags: {
@@ -7203,7 +7203,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceLow: 28,
       priceHigh: 42,
       affiliateUrl: "https://www.amazon.com/s?k=frogtape+multi+surface+1.41+inch+4+pack&tag=alderprojects-20",
-      imageUrl: '/product-images/categories/_topic-universal.svg',
+      imageUrl: '/product-images/prep_painters_tape__frogtape_1_41_multi_surface_4_pack_60_yd_each.webp',
       productSpec: "Green FrogTape multi-surface, 1.41\" wide, 60 yards per roll, 4-pack. PaintBlock technology prevents bleed-through. Multi-purpose: painting, marking layout on-site, labeling boxes, masking trim."
     },
     tags: {
@@ -7282,7 +7282,7 @@ export const UNIVERSE: UniverseProduct[] = [
       priceLow: 22,
       priceHigh: 38,
       affiliateUrl: "https://www.amazon.com/s?k=pre+primed+sample+boards+11x14+12+pack&tag=alderprojects-20",
-      imageUrl: '/product-images/categories/_topic-universal.svg',
+      imageUrl: '/product-images/prep_sample_boards__pre_primed_white_sample_boards_12_pack_11_x14.webp',
       productSpec: "Pre-primed plywood or hardboard sample boards. 11\"x14\". 12-pack. Use for testing paint colors, stain colors, sample finishes. Movable around the room to test in different lighting."
     },
     tags: {

@@ -1,0 +1,1453 @@
+[
+  {
+    "universeId": "ryqtop_bamboo_drawer_organizer",
+    "productName": "Ryqtop Bamboo Drawer Organizer",
+    "status": "no_url"
+  },
+  {
+    "universeId": "pipishell_bamboo_drawer_organizer",
+    "productName": "Pipishell Bamboo Drawer Organizer",
+    "status": "no_url"
+  },
+  {
+    "universeId": "container_store_bamboo_drawer_organizers",
+    "productName": "Container Store Bamboo Drawer Organizers",
+    "status": "no_image_found",
+    "source": "brand_hero",
+    "brand": "Container Store",
+    "pageUrl": "https://www.containerstore.com/s/kitchen/drawer-organizers",
+    "reason": "fetch failed or no og:image / schema image"
+  },
+  {
+    "universeId": "simple_houseware_pull_out_cabinet_sliding_basket",
+    "productName": "Simple Houseware Pull-Out Cabinet Sliding Basket",
+    "status": "no_url"
+  },
+  {
+    "universeId": "holdn_storage_pull_out_cabinet_organizer_14w_21d",
+    "productName": "HOLDN'STORAGE Pull-Out Cabinet Organizer 14W x 21D",
+    "status": "no_url"
+  },
+  {
+    "universeId": "rev_a_shelf_5wb2_2122cr_two_tier",
+    "productName": "Rev-A-Shelf 5WB2-2122CR-1 Two-Tier",
+    "status": "no_image_found",
+    "source": "brand_hero",
+    "brand": "Rev-A-Shelf",
+    "pageUrl": "https://www.revashelf.com/",
+    "reason": "fetch failed or no og:image / schema image"
+  },
+  {
+    "universeId": "diolove_plastic_3_tier_expandable_spice_organizer",
+    "productName": "DIOLOVE Plastic 3-Tier Expandable Spice Organizer",
+    "status": "no_url"
+  },
+  {
+    "universeId": "spaceaid_bamboo_spice_drawer_organizer",
+    "productName": "SpaceAid Bamboo Spice Drawer Organizer",
+    "status": "no_url"
+  },
+  {
+    "universeId": "kraftmaid_wooden_spice_drawer_insert_kit",
+    "productName": "KraftMaid Wooden Spice Drawer Insert Kit",
+    "status": "no_image_found",
+    "source": "brand_hero",
+    "brand": "KraftMaid",
+    "pageUrl": "https://www.kraftmaid.com/",
+    "reason": "fetch failed or no og:image / schema image"
+  },
+  {
+    "universeId": "expandable_2_tier_carbon_steel_under_sink_organizer",
+    "productName": "Expandable 2-Tier Carbon Steel Under-Sink Organizer (26.8 to 35.8 inches)",
+    "status": "no_url"
+  },
+  {
+    "universeId": "rev_a_shelf_custom_under_sink_pullout_kit",
+    "productName": "Rev-A-Shelf Custom Under-Sink Pullout Kit",
+    "status": "no_image_found",
+    "source": "brand_hero",
+    "brand": "Rev-A-Shelf",
+    "pageUrl": "https://www.revashelf.com/",
+    "reason": "fetch failed or no og:image / schema image"
+  },
+  {
+    "universeId": "everie_extendable_food_container_lid_organizer",
+    "productName": "EVERIE Extendable Food Container Lid Organizer",
+    "status": "no_url"
+  },
+  {
+    "universeId": "kitchen_bag_organizer__bamboo_plastic_bag_organizer_4_pack",
+    "productName": "Bamboo Plastic Bag Organizer (4-pack), drawer-mounted",
+    "status": "no_url"
+  },
+  {
+    "universeId": "rev_a_shelf_drawer_mounted_wrap_organizer",
+    "productName": "Rev-A-Shelf Drawer-Mounted Wrap Organizer",
+    "status": "no_image_found",
+    "source": "brand_hero",
+    "brand": "Rev-A-Shelf",
+    "pageUrl": "https://www.revashelf.com/",
+    "reason": "fetch failed or no og:image / schema image"
+  },
+  {
+    "universeId": "utoplike_bamboo_kitchen_drawer_dividers_4_pack",
+    "productName": "Utoplike Bamboo Kitchen Drawer Dividers (4-pack)",
+    "status": "no_url"
+  },
+  {
+    "universeId": "container_store_bamboo_drawer_dividers",
+    "productName": "Container Store Bamboo Drawer Dividers",
+    "status": "no_image_found",
+    "source": "brand_hero",
+    "brand": "Container Store",
+    "pageUrl": "https://www.containerstore.com/s/kitchen/drawer-organizers",
+    "reason": "fetch failed or no og:image / schema image"
+  },
+  {
+    "universeId": "kitchen_lazy_susan__generic_12_inch_plastic_lazy_susan_turntable",
+    "productName": "Generic 12 inch plastic lazy susan turntable",
+    "status": "no_url"
+  },
+  {
+    "universeId": "rev_a_shelf_5bbsc_dm18_cr_two_tier_18_inch",
+    "productName": "Rev-A-Shelf 5BBSC-DM18-CR-1 Two-Tier 18 inch",
+    "status": "no_image_found",
+    "source": "brand_hero",
+    "brand": "Rev-A-Shelf",
+    "pageUrl": "https://www.revashelf.com/",
+    "reason": "fetch failed or no og:image / schema image"
+  },
+  {
+    "universeId": "rev_a_shelf_kidney_corner_pullout_system",
+    "productName": "Rev-A-Shelf Kidney Corner Pullout System",
+    "status": "no_image_found",
+    "source": "brand_hero",
+    "brand": "Rev-A-Shelf",
+    "pageUrl": "https://www.revashelf.com/",
+    "reason": "fetch failed or no og:image / schema image"
+  },
+  {
+    "universeId": "kitchen_magnetic_spice__magnetic_spice_tin_set_range_hood_mount",
+    "productName": "Magnetic Spice Tin Set + Range Hood Mount",
+    "status": "no_url"
+  },
+  {
+    "universeId": "kitchen_drying_mat__roll_up_dish_drying_mat",
+    "productName": "Roll-Up Dish Drying Mat",
+    "status": "ok",
+    "source": "brand_hero",
+    "brand": "Roll-Up",
+    "pageUrl": "https://www.amazon.com/",
+    "imageUrl": "https://m.media-amazon.com/images/I/31epF-8N9LL.png",
+    "rawPath": "public/product-images/_raw/kitchen_drying_mat__roll_up_dish_drying_mat.png"
+  },
+  {
+    "universeId": "kitchen_fridge_bins__clear_fridge_bin_set_variety_pack",
+    "productName": "Clear Fridge Bin Set (variety pack)",
+    "status": "no_url"
+  },
+  {
+    "universeId": "liberty_hardware_bar_pulls_10_pack",
+    "productName": "Liberty Hardware Bar Pulls 10-pack (3-3/4\" or 5-1/16\" center)",
+    "status": "ok",
+    "source": "brand_hero",
+    "brand": "Liberty",
+    "pageUrl": "https://www.libertyhardware.com/",
+    "imageUrl": "http://www.libertyhardware.com/cdn/shop/files/logo_only.png?v=1753803448",
+    "rawPath": "public/product-images/_raw/liberty_hardware_bar_pulls_10_pack.png"
+  },
+  {
+    "universeId": "amerock_bar_pulls_5116_matte_black_10pk",
+    "productName": "Amerock Bar Pulls 5-1/16\" Matte Black 10-pack (10BX40517MB)",
+    "status": "no_image_found",
+    "source": "specific",
+    "pageUrl": "https://www.amerock.com/products/cabinet-hardware/cabinet-pulls/bar-pulls",
+    "reason": "fetch failed or no og:image / schema image"
+  },
+  {
+    "universeId": "top_knobs_amwell_bridgeport_bar_pulls",
+    "productName": "Top Knobs Amwell or Bridgeport bar pulls (single)",
+    "status": "no_image_found",
+    "source": "brand_hero",
+    "brand": "Top Knobs",
+    "pageUrl": "https://www.topknobs.com/",
+    "reason": "fetch failed or no og:image / schema image"
+  },
+  {
+    "universeId": "hardware_swap_knobs__generic_round_knobs_6pk",
+    "productName": "Generic round knobs 6-pack",
+    "status": "no_url"
+  },
+  {
+    "universeId": "liberty_harmon_round_cabinet_knobs",
+    "productName": "Liberty Harmon Round Cabinet Knobs (1.25\" diameter, finish-matched)",
+    "status": "ok",
+    "source": "brand_hero",
+    "brand": "Liberty",
+    "pageUrl": "https://www.libertyhardware.com/",
+    "imageUrl": "http://www.libertyhardware.com/cdn/shop/files/logo_only.png?v=1753803448",
+    "rawPath": "public/product-images/_raw/liberty_hardware_bar_pulls_10_pack.png"
+  },
+  {
+    "universeId": "top_knobs_aspen_collection_round_knobs",
+    "productName": "Top Knobs Aspen Collection round knobs",
+    "status": "no_image_found",
+    "source": "brand_hero",
+    "brand": "Top Knobs",
+    "pageUrl": "https://www.topknobs.com/",
+    "reason": "fetch failed or no og:image / schema image"
+  },
+  {
+    "universeId": "hardware_swap_screws__m4_machine_screws_assortment",
+    "productName": "M4 machine screws assortment, 3/4\" / 1\" / 1-1/4\" lengths",
+    "status": "no_url"
+  },
+  {
+    "universeId": "hardware_swap_jig__paper_template_tape_measure",
+    "productName": "Paper template + tape measure",
+    "status": "no_url"
+  },
+  {
+    "universeId": "kreg_khi_pull_cabinet_hardware_jig",
+    "productName": "Kreg KHI-PULL Cabinet Hardware Jig",
+    "status": "ok",
+    "source": "specific",
+    "pageUrl": "https://www.kregtool.com/shop/clamping-and-measuring/jigs-and-fixtures/cabinet-hardware-jig/KHI-PULL.html",
+    "imageUrl": "https://www.kregtool.com/dw/image/v2/BDZM_PRD/on/demandware.static/-/Sites-master-kreg/default/dw56f88d48/images/hi-res/KHI-PULL-01.jpg?sw=800&sh=800",
+    "rawPath": "public/product-images/_raw/kreg_khi_pull_cabinet_hardware_jig.jpg"
+  },
+  {
+    "universeId": "kreg_khi_xlpull_cabinet_hardware_jig_pro",
+    "productName": "Kreg KHI-XLPULL Cabinet Hardware Jig Pro",
+    "status": "ok",
+    "source": "specific",
+    "pageUrl": "https://www.kregtool.com/shop/clamping-and-measuring/jigs-and-fixtures/cabinet-hardware-jig/KHI-XLPULL.html",
+    "imageUrl": "https://www.kregtool.com/dw/image/v2/BDZM_PRD/on/demandware.static/-/Sites-master-kreg/default/dwb37c52a2/images/hi-res/KHI-XLPULL-01.jpg?sw=800&sh=800",
+    "rawPath": "public/product-images/_raw/kreg_khi_xlpull_cabinet_hardware_jig_pro.jpg"
+  },
+  {
+    "universeId": "hardware_swap_softclose_hinges__generic_concealed_hinge_soft_close_12pk",
+    "productName": "Generic concealed hinge with soft-close (12-pack)",
+    "status": "no_url"
+  },
+  {
+    "universeId": "blum_compact_soft_close_hinges_12pk",
+    "productName": "Blum Compact Soft-Close hinges (12-pack)",
+    "status": "ok",
+    "source": "brand_hero",
+    "brand": "Blum",
+    "pageUrl": "https://www.blum.com/",
+    "imageUrl": "https://www.blum.com/corporate/media/bilder/produkte/boxsysteme/merivobox/me210657_aa_fot_fo_bau_-sall_-amc_-v1_stageimagelarge.jpg?r=4211261",
+    "rawPath": "public/product-images/_raw/blum_compact_soft_close_hinges_12pk.jpg"
+  },
+  {
+    "universeId": "minwax_wood_putty",
+    "productName": "Minwax Wood Putty (color-matched to cabinet finish)",
+    "status": "no_url"
+  },
+  {
+    "universeId": "behr_alkyd_semi_gloss_enamel_gallon",
+    "productName": "Behr Alkyd Semi-Gloss Enamel (1 gallon)",
+    "status": "no_image_found",
+    "source": "brand_hero",
+    "brand": "Behr",
+    "pageUrl": "https://www.behr.com/consumer/products/paint/",
+    "reason": "fetch failed or no og:image / schema image"
+  },
+  {
+    "universeId": "inslx_cabinet_coat_acrylic_urethane_satin_gallon",
+    "productName": "INSL-X Cabinet Coat Acrylic Urethane Satin (1 gallon, white)",
+    "status": "no_image_found",
+    "source": "specific",
+    "pageUrl": "https://www.benjaminmoore.com/en-us/insl-x/cabinet-coat",
+    "reason": "fetch failed or no og:image / schema image"
+  },
+  {
+    "universeId": "benjamin_moore_advance_waterborne_alkyd_satin",
+    "productName": "Benjamin Moore Advance Waterborne Alkyd Satin (1 gallon)",
+    "status": "no_url"
+  },
+  {
+    "universeId": "kilz_adhesion_bonding_primer_gallon",
+    "productName": "KILZ Adhesion Bonding Primer (1 gallon)",
+    "status": "no_url"
+  },
+  {
+    "universeId": "inslx_stix_acrylic_waterborne_bonding_primer_gallon",
+    "productName": "INSL-X Stix Acrylic Waterborne Bonding Primer (1 gallon)",
+    "status": "no_image_found",
+    "source": "brand_hero",
+    "brand": "INSL-X",
+    "pageUrl": "https://www.benjaminmoore.com/en-us/insl-x",
+    "reason": "fetch failed or no og:image / schema image"
+  },
+  {
+    "universeId": "zinsser_bin_shellac_based_primer_gallon",
+    "productName": "Zinsser BIN Shellac-Based Primer (1 gallon)",
+    "status": "no_url"
+  },
+  {
+    "universeId": "blum_clip_top_blumotion_12pk",
+    "productName": "Blum Clip Top Blumotion (12-pack)",
+    "status": "ok",
+    "source": "brand_hero",
+    "brand": "Blum",
+    "pageUrl": "https://www.blum.com/",
+    "imageUrl": "https://www.blum.com/corporate/media/bilder/produkte/boxsysteme/merivobox/me210657_aa_fot_fo_bau_-sall_-amc_-v1_stageimagelarge.jpg?r=4211261",
+    "rawPath": "public/product-images/_raw/blum_compact_soft_close_hinges_12pk.jpg"
+  },
+  {
+    "universeId": "kitchen_undercabinet_lighting__generic_amazon_led_strip_kit_10ft",
+    "productName": "Generic Amazon LED strip kit (10ft, plug-in)",
+    "status": "no_url"
+  },
+  {
+    "universeId": "wobane_under_cabinet_lighting_kit_10ft",
+    "productName": "Wobane Under Cabinet LED Lighting Kit (10ft)",
+    "status": "no_url"
+  },
+  {
+    "universeId": "ge_direct_wire_led_bar_10ft",
+    "productName": "GE Direct Wire LED Bar (hardwired, 10ft)",
+    "status": "no_url"
+  },
+  {
+    "universeId": "dap_alex_plus_kitchen_caulk_kit",
+    "productName": "DAP Alex Plus Acrylic Latex + Silicone Caulk (white) + steel caulking gun",
+    "status": "no_url"
+  },
+  {
+    "universeId": "wooster_shortcut_painting_supplies_kit",
+    "productName": "Wooster 2.5\" Shortcut angled sash brush + 4\" foam roller + 9x12 canvas drop cloth + 220/320 sandpaper",
+    "status": "no_image_found",
+    "source": "brand_hero",
+    "brand": "Wooster",
+    "pageUrl": "https://www.woosterbrush.com/",
+    "reason": "fetch failed or no og:image / schema image"
+  },
+  {
+    "universeId": "kitchen_drawer_slides__side_mount_ball_bearing_slides_5pair",
+    "productName": "Side-mount ball-bearing slides (generic, 5-pair)",
+    "status": "no_url"
+  },
+  {
+    "universeId": "blum_tandem_plus_blumotion_21in_5pair",
+    "productName": "Blum Tandem Plus Blumotion 21\" full-extension slides (5-pair)",
+    "status": "ok",
+    "source": "brand_hero",
+    "brand": "Blum",
+    "pageUrl": "https://www.blum.com/",
+    "imageUrl": "https://www.blum.com/corporate/media/bilder/produkte/boxsysteme/merivobox/me210657_aa_fot_fo_bau_-sall_-amc_-v1_stageimagelarge.jpg?r=4211261",
+    "rawPath": "public/product-images/_raw/blum_compact_soft_close_hinges_12pk.jpg"
+  },
+  {
+    "universeId": "blum_movento_undermount_slides_5pair",
+    "productName": "Blum Movento undermount slides (5-pair)",
+    "status": "ok",
+    "source": "brand_hero",
+    "brand": "Blum",
+    "pageUrl": "https://www.blum.com/",
+    "imageUrl": "https://www.blum.com/corporate/media/bilder/produkte/boxsysteme/merivobox/me210657_aa_fot_fo_bau_-sall_-amc_-v1_stageimagelarge.jpg?r=4211261",
+    "rawPath": "public/product-images/_raw/blum_compact_soft_close_hinges_12pk.jpg"
+  },
+  {
+    "universeId": "lake_adirondack_chairs__generic_resin_plastic_adirondack_chair_set_of_4",
+    "productName": "Generic resin/plastic Adirondack chair (set of 4)",
+    "status": "no_url"
+  },
+  {
+    "universeId": "polywood_classic_folding_adirondack_chair",
+    "productName": "POLYWOOD Classic Folding Adirondack Chair (4-chair purchase, AD5030)",
+    "status": "no_image_found",
+    "source": "specific",
+    "pageUrl": "https://www.polywood.com/classic-folding-adirondack-chair.html",
+    "reason": "fetch failed or no og:image / schema image"
+  },
+  {
+    "universeId": "polywood_modern_adirondack_curveback",
+    "productName": "POLYWOOD Modern Adirondack or Nautical Curveback (4-chair, AD600 series)",
+    "status": "no_image_found",
+    "source": "specific",
+    "pageUrl": "https://www.polywood.com/modern-curveback-adirondack-chair.html",
+    "reason": "fetch failed or no og:image / schema image"
+  },
+  {
+    "universeId": "lake_side_tables__plastic_resin_side_table_16_round_pair",
+    "productName": "Plastic resin side table, 16\" round (pair)",
+    "status": "no_url"
+  },
+  {
+    "universeId": "polywood_classic_side_table_pair",
+    "productName": "POLYWOOD Classic Side Table (15\"x19\", pair)",
+    "status": "ok",
+    "source": "brand_hero",
+    "brand": "POLYWOOD",
+    "pageUrl": "https://www.polywood.com/",
+    "imageUrl": "http://www.polywood.com/cdn/shop/files/DefaultShareImage-1200x630_1.jpg?v=1737008579",
+    "rawPath": "public/product-images/_raw/polywood_classic_side_table_pair.jpg"
+  },
+  {
+    "universeId": "lake_side_tables__solid_teak_outdoor_side_tables_pair",
+    "productName": "Solid teak outdoor side tables (pair)",
+    "status": "no_url"
+  },
+  {
+    "universeId": "hampton_bay_cushionguard_cushions_set_4",
+    "productName": "Hampton Bay CushionGuard cushions (set of 4)",
+    "status": "no_url"
+  },
+  {
+    "universeId": "sunbrella_replacement_cushions_adirondack_set_4",
+    "productName": "Sunbrella replacement cushions for Adirondack (set of 4)",
+    "status": "no_image_found",
+    "source": "brand_hero",
+    "brand": "Sunbrella",
+    "pageUrl": "https://www.sunbrella.com/",
+    "reason": "fetch failed or no og:image / schema image"
+  },
+  {
+    "universeId": "frontgate_sunbrella_cushions_premium",
+    "productName": "Frontgate / Restoration Hardware custom Sunbrella cushions",
+    "status": "no_image_found",
+    "source": "brand_hero",
+    "brand": "Sunbrella",
+    "pageUrl": "https://www.sunbrella.com/",
+    "reason": "fetch failed or no og:image / schema image"
+  },
+  {
+    "universeId": "lake_umbrella__pole_and_base_9ft_umbrella_walmart_tier_polyester",
+    "productName": "Pole-and-base 9ft umbrella (Walmart-tier polyester)",
+    "status": "no_url"
+  },
+  {
+    "universeId": "lake_umbrella__cantilever_umbrella_10ft_sunbrella_200lb_base",
+    "productName": "10ft cantilever umbrella with Sunbrella canopy + 200lb base",
+    "status": "no_image_found",
+    "source": "brand_hero",
+    "brand": "Sunbrella",
+    "pageUrl": "https://www.sunbrella.com/",
+    "reason": "fetch failed or no og:image / schema image"
+  },
+  {
+    "universeId": "treasure_garden_cantilever_11ft",
+    "productName": "Treasure Garden Cantilever 11ft + Frankford-style 250lb base",
+    "status": "no_url"
+  },
+  {
+    "universeId": "lake_outdoor_rug__generic_polyester_outdoor_rug_8x10",
+    "productName": "Generic polyester outdoor rug (8x10)",
+    "status": "no_url"
+  },
+  {
+    "universeId": "lake_outdoor_rug__solution_dyed_polypropylene_outdoor_rug_8x10",
+    "productName": "Solution-dyed polypropylene outdoor rug, 8x10",
+    "status": "no_url"
+  },
+  {
+    "universeId": "lake_outdoor_rug__indoor_outdoor_woven_rug_jute_sisal_blend",
+    "productName": "Indoor-outdoor woven rug (jute, sisal blend)",
+    "status": "no_url"
+  },
+  {
+    "universeId": "char_broil_or_nexgrill_3_burner",
+    "productName": "Char-Broil or Nexgrill 3-burner gas grill",
+    "status": "no_url"
+  },
+  {
+    "universeId": "weber_spirit_ii_e310_3_burner_lp",
+    "productName": "Weber Spirit II E-310 3-Burner Liquid Propane Grill, Black",
+    "status": "ok",
+    "source": "specific",
+    "pageUrl": "https://www.weber.com/US/en/grills/gas-grills/spirit-ii-series/spirit-ii-e-310/45010001.html",
+    "imageUrl": "https://www.weber.com/on/demandware.static/-/Sites-storefront-catalog-us-sfra-new/default/dwa6523e19/FY26_NPD_Spirit_MegaMenu_Image_207x165.jpg",
+    "rawPath": "public/product-images/_raw/weber_spirit_ii_e310_3_burner_lp.jpg"
+  },
+  {
+    "universeId": "weber_genesis_e325",
+    "productName": "Weber Genesis E-325 or higher (4-burner)",
+    "status": "no_image_found",
+    "source": "brand_hero",
+    "brand": "Weber",
+    "pageUrl": "https://www.weber.com/US/en/",
+    "reason": "fetch failed or no og:image / schema image"
+  },
+  {
+    "universeId": "lake_grill_cover__generic_universal_fit_grill_cover",
+    "productName": "Generic universal-fit grill cover",
+    "status": "no_url"
+  },
+  {
+    "universeId": "weber_premium_grill_cover_spirit",
+    "productName": "Weber Premium Outdoor Grill Cover (Spirit Series fit)",
+    "status": "no_image_found",
+    "source": "brand_hero",
+    "brand": "Weber",
+    "pageUrl": "https://www.weber.com/US/en/",
+    "reason": "fetch failed or no og:image / schema image"
+  },
+  {
+    "universeId": "lake_grill_cover__marine_grade_premium_grill_cover",
+    "productName": "\"Marine-grade\" premium grill cover",
+    "status": "no_url"
+  },
+  {
+    "universeId": "weber_grill_tools_3pc",
+    "productName": "Weber 3-piece grilling tool set (spatula, tongs, fork)",
+    "status": "no_image_found",
+    "source": "brand_hero",
+    "brand": "Weber",
+    "pageUrl": "https://www.weber.com/US/en/",
+    "reason": "fetch failed or no og:image / schema image"
+  },
+  {
+    "universeId": "walmart_string_lights_50ft",
+    "productName": "Walmart-tier string lights (50ft)",
+    "status": "no_url"
+  },
+  {
+    "universeId": "brightech_ambience_pro_led_string_lights_48ft",
+    "productName": "Brightech Ambience Pro LED outdoor string lights (48ft)",
+    "status": "no_url"
+  },
+  {
+    "universeId": "pottery_barn_west_elm_cafe_string_lights",
+    "productName": "Pottery Barn / West Elm \"café lights\"",
+    "status": "no_image_found",
+    "source": "brand_hero",
+    "brand": "Pottery Barn",
+    "pageUrl": "https://www.potterybarn.com/",
+    "reason": "fetch failed or no og:image / schema image"
+  },
+  {
+    "universeId": "coleman_xtreme_5day_70qt",
+    "productName": "Coleman Xtreme 5-day 70qt",
+    "status": "no_url"
+  },
+  {
+    "universeId": "rtic_65_hard_cooler",
+    "productName": "RTIC 65 Hard Cooler",
+    "status": "no_url"
+  },
+  {
+    "universeId": "yeti_tundra_65",
+    "productName": "Yeti Tundra 65",
+    "status": "no_url"
+  },
+  {
+    "universeId": "lake_floats_essentials__inflatable_lake_floats_3pk_drink_holders_4pk",
+    "productName": "Inflatable lake floats (3-pack) + floating drink holders (4-pack)",
+    "status": "no_url"
+  },
+  {
+    "universeId": "lake_bug_control__citronella_candles_spray_repellent",
+    "productName": "Citronella candles + spray repellent",
+    "status": "no_url"
+  },
+  {
+    "universeId": "thermacell_mr300",
+    "productName": "Thermacell MR300 Mosquito Repellent + replacement mats/butane",
+    "status": "ok",
+    "source": "brand_hero",
+    "brand": "Thermacell",
+    "pageUrl": "https://www.thermacell.com/",
+    "imageUrl": "https://optimise2.assets-servd.host/no-moz/production/general/Logos/THERMACELL-logo2026_2026-03-04-154554_wjdu.png?w=1200&h=630&q=82&auto=format&fit=crop&dm=1772639173&s=27a2d15171b15efbca02bd5f8008d4cc",
+    "rawPath": "public/product-images/_raw/thermacell_mr300.png"
+  },
+  {
+    "universeId": "thermacell_patio_shield_rechargeable",
+    "productName": "Thermacell Patio Shield rechargeable or full mosquito system",
+    "status": "ok",
+    "source": "brand_hero",
+    "brand": "Thermacell",
+    "pageUrl": "https://www.thermacell.com/",
+    "imageUrl": "https://optimise2.assets-servd.host/no-moz/production/general/Logos/THERMACELL-logo2026_2026-03-04-154554_wjdu.png?w=1200&h=630&q=82&auto=format&fit=crop&dm=1772639173&s=27a2d15171b15efbca02bd5f8008d4cc",
+    "rawPath": "public/product-images/_raw/thermacell_mr300.png"
+  },
+  {
+    "universeId": "generic_oxalic_acid_wood_deck_cleaner_1_gallon",
+    "productName": "Generic oxalic acid wood deck cleaner (1 gallon)",
+    "status": "no_url"
+  },
+  {
+    "universeId": "cabot_wood_brightener_1_gallon",
+    "productName": "Cabot Wood Brightener (1 gallon)",
+    "status": "image_fetch_failed",
+    "source": "brand_hero",
+    "brand": "Cabot",
+    "pageUrl": "https://www.cabotstain.com/",
+    "imageUrl": "https://www.cabotstain.com/content/dam/cbg-cabot/favicons/favicon.png"
+  },
+  {
+    "universeId": "restore_a_deck_two_step_cleaner_brightener_kit",
+    "productName": "Restore-A-Deck two-step cleaner + brightener kit",
+    "status": "no_url"
+  },
+  {
+    "universeId": "quickie_18_deck_scrub_brush_with_telescoping_handle",
+    "productName": "Quickie 18\" deck scrub brush with telescoping handle",
+    "status": "no_url"
+  },
+  {
+    "universeId": "generic_pin_type_moisture_meter",
+    "productName": "Generic pin-type moisture meter",
+    "status": "no_url"
+  },
+  {
+    "universeId": "general_tools_mmd4e_pin_and_pinless_moisture_meter",
+    "productName": "General Tools MMD4E pin-and-pinless moisture meter",
+    "status": "no_url"
+  },
+  {
+    "universeId": "behr_premium_semi_transparent_weatherproofing_stain_5_gallon",
+    "productName": "Behr Premium Semi-Transparent Weatherproofing Stain (5 gallon)",
+    "status": "no_image_found",
+    "source": "brand_hero",
+    "brand": "Behr",
+    "pageUrl": "https://www.behr.com/consumer/products/paint/",
+    "reason": "fetch failed or no og:image / schema image"
+  },
+  {
+    "universeId": "cabot_australian_timber_oil_1_gallon",
+    "productName": "Cabot Australian Timber Oil (1 gallon)",
+    "status": "no_image_found",
+    "source": "specific",
+    "pageUrl": "https://www.cabotstain.com/products/australian-timber-oil",
+    "reason": "fetch failed or no og:image / schema image"
+  },
+  {
+    "universeId": "sherwin_williams_superdeck_solid_color_5_gallon",
+    "productName": "Sherwin-Williams SuperDeck Solid Color (5 gallon)",
+    "status": "no_url"
+  },
+  {
+    "universeId": "deckmate_or_grk_exterior_deck_screws_2_5_3_5_1_lb",
+    "productName": "Deckmate or GRK exterior deck screws, 2.5\"-3.5\", 1 lb",
+    "status": "no_url"
+  },
+  {
+    "universeId": "deck_stair_grip__heavy_duty_anti_slip_black_tape_4_inch_x_30_ft",
+    "productName": "Heavy-duty anti-slip black tape (4 inch x 30 ft)",
+    "status": "no_url"
+  },
+  {
+    "universeId": "home_depot_rental_2_500_psi_gas_pressure_washer_4_hour",
+    "productName": "Home Depot rental: 2,500 PSI gas pressure washer (4-hour)",
+    "status": "no_url"
+  },
+  {
+    "universeId": "sun_joe_spx3000_electric_pressure_washer_2_030_psi",
+    "productName": "Sun Joe SPX3000 electric pressure washer (2,030 PSI)",
+    "status": "ok",
+    "source": "brand_hero",
+    "brand": "Sun Joe",
+    "pageUrl": "https://www.snowjoe.com/",
+    "imageUrl": "http://shopjoe.com/cdn/shop/files/S_Logo_Chrome_1200_x_628_px_76733ee8-c8d7-4f0a-872b-cc9597d73038.jpg?v=1713797305",
+    "rawPath": "public/product-images/_raw/sun_joe_spx3000_electric_pressure_washer_2_030_psi.jpg"
+  },
+  {
+    "universeId": "generac_speedwash_3_200_psi_gas_pressure_washer",
+    "productName": "Generac SpeedWash 3,200 PSI gas pressure washer",
+    "status": "no_url"
+  },
+  {
+    "universeId": "deck_board_repair__cat_s_paw_nail_puller_multi_tool_blade_spare_deck_boards",
+    "productName": "Cat's paw (nail puller) + multi-tool blade + spare deck boards",
+    "status": "no_url"
+  },
+  {
+    "universeId": "watersafe_all_in_one_basic_test_strips",
+    "productName": "Watersafe All-in-One basic test strips",
+    "status": "no_url"
+  },
+  {
+    "universeId": "tap_score_by_simplelab_essential_well_water_mail_in_lab_test",
+    "productName": "Tap Score by SimpleLab — Essential Well Water mail-in lab test",
+    "status": "no_url"
+  },
+  {
+    "universeId": "tap_score_advanced_well_water_test_95_analytes",
+    "productName": "Tap Score Advanced Well Water test (95+ analytes)",
+    "status": "no_url"
+  },
+  {
+    "universeId": "opening_leak_check__pressure_gauge_dye_tablets_paper_towels_kit",
+    "productName": "Pressure gauge + dye tablets + paper towels kit",
+    "status": "no_url"
+  },
+  {
+    "universeId": "generic_10_sediment_filter_5_micron_single",
+    "productName": "Generic 10\" sediment filter (5-micron, single)",
+    "status": "no_url"
+  },
+  {
+    "universeId": "pentek_10_sediment_carbon_block_2_pack",
+    "productName": "Pentek 10\" sediment + carbon block 2-pack",
+    "status": "no_image_found",
+    "source": "brand_hero",
+    "brand": "Pentek",
+    "pageUrl": "https://www.pentairhome.com/",
+    "reason": "fetch failed or no og:image / schema image"
+  },
+  {
+    "universeId": "big_blue_4_5_x_20_filter_housing_premium_media",
+    "productName": "Big Blue 4.5\" x 20\" filter housing + premium media",
+    "status": "no_url"
+  },
+  {
+    "universeId": "opening_cleaning_kit__basic_cleaning_consumables_lysol_mr_clean_comet_sponges",
+    "productName": "Basic cleaning consumables (Lysol, Mr Clean, Comet, sponges)",
+    "status": "no_url"
+  },
+  {
+    "universeId": "method_tier_cleaning_kit_microfiber_mrs_meyer_s_bleach",
+    "productName": "Method-tier cleaning kit + microfiber + Mrs. Meyer's + bleach",
+    "status": "no_url"
+  },
+  {
+    "universeId": "generic_30_pint_dehumidifier",
+    "productName": "Generic 30-pint dehumidifier",
+    "status": "no_url"
+  },
+  {
+    "universeId": "homelabs_50_pint_dehumidifier_with_continuous_drain",
+    "productName": "hOmeLabs 50-pint dehumidifier with continuous drain",
+    "status": "no_url"
+  },
+  {
+    "universeId": "aprilaire_whole_house_dehumidifier_1850_1830",
+    "productName": "Aprilaire whole-house dehumidifier (1850, 1830)",
+    "status": "no_url"
+  },
+  {
+    "universeId": "sterilite_27_quart_latching_tote_label_maker_labels",
+    "productName": "Sterilite 27-quart latching tote + label maker labels",
+    "status": "image_fetch_failed",
+    "source": "brand_hero",
+    "brand": "Sterilite",
+    "pageUrl": "https://www.sterilite.com/",
+    "imageUrl": "https://www.sterilite.com/images/logo.png"
+  },
+  {
+    "universeId": "opening_consumables__aa_aaa_battery_24_pack_6_led_bulbs_lighter_duct_tape",
+    "productName": "AA/AAA battery 24-pack + 6 LED bulbs + lighter + duct tape",
+    "status": "no_url"
+  },
+  {
+    "universeId": "opening_shutoff_labels__adhesive_shutoff_valve_identification_labels",
+    "productName": "Adhesive shutoff valve identification labels",
+    "status": "no_url"
+  },
+  {
+    "universeId": "govee_water_leak_detector_5_pack_audible_only_no_wifi",
+    "productName": "Govee Water Leak Detector 5-Pack (audible only, no WiFi)",
+    "status": "no_image_found",
+    "source": "specific",
+    "pageUrl": "https://us.govee.com/products/water-leak-detector-5-pack",
+    "reason": "fetch failed or no og:image / schema image"
+  },
+  {
+    "universeId": "govee_wifi_water_leak_detector_3_pack_with_gateway_h5054",
+    "productName": "Govee WiFi Water Leak Detector 3-Pack with Gateway (H5054)",
+    "status": "no_image_found",
+    "source": "specific",
+    "pageUrl": "https://us.govee.com/products/govee-wifi-water-leak-detector-h5054",
+    "reason": "fetch failed or no og:image / schema image"
+  },
+  {
+    "universeId": "yolink_water_leak_starter_kit_hub_2_leak_sensor_4",
+    "productName": "YoLink Water Leak Starter Kit (Hub + 2 Leak Sensor 4)",
+    "status": "no_image_found",
+    "source": "specific",
+    "pageUrl": "https://www.yosmart.com/products/Water-Leak-Sensor-Starter-Kit",
+    "reason": "fetch failed or no og:image / schema image"
+  },
+  {
+    "universeId": "frost_king_1_2_copper_foam_pipe_insulation_6_ft_single",
+    "productName": "Frost King 1/2\" copper foam pipe insulation, 6 ft (single)",
+    "status": "no_image_found",
+    "source": "specific",
+    "pageUrl": "https://www.frostking.com/product/foam-pipe-insulation-tube/",
+    "reason": "fetch failed or no og:image / schema image"
+  },
+  {
+    "universeId": "frost_king_3_4_copper_foam_pipe_insulation_3_ft_4_pack",
+    "productName": "Frost King 3/4\" copper foam pipe insulation, 3 ft 4-pack",
+    "status": "no_image_found",
+    "source": "specific",
+    "pageUrl": "https://www.frostking.com/product/foam-pipe-insulation-tube/",
+    "reason": "fetch failed or no og:image / schema image"
+  },
+  {
+    "universeId": "frost_king_1_rubber_tubular_pipe_insulation_6_ft",
+    "productName": "Frost King 1\" rubber tubular pipe insulation, 6 ft",
+    "status": "no_image_found",
+    "source": "specific",
+    "pageUrl": "https://www.frostking.com/product/rubber-tubular-pipe-insulation/",
+    "reason": "fetch failed or no og:image / schema image"
+  },
+  {
+    "universeId": "generic_constant_wattage_heat_cable_6_ft",
+    "productName": "Generic constant-wattage heat cable, 6 ft",
+    "status": "no_url"
+  },
+  {
+    "universeId": "frost_king_6_ft_self_regulating_heat_cable_with_built_in_thermos",
+    "productName": "Frost King 6 ft self-regulating heat cable with built-in thermostat",
+    "status": "ok",
+    "source": "brand_hero",
+    "brand": "Frost King",
+    "pageUrl": "https://www.frostking.com/",
+    "imageUrl": "https://www.frostking.com/images/frost-king_og-image2.png",
+    "rawPath": "public/product-images/_raw/frost_king_6_ft_self_regulating_heat_cable_with_built_in_thermos.png"
+  },
+  {
+    "universeId": "easyheat_or_pentair_self_regulating_heat_cable_kit_with_insulati",
+    "productName": "EasyHeat or Pentair self-regulating heat cable kit with insulation",
+    "status": "no_url"
+  },
+  {
+    "universeId": "honeywell_home_programmable_thermostat_non_smart",
+    "productName": "Honeywell Home Programmable Thermostat (non-smart)",
+    "status": "ok",
+    "source": "brand_hero",
+    "brand": "Honeywell",
+    "pageUrl": "https://www.honeywellhome.com/",
+    "imageUrl": "http://www.honeywellhome.com/cdn/shop/files/T6_Living_Room_Wide_72.jpg?crop=center&height=1200&v=1757600586&width=1200",
+    "rawPath": "public/product-images/_raw/honeywell_home_programmable_thermostat_non_smart.jpg"
+  },
+  {
+    "universeId": "honeywell_home_t9_smart_thermostat_with_wifi",
+    "productName": "Honeywell Home T9 Smart Thermostat with WiFi",
+    "status": "ok",
+    "source": "brand_hero",
+    "brand": "Honeywell",
+    "pageUrl": "https://www.honeywellhome.com/",
+    "imageUrl": "http://www.honeywellhome.com/cdn/shop/files/T6_Living_Room_Wide_72.jpg?crop=center&height=1200&v=1757600586&width=1200",
+    "rawPath": "public/product-images/_raw/honeywell_home_programmable_thermostat_non_smart.jpg"
+  },
+  {
+    "universeId": "ecobee_smart_thermostat_premium_with_sensors",
+    "productName": "Ecobee Smart Thermostat Premium with sensors",
+    "status": "no_url"
+  },
+  {
+    "universeId": "foam_hose_bib_cover_single",
+    "productName": "Foam hose bib cover (single)",
+    "status": "no_url"
+  },
+  {
+    "universeId": "frost_king_insulated_thermal_hose_bib_cover_2_pack",
+    "productName": "Frost King insulated thermal hose bib cover (2-pack)",
+    "status": "ok",
+    "source": "brand_hero",
+    "brand": "Frost King",
+    "pageUrl": "https://www.frostking.com/",
+    "imageUrl": "https://www.frostking.com/images/frost-king_og-image2.png",
+    "rawPath": "public/product-images/_raw/frost_king_6_ft_self_regulating_heat_cable_with_built_in_thermos.png"
+  },
+  {
+    "universeId": "freeze_hose_bib_cover__frost_proof_outdoor_faucet_replacement_sillcock_12",
+    "productName": "Frost-proof outdoor faucet replacement (sillcock, 12\")",
+    "status": "no_url"
+  },
+  {
+    "universeId": "generic_foam_weatherstripping_tape_17_ft",
+    "productName": "Generic foam weatherstripping tape, 17 ft",
+    "status": "no_url"
+  },
+  {
+    "universeId": "frost_king_v_strip_door_sweep_draft_stoppers_kit",
+    "productName": "Frost King V-strip + door sweep + draft stoppers kit",
+    "status": "ok",
+    "source": "brand_hero",
+    "brand": "Frost King",
+    "pageUrl": "https://www.frostking.com/",
+    "imageUrl": "https://www.frostking.com/images/frost-king_og-image2.png",
+    "rawPath": "public/product-images/_raw/frost_king_6_ft_self_regulating_heat_cable_with_built_in_thermos.png"
+  },
+  {
+    "universeId": "freeze_draft_sealing__door_silicone_bulb_weatherstripping_storm_windows_assessment",
+    "productName": "Door silicone bulb weatherstripping + storm windows assessment",
+    "status": "no_url"
+  },
+  {
+    "universeId": "freeze_shutoff_labels__adhesive_shutoff_valve_identification_labels_assortment",
+    "productName": "Adhesive shutoff valve identification labels (assortment)",
+    "status": "no_url"
+  },
+  {
+    "universeId": "moen_flo_smart_water_shutoff_3_4",
+    "productName": "Moen Flo Smart Water Shutoff (3/4\")",
+    "status": "no_url"
+  },
+  {
+    "universeId": "yolink_smart_water_shutoff_valve_with_lora_hub",
+    "productName": "YoLink Smart Water Shutoff Valve with LoRa hub",
+    "status": "ok",
+    "source": "brand_hero",
+    "brand": "YoLink",
+    "pageUrl": "https://www.yosmart.com/",
+    "imageUrl": "http://shop.yosmart.com/cdn/shop/files/YOLINK_CIRCLE12_1200x1200.png?v=1685395681",
+    "rawPath": "public/product-images/_raw/yolink_smart_water_shutoff_valve_with_lora_hub.png"
+  },
+  {
+    "universeId": "marcell_or_temp_stick_cellular_temperature_monitor",
+    "productName": "Marcell or Temp Stick cellular temperature monitor",
+    "status": "no_url"
+  },
+  {
+    "universeId": "moisture_hygrometer__acurite_digital_hygrometer_single",
+    "productName": "AcuRite digital hygrometer (single)",
+    "status": "no_url"
+  },
+  {
+    "universeId": "govee_wifi_hygrometer_3_pack_with_app_alerts",
+    "productName": "Govee WiFi Hygrometer 3-pack with app alerts",
+    "status": "no_image_found",
+    "source": "brand_hero",
+    "brand": "Govee",
+    "pageUrl": "https://us.govee.com/",
+    "reason": "fetch failed or no og:image / schema image"
+  },
+  {
+    "universeId": "moisture_hygrometer__sensorpush_htp_xw_outdoor_rated_wireless_hygrometer_kit",
+    "productName": "SensorPush HTP.xw outdoor-rated wireless hygrometer kit",
+    "status": "no_url"
+  },
+  {
+    "universeId": "moisture_mold_test__my_mold_detective_diy_mold_test_kit",
+    "productName": "My Mold Detective DIY mold test kit",
+    "status": "no_url"
+  },
+  {
+    "universeId": "moisture_odor_absorber__moso_natural_bamboo_charcoal_air_purifying_bags_4_pack_200g_each",
+    "productName": "Moso Natural Bamboo Charcoal Air Purifying Bags (4-pack, 200g each)",
+    "status": "no_url"
+  },
+  {
+    "universeId": "moisture_air_mover__lasko_3300_wind_machine_3_speed_air_circulator",
+    "productName": "Lasko 3300 Wind Machine 3-speed air circulator",
+    "status": "no_url"
+  },
+  {
+    "universeId": "owner_drill_driver__black_decker_20v_max_cordless_drill_kit_with_battery_charger",
+    "productName": "Black+Decker 20V MAX cordless drill kit (with battery + charger)",
+    "status": "no_url"
+  },
+  {
+    "universeId": "owner_drill_driver__dewalt_dcd777_20v_max_brushless_drill_kit_2_batteries_charger",
+    "productName": "DeWalt DCD777 20V MAX brushless drill kit (2 batteries + charger)",
+    "status": "no_image_found",
+    "source": "brand_hero",
+    "brand": "DeWalt",
+    "pageUrl": "https://www.dewalt.com/",
+    "reason": "fetch failed or no og:image / schema image"
+  },
+  {
+    "universeId": "owner_drill_driver__milwaukee_m18_fuel_drill_impact_driver_combo_kit",
+    "productName": "Milwaukee M18 FUEL drill + impact driver combo kit",
+    "status": "ok",
+    "source": "brand_hero",
+    "brand": "Milwaukee",
+    "pageUrl": "https://www.milwaukeetool.com/",
+    "imageUrl": "https://www.milwaukeetool.com/--/web-images/sc/0d214d981fd64106981ca5bb450d45eb?hash=903a55c18e4a4d622900871b45704083&lang=en",
+    "rawPath": "public/product-images/_raw/owner_drill_driver__milwaukee_m18_fuel_drill_impact_driver_combo_kit.webp"
+  },
+  {
+    "universeId": "generic_100_piece_drill_bit_set",
+    "productName": "Generic 100-piece drill bit set",
+    "status": "no_url"
+  },
+  {
+    "universeId": "owner_drill_bits__dewalt_20_piece_titanium_drill_bit_set_30_piece_driver_bit_set",
+    "productName": "DeWalt 20-piece titanium drill bit set + 30-piece driver bit set",
+    "status": "no_image_found",
+    "source": "brand_hero",
+    "brand": "DeWalt",
+    "pageUrl": "https://www.dewalt.com/",
+    "reason": "fetch failed or no og:image / schema image"
+  },
+  {
+    "universeId": "owner_drill_bits__dewalt_cobalt_drill_bit_set_wera_driver_bit_kit",
+    "productName": "DeWalt cobalt drill bit set + Wera driver bit kit",
+    "status": "no_image_found",
+    "source": "brand_hero",
+    "brand": "DeWalt",
+    "pageUrl": "https://www.dewalt.com/",
+    "reason": "fetch failed or no og:image / schema image"
+  },
+  {
+    "universeId": "owner_level__stanley_fatmax_24_magnetic_level",
+    "productName": "Stanley FatMax 24\" magnetic level",
+    "status": "ok",
+    "source": "brand_hero",
+    "brand": "Stanley",
+    "pageUrl": "https://www.stanleytools.com/",
+    "imageUrl": "https://bynder.sbdinc.com/m/3f4dcbe4c38e4f12/Drupal_Large-ST_stanley-category-fallbackat2x_GEB1.jpg",
+    "rawPath": "public/product-images/_raw/owner_level__stanley_fatmax_24_magnetic_level.jpg"
+  },
+  {
+    "universeId": "owner_stud_finder__franklin_sensors_prosensor_710_stud_finder",
+    "productName": "Franklin Sensors ProSensor 710 stud finder",
+    "status": "no_url"
+  },
+  {
+    "universeId": "owner_tape_measure__stanley_fatmax_25_foot_tape_measure",
+    "productName": "Stanley FatMax 25-foot tape measure",
+    "status": "ok",
+    "source": "brand_hero",
+    "brand": "Stanley",
+    "pageUrl": "https://www.stanleytools.com/",
+    "imageUrl": "https://bynder.sbdinc.com/m/3f4dcbe4c38e4f12/Drupal_Large-ST_stanley-category-fallbackat2x_GEB1.jpg",
+    "rawPath": "public/product-images/_raw/owner_level__stanley_fatmax_24_magnetic_level.jpg"
+  },
+  {
+    "universeId": "owner_utility_knife__milwaukee_fastback_folding_utility_knife_100_pack_blades",
+    "productName": "Milwaukee FastBack folding utility knife + 100-pack blades",
+    "status": "ok",
+    "source": "brand_hero",
+    "brand": "Milwaukee",
+    "pageUrl": "https://www.milwaukeetool.com/",
+    "imageUrl": "https://www.milwaukeetool.com/--/web-images/sc/0d214d981fd64106981ca5bb450d45eb?hash=903a55c18e4a4d622900871b45704083&lang=en",
+    "rawPath": "public/product-images/_raw/owner_drill_driver__milwaukee_m18_fuel_drill_impact_driver_combo_kit.webp"
+  },
+  {
+    "universeId": "owner_caulk_gun__newborn_brothers_250_steel_skeleton_caulk_gun",
+    "productName": "Newborn Brothers 250 steel skeleton caulk gun",
+    "status": "no_url"
+  },
+  {
+    "universeId": "owner_multitool__dewalt_dcs354_20v_max_brushless_oscillating_multi_tool_bare_tool",
+    "productName": "DeWalt DCS354 20V MAX brushless oscillating multi-tool (bare tool)",
+    "status": "no_image_found",
+    "source": "brand_hero",
+    "brand": "DeWalt",
+    "pageUrl": "https://www.dewalt.com/",
+    "reason": "fetch failed or no og:image / schema image"
+  },
+  {
+    "universeId": "owner_fastener_kit__drywall_anchor_kit_screw_assortment_deck_wood_sheetmetal_screws",
+    "productName": "Drywall anchor kit + screw assortment (deck/wood/sheetmetal screws)",
+    "status": "no_url"
+  },
+  {
+    "universeId": "owner_work_light__dewalt_20v_max_led_work_light_coast_headlamp",
+    "productName": "DeWalt 20V MAX LED work light + Coast headlamp",
+    "status": "no_image_found",
+    "source": "brand_hero",
+    "brand": "DeWalt",
+    "pageUrl": "https://www.dewalt.com/",
+    "reason": "fetch failed or no og:image / schema image"
+  },
+  {
+    "universeId": "water_bacteria_test__coliform_e_coli_well_water_bacteria_test_kit",
+    "productName": "Coliform/E. coli well water bacteria test kit",
+    "status": "no_url"
+  },
+  {
+    "universeId": "generic_brand_fridge_filter_compatible_with_major_brands",
+    "productName": "Generic-brand fridge filter compatible with major brands",
+    "status": "no_url"
+  },
+  {
+    "universeId": "water_fridge_filter__oem_fridge_filter_samsung_haf_cin_lg_lt700p_etc",
+    "productName": "OEM fridge filter (Samsung HAF-CIN, LG LT700P, etc.)",
+    "status": "no_url"
+  },
+  {
+    "universeId": "water_drinking_filter__brita_standard_10_cup_pitcher_with_filter",
+    "productName": "Brita Standard 10-cup pitcher with filter",
+    "status": "no_url"
+  },
+  {
+    "universeId": "water_drinking_filter__zerowater_10_cup_pitcher_with_tds_meter",
+    "productName": "ZeroWater 10-cup pitcher with TDS meter",
+    "status": "no_url"
+  },
+  {
+    "universeId": "water_drinking_filter__aquasana_aq_5300_3_stage_under_sink_filter_system",
+    "productName": "Aquasana AQ-5300+ 3-stage under-sink filter system",
+    "status": "no_url"
+  },
+  {
+    "universeId": "water_filter_wrench__standard_10_filter_housing_wrench_spare_o_ring_kit",
+    "productName": "Standard 10\" filter housing wrench + spare O-ring kit",
+    "status": "no_url"
+  },
+  {
+    "universeId": "water_pressure_gauge__hose_bib_mount_water_pressure_gauge_0_200_psi",
+    "productName": "Hose-bib mount water pressure gauge (0-200 PSI)",
+    "status": "no_url"
+  },
+  {
+    "universeId": "generic_1_2_nylon_double_braid_dock_line_25_ft_single",
+    "productName": "Generic 1/2\" nylon double-braid dock line, 25 ft (single)",
+    "status": "no_url"
+  },
+  {
+    "universeId": "dock_lines__new_england_ropes_5_8_double_braid_dock_lines_4_pack_25_ft",
+    "productName": "New England Ropes 5/8\" double-braid dock lines (4-pack, 25 ft)",
+    "status": "no_url"
+  },
+  {
+    "universeId": "dock_lines__yale_cordage_sterling_lite_high_modulus_dock_line_set",
+    "productName": "Yale Cordage Sterling Lite High-Modulus Dock Line set",
+    "status": "no_url"
+  },
+  {
+    "universeId": "generic_vinyl_boat_fenders_4_pack",
+    "productName": "Generic vinyl boat fenders (4-pack)",
+    "status": "no_url"
+  },
+  {
+    "universeId": "dock_bumpers__taylor_made_hull_bumper_dock_bumper_combo",
+    "productName": "Taylor Made hull bumper / dock bumper combo",
+    "status": "no_url"
+  },
+  {
+    "universeId": "dock_bumpers__polyform_g_series_fender_set_with_line_bag",
+    "productName": "Polyform G-series fender set with line bag",
+    "status": "no_url"
+  },
+  {
+    "universeId": "dock_marine_hardware__316_stainless_steel_marine_bolts_nuts_washers_assortment",
+    "productName": "316 stainless steel marine bolts + nuts + washers (assortment)",
+    "status": "no_url"
+  },
+  {
+    "universeId": "generic_solar_dock_lights_4_pack",
+    "productName": "Generic solar dock lights (4-pack)",
+    "status": "no_url"
+  },
+  {
+    "universeId": "dock_lighting__dock_edge_led_rope_lighting_kit_low_voltage_50_ft",
+    "productName": "Dock Edge LED rope lighting kit (low-voltage, 50 ft)",
+    "status": "no_url"
+  },
+  {
+    "universeId": "dock_lighting__hardwired_marine_led_dock_lights_with_motion_sensor",
+    "productName": "Hardwired marine LED dock lights with motion sensor",
+    "status": "no_url"
+  },
+  {
+    "universeId": "generic_4_step_dock_ladder_telescoping",
+    "productName": "Generic 4-step dock ladder (telescoping)",
+    "status": "no_url"
+  },
+  {
+    "universeId": "dock_ladder__jif_marine_5_step_heavy_duty_ladder_with_poly_steps",
+    "productName": "JIF Marine 5-step heavy-duty ladder with poly steps",
+    "status": "no_url"
+  },
+  {
+    "universeId": "dock_ladder__custom_welded_stainless_steel_ladder_with_grab_handles",
+    "productName": "Custom welded stainless steel ladder with grab handles",
+    "status": "no_url"
+  },
+  {
+    "universeId": "dock_mildew_cleaner__30_hydrogen_peroxide_outdoor_cleaner_or_wet_forget_concentrate",
+    "productName": "30% Hydrogen peroxide outdoor cleaner OR Wet & Forget concentrate",
+    "status": "no_image_found",
+    "source": "brand_hero",
+    "brand": "Wet & Forget",
+    "pageUrl": "https://www.wetandforget.com/",
+    "reason": "fetch failed or no og:image / schema image"
+  },
+  {
+    "universeId": "dock_storage_bin__suncast_50_gallon_resin_deck_box",
+    "productName": "Suncast 50-gallon resin deck box",
+    "status": "no_image_found",
+    "source": "brand_hero",
+    "brand": "Suncast",
+    "pageUrl": "https://www.suncast.com/",
+    "reason": "fetch failed or no og:image / schema image"
+  },
+  {
+    "universeId": "dock_storage_bin__suncast_73_gallon_premium_resin_storage_bench_with_seating",
+    "productName": "Suncast 73-gallon premium resin storage bench (with seating)",
+    "status": "no_image_found",
+    "source": "brand_hero",
+    "brand": "Suncast",
+    "pageUrl": "https://www.suncast.com/",
+    "reason": "fetch failed or no og:image / schema image"
+  },
+  {
+    "universeId": "dock_non_slip_strips__marine_grade_anti_slip_tape_4_inch_x_60_ft",
+    "productName": "Marine-grade anti-slip tape (4 inch x 60 ft)",
+    "status": "no_url"
+  },
+  {
+    "universeId": "safety_fire_extinguisher__first_alert_home1_1_a_10_b_c_compliance_extinguisher",
+    "productName": "First Alert HOME1 1-A:10-B:C compliance extinguisher",
+    "status": "no_image_found",
+    "source": "brand_hero",
+    "brand": "First Alert",
+    "pageUrl": "https://www.firstalertstore.com/",
+    "reason": "fetch failed or no og:image / schema image"
+  },
+  {
+    "universeId": "safety_fire_extinguisher__first_alert_pro5_heavy_duty_plus_3_a_40_b_c_single",
+    "productName": "First Alert PRO5 Heavy Duty Plus 3-A:40-B:C (single)",
+    "status": "no_image_found",
+    "source": "specific",
+    "pageUrl": "https://www.firstalertstore.com/store/products/product-detail/sku/PRO5.htm",
+    "reason": "fetch failed or no og:image / schema image"
+  },
+  {
+    "universeId": "safety_fire_extinguisher__amerex_b500_5_lb_abc_dry_chemical_fire_extinguisher_2_pack",
+    "productName": "Amerex B500 5-lb ABC Dry Chemical Fire Extinguisher 2-pack",
+    "status": "no_url"
+  },
+  {
+    "universeId": "safety_smoke_co_detector__first_alert_sco5cn_battery_powered_smoke_co_detector_single",
+    "productName": "First Alert SCO5CN battery-powered smoke + CO detector (single)",
+    "status": "no_image_found",
+    "source": "brand_hero",
+    "brand": "First Alert",
+    "pageUrl": "https://www.firstalertstore.com/",
+    "reason": "fetch failed or no og:image / schema image"
+  },
+  {
+    "universeId": "safety_smoke_co_detector__first_alert_10_year_sealed_battery_smoke_co_detectors_3_pack",
+    "productName": "First Alert 10-year sealed battery smoke + CO detectors (3-pack)",
+    "status": "no_image_found",
+    "source": "brand_hero",
+    "brand": "First Alert",
+    "pageUrl": "https://www.firstalertstore.com/",
+    "reason": "fetch failed or no og:image / schema image"
+  },
+  {
+    "universeId": "safety_smoke_co_detector__google_nest_protect_smart_smoke_co_detector_3_pack",
+    "productName": "Google Nest Protect smart smoke + CO detector (3-pack)",
+    "status": "no_url"
+  },
+  {
+    "universeId": "generic_100_piece_first_aid_kit",
+    "productName": "Generic 100-piece first aid kit",
+    "status": "no_url"
+  },
+  {
+    "universeId": "safety_first_aid_kit__first_aid_only_osha_compliant_250_piece_kit_50_person",
+    "productName": "First Aid Only OSHA-Compliant 250-piece kit (50-person)",
+    "status": "no_url"
+  },
+  {
+    "universeId": "safety_first_aid_kit__my_medic_the_medic_emergency_kit",
+    "productName": "My Medic The Medic emergency kit",
+    "status": "no_url"
+  },
+  {
+    "universeId": "safety_flashlight_lantern__aaa_battery_led_flashlight_4_pack",
+    "productName": "AAA-battery LED flashlight 4-pack",
+    "status": "no_url"
+  },
+  {
+    "universeId": "safety_flashlight_lantern__coast_led_flashlight_2_pack_streamlight_led_lantern",
+    "productName": "Coast LED flashlight 2-pack + Streamlight LED lantern",
+    "status": "no_url"
+  },
+  {
+    "universeId": "safety_flashlight_lantern__goal_zero_anker_rechargeable_lanterns_headlamps",
+    "productName": "Goal Zero / Anker rechargeable lanterns + headlamps",
+    "status": "no_url"
+  },
+  {
+    "universeId": "safety_emergency_power__anker_521_powerhouse_256wh_portable_power_station",
+    "productName": "Anker 521 PowerHouse 256Wh portable power station",
+    "status": "no_url"
+  },
+  {
+    "universeId": "safety_emergency_power__jackery_explorer_1000_1002_wh",
+    "productName": "Jackery Explorer 1000 (1002 Wh)",
+    "status": "no_url"
+  },
+  {
+    "universeId": "safety_emergency_power__ecoflow_delta_2_max_2048_wh_with_expansion_battery",
+    "productName": "EcoFlow DELTA 2 Max (2048 Wh) with expansion battery",
+    "status": "no_url"
+  },
+  {
+    "universeId": "safety_emergency_docs__document_holder_printed_emergency_info_template",
+    "productName": "Document holder + printed emergency info template",
+    "status": "no_url"
+  },
+  {
+    "universeId": "prep_laser_measure__bosch_glm_20_blaze_65_foot_laser_distance_measure",
+    "productName": "Bosch GLM 20 Blaze 65-foot laser distance measure",
+    "status": "ok",
+    "source": "brand_hero",
+    "brand": "Bosch",
+    "pageUrl": "https://www.boschtools.com/us/en/",
+    "imageUrl": "https://www.boschtools.com/us/media/professional_bi/tv_search-default_200x200.png",
+    "rawPath": "public/product-images/_raw/prep_laser_measure__bosch_glm_20_blaze_65_foot_laser_distance_measure.png"
+  },
+  {
+    "universeId": "prep_laser_measure__bosch_glm_165_27_165_foot_laser_measure_with_bluetooth",
+    "productName": "Bosch GLM 165-27 165-foot laser measure with Bluetooth",
+    "status": "ok",
+    "source": "brand_hero",
+    "brand": "Bosch",
+    "pageUrl": "https://www.boschtools.com/us/en/",
+    "imageUrl": "https://www.boschtools.com/us/media/professional_bi/tv_search-default_200x200.png",
+    "rawPath": "public/product-images/_raw/prep_laser_measure__bosch_glm_20_blaze_65_foot_laser_distance_measure.png"
+  },
+  {
+    "universeId": "prep_graph_paper_kit__engineering_graph_paper_pad_architectural_scale_ruler",
+    "productName": "Engineering graph paper pad + architectural scale ruler",
+    "status": "no_url"
+  },
+  {
+    "universeId": "prep_painters_tape__frogtape_1_41_multi_surface_4_pack_60_yd_each",
+    "productName": "FrogTape 1.41\" multi-surface 4-pack (60 yd each)",
+    "status": "no_url"
+  },
+  {
+    "universeId": "prep_label_maker__brother_p_touch_pt_d210_label_maker",
+    "productName": "Brother P-touch PT-D210 label maker",
+    "status": "no_url"
+  },
+  {
+    "universeId": "prep_sample_boards__pre_primed_white_sample_boards_12_pack_11_x14",
+    "productName": "Pre-primed white sample boards (12-pack, 11\"x14\")",
+    "status": "no_url"
+  },
+  {
+    "universeId": "prep_phone_tripod__manfrotto_pixi_mini_tripod_clip_on_led_ring_light",
+    "productName": "Manfrotto PIXI mini tripod + clip-on LED ring light",
+    "status": "no_url"
+  },
+  {
+    "universeId": "prep_inspection_mirror__telescoping_inspection_mirror_usb_endoscope_camera",
+    "productName": "Telescoping inspection mirror + USB endoscope camera",
+    "status": "no_url"
+  },
+  {
+    "universeId": "generic_plastic_boot_tray_30_x_15",
+    "productName": "Generic plastic boot tray, 30\" x 15\"",
+    "status": "no_url"
+  },
+  {
+    "universeId": "mudroom_boot_tray__weathertech_boottray_16_x_36_black",
+    "productName": "WeatherTech BootTray 16\" x 36\" (Black)",
+    "status": "ok",
+    "source": "specific",
+    "pageUrl": "https://www.weathertech.com/boottray/",
+    "imageUrl": "https://images.weathertech.com/131d7819-ef8f-4209-a7a0-b1a801471a46/BootTray_Angle_Black_Original%20file.jpg",
+    "rawPath": "public/product-images/_raw/mudroom_boot_tray__weathertech_boottray_16_x_36_black.jpg"
+  },
+  {
+    "universeId": "mudroom_boot_tray__weathertech_boottray_16_x_36_plus_indoormat_24_x39",
+    "productName": "WeatherTech BootTray 16\" x 36\" PLUS IndoorMat 24\"x39\"",
+    "status": "ok",
+    "source": "brand_hero",
+    "brand": "WeatherTech",
+    "pageUrl": "https://www.weathertech.com/boottray/",
+    "imageUrl": "https://images.weathertech.com/131d7819-ef8f-4209-a7a0-b1a801471a46/BootTray_Angle_Black_Original%20file.jpg",
+    "rawPath": "public/product-images/_raw/mudroom_boot_tray__weathertech_boottray_16_x_36_black.jpg"
+  },
+  {
+    "universeId": "generic_rubber_backed_coir_doormat_24_x_36",
+    "productName": "Generic rubber-backed coir doormat, 24\" x 36\"",
+    "status": "no_url"
+  },
+  {
+    "universeId": "mudroom_entry_mat__gorilla_grip_original_durable_natural_rubber_door_mat_47_x_35",
+    "productName": "Gorilla Grip Original Durable Natural Rubber Door Mat (47\" x 35\")",
+    "status": "no_url"
+  },
+  {
+    "universeId": "mudroom_entry_mat__waterhog_eco_premier_4x6_commercial_grade_entry_mat",
+    "productName": "WaterHog Eco Premier 4x6 commercial-grade entry mat",
+    "status": "no_url"
+  },
+  {
+    "universeId": "generic_adhesive_back_hooks_5_pack",
+    "productName": "Generic adhesive-back hooks, 5-pack",
+    "status": "no_url"
+  },
+  {
+    "universeId": "liberty_hardware_steel_wall_hooks_5_pack_drywall_anchors",
+    "productName": "Liberty Hardware steel wall hooks (5-pack) + drywall anchors",
+    "status": "ok",
+    "source": "brand_hero",
+    "brand": "Liberty",
+    "pageUrl": "https://www.libertyhardware.com/",
+    "imageUrl": "http://www.libertyhardware.com/cdn/shop/files/logo_only.png?v=1753803448",
+    "rawPath": "public/product-images/_raw/liberty_hardware_bar_pulls_10_pack.png"
+  },
+  {
+    "universeId": "pottery_barn_cast_iron_coat_hooks_5_pack_equivalent",
+    "productName": "Pottery Barn cast iron coat hooks (5-pack equivalent)",
+    "status": "no_image_found",
+    "source": "brand_hero",
+    "brand": "Pottery Barn",
+    "pageUrl": "https://www.potterybarn.com/",
+    "reason": "fetch failed or no og:image / schema image"
+  },
+  {
+    "universeId": "mudroom_bench__ikea_tjusig_bench_or_equivalent_ikea_bench_with_shoe_storage",
+    "productName": "IKEA TJUSIG bench (or equivalent IKEA bench with shoe storage)",
+    "status": "no_url"
+  },
+  {
+    "universeId": "mudroom_bench__solid_wood_entry_bench_with_cubby_storage_44_wide",
+    "productName": "Solid wood entry bench with cubby storage (44\" wide)",
+    "status": "no_url"
+  },
+  {
+    "universeId": "pottery_barn_samantha_entry_bench_or_equivalent_custom_shop_benc",
+    "productName": "Pottery Barn Samantha entry bench or equivalent custom-shop bench",
+    "status": "no_image_found",
+    "source": "brand_hero",
+    "brand": "Pottery Barn",
+    "pageUrl": "https://www.potterybarn.com/",
+    "reason": "fetch failed or no og:image / schema image"
+  },
+  {
+    "universeId": "mudroom_wet_gear_rack__folding_clothesline_or_expandable_wall_mount_drying_rack",
+    "productName": "Folding clothesline or expandable wall-mount drying rack",
+    "status": "no_url"
+  },
+  {
+    "universeId": "mudroom_wet_gear_rack__stacking_accordion_style_drying_rack_with_floor_pan",
+    "productName": "Stacking accordion-style drying rack with floor pan",
+    "status": "no_url"
+  },
+  {
+    "universeId": "sterilite_plastic_storage_bins_27_qt_3_pack",
+    "productName": "Sterilite plastic storage bins, 27 qt, 3-pack",
+    "status": "image_fetch_failed",
+    "source": "brand_hero",
+    "brand": "Sterilite",
+    "pageUrl": "https://www.sterilite.com/",
+    "imageUrl": "https://www.sterilite.com/images/logo.png"
+  },
+  {
+    "universeId": "mudroom_gear_bins__mdesign_fabric_storage_bins_with_handles_6_pack",
+    "productName": "mDesign fabric storage bins with handles, 6-pack",
+    "status": "no_image_found",
+    "source": "brand_hero",
+    "brand": "mDesign",
+    "pageUrl": "https://mdesignhomedecor.com/",
+    "reason": "fetch failed or no og:image / schema image"
+  },
+  {
+    "universeId": "mudroom_gear_bins__container_store_custom_bin_system_with_labels",
+    "productName": "Container Store custom bin system with labels",
+    "status": "no_image_found",
+    "source": "brand_hero",
+    "brand": "Container Store",
+    "pageUrl": "https://www.containerstore.com/s/kitchen/drawer-organizers",
+    "reason": "fetch failed or no og:image / schema image"
+  },
+  {
+    "universeId": "mudroom_towel_station__wall_mount_towel_rack_6_microfiber_towels",
+    "productName": "Wall-mount towel rack + 6 microfiber towels",
+    "status": "no_url"
+  },
+  {
+    "universeId": "mudroom_floor_protection__indoor_runner_rug_washable_2_5_x_7",
+    "productName": "Indoor runner rug (washable, 2.5' x 7')",
+    "status": "no_url"
+  }
+]

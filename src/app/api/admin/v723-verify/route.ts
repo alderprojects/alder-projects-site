@@ -69,6 +69,8 @@ const EXPECTED_STATS: Record<string, { slotCount: number; skipCount: number }> =
   outdoor_dock_lake: { slotCount: 8, skipCount: 8 },
   home_safety_kit: { slotCount: 6, skipCount: 8 },
   universal_project_prep: { slotCount: 7, skipCount: 7 },
+  // V7.2.6 — mudroom_entry_reset ingested (paste 3 source file).
+  mudroom_entry_reset: { slotCount: 8, skipCount: 9 },
 }
 
 // V7.2.5 — destinations a catalog can route a buyer to instead of

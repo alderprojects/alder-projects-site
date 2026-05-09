@@ -7188,4 +7188,769 @@ export const UNIVERSE: UniverseProduct[] = [
       tier: "sweet_spot"
     }
   },
+  {
+    universeId: "generic_plastic_boot_tray_30_x_15",
+    rank: 100,
+    variant: {
+      productName: "Generic plastic boot tray, 30\" x 15\"",
+      priceLow: 18,
+      priceHigh: 32,
+      affiliateUrl: "https://www.amazon.com/s?k=plastic+boot+tray+30+inch+entry&tag=alderprojects-20",
+      productSpec: "Hard plastic, 30\"x15\". Holds 2-3 pairs of boots. Cracks at corners after 2-3 freeze-thaw cycles. Inexpensive but short life."
+    },
+    tags: {
+      topics: [
+        "mudroom"
+      ],
+      roles: [
+        "accessory",
+        "preventer"
+      ],
+      functions: [
+        "boot_tray"
+      ],
+      seasons: [
+        "mud_season",
+        "spring",
+        "year_round"
+      ],
+      propertyTypes: [],
+      conditions: [],
+      alreadyHaveFlag: "has_boot_tray",
+      tier: "budget"
+    },
+    citations: [
+      "WeatherTech BootTray Amazon listing (B0134VP96Q)",
+      "WeatherTech material specifications",
+      "Wirecutter best boot tray testing"
+    ],
+    migratedFrom: {
+      scope: "mudroom_entry_reset",
+      slotId: "mudroom_boot_tray",
+      tier: "budget"
+    }
+  },
+  {
+    universeId: "mudroom_boot_tray__weathertech_boottray_16_x_36_black",
+    rank: 100,
+    variant: {
+      productName: "WeatherTech BootTray 16\" x 36\" (Black)",
+      priceLow: 39,
+      priceHigh: 55,
+      amazonAsin: "B0134VP96Q",
+      affiliateUrl: "https://www.amazon.com/dp/B0134VP96Q?tag=alderprojects-20",
+      productSpec: "TPE (thermoplastic elastomer) — flexible, durable, freeze-tolerant. 16\" x 36\" holds up to 4 pairs of boots. Engineered channels keep water and debris off the shoes. Made in USA. Multiple colors. Stays put on hardwood and tile (no sliding)."
+    },
+    tags: {
+      topics: [
+        "mudroom"
+      ],
+      roles: [
+        "accessory",
+        "preventer"
+      ],
+      functions: [
+        "boot_tray"
+      ],
+      seasons: [
+        "mud_season",
+        "spring",
+        "year_round"
+      ],
+      propertyTypes: [],
+      conditions: [],
+      alreadyHaveFlag: "has_boot_tray",
+      tier: "sweet_spot"
+    },
+    citations: [
+      "WeatherTech BootTray Amazon listing (B0134VP96Q)",
+      "WeatherTech material specifications",
+      "Wirecutter best boot tray testing"
+    ],
+    migratedFrom: {
+      scope: "mudroom_entry_reset",
+      slotId: "mudroom_boot_tray",
+      tier: "sweet_spot"
+    }
+  },
+  {
+    universeId: "mudroom_boot_tray__weathertech_boottray_16_x_36_plus_indoormat_24_x39",
+    rank: 100,
+    variant: {
+      productName: "WeatherTech BootTray 16\" x 36\" PLUS IndoorMat 24\"x39\"",
+      priceLow: 100,
+      priceHigh: 145,
+      affiliateUrl: "https://www.amazon.com/s?k=weathertech+boottray+indoor+mat+combo&tag=alderprojects-20",
+      productSpec: "BootTray for the boot rack zone + matching IndoorMat for the immediately-inside-the-door zone. Two-zone strategy: tray catches the wet boots, mat catches the wet socks/feet that transition off the tray."
+    },
+    tags: {
+      topics: [
+        "mudroom"
+      ],
+      roles: [
+        "accessory",
+        "preventer"
+      ],
+      functions: [
+        "boot_tray"
+      ],
+      seasons: [
+        "mud_season",
+        "spring",
+        "year_round"
+      ],
+      propertyTypes: [],
+      conditions: [],
+      alreadyHaveFlag: "has_boot_tray",
+      tier: "premium"
+    },
+    citations: [
+      "WeatherTech BootTray Amazon listing (B0134VP96Q)",
+      "WeatherTech material specifications",
+      "Wirecutter best boot tray testing"
+    ],
+    migratedFrom: {
+      scope: "mudroom_entry_reset",
+      slotId: "mudroom_boot_tray",
+      tier: "premium"
+    }
+  },
+  {
+    universeId: "generic_rubber_backed_coir_doormat_24_x_36",
+    rank: 100,
+    variant: {
+      productName: "Generic rubber-backed coir doormat, 24\" x 36\"",
+      priceLow: 22,
+      priceHigh: 38,
+      affiliateUrl: "https://www.amazon.com/s?k=coir+doormat+heavy+duty+rubber+backed+24x36&tag=alderprojects-20",
+      productSpec: "Natural coir fiber on rubber backing. 24\" x 36\". Effective for dry debris; sheds itself onto the floor over time. ~2-3 year typical life."
+    },
+    tags: {
+      topics: [
+        "mudroom"
+      ],
+      roles: [
+        "textile",
+        "preventer"
+      ],
+      functions: [
+        "entry_mat"
+      ],
+      seasons: [
+        "mud_season",
+        "spring",
+        "year_round"
+      ],
+      propertyTypes: [],
+      conditions: [],
+      alreadyHaveFlag: "has_entry_mat",
+      tier: "budget"
+    },
+    citations: [
+      "Gorilla Grip product line documentation",
+      "Wirecutter best entry mat testing",
+      "WaterHog commercial-grade specifications"
+    ],
+    migratedFrom: {
+      scope: "mudroom_entry_reset",
+      slotId: "mudroom_entry_mat",
+      tier: "budget"
+    }
+  },
+  {
+    universeId: "mudroom_entry_mat__gorilla_grip_original_durable_natural_rubber_door_mat_47_x_35",
+    rank: 100,
+    variant: {
+      productName: "Gorilla Grip Original Durable Natural Rubber Door Mat (47\" x 35\")",
+      priceLow: 48,
+      priceHigh: 75,
+      affiliateUrl: "https://www.amazon.com/s?k=gorilla+grip+natural+rubber+door+mat+47+35&tag=alderprojects-20",
+      productSpec: "TPR (thermoplastic rubber) waffle pattern. 47\" x 35\". Drains water and traps dirt. Stays put on hardwood, tile, vinyl. 5-7 year lifespan with regular hosing-off. Wirecutter pick at this tier."
+    },
+    tags: {
+      topics: [
+        "mudroom"
+      ],
+      roles: [
+        "textile",
+        "preventer"
+      ],
+      functions: [
+        "entry_mat"
+      ],
+      seasons: [
+        "mud_season",
+        "spring",
+        "year_round"
+      ],
+      propertyTypes: [],
+      conditions: [],
+      alreadyHaveFlag: "has_entry_mat",
+      tier: "sweet_spot"
+    },
+    citations: [
+      "Gorilla Grip product line documentation",
+      "Wirecutter best entry mat testing",
+      "WaterHog commercial-grade specifications"
+    ],
+    migratedFrom: {
+      scope: "mudroom_entry_reset",
+      slotId: "mudroom_entry_mat",
+      tier: "sweet_spot"
+    }
+  },
+  {
+    universeId: "mudroom_entry_mat__waterhog_eco_premier_4x6_commercial_grade_entry_mat",
+    rank: 100,
+    variant: {
+      productName: "WaterHog Eco Premier 4x6 commercial-grade entry mat",
+      priceLow: 165,
+      priceHigh: 240,
+      affiliateUrl: "https://www.amazon.com/s?k=waterhog+eco+premier+4x6+entry+mat&tag=alderprojects-20",
+      productSpec: "Commercial-grade. 4 ft x 6 ft. Polypropylene fiber on rubber backing. Found in hotel lobbies and high-traffic commercial entries. 10+ year lifespan. Captures water and debris far better than residential mats."
+    },
+    tags: {
+      topics: [
+        "mudroom"
+      ],
+      roles: [
+        "textile",
+        "preventer"
+      ],
+      functions: [
+        "entry_mat"
+      ],
+      seasons: [
+        "mud_season",
+        "spring",
+        "year_round"
+      ],
+      propertyTypes: [],
+      conditions: [],
+      alreadyHaveFlag: "has_entry_mat",
+      tier: "premium"
+    },
+    citations: [
+      "Gorilla Grip product line documentation",
+      "Wirecutter best entry mat testing",
+      "WaterHog commercial-grade specifications"
+    ],
+    migratedFrom: {
+      scope: "mudroom_entry_reset",
+      slotId: "mudroom_entry_mat",
+      tier: "premium"
+    }
+  },
+  {
+    universeId: "generic_adhesive_back_hooks_5_pack",
+    rank: 100,
+    variant: {
+      productName: "Generic adhesive-back hooks, 5-pack",
+      priceLow: 8,
+      priceHigh: 14,
+      affiliateUrl: "https://www.amazon.com/s?k=adhesive+wall+hooks+heavy+duty&tag=alderprojects-20",
+      productSpec: "3M-style adhesive hooks. 5-15 lb capacity (varies). No anchors, no drilling. Effective for light loads; fail with heavy wet coats."
+    },
+    tags: {
+      topics: [
+        "mudroom"
+      ],
+      roles: [
+        "hardware",
+        "organizer"
+      ],
+      functions: [
+        "wall_hooks"
+      ],
+      seasons: [
+        "mud_season",
+        "spring",
+        "year_round"
+      ],
+      propertyTypes: [],
+      conditions: [],
+      alreadyHaveFlag: "has_wall_hooks",
+      tier: "budget"
+    },
+    citations: [
+      "Liberty Hardware product line documentation",
+      "Drywall anchor weight ratings"
+    ],
+    migratedFrom: {
+      scope: "mudroom_entry_reset",
+      slotId: "mudroom_wall_hooks",
+      tier: "budget"
+    }
+  },
+  {
+    universeId: "liberty_hardware_steel_wall_hooks_5_pack_drywall_anchors",
+    rank: 100,
+    variant: {
+      productName: "Liberty Hardware steel wall hooks (5-pack) + drywall anchors",
+      priceLow: 22,
+      priceHigh: 38,
+      affiliateUrl: "https://www.amazon.com/s?k=liberty+hardware+wall+hook+5+pack+oil+rubbed&tag=alderprojects-20",
+      productSpec: "Cast steel hooks with oil-rubbed bronze, satin nickel, or matte black finish. 30+ lb capacity. Includes wall anchors. Mount with screws into studs or drywall anchors. Liberty is the standard at this tier."
+    },
+    tags: {
+      topics: [
+        "mudroom"
+      ],
+      roles: [
+        "hardware",
+        "organizer"
+      ],
+      functions: [
+        "wall_hooks"
+      ],
+      seasons: [
+        "mud_season",
+        "spring",
+        "year_round"
+      ],
+      propertyTypes: [],
+      conditions: [],
+      alreadyHaveFlag: "has_wall_hooks",
+      tier: "sweet_spot"
+    },
+    citations: [
+      "Liberty Hardware product line documentation",
+      "Drywall anchor weight ratings"
+    ],
+    migratedFrom: {
+      scope: "mudroom_entry_reset",
+      slotId: "mudroom_wall_hooks",
+      tier: "sweet_spot"
+    }
+  },
+  {
+    universeId: "pottery_barn_cast_iron_coat_hooks_5_pack_equivalent",
+    rank: 100,
+    variant: {
+      productName: "Pottery Barn cast iron coat hooks (5-pack equivalent)",
+      priceLow: 75,
+      priceHigh: 130,
+      affiliateUrl: "https://www.amazon.com/s?k=cast+iron+coat+hooks+wall+mount&tag=alderprojects-20",
+      productSpec: "Solid cast iron, antique-finish. ~$15-25 per hook. Statement piece. Same load capacity as Liberty — premium is aesthetic."
+    },
+    tags: {
+      topics: [
+        "mudroom"
+      ],
+      roles: [
+        "hardware",
+        "organizer"
+      ],
+      functions: [
+        "wall_hooks"
+      ],
+      seasons: [
+        "mud_season",
+        "spring",
+        "year_round"
+      ],
+      propertyTypes: [],
+      conditions: [],
+      alreadyHaveFlag: "has_wall_hooks",
+      tier: "premium"
+    },
+    citations: [
+      "Liberty Hardware product line documentation",
+      "Drywall anchor weight ratings"
+    ],
+    migratedFrom: {
+      scope: "mudroom_entry_reset",
+      slotId: "mudroom_wall_hooks",
+      tier: "premium"
+    }
+  },
+  {
+    universeId: "mudroom_bench__ikea_tjusig_bench_or_equivalent_ikea_bench_with_shoe_storage",
+    rank: 100,
+    variant: {
+      productName: "IKEA TJUSIG bench (or equivalent IKEA bench with shoe storage)",
+      priceLow: 80,
+      priceHigh: 130,
+      affiliateUrl: "https://www.amazon.com/s?k=ikea+tjusig+bench+shoe+storage&tag=alderprojects-20",
+      productSpec: "Pine bench with open shoe storage underneath. ~$100. Self-assembly. Holds 4-6 pairs of shoes below; 2-3 person seating above. IKEA quality — works, not durable for 10+ years."
+    },
+    tags: {
+      topics: [
+        "mudroom"
+      ],
+      roles: [],
+      functions: [],
+      seasons: [
+        "mud_season",
+        "spring",
+        "year_round"
+      ],
+      propertyTypes: [],
+      conditions: [],
+      alreadyHaveFlag: "has_entry_bench",
+      tier: "budget"
+    },
+    citations: [
+      "Solid wood entry bench durability comparisons",
+      "Mudroom layout guidance"
+    ],
+    migratedFrom: {
+      scope: "mudroom_entry_reset",
+      slotId: "mudroom_bench",
+      tier: "budget"
+    }
+  },
+  {
+    universeId: "mudroom_bench__solid_wood_entry_bench_with_cubby_storage_44_wide",
+    rank: 100,
+    variant: {
+      productName: "Solid wood entry bench with cubby storage (44\" wide)",
+      priceLow: 180,
+      priceHigh: 280,
+      affiliateUrl: "https://www.amazon.com/s?k=solid+wood+entry+bench+shoe+storage+44&tag=alderprojects-20",
+      productSpec: "Solid wood (pine or rubberwood) construction. 44\" wide. Three open cubbies underneath for boots/shoes. Seating for 2-3. 10+ year lifespan with normal use."
+    },
+    tags: {
+      topics: [
+        "mudroom"
+      ],
+      roles: [],
+      functions: [],
+      seasons: [
+        "mud_season",
+        "spring",
+        "year_round"
+      ],
+      propertyTypes: [],
+      conditions: [],
+      alreadyHaveFlag: "has_entry_bench",
+      tier: "sweet_spot"
+    },
+    citations: [
+      "Solid wood entry bench durability comparisons",
+      "Mudroom layout guidance"
+    ],
+    migratedFrom: {
+      scope: "mudroom_entry_reset",
+      slotId: "mudroom_bench",
+      tier: "sweet_spot"
+    }
+  },
+  {
+    universeId: "pottery_barn_samantha_entry_bench_or_equivalent_custom_shop_benc",
+    rank: 100,
+    variant: {
+      productName: "Pottery Barn Samantha entry bench or equivalent custom-shop bench",
+      priceLow: 600,
+      priceHigh: 1100,
+      affiliateUrl: "https://www.amazon.com/s?k=pottery+barn+samantha+entry+bench&tag=alderprojects-20",
+      productSpec: "Hardwood, soft-close drawers, fabric cushion. Statement furniture — the mudroom centerpiece. Built to last 20+ years."
+    },
+    tags: {
+      topics: [
+        "mudroom"
+      ],
+      roles: [],
+      functions: [],
+      seasons: [
+        "mud_season",
+        "spring",
+        "year_round"
+      ],
+      propertyTypes: [],
+      conditions: [],
+      alreadyHaveFlag: "has_entry_bench",
+      tier: "premium"
+    },
+    citations: [
+      "Solid wood entry bench durability comparisons",
+      "Mudroom layout guidance"
+    ],
+    migratedFrom: {
+      scope: "mudroom_entry_reset",
+      slotId: "mudroom_bench",
+      tier: "premium"
+    }
+  },
+  {
+    universeId: "mudroom_wet_gear_rack__folding_clothesline_or_expandable_wall_mount_drying_rack",
+    rank: 100,
+    variant: {
+      productName: "Folding clothesline or expandable wall-mount drying rack",
+      priceLow: 22,
+      priceHigh: 42,
+      affiliateUrl: "https://www.amazon.com/s?k=wall+mount+folding+drying+rack+laundry&tag=alderprojects-20",
+      productSpec: "Wall-mounted folding rack. 16-20 inches deep when extended. Holds 4-8 wet items. Folds flat against wall when not in use."
+    },
+    tags: {
+      topics: [
+        "mudroom"
+      ],
+      roles: [
+        "organizer"
+      ],
+      functions: [
+        "wet_gear_rack"
+      ],
+      seasons: [
+        "mud_season",
+        "spring",
+        "year_round"
+      ],
+      propertyTypes: [],
+      conditions: [],
+      alreadyHaveFlag: "has_wet_gear_rack",
+      tier: "budget"
+    },
+    citations: [
+      "Wet gear drying best practices",
+      "Mildew prevention guidance"
+    ],
+    migratedFrom: {
+      scope: "mudroom_entry_reset",
+      slotId: "mudroom_wet_gear_rack",
+      tier: "budget"
+    }
+  },
+  {
+    universeId: "mudroom_wet_gear_rack__stacking_accordion_style_drying_rack_with_floor_pan",
+    rank: 100,
+    variant: {
+      productName: "Stacking accordion-style drying rack with floor pan",
+      priceLow: 55,
+      priceHigh: 95,
+      affiliateUrl: "https://www.amazon.com/s?k=accordion+drying+rack+floor+pan+wet+gear&tag=alderprojects-20",
+      productSpec: "Multi-tier accordion rack with drip pan below. 35\"+ height. Holds wetsuits, snow gear, towels. Floor pan catches drip water. Folds for storage."
+    },
+    tags: {
+      topics: [
+        "mudroom"
+      ],
+      roles: [
+        "organizer"
+      ],
+      functions: [
+        "wet_gear_rack"
+      ],
+      seasons: [
+        "mud_season",
+        "spring",
+        "year_round"
+      ],
+      propertyTypes: [],
+      conditions: [],
+      alreadyHaveFlag: "has_wet_gear_rack",
+      tier: "sweet_spot"
+    },
+    citations: [
+      "Wet gear drying best practices",
+      "Mildew prevention guidance"
+    ],
+    migratedFrom: {
+      scope: "mudroom_entry_reset",
+      slotId: "mudroom_wet_gear_rack",
+      tier: "sweet_spot"
+    }
+  },
+  {
+    universeId: "sterilite_plastic_storage_bins_27_qt_3_pack",
+    rank: 100,
+    variant: {
+      productName: "Sterilite plastic storage bins, 27 qt, 3-pack",
+      priceLow: 28,
+      priceHigh: 45,
+      affiliateUrl: "https://www.amazon.com/s?k=sterilite+27+quart+storage+bin+latching+3+pack&tag=alderprojects-20",
+      productSpec: "Latching plastic bins. 27 qt each (~14\"x18\"x10\"). Stackable. Holds gloves, hats, scarves, sunscreen, swim toys. Sterilite is the durability standard for plastic bins."
+    },
+    tags: {
+      topics: [
+        "mudroom"
+      ],
+      roles: [
+        "organizer"
+      ],
+      functions: [
+        "gear_bins"
+      ],
+      seasons: [
+        "mud_season",
+        "spring",
+        "year_round"
+      ],
+      propertyTypes: [],
+      conditions: [],
+      alreadyHaveFlag: "has_gear_bins",
+      tier: "budget"
+    },
+    citations: [
+      "Sterilite product line documentation",
+      "mDesign storage bin specifications"
+    ],
+    migratedFrom: {
+      scope: "mudroom_entry_reset",
+      slotId: "mudroom_gear_bins",
+      tier: "budget"
+    }
+  },
+  {
+    universeId: "mudroom_gear_bins__mdesign_fabric_storage_bins_with_handles_6_pack",
+    rank: 100,
+    variant: {
+      productName: "mDesign fabric storage bins with handles, 6-pack",
+      priceLow: 38,
+      priceHigh: 65,
+      affiliateUrl: "https://www.amazon.com/s?k=mdesign+fabric+storage+bins+with+handles+6+pack&tag=alderprojects-20",
+      productSpec: "Linen/canvas-look fabric on rigid frame. 6 bins (~10\"x10\"x10\"). Aesthetic upgrade from plastic. Spot-clean only — not for actually wet gear, but for dry rotation (gloves, hats)."
+    },
+    tags: {
+      topics: [
+        "mudroom"
+      ],
+      roles: [
+        "organizer"
+      ],
+      functions: [
+        "gear_bins"
+      ],
+      seasons: [
+        "mud_season",
+        "spring",
+        "year_round"
+      ],
+      propertyTypes: [],
+      conditions: [],
+      alreadyHaveFlag: "has_gear_bins",
+      tier: "sweet_spot"
+    },
+    citations: [
+      "Sterilite product line documentation",
+      "mDesign storage bin specifications"
+    ],
+    migratedFrom: {
+      scope: "mudroom_entry_reset",
+      slotId: "mudroom_gear_bins",
+      tier: "sweet_spot"
+    }
+  },
+  {
+    universeId: "mudroom_gear_bins__container_store_custom_bin_system_with_labels",
+    rank: 100,
+    variant: {
+      productName: "Container Store custom bin system with labels",
+      priceLow: 120,
+      priceHigh: 220,
+      affiliateUrl: "https://www.amazon.com/s?k=container+store+labeled+storage+bins+modular&tag=alderprojects-20",
+      productSpec: "Designer-grade modular bins. Custom-fit your shelves. ~$30-40 per bin. Aesthetic premium; functional parity with cheaper bins."
+    },
+    tags: {
+      topics: [
+        "mudroom"
+      ],
+      roles: [
+        "organizer"
+      ],
+      functions: [
+        "gear_bins"
+      ],
+      seasons: [
+        "mud_season",
+        "spring",
+        "year_round"
+      ],
+      propertyTypes: [],
+      conditions: [],
+      alreadyHaveFlag: "has_gear_bins",
+      tier: "premium"
+    },
+    citations: [
+      "Sterilite product line documentation",
+      "mDesign storage bin specifications"
+    ],
+    migratedFrom: {
+      scope: "mudroom_entry_reset",
+      slotId: "mudroom_gear_bins",
+      tier: "premium"
+    }
+  },
+  {
+    universeId: "mudroom_towel_station__wall_mount_towel_rack_6_microfiber_towels",
+    rank: 100,
+    variant: {
+      productName: "Wall-mount towel rack + 6 microfiber towels",
+      priceLow: 35,
+      priceHigh: 60,
+      affiliateUrl: "https://www.amazon.com/s?k=wall+mount+towel+rack+microfiber+towel+set&tag=alderprojects-20",
+      productSpec: "Wall-mounted towel rack with 4-6 hooks/bars. Plus 6 absorbent microfiber towels (16\"x24\"). Microfiber dries faster than cotton, holds more water per ounce."
+    },
+    tags: {
+      topics: [
+        "mudroom"
+      ],
+      roles: [
+        "textile",
+        "accessory"
+      ],
+      functions: [
+        "towel_station"
+      ],
+      seasons: [
+        "mud_season",
+        "spring",
+        "year_round"
+      ],
+      propertyTypes: [],
+      conditions: [],
+      alreadyHaveFlag: "has_towel_station",
+      tier: "sweet_spot"
+    },
+    citations: [
+      "Microfiber vs cotton absorbency comparison"
+    ],
+    migratedFrom: {
+      scope: "mudroom_entry_reset",
+      slotId: "mudroom_towel_station",
+      tier: "sweet_spot"
+    }
+  },
+  {
+    universeId: "mudroom_floor_protection__indoor_runner_rug_washable_2_5_x_7",
+    rank: 100,
+    variant: {
+      productName: "Indoor runner rug (washable, 2.5' x 7')",
+      priceLow: 45,
+      priceHigh: 85,
+      affiliateUrl: "https://www.amazon.com/s?k=washable+runner+rug+2.5+ft+x+7+ft+entryway&tag=alderprojects-20",
+      productSpec: "2.5 ft x 7 ft synthetic runner. Machine washable. Rubber-backed. Bridges from entry mat to nearest carpeted/finished room. Synthetic fiber (not cotton or wool)."
+    },
+    tags: {
+      topics: [
+        "mudroom"
+      ],
+      roles: [
+        "textile",
+        "preventer"
+      ],
+      functions: [
+        "floor_protection"
+      ],
+      seasons: [
+        "mud_season",
+        "spring",
+        "year_round"
+      ],
+      propertyTypes: [],
+      conditions: [],
+      alreadyHaveFlag: "has_floor_protection",
+      tier: "sweet_spot"
+    },
+    citations: [
+      "Indoor runner rug product comparisons",
+      "Washable rug fiber durability"
+    ],
+    migratedFrom: {
+      scope: "mudroom_entry_reset",
+      slotId: "mudroom_floor_protection",
+      tier: "sweet_spot"
+    }
+  },
 ]

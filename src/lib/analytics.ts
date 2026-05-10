@@ -773,6 +773,8 @@ export type ResultPageEvent =
   | 'retailer_click'
   | 'skip_card_view'
   | 'skipped_item_add_anyway'
+  | 'skipped_item_secondary_click'
+  | 'skip_card_avoided_spend_view'
   | 'keep_skipped_click'
   | 'addon_card_view'
   | 'addon_add_click'

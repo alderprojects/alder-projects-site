@@ -79,7 +79,7 @@ export default function Footer() {
                 maxWidth: 240,
               }}
             >
-              Vermont property tool. Address in, full picture out.
+              Practical project guidance for Vermont homes.
             </p>
             <a
               href="mailto:hello@alderprojects.com"

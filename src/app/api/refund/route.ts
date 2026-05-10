@@ -17,8 +17,10 @@ import {
   markSmartCartRefunded,
   markWorthItPlanRefunded,
   logPlanEvent,
+  isV2Cart,
 } from '@/lib/storage'
 import { kv } from '@vercel/kv'
+import { logBuyerEvent, hashEmail } from '@/lib/buyer-events'
 
 export const dynamic = 'force-dynamic'
 
@@ -120,6 +122,44 @@ export async function POST(req: Request) {
   if (planCode) {
     await markWorthItPlanRefunded(planCode)
     await logPlanEvent(planCode, 'plan_refunded', { reason: reason ?? '', refundId: refund.id })
+  }
+
+  // v7.2.13 — durable buyer event log for refund analytics. Wrapped
+  // in try/catch so analytics never blocks the refund response.
+  // Only v2 carts have the structured fields; v1 carts (legacy) skip
+  // the analytics log — there are no live v1 carts being refunded.
+  if (cartId) {
+    try {
+      const cart = await getSmartCart(cartId)
+      if (cart && isV2Cart(cart)) {
+        await logBuyerEvent({
+          eventType: 'cart_refunded',
+          cartId,
+          customerEmailHash: hashEmail(cart.customerEmail),
+          topic: cart.topic,
+          scopeVariantId: cart.scopeVariantId,
+          scenario: cart.scenario,
+          town: cart.customerProvidedAddress ?? null,
+          townTier: null,
+          fee: 19.99,
+          leanCartLow: cart.savings.leanCartLow,
+          leanCartHigh: cart.savings.leanCartHigh,
+          avoidedSpendLow: cart.savings.potentialSavingsLow,
+          avoidedSpendHigh: cart.savings.potentialSavingsHigh,
+          selectedSlotCount: null,
+          totalSlotCount: cart.slots.length,
+          refundReason: reason ?? '(no reason given)',
+          refundedAt: new Date().toISOString(),
+          utmSource: null,
+          utmMedium: null,
+          utmCampaign: null,
+          referrer: null,
+          sessionId: null,
+        })
+      }
+    } catch (err) {
+      console.error('[buyer-events] cart_refunded log failed', err)
+    }
   }
 
   return NextResponse.json({

@@ -30,7 +30,7 @@ interface Props {
 }
 
 const TIER_LABEL_FRIENDLY: Record<CartTier, string> = {
-  sweet_spot: 'Sweet-spot pick',
+  sweet_spot: 'Recommended pick',
   premium: 'Durable pick',
   budget: 'Best value',
 }

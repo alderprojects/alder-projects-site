@@ -195,6 +195,18 @@ export interface SmartCartV2Output {
     label: string
     daysRemaining?: number
   }
+
+  /**
+   * v7.2.14 — full list of scope-level route-out conditions, forwarded
+   * from the catalog so the result page can render a "when to call a pro"
+   * callout even when the cart is NOT actively routed out. Distinct
+   * from `routedOut` (singular, the triggered rule).
+   */
+  routeOutRules?: Array<{
+    condition: string
+    destination: 'worth_it' | 'small_pro' | 'contractor' | 'verify_first'
+    reason: string
+  }>
 }
 
 export const TIER_LABEL: Record<CartTier, string> = {

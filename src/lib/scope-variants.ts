@@ -52,7 +52,8 @@ export const SCOPE_VARIANTS: Record<TopicId, ScopeVariant[]> = {
       topic: 'kitchen',
       label: 'Kitchen organizers',
       description: 'Drawer dividers, lazy susans, pantry organizers. Pulled from the existing kit; deeper authored content lands in V7.1.',
-      smartCartReady: false,
+      // v7.2.14: catalog confirmed launch-ready by audit; flag flipped from false.
+      smartCartReady: true,
       defaultLane: 'diy',
       estCostRange: { low: 40, high: 200 },
       relevantKitIds: ['kitchen_organizers'],
@@ -115,12 +116,34 @@ export const SCOPE_VARIANTS: Record<TopicId, ScopeVariant[]> = {
 
   // ---------- Weatherization (2 variants) ----------------------------
   weatherization: [
+    // v7.2.14 — pilot scope.
+    {
+      id: 'window_weatherization',
+      topic: 'weatherization',
+      label: 'Window weatherization — film, weatherstrip, draft control',
+      description:
+        'Close drafts for one winter before deciding on $800-$1,500/window replacement. Vermont-specific.',
+      smartCartReady: true,
+      defaultLane: 'diy',
+      estCostRange: { low: 80, high: 220 },
+      relevantKitIds: ['diy_weatherization_tools'],
+      overbuyTrapIds: [
+        'window_indow_inserts_no_test',
+        'window_designer_curtains',
+        'window_replacement_no_diagnosis',
+      ],
+      skipListTopicTags: ['window_weatherization', 'weatherization_diy'],
+      timingCategory: 'weatherization_materials',
+    },
     {
       id: 'weatherization_diy_air_sealing',
       topic: 'weatherization',
       label: 'DIY air sealing — caulk, foam, weatherstrip',
       description: 'The high-payoff DIY pass. Submit receipts to EVT for $100 cash back.',
-      smartCartReady: true,
+      // v7.2.14: catalog never shipped; ready flag flipped to false to prevent
+      // dropdown selection of a scope with no catalog. Returns as a guide
+      // section under window weatherization in v7.2.14, not a separate cart.
+      smartCartReady: false,
       defaultLane: 'diy',
       estCostRange: { low: 60, high: 180 },
       relevantKitIds: ['diy_weatherization_tools'],
@@ -332,6 +355,24 @@ export const SCOPE_VARIANTS: Record<TopicId, ScopeVariant[]> = {
       skipListTopicTags: ['safety'],
       timingCategory: 'year_round',
     },
+    // v7.2.14 — pilot scope.
+    {
+      id: 'basement_moisture_prep',
+      topic: 'home_repair',
+      label: 'Basement moisture prep before finishing',
+      description:
+        'Diagnose humidity, leaks, and water risk before committing $20-50k to a finished basement.',
+      smartCartReady: true,
+      defaultLane: 'diy',
+      estCostRange: { low: 80, high: 350 },
+      relevantKitIds: ['home_moisture_control'],
+      overbuyTrapIds: [
+        'basement_premium_dehumidifier_no_test',
+        'basement_finishing_no_diagnosis',
+      ],
+      skipListTopicTags: ['basement_moisture', 'moisture'],
+      timingCategory: 'year_round',
+    },
   ],
 
   // ---------- Universal (2 variants — v7.2.5) ------------------------
@@ -381,10 +422,14 @@ export function getScopeVariantsForTopic(topic: TopicId): ScopeVariant[] {
   return SCOPE_VARIANTS[topic] ?? []
 }
 
-// Topics that have at least one V7 scope variant — drives the topic
-// dropdown in the curation modal.
+// Topics that have at least one Smart-Cart-ready variant — drives the topic
+// dropdown in the curation modal. v7.2.14: filter narrowed from "any
+// variant" to "any ready variant" so topics whose only variants are stubs
+// (e.g. weatherization, bath, heat_pump) do not appear and 500.
 export function getV7Topics(): TopicId[] {
-  return (Object.keys(SCOPE_VARIANTS) as TopicId[]).filter(t => SCOPE_VARIANTS[t].length > 0)
+  return (Object.keys(SCOPE_VARIANTS) as TopicId[]).filter(t =>
+    SCOPE_VARIANTS[t].some(v => v.smartCartReady),
+  )
 }
 
 // Variants flagged smartCartReady=true — used by tests to confirm V7

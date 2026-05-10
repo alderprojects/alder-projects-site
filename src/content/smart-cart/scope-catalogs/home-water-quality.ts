@@ -413,23 +413,6 @@ export const HOME_WATER_QUALITY: ScopeCatalog = {
   ],
   "skipList": [
     {
-      "id": "skip_filter_no_test_first",
-      "type": "wrong_version",
-      "title": "Buying filter system before water testing",
-      "marketingPitch": "Comprehensive whole-house water treatment.",
-      "realReason": "Filters target specific contaminants. A $2,500 system that addresses chlorine when your real problem is arsenic doesn't fix arsenic. Test first, then size and select the system. The lab test ($165) is the highest-leverage spend in this entire scope.",
-      "amountSaved": {
-        "low": 1500,
-        "high": 4500
-      },
-      "appliesToScope": [
-        "home_water_quality"
-      ],
-      "citations": [
-        "EPA water treatment selection guidance"
-      ]
-    },
-    {
       "id": "skip_pitcher_for_sediment",
       "type": "wrong_version",
       "title": "Pitcher filter when the issue is sediment",
@@ -454,7 +437,7 @@ export const HOME_WATER_QUALITY: ScopeCatalog = {
       "realReason": "RO removes nearly everything — including beneficial minerals. It's the right answer if you have arsenic, fluoride, or specific metals to address. It's expensive overkill ($300-$600 + filter replacement costs) if your test shows only chlorine taste. Test first.",
       "amountSaved": {
         "low": 200,
-        "high": 500
+        "high": 400
       },
       "appliesToScope": [
         "home_water_quality"
@@ -482,14 +465,9 @@ export const HOME_WATER_QUALITY: ScopeCatalog = {
     },
     {
       "id": "skip_taste_as_safety",
-      "type": "wrong_version",
+      "type": "wrong_category",
       "title": "Treating water taste as a safety indicator",
-      "marketingPitch": "\"Tastes great, must be safe.\"",
       "realReason": "Water that tastes fine can have invisible bacteria, lead, arsenic, or radon. Water that tastes bad can be perfectly safe but contain harmless chlorine. Taste is not a safety signal. Annual lab testing is the safety check.",
-      "amountSaved": {
-        "low": 0,
-        "high": 0
-      },
       "appliesToScope": [
         "home_water_quality"
       ],
@@ -559,6 +537,11 @@ export const HOME_WATER_QUALITY: ScopeCatalog = {
   "primaryCustomerPain": "Vermont rural homes are mostly on private wells. Water quality varies by region (arsenic in some areas, radon-in-water in others, manganese, iron, hardness everywhere). Buying a filter system without testing first means you almost always solve the wrong problem.",
   "valueProposition": "A $165 lab test plus the right targeted filter system ($75-$250) replaces a $2,500 whole-house treatment system that addressed the wrong contaminant. Test first, treat right.",
   "routeOutRules": [
+    {
+      "condition": "considering_whole_house_treatment_no_test",
+      "destination": "verify_first",
+      "reason": "Whole-house water treatment systems run $1,500–$4,500 installed and are tuned to specific contaminants. Without a current lab test, almost every buyer solves the wrong problem. Get a $165 lab test first, then a water-quality pro can size the right system. Smart Cart is not the right tool for a major treatment-system purchase."
+    },
     {
       "condition": "has_bacteria_positive_test",
       "destination": "small_pro",

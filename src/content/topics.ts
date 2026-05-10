@@ -10,6 +10,9 @@ import { VERMONT_WEATHERIZATION_EVT_REBATE_CONTENT } from './topics/vermont-weat
 import { VERMONT_SOLAR_BATTERY_STACK_2026_CONTENT } from './topics/vermont-solar-battery-stack-2026'
 import { VERMONT_ADU_PERMIT_COST_2026_CONTENT } from './topics/vermont-adu-permit-cost-2026'
 import { VERMONT_REBATE_STACK_2026_CONTENT } from './topics/vermont-rebate-stack-2026'
+// v7.2.14 — pilot guides
+import { WINDOW_FILM_VS_REPLACEMENT_VERMONT_CONTENT } from './topics/window-film-vs-replacement-vermont'
+import { BEFORE_FINISHING_BASEMENT_MOISTURE_CHECKS_VERMONT_CONTENT } from './topics/before-finishing-basement-moisture-checks-vermont'
 
 export const TOPIC_CONTENT: Record<string, TopicGuideContent> = {
   'vermont-heat-pump-rebate-stack-2026': HEAT_PUMP_REBATE_STACK_2026_CONTENT,
@@ -17,6 +20,10 @@ export const TOPIC_CONTENT: Record<string, TopicGuideContent> = {
   'vermont-solar-battery-stack-2026': VERMONT_SOLAR_BATTERY_STACK_2026_CONTENT,
   'vermont-adu-permit-cost-2026': VERMONT_ADU_PERMIT_COST_2026_CONTENT,
   'vermont-rebate-stack-2026': VERMONT_REBATE_STACK_2026_CONTENT,
+  // v7.2.14
+  'window-film-vs-replacement-vermont': WINDOW_FILM_VS_REPLACEMENT_VERMONT_CONTENT,
+  'before-finishing-basement-moisture-checks-vermont':
+    BEFORE_FINISHING_BASEMENT_MOISTURE_CHECKS_VERMONT_CONTENT,
 }
 
 export const TOPIC_SLUGS = Object.keys(TOPIC_CONTENT)

@@ -30,6 +30,9 @@ import { HOME_SAFETY_KIT } from './scope-catalogs/home-safety-kit'
 import { UNIVERSAL_PROJECT_PREP } from './scope-catalogs/universal-project-prep'
 // V7.2.6
 import { MUDROOM_ENTRY_RESET } from './scope-catalogs/mudroom-entry-reset'
+// V7.2.14 — pilot catalogs
+import { WINDOW_WEATHERIZATION } from './scope-catalogs/window-weatherization'
+import { BASEMENT_MOISTURE_PREP } from './scope-catalogs/basement-moisture-prep'
 
 const CATALOGS: ScopeCatalog[] = [
   KITCHEN_ORGANIZERS,
@@ -50,6 +53,9 @@ const CATALOGS: ScopeCatalog[] = [
   UNIVERSAL_PROJECT_PREP,
   // V7.2.6
   MUDROOM_ENTRY_RESET,
+  // V7.2.14
+  WINDOW_WEATHERIZATION,
+  BASEMENT_MOISTURE_PREP,
 ]
 
 // ---------- Catalog lookup ------------------------------------------

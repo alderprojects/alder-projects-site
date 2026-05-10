@@ -494,4 +494,26 @@ export const KITCHEN_COSMETIC_REFRESH: ScopeCatalog = {
     tight_budget: { selectedTier: 'budget', alreadyHave: [] },
     premium: { selectedTier: 'premium', alreadyHave: [] },
   },
+
+  // v7.2.14: scope-level metadata added to legacy v7.2.3 catalog.
+  smartCartPromise:
+    'Spend $80-$220 to refresh the kitchen with paint, hardware, and lighting — no remodel.',
+  primaryCustomerPain:
+    'The kitchen feels dated, but a remodel is years away or out of scope. Most homeowners either live with it or overspend on a half-measure.',
+  valueProposition:
+    'A Saturday-DIY pass on cabinets, pulls, and undercabinet lighting buys 5-10 more years of comfort with the existing kitchen for under $250 — vs. the $15-30k remodel later.',
+  routeOutRules: [
+    {
+      condition: 'cabinets_water_damaged_or_warped',
+      destination: 'small_pro',
+      reason:
+        "Damaged cabinets won't take paint cleanly. If sides are bowed or doors are warped, refresh won't hide it — refacing or replacement is the right scope.",
+    },
+    {
+      condition: 'planning_kitchen_remodel',
+      destination: 'verify_first',
+      reason:
+        "If you're planning a full remodel within 12 months, refresh dollars are mostly wasted. Skip the cosmetic round.",
+    },
+  ],
 }

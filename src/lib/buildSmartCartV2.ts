@@ -186,6 +186,9 @@ export function buildSmartCartV2(
     nextBestGaps,
     bundlePrompts,
     urgencyBanner,
+    // v7.2.14 — forward route-out rules so the result page can render
+    // a "when to call a pro" callout for non-routed-out carts.
+    routeOutRules: catalog.routeOutRules,
   }
 }
 

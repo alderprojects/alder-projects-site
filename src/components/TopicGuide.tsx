@@ -2,6 +2,7 @@ import Link from 'next/link'
 import Nav from '@/components/Nav'
 import Footer from '@/components/Footer'
 import GuideFooter from '@/components/GuideFooter'
+import PageViewEvent from '@/components/PageViewEvent'
 import {
   buildArticle,
   buildBreadcrumbList,
@@ -57,6 +58,8 @@ export default function TopicGuide({
 
   return (
     <div style={{ minHeight: '100vh', backgroundColor: C.cream, fontFamily: FB }}>
+      {/* v7.2.14 — fire guide_view event on mount. */}
+      <PageViewEvent kind="guide" slug={content.slug} topicId={content.topicId} />
       {schemas.map((schema, i) => (
         <script
           key={i}

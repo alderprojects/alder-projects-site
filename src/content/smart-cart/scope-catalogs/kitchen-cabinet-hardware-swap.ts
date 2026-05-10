@@ -343,4 +343,26 @@ export const KITCHEN_CABINET_HARDWARE_SWAP: ScopeCatalog = {
     tight_budget: { selectedTier: 'budget', alreadyHave: [] },
     premium: { selectedTier: 'premium', alreadyHave: [] },
   },
+
+  // v7.2.14: scope-level metadata added to legacy v7.2.3 catalog.
+  smartCartPromise:
+    'Spend $30-$180 on hardware to give cabinets a new-kitchen feel — no paint, no replacement.',
+  primaryCustomerPain:
+    'The kitchen looks tired, but tearing out cabinets is years away. Hardware swap is the cheapest meaningful upgrade — and the easiest to get wrong on hole spacing.',
+  valueProposition:
+    'New pulls and soft-close hinges read as "renovated" to most eyes for under $200. The new-kitchen sensation for ~1% of remodel cost.',
+  routeOutRules: [
+    {
+      condition: 'hardware_holes_dont_match_existing',
+      destination: 'verify_first',
+      reason:
+        "If new pulls don't fit the existing center-to-center hole spacing, you'll be drilling and patching. Either match the spacing exactly, or commit to filling and repainting cabinet doors.",
+    },
+    {
+      condition: 'cabinet_doors_warped_or_damaged',
+      destination: 'small_pro',
+      reason:
+        "Hardware on damaged doors looks worse, not better. If doors are warped or splitting, this isn't the right scope — replace or reface.",
+    },
+  ],
 }

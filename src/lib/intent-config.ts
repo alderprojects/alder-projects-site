@@ -242,7 +242,8 @@ export const SMART_CART_CATEGORIES: SmartCartCategory[] = [
     notRightIfPointsToWorthIt: [
       'You are debating a mudroom build-out or addition',
     ],
-    curationStatus: 'beta',
+    // v7.2.14: removed beta — backed by launch-ready mudroom_entry_reset.
+    curationStatus: 'curated',
   },
   {
     id: 'opening_the_house',
@@ -271,7 +272,9 @@ export const SMART_CART_CATEGORIES: SmartCartCategory[] = [
     notRightIfPointsToWorthIt: [
       'You are deciding whether to add a screen porch or rebuild the dock',
     ],
-    curationStatus: 'beta',
+    // v7.2.14: removed beta — backed by launch-ready outdoor_lake_season +
+    // outdoor_seasonal_opening + outdoor_dock_lake.
+    curationStatus: 'curated',
   },
   {
     id: 'small_repair',

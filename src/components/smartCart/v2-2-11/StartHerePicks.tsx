@@ -11,20 +11,17 @@
 import { useEffect } from 'react'
 import type { CartSlot, CartTier } from '@/lib/smart-cart-model'
 import { trackResultPageEvent } from '@/lib/analytics'
+import { selectStartHere } from '@/lib/result-page-content'
 import ProductPickCard from './ProductPickCard'
+
+// Re-export so existing callers using the v2-2-11/StartHerePicks
+// import path keep working. The implementation now lives in
+// result-page-content.ts (server-OK module).
+export { selectStartHere }
 
 interface Props {
   slots: CartSlot[]
   tier: CartTier
-}
-
-export function selectStartHere(coreSlots: CartSlot[]): CartSlot[] {
-  if (coreSlots.length === 0) return []
-  // Prefer slots with costBenefitClaim, preserving catalog order otherwise
-  const withClaim = coreSlots.filter(s => s.costBenefitClaim)
-  const without = coreSlots.filter(s => !s.costBenefitClaim)
-  const ordered = [...withClaim, ...without]
-  return ordered.slice(0, Math.min(3, coreSlots.length))
 }
 
 export default function StartHerePicks({ slots, tier }: Props) {

@@ -8,6 +8,7 @@
 // TopicId lives in property-modules. Import is from the .tsx file
 // at runtime (Next.js / tsx resolves the extension automatically).
 import type { TopicId } from './property-modules'
+import type { CartSlot } from './smart-cart-model'
 // (no .tsx in import path — the bundler resolves .tsx, .ts, .d.ts in
 // that order. No runtime change needed.)
 
@@ -290,6 +291,26 @@ export function extractSpecChips(productSpec: string): string[] {
     }
   }
   return out
+}
+
+// ---------- Start Here selection (server-runnable) -------------
+//
+// v7.2.11 hotfix: this helper used to live in StartHerePicks.tsx,
+// which has a 'use client' directive. V2ResultLayout (server) needs
+// the helper to dedupe hero slots from the full list, so it's
+// hosted here in a server-OK module. Importing it from the client
+// component is fine; importing it from a server component is also
+// fine because this module has no client directive.
+
+const START_HERE_MAX = 3
+
+export function selectStartHere(coreSlots: CartSlot[]): CartSlot[] {
+  if (coreSlots.length === 0) return []
+  // Prefer slots with costBenefitClaim, preserving catalog order otherwise
+  const withClaim = coreSlots.filter(s => s.costBenefitClaim)
+  const without = coreSlots.filter(s => !s.costBenefitClaim)
+  const ordered = [...withClaim, ...without]
+  return ordered.slice(0, Math.min(START_HERE_MAX, coreSlots.length))
 }
 
 // ---------- Topic icon for cross-sell cards ---------------------

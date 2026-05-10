@@ -5,11 +5,14 @@ import Nav from '@/components/Nav'
 import Footer from '@/components/Footer'
 import CurationModal from '@/components/CurationModal'
 import PageViewEvent from '@/components/PageViewEvent'
+import Why1999Module from '@/components/Why1999Module'
 import {
   buildArticle,
   buildBreadcrumbList,
+  buildSmartCartProduct,
   absUrl,
 } from '@/lib/jsonld'
+import { CONFIG } from '@/lib/recommender-config'
 import {
   SMART_CART_TOPIC_LANDINGS,
   SMART_CART_TOPIC_SLUGS,
@@ -48,6 +51,12 @@ const C = {
   ivory: '#F5EFE0',
   sage: '#7A9B6F',
 }
+
+// v7.2.15 — map topic landing slugs to the matching Why $19.99 variant.
+const WHY_VARIANT_BY_SLUG: Record<string, 'window' | 'basement'> = {
+  'window-weatherization-vermont': 'window',
+  'basement-moisture-prep': 'basement',
+}
 const FS = "'Playfair Display', Georgia, serif"
 const FB = "'DM Sans', system-ui, sans-serif"
 
@@ -70,6 +79,16 @@ export default function SmartCartTopicPage({ params }: Props) {
       { name: 'Smart Cart', url: '/smart-cart' },
       { name: c.h1.replace(/\.$/, ''), url: path },
     ]),
+    // v7.2.15 — Smart Cart Product / Offer schema. The page IS the product
+    // landing page for the $19.99 cart for this scope. No fake reviews,
+    // no aggregate ratings.
+    buildSmartCartProduct({
+      name: c.h1.replace(/\.$/, ''),
+      description: c.metaDescription,
+      url,
+      priceUsd: CONFIG.products.smartCart.priceUsd,
+      category: c.scopeVariantId,
+    }),
   ]
 
   return (
@@ -147,6 +166,10 @@ export default function SmartCartTopicPage({ params }: Props) {
               data-curation-modal-product="smart_cart"
               data-curation-modal-topic={c.topicId}
               data-curation-modal-scope={c.scopeVariantId}
+              data-curation-modal-scenario="just_starting"
+              data-topic-id={c.topicId}
+              data-scope-id={c.scopeVariantId}
+              data-scenario-id="just_starting"
               style={{
                 background: C.accent,
                 color: '#fff',
@@ -175,6 +198,12 @@ export default function SmartCartTopicPage({ params }: Props) {
           </div>
 
           <Section title="What the cart picks for you" items={c.pickTeaser} accent={C.sage} />
+          {/* v7.2.15 — concrete "Why $19.99?" module above the skip
+              section. Mapped from the topic slug to the buyer's actual
+              fear. */}
+          {WHY_VARIANT_BY_SLUG[c.slug] && (
+            <Why1999Module variant={WHY_VARIANT_BY_SLUG[c.slug]} />
+          )}
           <Section title="What it skips" items={c.skipTeaser} accent={C.inkFaint} />
           <Section
             title="When to skip the cart and call a pro"

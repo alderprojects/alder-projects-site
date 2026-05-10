@@ -407,10 +407,15 @@ function computeSavings(
     overbuyLow += v.priceLow
     overbuyHigh += v.priceHigh
   }
+  // v7.2.15 — apply the same 0.5 conservatism factor to .high that we
+  // already applied to .low. Buyers typically encounter 1-2 of the listed
+  // traps, not all of them; summing every .high inflates the headline
+  // number into "marketing claim" territory and breaks the reconciliation
+  // between the displayed savings and the visible skip-item ranges.
   for (const item of skipList) {
     if (item.type !== 'wrong_version' || !item.amountSaved) continue
     overbuyLow += item.amountSaved.low * 0.5
-    overbuyHigh += item.amountSaved.high
+    overbuyHigh += item.amountSaved.high * 0.5
   }
 
   return {

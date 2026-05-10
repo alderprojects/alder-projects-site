@@ -210,3 +210,51 @@ export function computeSelectedTotalRange(
   }
   return { low, high }
 }
+
+// v7.2.15 — total a list of slots at the chosen tier, ignoring selection.
+// Used to compute core / addon / all-in totals from product ranges so the
+// result page header and sidebar stop conflating "core" with "every pick".
+export function computeSlotTotalRange(
+  slots: CartSlot[],
+  tier: 'budget' | 'sweet_spot' | 'premium',
+): { low: number; high: number } {
+  let low = 0
+  let high = 0
+  for (const slot of slots) {
+    const variant = slot.tiers[tier] ?? slot.tiers.sweet_spot
+    if (!variant) continue
+    low += variant.priceLow ?? 0
+    high += variant.priceHigh ?? variant.priceLow ?? 0
+  }
+  return { low, high }
+}
+
+// v7.2.15 — compute core / addon / all-in totals together. Builders today
+// store cart.savings.leanCartLow as the CORE total; addons and all-in are
+// derived. Renderers use these so the math reconciles.
+export interface CartTotals {
+  coreLow: number
+  coreHigh: number
+  addOnLow: number
+  addOnHigh: number
+  allInLow: number
+  allInHigh: number
+}
+
+export function computeCartTotals(
+  cart: SmartCartV2Output,
+): CartTotals {
+  const tier = cart.selectedTier
+  const coreSlots = cart.slots.filter(s => s.slotKind === 'core')
+  const addOnSlots = cart.slots.filter(s => s.slotKind === 'addon')
+  const core = computeSlotTotalRange(coreSlots, tier)
+  const addon = computeSlotTotalRange(addOnSlots, tier)
+  return {
+    coreLow: core.low,
+    coreHigh: core.high,
+    addOnLow: addon.low,
+    addOnHigh: addon.high,
+    allInLow: core.low + addon.low,
+    allInHigh: core.high + addon.high,
+  }
+}

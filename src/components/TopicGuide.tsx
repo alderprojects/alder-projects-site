@@ -5,6 +5,7 @@ import GuideFooter from '@/components/GuideFooter'
 import PageViewEvent from '@/components/PageViewEvent'
 import SmartCartGuideCTA from '@/components/SmartCartGuideCTA'
 import CurationModal from '@/components/CurationModal'
+import Why1999Module from '@/components/Why1999Module'
 import {
   buildArticle,
   buildBreadcrumbList,
@@ -156,7 +157,14 @@ export default function TopicGuide({
             {/* v7.2.14 fix-up — CTA #2: end of "What the $19.99..." section */}
             {content.smartCartCta &&
               /^What the \$19\.99 Smart Cart actually does/i.test(section.h2) && (
-                <SmartCartGuideCTA variant="inline" {...content.smartCartCta} />
+                <>
+                  <SmartCartGuideCTA variant="inline" {...content.smartCartCta} />
+                  {/* v7.2.15 — concrete "Why $19.99?" right after the
+                      second CTA so the trust pitch follows the action. */}
+                  {content.why1999Variant && (
+                    <Why1999Module variant={content.why1999Variant} />
+                  )}
+                </>
               )}
           </section>
         ))}

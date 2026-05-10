@@ -1,13 +1,13 @@
 'use client'
 
 // IntentSelector — grid of intent buttons used on the rebuilt
-// /smart-cart and /worth-it sales pages. Selecting a button updates
-// the page's selectedIntentId state, which drives the dynamic
+// /smart-cart and /worth-it sales pages. Selecting an active button
+// updates the page's selectedIntentId state, which drives the dynamic
 // example card and the CTA's data attributes.
 //
-// Coming-soon items remain clickable so the page can show a soft
-// "this category is being curated" message instead of going dead.
-// Beta items render with a small badge.
+// v7.2.15 — coming-soon tiles are non-interactive and rendered in a
+// visually distinct row below the active picker so they can't trap
+// the buyer in a dead flow. Beta items render with a small badge.
 
 import type { CurationStatus } from '@/lib/intent-config'
 
@@ -40,24 +40,26 @@ export default function IntentSelector({
         ? 'md:grid-cols-2 lg:grid-cols-4'
         : 'md:grid-cols-2 lg:grid-cols-3'
 
+  const active = items.filter(i => i.curationStatus !== 'coming_soon')
+  const upcoming = items.filter(i => i.curationStatus === 'coming_soon')
+
   return (
     <section className="my-8">
       <h2 className="font-display text-xl text-[#1a1f1a] mb-4">{title}</h2>
       <div className={`grid grid-cols-1 ${gridCols} gap-3`}>
-        {items.map(item => {
+        {active.map(item => {
           const selected = item.id === value
-          const dim = item.curationStatus === 'coming_soon'
           return (
             <button
               key={item.id}
               type="button"
               onClick={() => onChange(item.id)}
+              data-intent-id={item.id}
               className={[
                 'text-left rounded-xl border px-4 py-3 transition-colors flex items-start gap-3 bg-white',
                 selected
                   ? 'border-[#1f3a2e] shadow-sm ring-2 ring-[#1f3a2e]/30'
                   : 'border-[#e8e3d4] hover:border-[#1f3a2e]/40',
-                dim ? 'opacity-70' : '',
               ].join(' ')}
             >
               <span className="w-9 h-9 rounded-md bg-[#fbf8f1] flex items-center justify-center flex-shrink-0 text-[#1f3a2e]">
@@ -72,16 +74,34 @@ export default function IntentSelector({
                     Beta
                   </span>
                 )}
-                {item.curationStatus === 'coming_soon' && (
-                  <span className="mt-1 inline-block text-[10px] uppercase tracking-wide bg-[#fbf8f1] text-[#1a1f1a]/70 border border-[#e8e3d4] px-1.5 py-0.5 rounded">
-                    Coming soon
-                  </span>
-                )}
               </span>
             </button>
           )
         })}
       </div>
+
+      {upcoming.length > 0 && (
+        <div className="mt-5 pt-4 border-t border-[#e8e3d4]">
+          <p className="text-xs uppercase tracking-wide text-[#1a1f1a]/55 mb-2">
+            Coming soon
+          </p>
+          <div className="flex flex-wrap gap-2">
+            {upcoming.map(item => (
+              <span
+                key={item.id}
+                aria-disabled="true"
+                data-intent-id={item.id}
+                className="inline-flex items-center gap-2 rounded-full border border-[#e8e3d4] bg-[#fbf8f1] px-3 py-1.5 text-xs text-[#1a1f1a]/65"
+              >
+                <svg viewBox="0 0 24 24" fill="currentColor" className="w-3.5 h-3.5 text-[#1a1f1a]/50">
+                  <path d={item.iconSvg} />
+                </svg>
+                {item.label}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
     </section>
   )
 }

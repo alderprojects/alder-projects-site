@@ -1,8 +1,11 @@
 // V7.2.1 — Cross-sell while Worth-It is paused.
+// v7.2.15 — reframed as a low-emphasis waitlist line so it does not
+// cannibalize the Smart Cart conversion. Sits below the primary CTA
+// rather than competing with it.
 //
-// On Smart Cart pages we used to upsell Worth-It; now we point at the
-// coming-soon page with a notify-me cue. On Worth-It pages this
-// component is no longer rendered (the page is the coming-soon page).
+// On Smart Cart pages this is the secondary "bigger than a shopping
+// list?" waitlist note. On Worth-It pages this component is no longer
+// rendered (the page is the coming-soon page).
 
 type Props = { fromProduct: 'smart_cart' | 'worth_it' }
 
@@ -10,25 +13,20 @@ export default function CrossSellSection({ fromProduct }: Props) {
   if (fromProduct !== 'smart_cart') return null
 
   return (
-    <aside className="my-10 bg-[#1f3a2e] text-white rounded-xl p-6 md:p-8 grid md:grid-cols-3 gap-4 items-center">
-      <div className="md:col-span-2">
-        <div className="text-xs uppercase tracking-wide text-white/70 mb-2">
-          Coming back
-        </div>
-        <h3 className="font-display text-xl mb-2">
-          More than just a shopping list?
-        </h3>
-        <p className="text-sm text-white/85">
-          Worth-It Plan returns soon — ranked moves, alternate paths,
-          DIY stop line, all tied to your property. Get notified when
-          it ships.
+    <aside className="my-8 border-t border-[#e8e3d4] pt-6 flex flex-wrap items-baseline gap-3 text-sm text-[#1a1f1a]/75">
+      <div className="flex-1 min-w-[220px]">
+        <p className="font-medium text-[#1a1f1a] mb-1">
+          Bigger than a shopping list?
+        </p>
+        <p className="text-[#1a1f1a]/70">
+          Join the Worth-It waitlist for larger renovation decisions.
         </p>
       </div>
       <a
         href="/worth-it"
-        className="bg-white text-[#1f3a2e] font-medium px-5 py-3 rounded-lg hover:bg-[#f5efe2] inline-block text-center"
+        className="text-[#1f3a2e] font-medium underline-offset-2 hover:underline"
       >
-        Get notified →
+        Join waitlist →
       </a>
     </aside>
   )

@@ -277,7 +277,11 @@ export const WINDOW_WEATHERIZATION: ScopeCatalog = {
       marketingPitch: '"Acoustic + thermal insert that looks invisible."',
       realReason:
         "Indow inserts run $400-700/window installed. They're a real product but the wrong starting point — film at $4-8/window closes 70-80% of the same air leakage. Use film for one winter; if the issue is genuinely conductive (cold radiating off the glass) and you want a permanent indoor solution, Indow is the upgrade. Most Vermont buyers find film does enough.",
-      amountSaved: { low: 300, high: 600 },
+      // v7.2.15 — capped to a credible single-window overbuy. The $400-700
+      // Indow upside per window is real, but the "buyer was about to do
+      // every window" framing is closer to project-deferral copy than to
+      // an avoided-overbuy claim.
+      amountSaved: { low: 200, high: 400 },
       appliesToScope: ['window_weatherization'],
       citations: ['Indow product documentation', 'Window film vs interior storm comparison'],
     },
@@ -304,13 +308,15 @@ export const WINDOW_WEATHERIZATION: ScopeCatalog = {
       citations: ['Weatherstripping price-vs-performance analysis'],
     },
     {
+      // v7.2.15 — recategorized as wrong_category (no amountSaved). The
+      // dollar value here belongs to project deferral, not avoided
+      // overbuying on this $19.99 cart. Surfaced via DEFERRAL_COPY in the
+      // value banner instead.
       id: 'skip_replacement_no_diagnosis',
-      type: 'wrong_version',
-      title: 'Window replacement quote without diagnosing each window',
-      marketingPitch: '"Whole-house Energy Star window replacement — pays for itself."',
+      type: 'wrong_category',
+      title: 'Whole-house window replacement before diagnosing each window',
       realReason:
         "A $10,000 whole-house replacement quote treats every window as identical. In a typical Vermont pre-1990 home, 60-80% of windows are leaky-but-intact (weatherize) and 20-40% are genuinely past saving (replace). Diagnose first; the same money on selective replacement plus weatherization on the rest goes 2-3x further.",
-      amountSaved: { low: 200, high: 400 },
       appliesToScope: ['window_weatherization'],
       citations: ['Selective vs whole-house replacement economics'],
     },

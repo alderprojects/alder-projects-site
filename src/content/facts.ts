@@ -539,6 +539,52 @@ export const FACTS: Record<string, Fact> = {
     sourceLabel: 'VT Department of Taxes — Property equalization',
     notes: 'St. Johnsbury, NEK, parts of Orleans/Essex/Caledonia counties. Trade-off: lower contractor density, longer lead times.',
   },
+
+  // ---------- v7.2.15 — window weatherization performance --------------
+  'window-film-air-leak-reduction': {
+    id: 'window-film-air-leak-reduction',
+    label: 'Air-leak reduction from interior shrink film + weatherstripping on a leaky pre-1990 double-hung',
+    value: '70-90% of air leakage closed',
+    verifyDate: '2026-05-10',
+    verifyAfter: '2027-05-10',
+    sourceUrl: 'https://www.energy.gov/energysaver/storm-windows',
+    sourceLabel: 'U.S. Department of Energy — Storm Windows / Window Treatments',
+    notes:
+      'DOE characterization of low-e storm panels and interior films vs. baseline single-pane / leaky double-hung air leakage. Building Science Corporation field studies of older residential windows report similar 70–90% air-leak reduction when film + V-strip + sash caulk are layered. Effect is on infiltration (CFM50 at the window), not on conductive U-value.',
+  },
+  'window-film-r-value-add': {
+    id: 'window-film-r-value-add',
+    label: 'Insulating-value uplift from interior shrink film over single-pane glass',
+    value: 'roughly +R-1 to +R-1.5',
+    verifyDate: '2026-05-10',
+    verifyAfter: '2027-05-10',
+    sourceUrl: 'https://www.energy.gov/energysaver/window-types-and-technologies',
+    sourceLabel: 'U.S. DOE — Window Types and Technologies',
+    notes:
+      'A trapped air gap between interior film and glass adds roughly R-1 to R-1.5 of insulating value, comparable to a thermal curtain. Fixed-frame interior storm panels (Indow-style acrylic) reach R-2 to R-3.',
+  },
+  'window-leaky-double-hung-cfm50': {
+    id: 'window-leaky-double-hung-cfm50',
+    label: 'Typical air leakage of a leaky pre-1990 double-hung at 50 Pa',
+    value: '~20-40 CFM at 50 Pa, sealable to ~5-10 CFM',
+    verifyDate: '2026-05-10',
+    verifyAfter: '2027-05-10',
+    sourceUrl: 'https://www.buildingscience.com/documents/insights/bsi-029-stack-effect',
+    sourceLabel: 'Building Science Corporation — residential window infiltration ranges',
+    notes:
+      'Range observed across BSC field characterizations of pre-1990 wood-sash double-hungs. After film + weatherstrip + caulk, residual leakage typically falls into the 5-10 CFM50 band, matching the upper bound of new-window performance.',
+  },
+  'evt-blower-door-priority-guidance': {
+    id: 'evt-blower-door-priority-guidance',
+    label: 'EVT energy audit scope-priority guidance',
+    value: 'rim joists and attic plate before windows',
+    verifyDate: '2026-05-10',
+    verifyAfter: '2026-12-31',
+    sourceUrl: 'https://www.efficiencyvermont.com/products/home-performance-with-energy-star',
+    sourceLabel: 'Efficiency Vermont — Home Performance with ENERGY STAR',
+    notes:
+      "EVT's audit-driven scope sequencing puts rim-joist and attic-plate air sealing ahead of window replacement on the typical pre-1990 Vermont home. Window replacement is rarely the highest-payback scope on a Vermont blower-door report.",
+  },
 }
 
 // ---------- Helpers ----------------------------------------------------

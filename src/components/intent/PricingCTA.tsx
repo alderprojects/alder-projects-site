@@ -62,6 +62,9 @@ export default function PricingCTA({
           data-curation-modal-scope={scopeVariantId}
           data-curation-modal-scenario={scenario}
           data-curation-modal-address={address ?? ''}
+          data-topic-id={topic}
+          data-scope-id={scopeVariantId}
+          data-scenario-id={scenario}
           className="bg-[#1f3a2e] hover:bg-[#162a21] text-white font-medium px-5 py-3 rounded-lg transition-colors"
         >
           {buttonText} →

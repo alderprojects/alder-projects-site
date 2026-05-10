@@ -157,6 +157,13 @@ For these windows, $80-$220 of weatherization kit closes 70-90% of the air leaka
     'evt-weatherization-standard-tier',
     'evt-weatherization-income-eligible',
     'evt-diy-weatherization-rebate',
+    // v7.2.15 — sources for the precise air-leak / R-value claims used in
+    // body copy. Numbers stay in prose; sources are listed in the
+    // Sources block at the bottom via GuideFooter.
+    'window-film-air-leak-reduction',
+    'window-film-r-value-add',
+    'window-leaky-double-hung-cfm50',
+    'evt-blower-door-priority-guidance',
   ],
 
   relatedGuideSlugs: [
@@ -184,4 +191,6 @@ For these windows, $80-$220 of weatherization kit closes 70-90% of the air leaka
     heroBody:
       'A $80–$220 weatherization kit closes 70-90% of felt drafts on most pre-1990 Vermont windows for one winter — and tells you which ones are genuinely past saving.',
   },
+  // v7.2.15 — render the concrete "Why $19.99?" module under the second CTA.
+  why1999Variant: 'window',
 }

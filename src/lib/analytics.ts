@@ -688,6 +688,72 @@ export function trackBridgeModuleClick(params: {
   })
 }
 
+// v7.2.15 — modal open + prefill state. Lets us see which CTAs land
+// the modal already filled (good UX) vs blank (likely-broken wiring).
+export function trackCurationModalOpen(params: {
+  product: string
+  topic?: string
+  scopeVariantId?: string
+  scenario?: string
+  sourcePath?: string
+  sourceComponent?: string
+}): void {
+  send('curation_modal_open', {
+    product: params.product,
+    topic: params.topic ?? '(none)',
+    scope_variant_id: params.scopeVariantId ?? '(none)',
+    scenario: params.scenario ?? '(none)',
+    source_path: params.sourcePath ?? '(none)',
+    source_component: params.sourceComponent ?? '(none)',
+  })
+}
+
+export function trackCurationModalPrefilled(params: {
+  product: string
+  topic?: string
+  scopeVariantId?: string
+  scenario?: string
+  prefillSource: 'data_attrs' | 'session_default'
+}): void {
+  send('curation_modal_prefilled', {
+    product: params.product,
+    topic: params.topic ?? '(none)',
+    scope_variant_id: params.scopeVariantId ?? '(none)',
+    scenario: params.scenario ?? '(none)',
+    prefill_source: params.prefillSource,
+  })
+}
+
+// v7.2.15 — fire on every Smart Cart CTA click that isn't on the
+// /smart-cart picker (those go through smart_cart_cta_clicked already).
+// `placement` describes which surface fired the click so funnel
+// analysis can compare guides vs topics vs bridges.
+export function trackSmartCartCtaClick(params: {
+  placement: string
+  topic?: string
+  scopeVariantId?: string
+  scenario?: string
+  sourcePath?: string
+}): void {
+  send('smart_cart_cta_click', {
+    placement: params.placement,
+    topic: params.topic ?? '(none)',
+    scope_variant_id: params.scopeVariantId ?? '(none)',
+    scenario: params.scenario ?? '(none)',
+    source_path: params.sourcePath ?? '(none)',
+  })
+}
+
+export function trackContractorContinueClick(params: {
+  fromPage: string
+  trade?: string
+}): void {
+  send('contractor_continue_click', {
+    from_page: params.fromPage,
+    trade: params.trade ?? '(none)',
+  })
+}
+
 export function trackSmartCartUpgradeClicked(params: { cartId: string }): void {
   send('smart_cart_upgrade_clicked', { cart_id: params.cartId })
 }

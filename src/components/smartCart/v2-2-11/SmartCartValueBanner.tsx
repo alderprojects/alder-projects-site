@@ -16,7 +16,7 @@ import { CONFIG } from '@/lib/recommender-config'
 import { formatPrice, formatPriceRange } from '@/lib/format'
 import type { SmartCartV2Output } from '@/lib/smart-cart-model'
 import { trackResultPageEvent } from '@/lib/analytics'
-import { computeSelectedTotalRange } from '@/lib/cart-selection'
+import { computeCartTotals, computeSelectedTotalRange } from '@/lib/cart-selection'
 import { useOptionalCartSelectionContext } from './CartSelectionContext'
 
 interface Props {
@@ -25,13 +25,37 @@ interface Props {
 
 const QUALITATIVE_THRESHOLD = 50
 
+// v7.2.15 — scope-keyed "project deferral" framing. The big-number ceiling
+// in the savings line was reading as marketing because it conflated
+// avoided-overbuying with "if you don't end up replacing windows" upside.
+// Split it: avoided overbuy stays on the cart line; deferral reads as a
+// conditional. Empty entries fall through to a generic disclaimer.
+const DEFERRAL_COPY: Record<
+  string,
+  { headline: string; body: string }
+> = {
+  window_weatherization: {
+    headline: 'Possibly deferring a major project: $1,000+',
+    body:
+      'Only if your windows turn out to be intact-but-drafty after the diagnostic step. Replacement runs $800–$1,500/window; weatherization buys you a winter to decide.',
+  },
+  basement_moisture_prep: {
+    headline: 'Possibly deferring a major project: $1,000+',
+    body:
+      'Only if the diagnostic surfaces a moisture problem that would have been walled in. Catching it now beats discovering a $20–50k finished basement is wet six months in.',
+  },
+}
+
 export default function SmartCartValueBanner({ cart }: Props) {
   const [methodologyOpen, setMethodologyOpen] = useState(false)
   const selection = useOptionalCartSelectionContext()
   const fee = CONFIG.products.smartCart.priceUsd
-  const { potentialSavingsLow, potentialSavingsHigh, leanCartLow, leanCartHigh } =
-    cart.savings
+  const { potentialSavingsLow, potentialSavingsHigh } = cart.savings
   const showAvoided = potentialSavingsHigh >= QUALITATIVE_THRESHOLD
+  // v7.2.15 — derive core/addon/all-in totals from slot tiers so this banner
+  // shows the same numbers as the header and the sidebar.
+  const totals = computeCartTotals(cart)
+  const hasAddOns = totals.addOnHigh > 0
 
   const showSelected = selection?.customized ?? false
   const selectedRange =
@@ -79,29 +103,54 @@ export default function SmartCartValueBanner({ cart }: Props) {
                 ? '—'
                 : formatPriceRange(selectedRange.low, selectedRange.high)
             }
-            caption={`${selectedCount} of ${cart.slots.length} picks · full cart ${formatPriceRange(leanCartLow, leanCartHigh)}`}
+            caption={`${selectedCount} of ${cart.slots.length} picks · all-in ${formatPriceRange(totals.allInLow, totals.allInHigh)}`}
           />
         ) : (
           <Stat
-            label="If you bought every pick"
-            value={formatPriceRange(leanCartLow, leanCartHigh)}
-            caption="Most buyers pick 3–5"
+            label="Core cart"
+            value={formatPriceRange(totals.coreLow, totals.coreHigh)}
+            caption={
+              hasAddOns
+                ? `Optional add-ons: +${formatPriceRange(totals.addOnLow, totals.addOnHigh)} · all-in ${formatPriceRange(totals.allInLow, totals.allInHigh)}`
+                : 'Most buyers pick 3–5'
+            }
           />
         )}
         {showAvoided ? (
           <Stat
-            label="Avoided spend"
+            label="Overbuying on this project"
             value={formatPriceRange(potentialSavingsLow, potentialSavingsHigh)}
+            caption="Sum of skipped-item ranges from this cart."
           />
         ) : (
-          <Stat label="Avoided spend" value="Hard to put a number on" />
+          <Stat
+            label="Overbuying on this project"
+            value="Hard to put a number on"
+          />
         )}
       </div>
+
+      {DEFERRAL_COPY[cart.scopeVariantId] && (
+        <div className="mt-1 mb-3 rounded-md bg-white/10 p-3 text-sm text-white/90">
+          <div className="font-medium text-white/95">
+            {DEFERRAL_COPY[cart.scopeVariantId].headline}
+          </div>
+          <p className="mt-1 text-white/80 leading-snug">
+            {DEFERRAL_COPY[cart.scopeVariantId].body}
+          </p>
+        </div>
+      )}
 
       <p className="text-sm text-white/90 mb-2">
         {showAvoided
           ? 'Pays for itself if you avoid one wrong item, one duplicate purchase, or one unnecessary upgrade.'
           : 'Designed to help avoid one wrong purchase or one extra trip.'}
+      </p>
+
+      <p className="text-xs text-white/65 italic mb-2">
+        Savings are avoided-overbuying estimates, not guaranteed rebates.
+        Bigger numbers usually mean: do the low-cost diagnostic step before
+        committing to the expensive project.
       </p>
 
       <button

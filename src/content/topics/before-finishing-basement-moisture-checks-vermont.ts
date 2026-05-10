@@ -193,4 +193,6 @@ export const BEFORE_FINISHING_BASEMENT_MOISTURE_CHECKS_VERMONT_CONTENT: TopicGui
     heroBody:
       "A $80–$300 diagnostic kit (hygrometer, moisture meter, water alarms, properly-sized dehumidifier, mold screen) tells you whether the basement is dry enough to finish — before you commit $20-50k to the bigger project.",
   },
+  // v7.2.15 — render the concrete "Why $19.99?" module under the second CTA.
+  why1999Variant: 'basement',
 }

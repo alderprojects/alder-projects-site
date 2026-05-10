@@ -28,11 +28,15 @@ function renderSmartCartBridge(slug: string) {
   if (slug.startsWith('basement-finishing-')) {
     return (
       <SmartCartBridge
-        headline="Test for moisture before you finish."
-        body="The $19.99 diagnostic kit (hygrometer, moisture meter, water alarms, properly-sized dehumidifier, mold screen) pays for itself many times over by catching problems before they're walled in. Compare to a $20–50k finish project."
+        headline="Before you finish the basement, check for moisture problems."
+        body="They're easier to catch before drywall and flooring go in. Start with the $19.99 basement moisture prep list, or route straight to a pro if you have active water, mold, or foundation issues."
         topicSlug="basement-moisture-prep"
         ctaText="See the basement moisture prep cart"
-        secondaryText="Active water, mold, or foundation cracks? Continue to basement contractors below ↓"
+        contractorCta={{
+          text: 'Have active water, mold, or structural issues? Talk to a basement waterproofing pro',
+          href: '/contractors',
+          trade: 'basement_waterproofing',
+        }}
       />
     )
   }

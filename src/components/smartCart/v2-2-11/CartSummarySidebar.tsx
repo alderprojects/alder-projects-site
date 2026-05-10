@@ -13,6 +13,7 @@ import { formatPrice, formatPriceRange } from '@/lib/format'
 import type { CartSlot, CartTier, SmartCartV2Output } from '@/lib/smart-cart-model'
 import { trackResultPageEvent } from '@/lib/analytics'
 import {
+  computeCartTotals,
   computeSelectedTotalRange,
   filterSelectedSlots,
 } from '@/lib/cart-selection'
@@ -44,9 +45,12 @@ export default function CartSummarySidebar({
   const [savedNote, setSavedNote] = useState<string | null>(null)
   const selection = useCartSelectionContext()
   const fee = CONFIG.products.smartCart.priceUsd
-  const { leanCartLow, leanCartHigh, potentialSavingsLow, potentialSavingsHigh } =
-    cart.savings
+  const { potentialSavingsLow, potentialSavingsHigh } = cart.savings
   const showAvoided = potentialSavingsHigh >= 50
+  // v7.2.15 — derive core/addon/all-in totals from the slot tiers so the
+  // sidebar reflects the same numbers as the header and the cards.
+  const totals = computeCartTotals(cart)
+  const hasAddOns = totals.addOnHigh > 0
 
   const allSelectableSlots = [...coreSlots, ...addOnSlots]
   const selectedSlots = filterSelectedSlots(
@@ -143,16 +147,33 @@ export default function CartSummarySidebar({
                   tone="alder"
                 />
                 <Row
-                  label="Full cart"
-                  value={formatPriceRange(leanCartLow, leanCartHigh)}
+                  label="All-in if every pick"
+                  value={formatPriceRange(totals.allInLow, totals.allInHigh)}
                   subtle
                 />
               </>
             ) : (
-              <Row
-                label="If you bought every pick"
-                value={formatPriceRange(leanCartLow, leanCartHigh)}
-              />
+              <>
+                <Row
+                  label="Core cart"
+                  value={formatPriceRange(totals.coreLow, totals.coreHigh)}
+                  tone="alder"
+                />
+                {hasAddOns && (
+                  <>
+                    <Row
+                      label="Optional add-ons"
+                      value={`+${formatPriceRange(totals.addOnLow, totals.addOnHigh)}`}
+                      subtle
+                    />
+                    <Row
+                      label="All-in if every pick"
+                      value={formatPriceRange(totals.allInLow, totals.allInHigh)}
+                      subtle
+                    />
+                  </>
+                )}
+              </>
             )}
             <Row label="Smart Cart fee" value={formatPrice(fee)} subtle />
             {showAvoided && (
@@ -163,6 +184,13 @@ export default function CartSummarySidebar({
               />
             )}
           </dl>
+          {!showSelectedView && hasAddOns && (
+            <p className="text-xs text-[#1a1f1a]/65 leading-snug mb-3">
+              Most buyers should not buy every optional item. Start with the
+              core cart, then add the optional picks that match what you
+              actually see in your home.
+            </p>
+          )}
 
           <button
             onClick={onPrimaryCTA}
@@ -218,7 +246,6 @@ export default function CartSummarySidebar({
       </aside>
 
       <MobileBottomSheet
-        cart={cart}
         onPrimary={onPrimaryCTA}
         savedNote={savedNote}
         onSave={onSaveForLater}
@@ -228,6 +255,11 @@ export default function CartSummarySidebar({
         selectedTotal={selectedTotal}
         canBuy={canBuy}
         headerLabel={headerLabel}
+        coreLow={totals.coreLow}
+        coreHigh={totals.coreHigh}
+        allInLow={totals.allInLow}
+        allInHigh={totals.allInHigh}
+        hasAddOns={hasAddOns}
       />
 
       <RetailerBuyModal
@@ -267,7 +299,6 @@ function Row({
 }
 
 function MobileBottomSheet({
-  cart,
   onPrimary,
   savedNote,
   onSave,
@@ -277,8 +308,12 @@ function MobileBottomSheet({
   selectedTotal,
   canBuy,
   headerLabel,
+  coreLow,
+  coreHigh,
+  allInLow,
+  allInHigh,
+  hasAddOns,
 }: {
-  cart: SmartCartV2Output
   onPrimary: () => void
   savedNote: string | null
   onSave: () => void
@@ -288,16 +323,20 @@ function MobileBottomSheet({
   selectedTotal: { low: number; high: number }
   canBuy: boolean
   headerLabel: string
+  coreLow: number
+  coreHigh: number
+  allInLow: number
+  allInHigh: number
+  hasAddOns: boolean
 }) {
   const [expanded, setExpanded] = useState(false)
   const fee = CONFIG.products.smartCart.priceUsd
-  const { leanCartLow, leanCartHigh } = cart.savings
 
   const displayTotal = showSelectedView
     ? selectedCount === 0
       ? '—'
       : formatPriceRange(selectedTotal.low, selectedTotal.high)
-    : formatPriceRange(leanCartLow, leanCartHigh)
+    : formatPriceRange(coreLow, coreHigh)
   const totalLabel = showSelectedView
     ? `${selectedCount} of ${totalSelectable} selected`
     : headerLabel
@@ -341,10 +380,22 @@ function MobileBottomSheet({
               <span className="text-[#1a1f1a]/55">Smart Cart fee</span>
               <span>{formatPrice(fee)}</span>
             </div>
+            {!showSelectedView && hasAddOns && (
+              <>
+                <div className="flex justify-between">
+                  <span className="text-[#1a1f1a]/55">Optional add-ons</span>
+                  <span>+{formatPriceRange(allInLow - coreLow, allInHigh - coreHigh)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-[#1a1f1a]/55">All-in if every pick</span>
+                  <span>{formatPriceRange(allInLow, allInHigh)}</span>
+                </div>
+              </>
+            )}
             {showSelectedView && (
               <div className="flex justify-between">
-                <span className="text-[#1a1f1a]/55">Full cart</span>
-                <span>{formatPriceRange(leanCartLow, leanCartHigh)}</span>
+                <span className="text-[#1a1f1a]/55">All-in if every pick</span>
+                <span>{formatPriceRange(allInLow, allInHigh)}</span>
               </div>
             )}
             <button

@@ -182,6 +182,48 @@ export function renderJsonLdScript(schemaObj: object): string {
   return `<script type="application/ld+json">${JSON.stringify(schemaObj)}</script>`
 }
 
+// v7.2.15 — Product/Offer schema for Smart Cart topic landing pages.
+// One Product per topic; the Offer carries the $19.99 fee. Deliberately
+// no aggregateRating, no reviewCount — we don't have either yet.
+export type SmartCartProductInput = {
+  name: string
+  description: string
+  url: string
+  imageUrl?: string
+  priceUsd: number
+  /** Free-form scope label for the Product's category. Optional. */
+  category?: string
+}
+
+export function buildSmartCartProduct(input: SmartCartProductInput) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    name: input.name,
+    description: input.description,
+    url: input.url,
+    image: input.imageUrl ?? PUBLISHER_LOGO,
+    brand: {
+      '@type': 'Organization',
+      name: PUBLISHER_NAME,
+      url: BASE_URL,
+    },
+    ...(input.category ? { category: input.category } : {}),
+    offers: {
+      '@type': 'Offer',
+      url: input.url,
+      priceCurrency: 'USD',
+      price: input.priceUsd.toFixed(2),
+      availability: 'https://schema.org/InStock',
+      seller: {
+        '@type': 'Organization',
+        name: PUBLISHER_NAME,
+        url: BASE_URL,
+      },
+    },
+  }
+}
+
 // Helper for canonical URL building from a path.
 export function absUrl(path: string): string {
   if (path.startsWith('http')) return path

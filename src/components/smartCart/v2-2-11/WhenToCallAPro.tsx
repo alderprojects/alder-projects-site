@@ -31,8 +31,8 @@ export default function WhenToCallAPro({ cart }: Props) {
         When to skip this cart and call a pro
       </h2>
       <p className="text-sm text-[#1a1f1a]/70 mb-4">
-        This cart is the right tool for the cases below. If any of these apply,
-        skip the cart — these need a pro, not a $19.99 product list.
+        This cart is NOT the right tool for the cases below. If any of these
+        apply, skip the cart and talk to a pro first.
       </p>
       <ul className="space-y-3 text-sm text-[#1a1f1a]/85">
         {rules.map((r, i) => (

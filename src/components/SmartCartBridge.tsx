@@ -1,12 +1,21 @@
 'use client'
 
 import Link from 'next/link'
-import { trackBridgeModuleClick } from '@/lib/analytics'
+import {
+  trackBridgeModuleClick,
+  trackContractorContinueClick,
+} from '@/lib/analytics'
 
 // v7.2.14 — Smart Cart bridge module.
 // Renders above contractor / town × service page content where
 // the cart is a better first step for some users. Pairs with the
 // pre-cart landing page for the topic.
+//
+// v7.2.15 — secondary text can either stay as an italic line (default,
+// non-blocking on pages where the contractor list is right below) or
+// surface as a clickable secondary CTA (used on /basement-finishing-vermont
+// where urgent pro intent — active water, mold, structural — should not
+// be sent to a $19.99 cart by default).
 
 const C = {
   ink: '#1C2B1A',
@@ -29,6 +38,12 @@ export type SmartCartBridgeProps = {
   ctaText: string
   /** Optional secondary line (e.g. "Still need a pro? Continue below ↓"). */
   secondaryText?: string
+  /**
+   * v7.2.15 — optional contractor / pro continuation CTA. Renders as a
+   * second clickable link next to the primary cart CTA. When set, the
+   * `secondaryText` italic line is suppressed in favor of the link.
+   */
+  contractorCta?: { text: string; href: string; trade?: string }
 }
 
 export default function SmartCartBridge({
@@ -37,6 +52,7 @@ export default function SmartCartBridge({
   topicSlug,
   ctaText,
   secondaryText,
+  contractorCta,
 }: SmartCartBridgeProps) {
   return (
     <aside
@@ -83,30 +99,56 @@ export default function SmartCartBridge({
       >
         {body}
       </p>
-      <Link
-        href={`/smart-cart/topic/${topicSlug}`}
-        onClick={() => {
-          if (typeof window === 'undefined') return
-          trackBridgeModuleClick({
-            topicSlug,
-            fromPage: window.location.pathname,
-          })
-        }}
-        style={{
-          display: 'inline-block',
-          background: C.accent,
-          color: '#fff',
-          fontFamily: FB,
-          fontSize: 14,
-          fontWeight: 600,
-          textDecoration: 'none',
-          padding: '10px 18px',
-          borderRadius: 4,
-        }}
-      >
-        {ctaText} →
-      </Link>
-      {secondaryText && (
+      <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', alignItems: 'center' }}>
+        <Link
+          href={`/smart-cart/topic/${topicSlug}`}
+          data-source-component="smart_cart_bridge"
+          onClick={() => {
+            if (typeof window === 'undefined') return
+            trackBridgeModuleClick({
+              topicSlug,
+              fromPage: window.location.pathname,
+            })
+          }}
+          style={{
+            display: 'inline-block',
+            background: C.accent,
+            color: '#fff',
+            fontFamily: FB,
+            fontSize: 14,
+            fontWeight: 600,
+            textDecoration: 'none',
+            padding: '10px 18px',
+            borderRadius: 4,
+          }}
+        >
+          {ctaText} →
+        </Link>
+        {contractorCta && (
+          <Link
+            href={contractorCta.href}
+            data-source-component="smart_cart_bridge_contractor"
+            onClick={() => {
+              if (typeof window === 'undefined') return
+              trackContractorContinueClick({
+                fromPage: window.location.pathname,
+                trade: contractorCta.trade,
+              })
+            }}
+            style={{
+              fontFamily: FB,
+              fontSize: 14,
+              fontWeight: 600,
+              color: C.ink,
+              textDecoration: 'underline',
+              textUnderlineOffset: 3,
+            }}
+          >
+            {contractorCta.text} →
+          </Link>
+        )}
+      </div>
+      {!contractorCta && secondaryText && (
         <p
           style={{
             fontSize: 13,

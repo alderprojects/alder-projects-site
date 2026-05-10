@@ -17,7 +17,6 @@ import RecommendedPicksList from './v2-2-11/RecommendedPicksList'
 import AddOnlyIfNeeded from './v2-2-11/AddOnlyIfNeeded'
 import SkipForNow from './v2-2-11/SkipForNow'
 import WhenToCallAPro from './v2-2-11/WhenToCallAPro'
-import WhyThesePicks from './v2-2-11/WhyThesePicks'
 import NotQuiteRight from './v2-2-11/NotQuiteRight'
 import CrossScopeDiscovery from './v2-2-11/CrossScopeDiscovery'
 import PhotoBetaStrip from './v2-2-11/PhotoBetaStrip'
@@ -29,6 +28,14 @@ import CartActions from './CartActions'
 
 type Props = { cart: SmartCartV2Output }
 
+// v7.2.15 — scopes whose worst-case is irreversible (mold inside a finished
+// wall, etc.) render the route-out conditions ABOVE the buy list so the
+// buyer sees the disqualifiers first. Window weatherization keeps the
+// route-out below the buy list (worst case is wasting $80 on a kit).
+const ROUTE_OUT_FIRST_SCOPES = new Set<string>([
+  'basement_moisture_prep',
+])
+
 export default function V2ResultLayout({ cart }: Props) {
   const coreSlots = cart.slots.filter(s => s.slotKind === 'core')
   const addOnSlots = cart.slots.filter(s => s.slotKind === 'addon')
@@ -36,6 +43,7 @@ export default function V2ResultLayout({ cart }: Props) {
   const heroIds = new Set(heroSlots.map(s => s.slotId))
   // The full list shows the non-hero core slots (deduped against Start Here)
   const fullListSlots = coreSlots.filter(s => !heroIds.has(s.slotId))
+  const routeOutFirst = ROUTE_OUT_FIRST_SCOPES.has(cart.scopeVariantId)
 
   return (
     <main className="min-h-screen bg-[#fbf8f1] text-[#1a1f1a] print:bg-white pb-24 lg:pb-0">
@@ -61,6 +69,10 @@ export default function V2ResultLayout({ cart }: Props) {
 
               <div className="lg:grid lg:grid-cols-3 lg:gap-6 items-start">
                 <div className="lg:col-span-2">
+                  {/* v7.2.15 — basement and other irreversible-risk scopes
+                      render the route-out section ABOVE the buy list so the
+                      disqualifiers are seen first. */}
+                  {routeOutFirst && <WhenToCallAPro cart={cart} />}
                   <StartHerePicks slots={heroSlots} tier={cart.selectedTier} />
                   {fullListSlots.length > 0 && (
                     <RecommendedPicksList
@@ -73,9 +85,10 @@ export default function V2ResultLayout({ cart }: Props) {
                     <AddOnlyIfNeeded slots={addOnSlots} tier={cart.selectedTier} />
                   )}
                   <SkipForNow items={cart.skipList} />
-                  {/* v7.2.14 — trust callout listing scope route-outs. */}
-                  <WhenToCallAPro cart={cart} />
-                  <WhyThesePicks cart={cart} />
+                  {/* v7.2.14 — trust callout listing scope route-outs.
+                      v7.2.15 — only render here for scopes that don't already
+                      render it at the top. */}
+                  {!routeOutFirst && <WhenToCallAPro cart={cart} />}
                   <NotQuiteRight cart={cart} />
                   <CrossScopeDiscovery scopeVariantId={cart.scopeVariantId} />
                   <PhotoBetaStrip />

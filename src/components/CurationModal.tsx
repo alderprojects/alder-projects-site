@@ -21,6 +21,10 @@ import type { TopicId } from '@/lib/property-modules'
 import type { BriefScenarioId } from '@/lib/recommender-config.types'
 import type { IntentTeaser } from '@/lib/intent-config'
 import type { CartTier } from '@/lib/smart-cart-model'
+import {
+  trackCurationModalOpen,
+  trackCurationModalPrefilled,
+} from '@/lib/analytics'
 import DynamicExampleCard from './intent/DynamicExampleCard'
 
 type ProductId = 'smart_cart' | 'worth_it'
@@ -118,6 +122,35 @@ export default function CurationModal() {
           : undefined,
       )
       setError(null)
+      // v7.2.15 — fire modal_open and (when prefilled) modal_prefilled.
+      // sourcePath comes from window.location, sourceComponent from the
+      // nearest data-source-component on the open button if present.
+      try {
+        const sourceComponent =
+          btn.getAttribute('data-source-component') ??
+          btn.closest('[data-source-component]')?.getAttribute('data-source-component') ??
+          undefined
+        const sourcePath = window.location.pathname
+        trackCurationModalOpen({
+          product: 'smart_cart',
+          topic: t,
+          scopeVariantId: sc ?? undefined,
+          scenario: s ?? undefined,
+          sourcePath,
+          sourceComponent,
+        })
+        if (sc || s) {
+          trackCurationModalPrefilled({
+            product: 'smart_cart',
+            topic: t,
+            scopeVariantId: sc ?? undefined,
+            scenario: s ?? undefined,
+            prefillSource: 'data_attrs',
+          })
+        }
+      } catch {
+        // analytics is best-effort
+      }
       setOpen(true)
     }
     document.addEventListener('click', handler)

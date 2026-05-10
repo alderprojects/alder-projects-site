@@ -24,6 +24,7 @@ import IntentSelector, {
   type IntentSelectorItem,
 } from './IntentSelector'
 import DynamicExampleCard from './DynamicExampleCard'
+import Why1999Module, { type Why1999Variant } from '@/components/Why1999Module'
 import ValueProofGrid from './ValueProofGrid'
 import ProductFitSection from './ProductFitSection'
 import CrossSellSection from './CrossSellSection'
@@ -39,6 +40,13 @@ const SCENARIO_LABELS: Record<string, string> = {
   tight_budget: 'Tight budget',
   premium: 'Premium',
   lake_property: 'Lake property',
+}
+
+// v7.2.15 — map picker scope-variant to the concrete "Why $19.99?" copy.
+// Falls through to no module on scopes without a paired variant.
+const WHY_VARIANT_BY_SCOPE: Record<string, Why1999Variant> = {
+  window_weatherization: 'window',
+  basement_moisture_prep: 'basement',
 }
 
 export default function SalesPageClient({ product }: Props) {
@@ -112,16 +120,22 @@ export default function SalesPageClient({ product }: Props) {
           onChange={setSelectedId}
         />
 
-        {selected.curationStatus === 'coming_soon' && (
-          <ComingSoonNotice product={product} />
-        )}
-
         <DynamicExampleCard
           teaser={teaser}
           scopeLabel={selected.label}
           scenarioLabel={SCENARIO_LABELS[scenario] ?? scenario}
           productPrice={cfg.priceUsd}
         />
+
+        {/* v7.2.15 — concrete "Why $19.99?" right under the example card,
+            keyed on the selected scope. Compact density to fit alongside
+            the picker without crowding the conversion CTA. */}
+        {product === 'smart_cart' && WHY_VARIANT_BY_SCOPE[scope] && (
+          <Why1999Module
+            variant={WHY_VARIANT_BY_SCOPE[scope]}
+            density="compact"
+          />
+        )}
 
         <ValueProofGrid product={product} />
 
@@ -187,6 +201,9 @@ function Hero({
             data-curation-modal-topic={topic}
             data-curation-modal-scope={scope}
             data-curation-modal-scenario={scenario}
+            data-topic-id={topic}
+            data-scope-id={scope}
+            data-scenario-id={scenario}
             className="bg-[#1f3a2e] hover:bg-[#162a21] text-white font-medium px-6 py-3 rounded-lg transition-colors"
           >
             {ctaCopy} — {formatPrice(price)}
@@ -220,20 +237,3 @@ function smoothScrollToExample(e: React.MouseEvent<HTMLAnchorElement>) {
   el?.scrollIntoView({ behavior: 'smooth', block: 'start' })
 }
 
-// ---------- Coming-soon notice --------------------------------------
-
-function ComingSoonNotice({ product }: { product: Product }) {
-  void product
-  return (
-    <aside className="bg-[#fbf8f1] border border-[#e8e3d4] rounded-md px-4 py-3 my-4 text-sm text-[#1a1f1a]/85">
-      This category is being curated. Want a free property profile in the
-      meantime?{' '}
-      <a
-        href="/property/main-street-stowe-vt"
-        className="text-[#1f3a2e] underline-offset-2 hover:underline"
-      >
-        Try a sample property profile →
-      </a>
-    </aside>
-  )
-}

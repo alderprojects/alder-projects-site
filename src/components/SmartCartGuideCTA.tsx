@@ -16,6 +16,7 @@ import Link from 'next/link'
 import type { TopicId } from '@/lib/property-modules'
 import type { CartTier } from '@/lib/smart-cart-model'
 import type { BriefScenarioId } from '@/lib/recommender-config.types'
+import { trackSmartCartCtaClick } from '@/lib/analytics'
 
 const C = {
   ink: '#1C2B1A',
@@ -61,6 +62,21 @@ export default function SmartCartGuideCTA({
   primaryLabel = 'Build my Smart Cart — $19.99',
   secondaryLabel = 'Just want the buy/skip list →',
 }: Props) {
+  const placementByVariant: Record<typeof variant, string> = {
+    top: 'guide_cta_top',
+    inline: 'guide_cta_inline',
+    hero: 'guide_cta_hero',
+  }
+  function onCtaClick() {
+    if (typeof window === 'undefined') return
+    trackSmartCartCtaClick({
+      placement: placementByVariant[variant],
+      topic: topicId,
+      scopeVariantId,
+      scenario,
+      sourcePath: window.location.pathname,
+    })
+  }
   const dataAttrs = {
     'data-curation-modal-open': true,
     'data-curation-modal-product': 'smart_cart',
@@ -68,6 +84,15 @@ export default function SmartCartGuideCTA({
     'data-curation-modal-scope': scopeVariantId,
     'data-curation-modal-scenario': scenario,
     'data-curation-modal-tier': tier,
+    'data-source-component': placementByVariant[variant],
+    // v7.2.15 — deterministic QA hooks. Manual QA can verify modal
+    // prefill from DevTools without firing the modal. Mirrors the
+    // modal-open attrs above; do not remove the originals (the
+    // CurationModal click handler reads from those).
+    'data-topic-id': topicId,
+    'data-scope-id': scopeVariantId,
+    'data-scenario-id': scenario,
+    onClick: onCtaClick,
   }
 
   if (variant === 'top') {

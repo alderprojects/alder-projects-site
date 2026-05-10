@@ -69,6 +69,14 @@ export type TopicGuideContent = {
    *      property-tool funnel.
    */
   smartCartCta?: SmartCartGuideCTAConfig
+
+  /**
+   * v7.2.15 — render the concrete "Why $19.99?" trust module after the
+   * second CTA in the guide. Names the failure mode the buyer fears.
+   * Today: 'window' or 'basement'. Omit on guides without a paired
+   * Smart Cart pilot.
+   */
+  why1999Variant?: 'window' | 'basement'
 }
 
 // Required H2 patterns (semantic, not literal). A topic guide

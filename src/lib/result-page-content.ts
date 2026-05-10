@@ -42,7 +42,7 @@ export interface CrossSellCard {
 export const SMART_CART_VALUE_PROPS: ValuePropChip[] = [
   {
     title: 'Right size for most homes',
-    body: 'Picks fit standard drawers, doors, and cabinets.',
+    body: 'Picks chosen to fit common Vermont home configurations.',
   },
   {
     title: 'Better quality, better value',
@@ -61,6 +61,94 @@ export const SMART_CART_VALUE_PROPS: ValuePropChip[] = [
     body: 'Each pick complements the others; nothing redundant.',
   },
 ]
+
+// v7.2.12 — Topic-level overrides for the universal value-prop chips.
+// Only the body of chip [0] is currently overridden per topic so the
+// "Right size for most homes" line speaks to the buyer's actual project
+// area. Other chips stay universal.
+const TOPIC_VALUE_PROPS_OVERRIDES: Record<string, Partial<ValuePropChip>[]> = {
+  kitchen: [
+    { body: 'Picks fit standard drawers, doors, and cabinets.' },
+    {}, {}, {}, {},
+  ],
+  outdoor: [
+    { body: 'Sized for typical Vermont decks, docks, and exteriors.' },
+    {}, {}, {}, {},
+  ],
+  mudroom: [
+    { body: 'Sized for typical Vermont entryways and gear loads.' },
+    {}, {}, {}, {},
+  ],
+  weatherization: [
+    { body: 'Sized for residential pipes, windows, and door gaps.' },
+    {}, {}, {}, {},
+  ],
+  home_repair: [
+    { body: 'Sized for typical residential pipes, capacity, and coverage.' },
+    {}, {}, {}, {},
+  ],
+  bath: [
+    { body: 'Sized for standard fixture configurations and tile setups.' },
+    {}, {}, {}, {},
+  ],
+  universal: [
+    { body: 'Useful at any home, sized for general-purpose project work.' },
+    {}, {}, {}, {},
+  ],
+}
+
+// Scope-level overrides take precedence over topic-level when both
+// are defined. Empty `{}` entries fall through to the base value.
+const SCOPE_VALUE_PROPS_OVERRIDES: Record<string, Partial<ValuePropChip>[]> = {
+  outdoor_freeze_prevention: [
+    { body: 'Sized for residential pipes, hose bibs, and unheated zones.' },
+    {}, {}, {}, {},
+  ],
+  outdoor_seasonal_opening: [
+    { body: 'Stocked for re-opening seasonal homes after a long close.' },
+    {}, {}, {}, {},
+  ],
+  outdoor_dock_lake: [
+    { body: 'Sized for typical Vermont docks, hardware, and lake conditions.' },
+    {}, {}, {}, {},
+  ],
+  outdoor_deck_refresh: [
+    { body: 'Coverage and tools sized for residential deck dimensions.' },
+    {}, {}, {}, {},
+  ],
+  outdoor_lake_season: [
+    { body: 'Stocked for the season at a lake or seasonal property.' },
+    {}, {}, {}, {},
+  ],
+  home_water_quality: [
+    { body: 'Tests and filters sized for typical Vermont well systems.' },
+    {}, {}, {}, {},
+  ],
+  home_safety_kit: [
+    { body: 'Coverage sized for a residential home, primary or seasonal.' },
+    {}, {}, {}, {},
+  ],
+  home_moisture_control: [
+    { body: 'Sized for typical basements, crawl spaces, and humidity zones.' },
+    {}, {}, {}, {},
+  ],
+}
+
+export function getValueProps(
+  topic: string | undefined,
+  scopeVariantId?: string,
+): ValuePropChip[] {
+  const scopeOverrides = scopeVariantId
+    ? SCOPE_VALUE_PROPS_OVERRIDES[scopeVariantId]
+    : undefined
+  const topicOverrides = topic ? TOPIC_VALUE_PROPS_OVERRIDES[topic] : undefined
+  const overrides = scopeOverrides ?? topicOverrides
+  if (!overrides) return SMART_CART_VALUE_PROPS
+  return SMART_CART_VALUE_PROPS.map((base, i) => ({
+    ...base,
+    ...(overrides[i] ?? {}),
+  }))
+}
 
 // ---------- Per-scope header content (friction → cart bridge) -----
 
@@ -145,6 +233,67 @@ export const SCOPE_HEADER_CONTENT: Record<string, ScopeHeaderContent> = {
 
 export function getScopeHeaderContent(scopeVariantId: string): ScopeHeaderContent {
   return SCOPE_HEADER_CONTENT[scopeVariantId] ?? FALLBACK_HEADER
+}
+
+// ---------- Measurement / fit reminder (v7.2.12) -------------------
+//
+// Surfaces a scope-aware "measure first" line on the tier drawer for
+// fit-sensitive products. Wrong-fit purchases are the #1 return reason
+// across kitchen, outdoor, freeze prevention, mudroom, and safety;
+// catching them at decision time pays back the $19.99 fee directly.
+
+const MEASUREMENT_REMINDER_BY_TOPIC: Record<string, string> = {
+  kitchen:
+    'Measure first — drawer or cabinet width, then check the fit range above before you click buy.',
+  outdoor:
+    'Check fit first — deck dimensions, hose bib count, or hardware size, then match to the spec above.',
+  mudroom:
+    'Measure first — bench, hooks, and bins should match your entryway depth and width before buying.',
+  bath:
+    'Measure first — confirm fixture spread, drain offset, or tile clearance against the spec above.',
+  weatherization:
+    'Check sizing first — pipe diameter, window dimensions, or door gap should match the spec above.',
+  home_repair:
+    'Verify fit first — pipe size, sensor coverage, or capacity should match your situation before buying.',
+  universal:
+    'Check fit and capacity against your project before clicking buy — sizes vary by home.',
+}
+
+const MEASUREMENT_REMINDER_BY_SCOPE: Record<string, string> = {
+  outdoor_freeze_prevention:
+    'Measure pipe diameter first — most Vermont supply lines are 1/2" or 3/4", and the wrong-size insulation slips off.',
+  outdoor_deck_refresh:
+    'Measure square footage first — deck stains and sealers cover by area, and one extra gallon costs about as much as a return trip.',
+  outdoor_dock_lake:
+    'Check hardware sizing and dock board widths first — replacement hardware needs to match your existing post and rail dimensions.',
+  outdoor_seasonal_opening:
+    'Confirm hose bib count and supply line condition first — opening kits assume working shutoffs and intact lines.',
+  home_water_quality:
+    'Test before treating — the right filter depends on what your water actually contains.',
+  home_moisture_control:
+    'Measure square footage and ceiling height first — dehumidifier capacity scales by volume.',
+  home_safety_kit:
+    'Confirm what you already have, then check coverage area — one extinguisher per zone, one detector per level minimum.',
+  mudroom_entry_reset:
+    'Measure first — entryway width, ceiling height, and door swing should be checked before bench or rack purchases.',
+  outdoor_lake_season:
+    'Check storage size and weight before buying — opening totes and gear bins need to fit your storage closet or boat hatch.',
+}
+
+const MEASUREMENT_REMINDER_FALLBACK =
+  'Check the fit and dimensions above against your project before clicking buy.'
+
+export function getMeasurementReminder(
+  topic: string | undefined,
+  scopeVariantId?: string,
+): string {
+  if (scopeVariantId && MEASUREMENT_REMINDER_BY_SCOPE[scopeVariantId]) {
+    return MEASUREMENT_REMINDER_BY_SCOPE[scopeVariantId]
+  }
+  if (topic && MEASUREMENT_REMINDER_BY_TOPIC[topic]) {
+    return MEASUREMENT_REMINDER_BY_TOPIC[topic]
+  }
+  return MEASUREMENT_REMINDER_FALLBACK
 }
 
 // ---------- Cross-scope discovery ---------------------------------
@@ -263,6 +412,12 @@ const REVIEW_RE = /\b\d+\.?\d*\s*stars?|\d[\d,]*\+?\s*reviews?|reviewer\s+(favor
 /**
  * Pull short product feature chips from the productSpec string. Filters
  * out review/rating phrases and overlong fragments.
+ *
+ * v7.2.12 — two-pass with dimension priority. Buyers across all topics
+ * (kitchen drawers, freeze prevention pipe sizes, deck square footage,
+ * mudroom bench dims, safety ratings) consistently care about fit info
+ * first, then features. Surfacing dimension chips ahead of feature
+ * chips reduces wrong-fit purchases — the #1 return reason.
  */
 export function extractSpecChips(productSpec: string): string[] {
   if (!productSpec) return []
@@ -271,7 +426,10 @@ export function extractSpecChips(productSpec: string): string[] {
     .map(s => s.trim())
     .filter(s => s && !REVIEW_RE.test(s))
 
-  const out: string[] = []
+  // Two-pass: dimension/fit chips first across all topics, then features.
+  const dimensionChips: string[] = []
+  const otherChips: string[] = []
+
   for (const s of sentences) {
     for (const part of s.split(/,\s*/)) {
       const cleaned = part
@@ -286,11 +444,40 @@ export function extractSpecChips(productSpec: string): string[] {
       ) {
         continue
       }
-      out.push(cleaned)
-      if (out.length >= MAX_CHIPS) return out
+      if (isDimensionChip(cleaned)) {
+        dimensionChips.push(cleaned)
+      } else {
+        otherChips.push(cleaned)
+      }
     }
   }
-  return out
+
+  return [...dimensionChips, ...otherChips].slice(0, MAX_CHIPS)
+}
+
+// Identifies chips that carry fit / dimension / capacity info across
+// kitchen (drawer ranges), outdoor (pipe/deck), freeze prevention
+// (fractional inch pipe sizes), water quality (gallons, sq ft),
+// safety (ratings, dB), mudroom (bench dims), and universal scopes.
+function isDimensionChip(chip: string): boolean {
+  return (
+    /\d+\s*(?:to|–|-)\s*\d+(?:\.\d+)?\s*(?:inch(es)?|"|in\b|ft\b|feet|foot)/i.test(chip) ||
+    /\b\d+\/\d+\s*(?:inch(es)?|"|in\b|OD|ID)/i.test(chip) ||
+    /\b\d+(?:\.\d+)?\s*(?:inch(es)?|"|in\b|ft\b|feet|foot|cm|mm|m\b)/i.test(chip) ||
+    /\bfits?\b.*\d/i.test(chip) ||
+    /\bsized\b.*\d/i.test(chip) ||
+    /\bcover(s|age)?\b.*\d/i.test(chip) ||
+    /\bexpand(s|able|ing)?\b/i.test(chip) ||
+    /\bholds?\s+(?:up to\s+)?\d/i.test(chip) ||
+    /\bcapacity\b/i.test(chip) ||
+    /\b\d+(?:\.\d+)?\s*-?\s*(?:lb|pound|oz|ounce|gram|kg|gallon|gal\b|liter|qt|quart|pint)/i.test(chip) ||
+    /\b\d+[\d,]*\s*sq\s*\.?\s*(?:ft|feet|m)/i.test(chip) ||
+    /\b\d+\s*-?\s*(?:tier|level|piece|pack|count|set|pair)\b/i.test(chip) ||
+    /\b\d+\s*-?\s*(?:watt|amp|volt|dB)/i.test(chip) ||
+    /-?\d+\s*°?\s*[FC]\b/.test(chip) ||
+    /\b\d+\s*-\s*[A-Z]:?\d*\s*-\s*[A-Z]/.test(chip) ||
+    /\b\d+\s*-?\s*(?:hour|day|week|month|year|season|cycle)/i.test(chip)
+  )
 }
 
 // ---------- Start Here selection (server-runnable) -------------

@@ -21,6 +21,7 @@ import NotQuiteRight from './v2-2-11/NotQuiteRight'
 import CrossScopeDiscovery from './v2-2-11/CrossScopeDiscovery'
 import PhotoBetaStrip from './v2-2-11/PhotoBetaStrip'
 import CartSummarySidebar from './v2-2-11/CartSummarySidebar'
+import { CartSelectionProvider } from './v2-2-11/CartSelectionContext'
 import RouteOutBanner from './sections/RouteOutBanner'
 import UrgencyBanner from './sections/UrgencyBanner'
 import CartActions from './CartActions'
@@ -39,54 +40,57 @@ export default function V2ResultLayout({ cart }: Props) {
     <main className="min-h-screen bg-[#fbf8f1] text-[#1a1f1a] print:bg-white pb-24 lg:pb-0">
       <Header cart={cart} />
 
-      <div className="max-w-6xl mx-auto px-4 py-8 md:py-12">
-        {cart.routedOut ? (
-          <>
-            <SmartCartResultPageHeader cart={cart} />
-            <RouteOutBanner cart={cart} />
-          </>
-        ) : (
-          <>
-            <SmartCartResultPageHeader cart={cart} />
-            <UrgencyBanner cart={cart} />
-            <SmartCartValueBanner cart={cart} />
+      <CartSelectionProvider cart={cart}>
+        <div className="max-w-6xl mx-auto px-4 py-8 md:py-12">
+          {cart.routedOut ? (
+            <>
+              <SmartCartResultPageHeader cart={cart} />
+              <RouteOutBanner cart={cart} />
+            </>
+          ) : (
+            <>
+              <SmartCartResultPageHeader cart={cart} />
+              <UrgencyBanner cart={cart} />
+              <SmartCartValueBanner cart={cart} />
 
-            <div className="lg:grid lg:grid-cols-3 lg:gap-6 items-start">
-              <div className="lg:col-span-2">
-                <StartHerePicks slots={heroSlots} tier={cart.selectedTier} />
-                {fullListSlots.length > 0 && (
-                  <RecommendedPicksList
-                    slots={fullListSlots}
+              <div className="lg:grid lg:grid-cols-3 lg:gap-6 items-start">
+                <div className="lg:col-span-2">
+                  <StartHerePicks slots={heroSlots} tier={cart.selectedTier} />
+                  {fullListSlots.length > 0 && (
+                    <RecommendedPicksList
+                      slots={fullListSlots}
+                      tier={cart.selectedTier}
+                      startHereCount={heroSlots.length}
+                    />
+                  )}
+                  {addOnSlots.length > 0 && (
+                    <AddOnlyIfNeeded slots={addOnSlots} tier={cart.selectedTier} />
+                  )}
+                  <SkipForNow items={cart.skipList} />
+                  <WhyThesePicks cart={cart} />
+                  <NotQuiteRight cart={cart} />
+                  <CrossScopeDiscovery scopeVariantId={cart.scopeVariantId} />
+                  <PhotoBetaStrip />
+                </div>
+
+                <div className="lg:col-span-1">
+                  <CartSummarySidebar
+                    cart={cart}
+                    coreSlots={coreSlots}
+                    addOnSlots={addOnSlots}
                     tier={cart.selectedTier}
-                    startHereCount={heroSlots.length}
                   />
-                )}
-                {addOnSlots.length > 0 && (
-                  <AddOnlyIfNeeded slots={addOnSlots} tier={cart.selectedTier} />
-                )}
-                <SkipForNow items={cart.skipList} />
-                <WhyThesePicks cart={cart} />
-                <NotQuiteRight cart={cart} />
-                <CrossScopeDiscovery scopeVariantId={cart.scopeVariantId} />
-                <PhotoBetaStrip />
+                </div>
               </div>
+            </>
+          )}
 
-              <div className="lg:col-span-1">
-                <CartSummarySidebar
-                  cart={cart}
-                  coreSlots={coreSlots}
-                  tier={cart.selectedTier}
-                />
-              </div>
-            </div>
-          </>
-        )}
-
-        <p className="mt-8 text-xs text-[#1a1f1a]/55 text-center">
-          30-day link to view your cart. Saved at{' '}
-          <code>{`/smart-cart/result/${cart.cartId}`}</code>.
-        </p>
-      </div>
+          <p className="mt-8 text-xs text-[#1a1f1a]/55 text-center">
+            30-day link to view your cart. Saved at{' '}
+            <code>{`/smart-cart/result/${cart.cartId}`}</code>.
+          </p>
+        </div>
+      </CartSelectionProvider>
 
       <Footer />
     </main>

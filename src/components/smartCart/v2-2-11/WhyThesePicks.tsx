@@ -1,14 +1,13 @@
-// v7.2.11 — "Why these picks?" practical-rationale section.
+// v7.2.12 — "Why these picks?" section, now scope-aware.
 //
-// Catalog smartCartPromise (when present) sits above 5 always-true
-// chips that describe how Alder builds Smart Cart. No "Vermont
-// context" heading; Vermont language flows through scope-specific
-// header framing instead.
+// Reads value-prop chips from getValueProps() so the topic / scope
+// can override the universal copy with project-specific framing.
 
-import { SMART_CART_VALUE_PROPS } from '@/lib/result-page-content'
+import { getValueProps } from '@/lib/result-page-content'
 import type { SmartCartV2Output } from '@/lib/smart-cart-model'
 
 export default function WhyThesePicks({ cart }: { cart: SmartCartV2Output }) {
+  const props = getValueProps(cart.topic, cart.scopeVariantId)
   return (
     <section className="bg-white border border-[#e8e3d4] rounded-xl p-5 md:p-6 mb-6">
       <h2 className="font-display text-xl text-[#1a1f1a] mb-3">Why these picks?</h2>
@@ -18,7 +17,7 @@ export default function WhyThesePicks({ cart }: { cart: SmartCartV2Output }) {
         </p>
       )}
       <ul className="grid sm:grid-cols-2 gap-3">
-        {SMART_CART_VALUE_PROPS.map(p => (
+        {props.map(p => (
           <li key={p.title} className="text-sm">
             <strong className="text-[#1a1f1a]">{p.title}.</strong>{' '}
             <span className="text-[#1a1f1a]/75">{p.body}</span>

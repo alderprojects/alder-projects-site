@@ -1,24 +1,26 @@
 'use client'
 
-// v7.2.11 — single product pick card.
+// v7.2.12 — single product pick card.
 //
 // Image-first layout. Three reason chips max. ONE expandable
-// "Why this one?" reveals a mini comparison (recommended vs cheaper
-// vs premium). No per-card savings badge — savings live in the value
-// banner only. No fake reviews or ratings.
-//
-// Tier label is a friendlier framing than the raw tier name:
-//   sweet_spot → "Sweet-spot pick"
-//   premium    → "Durable pick"
-//   budget     → "Best value"
+// "Why this one?" reveals a tier drawer with REAL budget/premium
+// product names + retailer links per the v7.2.12 spec, plus a
+// scope-aware "measure first" reminder for fit-sensitive products.
+// Selection checkbox top-right wires into the cart-selection
+// context for multi-select buy.
 
 import { useState } from 'react'
 import { formatPriceRange } from '@/lib/format'
 import type { CartSlot, CartTier, CartTierVariant } from '@/lib/smart-cart-model'
 import { resolveImageUrl } from '@/lib/smart-cart-images'
-import { extractSpecChips } from '@/lib/result-page-content'
-import { trackResultPageEvent } from '@/lib/analytics'
+import {
+  extractSpecChips,
+  getMeasurementReminder,
+} from '@/lib/result-page-content'
+import { trackResultPageEvent, type ResultPageEvent } from '@/lib/analytics'
 import ProductImage from './ProductImage'
+import SelectionCheckbox from './SelectionCheckbox'
+import { useOptionalCartSelectionContext } from './CartSelectionContext'
 
 interface Props {
   slot: CartSlot
@@ -35,10 +37,12 @@ const TIER_LABEL_FRIENDLY: Record<CartTier, string> = {
 
 export default function ProductPickCard({ slot, tier, index, hero }: Props) {
   const [open, setOpen] = useState(false)
+  const ctx = useOptionalCartSelectionContext()
   const variant: CartTierVariant = slot.tiers[tier] ?? slot.tiers.sweet_spot
   const usedTier: CartTier = slot.tiers[tier] ? tier : 'sweet_spot'
   const imageUrl = resolveImageUrl(variant)
   const chips = extractSpecChips(variant.productSpec)
+  const isSelected = ctx ? ctx.isSelected(slot.slotId) : true
 
   function onExpand() {
     if (!open) {
@@ -51,8 +55,12 @@ export default function ProductPickCard({ slot, tier, index, hero }: Props) {
 
   return (
     <article
-      className={`bg-white border border-[#e8e3d4] rounded-xl ${
+      className={`bg-white border rounded-xl transition-colors ${
         hero ? 'p-5 md:p-6' : 'p-4 md:p-5'
+      } ${
+        isSelected
+          ? 'border-[#e8e3d4]'
+          : 'border-[#e8e3d4] bg-[#fbf8f1]/60 opacity-75'
       }`}
     >
       <div className="flex gap-4 md:gap-5">
@@ -67,13 +75,18 @@ export default function ProductPickCard({ slot, tier, index, hero }: Props) {
         />
 
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 mb-1">
+          <div className="flex items-start gap-2 mb-1">
             <span className="w-6 h-6 rounded-full bg-[#1f3a2e] text-white inline-flex items-center justify-center text-xs font-medium flex-shrink-0">
               {index}
             </span>
-            <span className="text-xs uppercase tracking-wide text-[#1a1f1a]/60 truncate">
+            <span className="text-xs uppercase tracking-wide text-[#1a1f1a]/60 truncate flex-1 mt-0.5">
               {slot.slotLabel}
             </span>
+            <SelectionCheckbox
+              slotId={slot.slotId}
+              ariaLabel={variant.productName}
+              size={hero ? 'hero' : 'default'}
+            />
           </div>
 
           <h3
@@ -151,62 +164,161 @@ export default function ProductPickCard({ slot, tier, index, hero }: Props) {
 }
 
 function WhyThisOne({ slot }: { slot: CartSlot }) {
-  const sweetSpot = slot.whyThis
-  const cheaper = slot.whyNotCheaper
-  const premium = slot.whyNotPremium
+  // v7.2.12 spec — budget/premium PRODUCTS shown in the drawer, not just
+  // reasoning. Buyers (across all topics) trust the recommendation more
+  // when they can see what was rejected by name and price.
+  const ctx = useOptionalCartSelectionContext()
+  const budgetVariant = slot.tiers.budget
+  const premiumVariant = slot.tiers.premium
+  const sweetVariant = slot.tiers.sweet_spot
+  const measurementReminder = getMeasurementReminder(
+    ctx?.cartTopic,
+    ctx?.cartScopeVariantId,
+  )
+
   return (
     <div className="mt-4 pt-4 border-t border-[#e8e3d4]">
+      <p className="text-xs text-[#1a1f1a]/70 mb-3 leading-snug">
+        Not every home needs the same tier. Alder picks the middle path
+        unless budget, finish, or durability matter more for your project.
+      </p>
       <div className="grid sm:grid-cols-3 gap-3 text-sm">
-        <Column
-          label="This pick"
-          tone="alder"
-          body={sweetSpot}
-          fallback="The best fit for most homes in this scope."
-        />
-        <Column
+        <TierColumn
           label="Cheaper option"
-          body={cheaper}
-          fallback="The cheaper version isn't featured because it commonly under-delivers on this slot."
+          variant={budgetVariant}
+          slotId={slot.slotId}
+          fallback={slot.whyNotCheaper}
+          fallbackDefault="No cheaper version we'd recommend — most under-deliver on this job."
+          ctaLabel="View cheaper"
+          eventName="product_tier_budget_click"
         />
-        <Column
+        <TierColumn
+          label="Alder picks this"
+          tone="alder"
+          variant={sweetVariant}
+          slotId={slot.slotId}
+          fallback={slot.whyThis}
+          fallbackDefault="Best balance of fit, quality, and price for most homes."
+          ctaLabel="View recommended"
+          eventName="product_tier_recommended_click"
+          isRecommended
+        />
+        <TierColumn
           label="Premium option"
-          body={premium}
-          fallback="The premium version isn't featured because the lift over this pick is small for most homes."
+          variant={premiumVariant}
+          slotId={slot.slotId}
+          fallback={slot.whyNotPremium}
+          fallbackDefault="Nicer materials but the lift is small for most homes."
+          ctaLabel="View premium"
+          eventName="product_tier_premium_click"
         />
       </div>
+      {hasMeasurementSensitiveSpec(sweetVariant?.productSpec) && (
+        <p className="mt-3 text-xs text-[#a44e2c] flex items-start gap-1.5">
+          <span aria-hidden="true">📏</span>
+          <span>{measurementReminder}</span>
+        </p>
+      )}
     </div>
   )
 }
 
-function Column({
+function TierColumn({
   label,
-  body,
+  variant,
+  slotId,
   fallback,
+  fallbackDefault,
+  ctaLabel,
+  eventName,
   tone,
+  isRecommended,
 }: {
   label: string
-  body?: string
-  fallback: string
+  variant?: CartTierVariant
+  slotId: string
+  fallback?: string
+  fallbackDefault: string
+  ctaLabel: string
+  eventName: ResultPageEvent
   tone?: 'alder'
+  isRecommended?: boolean
 }) {
+  const reasoning = fallback ?? fallbackDefault
+
   return (
     <div
       className={`rounded-md p-3 border ${
         tone === 'alder'
-          ? 'border-emerald-200 bg-emerald-50/60'
-          : 'border-[#e8e3d4] bg-[#f5efe2]/40'
+          ? 'border-emerald-300 bg-emerald-50/70 ring-1 ring-emerald-200'
+          : 'border-[#e8e3d4] bg-white/60'
       }`}
     >
       <div
-        className={`text-xs uppercase tracking-wide mb-1 font-medium ${
-          tone === 'alder' ? 'text-emerald-900' : 'text-[#1a1f1a]/70'
+        className={`text-[10px] uppercase tracking-wide mb-1.5 font-semibold ${
+          tone === 'alder' ? 'text-emerald-900' : 'text-[#1a1f1a]/60'
         }`}
       >
         {label}
       </div>
-      <p className="text-sm text-[#1a1f1a]/85 leading-snug">
-        {body ?? fallback}
-      </p>
+      {variant ? (
+        <>
+          <div className="text-sm font-medium text-[#1a1f1a] mb-0.5 leading-snug">
+            {variant.productName}
+          </div>
+          <div className="text-xs text-[#1a1f1a]/70 mb-2">
+            {formatPriceRange(variant.priceLow, variant.priceHigh)}
+          </div>
+          <p className="text-xs text-[#1a1f1a]/80 leading-snug mb-2.5">
+            {reasoning}
+          </p>
+          {variant.affiliateUrl && (
+            <a
+              href={variant.affiliateUrl}
+              target="_blank"
+              rel="noopener nofollow sponsored"
+              className={`inline-flex items-center text-xs font-medium px-2.5 py-1 rounded ${
+                isRecommended
+                  ? 'bg-[#1f3a2e] text-white hover:bg-[#162a21]'
+                  : 'border border-[#e8e3d4] text-[#1f3a2e] hover:bg-[#f5efe2]'
+              }`}
+              onClick={() =>
+                trackResultPageEvent(eventName, {
+                  slot_id: slotId,
+                  product_name: variant.productName,
+                })
+              }
+            >
+              {ctaLabel} →
+            </a>
+          )}
+        </>
+      ) : (
+        <p className="text-xs text-[#1a1f1a]/70 leading-snug italic">
+          {reasoning}
+        </p>
+      )}
     </div>
+  )
+}
+
+// Detects measurement-sensitive products by scanning productSpec for
+// dimension language. Used to surface a "measure first" reminder at
+// the decision moment — wrong-fit purchases are the #1 return reason
+// across kitchen, outdoor, freeze prevention, mudroom, and safety.
+function hasMeasurementSensitiveSpec(spec?: string): boolean {
+  if (!spec) return false
+  const s = spec.toLowerCase()
+  return (
+    /\d+(?:\.\d+)?\s*(?:to|–|-)\s*\d+(?:\.\d+)?\s*(?:inch|"|in\b|ft\b|feet)/i.test(s) ||
+    /\b\d+(?:\.\d+)?\s*(?:inch|"|in\b|ft\b|feet|foot|cm|mm)/i.test(s) ||
+    /\b\d+\/\d+\s*(?:inch|"|in\b|OD|ID)/i.test(s) ||
+    /\bfits?\b.*(?:inch|drawer|cabinet|pipe|window|door|hose|bib)/i.test(s) ||
+    /\bsized\b.*\d/i.test(s) ||
+    /\bcover(s|age)?\b.*\d/i.test(s) ||
+    /\bcapacity\b/i.test(s) ||
+    /\bexpand(s|able|ing)?\b/i.test(s) ||
+    /\b\d+[\d,]*\s*sq\s*\.?\s*(?:ft|feet|m)/i.test(s) ||
+    /\b\d+(?:\.\d+)?\s*(?:gallon|gal\b|liter|qt|quart|pint)/i.test(s)
   )
 }

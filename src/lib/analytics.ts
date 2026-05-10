@@ -790,6 +790,18 @@ export type ResultPageEvent =
   | 'not_right_click'
   | 'photo_beta_click'
   | 'photo_beta_signup_submit'
+  // v7.2.12 — multi-select buy
+  | 'cart_selection_added'
+  | 'cart_selection_removed'
+  | 'cart_selection_select_all'
+  | 'cart_selection_select_none'
+  | 'cart_selection_reset'
+  | 'retailer_modal_bulk_open'
+  | 'retailer_modal_fallback_click'
+  // v7.2.12 — tier drawer click tracking
+  | 'product_tier_budget_click'
+  | 'product_tier_recommended_click'
+  | 'product_tier_premium_click'
 
 export function trackResultPageEvent(
   event: ResultPageEvent,

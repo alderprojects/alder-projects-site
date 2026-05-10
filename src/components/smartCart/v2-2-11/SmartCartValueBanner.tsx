@@ -7,14 +7,17 @@
 // back to qualitative copy. "How we estimate this" expandable shows
 // the savings buckets so buyers can see the math.
 //
-// Per-card "Saved $X vs premium" badges from v7.2.8 are removed —
-// savings live here, not on every product card.
+// v7.2.12 — when the buyer has customized their selection, the
+// "If you bought every pick" stat tile flips to show "Your selection"
+// with the partial total. Center-tile label flips by selection state.
 
 import { useEffect, useState } from 'react'
 import { CONFIG } from '@/lib/recommender-config'
 import { formatPrice, formatPriceRange } from '@/lib/format'
 import type { SmartCartV2Output } from '@/lib/smart-cart-model'
 import { trackResultPageEvent } from '@/lib/analytics'
+import { computeSelectedTotalRange } from '@/lib/cart-selection'
+import { useOptionalCartSelectionContext } from './CartSelectionContext'
 
 interface Props {
   cart: SmartCartV2Output
@@ -24,10 +27,22 @@ const QUALITATIVE_THRESHOLD = 50
 
 export default function SmartCartValueBanner({ cart }: Props) {
   const [methodologyOpen, setMethodologyOpen] = useState(false)
+  const selection = useOptionalCartSelectionContext()
   const fee = CONFIG.products.smartCart.priceUsd
   const { potentialSavingsLow, potentialSavingsHigh, leanCartLow, leanCartHigh } =
     cart.savings
   const showAvoided = potentialSavingsHigh >= QUALITATIVE_THRESHOLD
+
+  const showSelected = selection?.customized ?? false
+  const selectedRange =
+    selection && showSelected
+      ? computeSelectedTotalRange(
+          cart.slots,
+          selection.selectedMap,
+          cart.selectedTier,
+        )
+      : null
+  const selectedCount = selection?.selectedCount ?? 0
 
   useEffect(() => {
     trackResultPageEvent('value_banner_view', {
@@ -49,10 +64,23 @@ export default function SmartCartValueBanner({ cart }: Props) {
     <section className="bg-[#1f3a2e] text-white rounded-xl p-5 md:p-6 mb-8">
       <div className="grid md:grid-cols-3 gap-5 mb-3">
         <Stat label="Smart Cart fee" value={formatPrice(fee)} />
-        <Stat
-          label="Estimated cart total"
-          value={formatPriceRange(leanCartLow, leanCartHigh)}
-        />
+        {showSelected && selectedRange ? (
+          <Stat
+            label="Your selection"
+            value={
+              selectedCount === 0
+                ? '—'
+                : formatPriceRange(selectedRange.low, selectedRange.high)
+            }
+            caption={`${selectedCount} of ${cart.slots.length} picks · full cart ${formatPriceRange(leanCartLow, leanCartHigh)}`}
+          />
+        ) : (
+          <Stat
+            label="If you bought every pick"
+            value={formatPriceRange(leanCartLow, leanCartHigh)}
+            caption="Most buyers pick 3–5"
+          />
+        )}
         {showAvoided ? (
           <Stat
             label="Avoided spend"
@@ -99,13 +127,24 @@ export default function SmartCartValueBanner({ cart }: Props) {
   )
 }
 
-function Stat({ label, value }: { label: string; value: string }) {
+function Stat({
+  label,
+  value,
+  caption,
+}: {
+  label: string
+  value: string
+  caption?: string
+}) {
   return (
     <div>
       <div className="text-xs uppercase tracking-wide text-white/65 mb-1">
         {label}
       </div>
       <div className="font-display text-xl md:text-2xl">{value}</div>
+      {caption && (
+        <div className="text-xs text-white/60 mt-1">{caption}</div>
+      )}
     </div>
   )
 }

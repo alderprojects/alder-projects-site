@@ -12,6 +12,7 @@ import type { CartSlot, CartTier } from '@/lib/smart-cart-model'
 import { formatPriceRange } from '@/lib/format'
 import { resolveImageUrl } from '@/lib/smart-cart-images'
 import ProductImage from './ProductImage'
+import SelectionCheckbox from './SelectionCheckbox'
 
 interface Props {
   slots: CartSlot[]
@@ -56,13 +57,17 @@ function AddOnRow({ slot, tier }: { slot: CartSlot; tier: CartTier }) {
             href={variant.affiliateUrl}
             target="_blank"
             rel="noopener nofollow sponsored"
-            className="font-medium text-[#1f3a2e] hover:underline truncate"
+            className="font-medium text-[#1f3a2e] hover:underline truncate flex-1"
           >
             {variant.productName}
           </a>
           <span className="text-sm whitespace-nowrap">
             {formatPriceRange(variant.priceLow, variant.priceHigh)}
           </span>
+          <SelectionCheckbox
+            slotId={slot.slotId}
+            ariaLabel={variant.productName}
+          />
         </div>
         <p className="text-sm text-[#1a1f1a]/80 mb-2">{slot.whyThis}</p>
         <div className="space-y-1 text-xs">

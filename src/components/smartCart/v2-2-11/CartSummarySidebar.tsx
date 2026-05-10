@@ -1,42 +1,67 @@
 'use client'
 
 // v7.2.11 — sticky right-side cart summary on desktop, mobile bottom
-// sheet that expands. Always shows: items count, estimated total,
-// fee, avoided spend (when meaningful), and the primary "View
-// retailers & buy" CTA + secondary "Save for later" + tertiary
-// "Adjust my cart".
+// sheet that expands.
 //
-// "Save for later" copies the 30-day result URL to clipboard
-// (lightweight; no email integration in v7.2.11 — that's v7.3.1
-// per the scope agreement).
-// "Adjust my cart" defers to existing CartActions for the respin
-// flow.
+// v7.2.12 — selection awareness. When the buyer engages with the
+// per-card checkboxes, the sidebar shows "X of Y selected" + the
+// running selected total. Modal opens with only selected items.
 
 import { useState } from 'react'
 import { CONFIG } from '@/lib/recommender-config'
 import { formatPrice, formatPriceRange } from '@/lib/format'
 import type { CartSlot, CartTier, SmartCartV2Output } from '@/lib/smart-cart-model'
 import { trackResultPageEvent } from '@/lib/analytics'
+import {
+  computeSelectedTotalRange,
+  filterSelectedSlots,
+} from '@/lib/cart-selection'
 import RetailerBuyModal from './RetailerBuyModal'
 import CartActions from '../CartActions'
+import { useCartSelectionContext } from './CartSelectionContext'
 
 interface Props {
   cart: SmartCartV2Output
   coreSlots: CartSlot[]
+  addOnSlots: CartSlot[]
   tier: CartTier
 }
 
-export default function CartSummarySidebar({ cart, coreSlots, tier }: Props) {
+export default function CartSummarySidebar({
+  cart,
+  coreSlots,
+  addOnSlots,
+  tier,
+}: Props) {
   const [modalOpen, setModalOpen] = useState(false)
   const [savedNote, setSavedNote] = useState<string | null>(null)
+  const selection = useCartSelectionContext()
   const fee = CONFIG.products.smartCart.priceUsd
   const { leanCartLow, leanCartHigh, potentialSavingsLow, potentialSavingsHigh } =
     cart.savings
-  const itemCount = cart.slots.length
   const showAvoided = potentialSavingsHigh >= 50
 
+  const allSelectableSlots = [...coreSlots, ...addOnSlots]
+  const selectedSlots = filterSelectedSlots(
+    allSelectableSlots,
+    selection.selectedMap,
+  )
+  const selectedTotal = computeSelectedTotalRange(
+    allSelectableSlots,
+    selection.selectedMap,
+    tier,
+  )
+
+  const showSelectedView = selection.customized
+  const selectedCount = selection.selectedCount
+  const totalSelectable = allSelectableSlots.length
+
   function onPrimaryCTA() {
-    trackResultPageEvent('primary_cta_view_retailers_buy_click', { cart_id: cart.cartId })
+    trackResultPageEvent('primary_cta_view_retailers_buy_click', {
+      cart_id: cart.cartId,
+      selected_count: selectedCount,
+      total_count: totalSelectable,
+    })
     setModalOpen(true)
   }
 
@@ -55,22 +80,58 @@ export default function CartSummarySidebar({ cart, coreSlots, tier }: Props) {
     window.setTimeout(() => setSavedNote(null), 4000)
   }
 
+  const canBuy = selectedCount > 0
+  const buyButtonLabel = canBuy
+    ? showSelectedView
+      ? `View ${selectedCount} pick${selectedCount === 1 ? '' : 's'} & buy →`
+      : 'View retailers & buy →'
+    : 'Pick at least one item'
+
   return (
     <>
-      {/* Desktop sticky sidebar */}
       <aside className="hidden lg:block lg:sticky lg:top-6">
         <div className="bg-white border border-[#e8e3d4] rounded-xl p-5 shadow-sm">
           <div className="flex items-baseline justify-between mb-4">
             <h3 className="font-display text-lg text-[#1a1f1a]">Cart summary</h3>
             <span className="text-xs text-[#1a1f1a]/65 px-2 py-0.5 rounded-full bg-[#f5efe2]">
-              {itemCount} items
+              {showSelectedView
+                ? `${selectedCount} of ${totalSelectable}`
+                : `${cart.slots.length} items`}
             </span>
           </div>
+
+          {showSelectedView && (
+            <p className="text-xs text-[#1a1f1a]/65 mb-3 leading-snug">
+              You picked {selectedCount}{' '}
+              {selectedCount === 1 ? 'item' : 'items'} to buy. Toggle the
+              boxes on each card to change the list.
+            </p>
+          )}
+
           <dl className="space-y-2 text-sm mb-4">
-            <Row
-              label="Estimated total"
-              value={formatPriceRange(leanCartLow, leanCartHigh)}
-            />
+            {showSelectedView ? (
+              <>
+                <Row
+                  label="Selected total"
+                  value={
+                    selectedCount === 0
+                      ? '—'
+                      : formatPriceRange(selectedTotal.low, selectedTotal.high)
+                  }
+                  tone="alder"
+                />
+                <Row
+                  label="Full cart"
+                  value={formatPriceRange(leanCartLow, leanCartHigh)}
+                  subtle
+                />
+              </>
+            ) : (
+              <Row
+                label="If you bought every pick"
+                value={formatPriceRange(leanCartLow, leanCartHigh)}
+              />
+            )}
             <Row label="Smart Cart fee" value={formatPrice(fee)} subtle />
             {showAvoided && (
               <Row
@@ -80,12 +141,36 @@ export default function CartSummarySidebar({ cart, coreSlots, tier }: Props) {
               />
             )}
           </dl>
+
           <button
             onClick={onPrimaryCTA}
-            className="w-full bg-[#1f3a2e] text-white font-medium py-3 rounded-lg hover:bg-[#162a21] mb-2"
+            disabled={!canBuy}
+            className={`w-full font-medium py-3 rounded-lg mb-2 transition-colors ${
+              canBuy
+                ? 'bg-[#1f3a2e] text-white hover:bg-[#162a21]'
+                : 'bg-[#e8e3d4] text-[#1a1f1a]/50 cursor-not-allowed'
+            }`}
           >
-            View retailers & buy →
+            {buyButtonLabel}
           </button>
+
+          {showSelectedView && (
+            <div className="flex items-center justify-between text-xs mb-3">
+              <button
+                onClick={selection.selectAll}
+                className="text-[#1f3a2e] hover:underline underline-offset-2"
+              >
+                Select all
+              </button>
+              <button
+                onClick={selection.resetToDefaults}
+                className="text-[#1a1f1a]/55 hover:text-[#1a1f1a] hover:underline underline-offset-2"
+              >
+                Reset to defaults
+              </button>
+            </div>
+          )}
+
           <button
             onClick={onSaveForLater}
             className="w-full text-sm text-[#1f3a2e] font-medium py-2 rounded-lg border border-[#e8e3d4] hover:bg-[#f5efe2] mb-2"
@@ -110,18 +195,22 @@ export default function CartSummarySidebar({ cart, coreSlots, tier }: Props) {
         </div>
       </aside>
 
-      {/* Mobile sticky bottom sheet */}
       <MobileBottomSheet
         cart={cart}
         onPrimary={onPrimaryCTA}
         savedNote={savedNote}
         onSave={onSaveForLater}
+        showSelectedView={showSelectedView}
+        selectedCount={selectedCount}
+        totalSelectable={totalSelectable}
+        selectedTotal={selectedTotal}
+        canBuy={canBuy}
       />
 
       <RetailerBuyModal
         open={modalOpen}
         onClose={() => setModalOpen(false)}
-        slots={coreSlots}
+        slots={selectedSlots}
         tier={tier}
         cartId={cart.cartId}
       />
@@ -159,15 +248,35 @@ function MobileBottomSheet({
   onPrimary,
   savedNote,
   onSave,
+  showSelectedView,
+  selectedCount,
+  totalSelectable,
+  selectedTotal,
+  canBuy,
 }: {
   cart: SmartCartV2Output
   onPrimary: () => void
   savedNote: string | null
   onSave: () => void
+  showSelectedView: boolean
+  selectedCount: number
+  totalSelectable: number
+  selectedTotal: { low: number; high: number }
+  canBuy: boolean
 }) {
   const [expanded, setExpanded] = useState(false)
   const fee = CONFIG.products.smartCart.priceUsd
   const { leanCartLow, leanCartHigh } = cart.savings
+
+  const displayTotal = showSelectedView
+    ? selectedCount === 0
+      ? '—'
+      : formatPriceRange(selectedTotal.low, selectedTotal.high)
+    : formatPriceRange(leanCartLow, leanCartHigh)
+  const totalLabel = showSelectedView
+    ? `${selectedCount} of ${totalSelectable} selected`
+    : 'Estimated total'
+
   return (
     <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-[#e8e3d4] shadow-[0_-4px_12px_rgba(0,0,0,0.05)]">
       <div className="px-4 py-3">
@@ -179,17 +288,26 @@ function MobileBottomSheet({
             className="flex flex-col items-start text-left flex-1"
           >
             <span className="text-xs text-[#1a1f1a]/60 uppercase tracking-wide">
-              Estimated total {expanded ? '▾' : '▴'}
+              {totalLabel} {expanded ? '▾' : '▴'}
             </span>
             <span className="font-display text-lg text-[#1a1f1a]">
-              {formatPriceRange(leanCartLow, leanCartHigh)}
+              {displayTotal}
             </span>
           </button>
           <button
             onClick={onPrimary}
-            className="bg-[#1f3a2e] text-white font-medium px-4 py-2.5 rounded-lg whitespace-nowrap"
+            disabled={!canBuy}
+            className={`font-medium px-4 py-2.5 rounded-lg whitespace-nowrap transition-colors ${
+              canBuy
+                ? 'bg-[#1f3a2e] text-white'
+                : 'bg-[#e8e3d4] text-[#1a1f1a]/50 cursor-not-allowed'
+            }`}
           >
-            View & buy →
+            {canBuy && showSelectedView
+              ? `View ${selectedCount} & buy →`
+              : canBuy
+                ? 'View & buy →'
+                : 'Pick one'}
           </button>
         </div>
         {expanded && (
@@ -198,6 +316,12 @@ function MobileBottomSheet({
               <span className="text-[#1a1f1a]/55">Smart Cart fee</span>
               <span>{formatPrice(fee)}</span>
             </div>
+            {showSelectedView && (
+              <div className="flex justify-between">
+                <span className="text-[#1a1f1a]/55">Full cart</span>
+                <span>{formatPriceRange(leanCartLow, leanCartHigh)}</span>
+              </div>
+            )}
             <button
               onClick={onSave}
               className="w-full text-sm text-[#1f3a2e] font-medium py-2 rounded-lg border border-[#e8e3d4]"

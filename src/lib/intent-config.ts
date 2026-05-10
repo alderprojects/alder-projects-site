@@ -21,10 +21,12 @@ import type { TopicId } from './property-modules'
 import type { BriefScenarioId, Season } from './recommender-config.types'
 
 export type SmartCartCategoryId =
-  | 'kitchen_refresh'
-  | 'deck_outdoor'
-  | 'winterizing'
+  | 'window_weatherization' // v7.2.14 pilot
+  | 'basement_moisture_prep' // v7.2.14 pilot
   | 'mudroom_entry'
+  | 'deck_outdoor'
+  | 'kitchen_refresh'
+  | 'winterizing'
   | 'opening_the_house'
   | 'small_repair'
 
@@ -86,6 +88,12 @@ export interface WorthItDecision {
 // Plain d= attribute strings, used inside an inline <svg viewBox="0 0 24 24">
 // so the icons match the existing CheckIcon / DotIcon / LockIcon pattern.
 
+// v7.2.14 fix-up — pilot scope icons.
+const ICON_WINDOW =
+  'M4 4h16v16H4V4zm2 2v6h6V6H6zm8 0v6h4V6h-4zM6 14v4h6v-4H6zm8 0v4h4v-4h-4z'
+const ICON_DROPLET =
+  'M12 2.5C12 2.5 6 9.5 6 14a6 6 0 1012 0c0-4.5-6-11.5-6-11.5zM10 16a3 3 0 003 3v-1.5a1.5 1.5 0 01-1.5-1.5H10z'
+
 const ICON_KITCHEN =
   'M4 9h16v2H4V9zm0 4h16v8H4v-8zm2-7h12v2H6V6z'
 const ICON_DECK =
@@ -114,37 +122,97 @@ const ICON_LEAF =
 // ---------- Smart Cart categories -----------------------------------
 
 export const SMART_CART_CATEGORIES: SmartCartCategory[] = [
+  // ===== v7.2.14 fix-up — two pilots lead the picker =====
   {
-    id: 'kitchen_refresh',
-    label: 'Kitchen organizers',
-    iconSvg: ICON_KITCHEN,
+    id: 'window_weatherization',
+    label: 'Window weatherization',
+    iconSvg: ICON_WINDOW,
     problem:
-      "I want a kitchen that finally works. What do I actually buy and what do I skip?",
-    topicId: 'kitchen',
-    // V7.2.1 — points at the curated v2 combination so the modal
-    // and the webhook route through buildSmartCartV2.
-    defaultScopeVariantId: 'kitchen_organizers',
+      'Frames are intact but the house is drafty. What do I buy for one winter before deciding on $800-$1,500/window replacement?',
+    topicId: 'weatherization',
+    defaultScopeVariantId: 'window_weatherization',
+    defaultScenarioId: 'just_starting',
+    seasonality: 'winter',
+    teaser: {
+      buyCount: 6,
+      skipCount: 4,
+      spendLow: 80,
+      spendHigh: 220,
+      savingsLow: 40,
+      savingsHigh: 180,
+      payoffSentence:
+        'Avoids the $400/window acrylic insert kit, the designer thermal curtain, and the premium weatherstripping tape that does the same job as the $4 V-strip.',
+    },
+    rightForYouIf: [
+      'Pre-1990 Vermont house with intact frames and air-leak drafts',
+      'You want a one-winter pass before committing to replacement',
+      'You want the diagnostic order, not just a product list',
+    ],
+    notRightIfPointsToWorthIt: [
+      'Frames are visibly rotted, glass has failed, or you have a contractor quote in hand',
+    ],
+    curationStatus: 'curated',
+  },
+  {
+    id: 'basement_moisture_prep',
+    label: 'Basement moisture prep',
+    iconSvg: ICON_DROPLET,
+    problem:
+      'Considering finishing the basement. How do I check moisture, leaks, and water risk before committing $20-50k?',
+    topicId: 'home_repair',
+    defaultScopeVariantId: 'basement_moisture_prep',
     defaultScenarioId: 'just_starting',
     seasonality: 'all',
     teaser: {
-      buyCount: 8,
-      skipCount: 11,
-      spendLow: 260,
-      spendHigh: 342,
-      savingsLow: 140,
-      savingsHigh: 310,
+      buyCount: 5,
+      skipCount: 5,
+      spendLow: 80,
+      spendHigh: 300,
+      savingsLow: 80,
+      savingsHigh: 260,
       payoffSentence:
-        'Avoids the bamboo cutlery tray that does not fit older drawers, the pantry pull-out that hits the P-trap, and the premium spice rack you will outgrow.',
+        "Avoids the contractor-grade dehumidifier sized for a warehouse, the mold-fogger sprays that don't fix moisture, and the smart sensor that just measures humidity twice.",
     },
     rightForYouIf: [
-      'You want a working kitchen, not a Pinterest one',
-      'You can spend a Saturday on it and want a clear shopping list before you go',
-      'You are wary of the all-in-one organization kits at Container Store',
-      'You have $100+ to spend and want real savings on the cart',
+      'Pre-finish: you want to know if the basement is dry enough to commit',
+      'Vermont basement that runs musty in winter or humid in summer',
+      'You want the diagnostic kit, not the repair kit',
     ],
     notRightIfPointsToWorthIt: [
-      'You are deciding whether to refresh, repair, or remodel — Worth-It returns soon',
+      'Active water during snowmelt, visible mold > 10 sq ft, or foundation cracks',
     ],
+    curationStatus: 'curated',
+  },
+  {
+    id: 'mudroom_entry',
+    label: 'Mudroom & entry',
+    iconSvg: ICON_MUD,
+    problem:
+      'The boots, the leashes, the snow shovel — staged so the rest of the house stays clean.',
+    topicId: 'mudroom',
+    // v7.2.14 fix-up — re-pointed from outdoor_lake_season placeholder to
+    // the launch-ready mudroom_entry_reset scope (mudroom topic).
+    defaultScopeVariantId: 'mudroom_entry_reset',
+    defaultScenarioId: 'just_starting',
+    seasonality: 'mud',
+    teaser: {
+      buyCount: 4,
+      skipCount: 3,
+      spendLow: 80,
+      spendHigh: 240,
+      savingsLow: 60,
+      savingsHigh: 180,
+      payoffSentence:
+        'Avoids the all-in-one mudroom kit and the premium boot tray when a $25 WaterHog and a wall hook do the job.',
+    },
+    rightForYouIf: [
+      'It is mud season and the front door is losing the daily fight',
+      'You want a list of the 4-5 things that actually help, not a Container Store haul',
+    ],
+    notRightIfPointsToWorthIt: [
+      'You are debating a mudroom build-out or addition',
+    ],
+    // v7.2.14: removed beta — backed by launch-ready mudroom_entry_reset.
     curationStatus: 'curated',
   },
   {
@@ -180,15 +248,50 @@ export const SMART_CART_CATEGORIES: SmartCartCategory[] = [
     curationStatus: 'curated',
   },
   {
+    id: 'kitchen_refresh',
+    label: 'Kitchen organizers',
+    iconSvg: ICON_KITCHEN,
+    problem:
+      "I want a kitchen that finally works. What do I actually buy and what do I skip?",
+    topicId: 'kitchen',
+    // V7.2.1 — points at the curated v2 combination so the modal
+    // and the webhook route through buildSmartCartV2.
+    defaultScopeVariantId: 'kitchen_organizers',
+    defaultScenarioId: 'just_starting',
+    seasonality: 'all',
+    teaser: {
+      buyCount: 8,
+      skipCount: 11,
+      spendLow: 260,
+      spendHigh: 342,
+      savingsLow: 140,
+      savingsHigh: 310,
+      payoffSentence:
+        'Avoids the bamboo cutlery tray that does not fit older drawers, the pantry pull-out that hits the P-trap, and the premium spice rack you will outgrow.',
+    },
+    rightForYouIf: [
+      'You want a working kitchen, not a Pinterest one',
+      'You can spend a Saturday on it and want a clear shopping list before you go',
+      'You are wary of the all-in-one organization kits at Container Store',
+      'You have $100+ to spend and want real savings on the cart',
+    ],
+    notRightIfPointsToWorthIt: [
+      'You are deciding whether to refresh, repair, or remodel — Worth-It returns soon',
+    ],
+    curationStatus: 'curated',
+  },
+  {
     id: 'winterizing',
     label: 'Winterizing',
     iconSvg: ICON_WINTER,
     problem:
       'Air sealing, draft fixes, the small stuff that makes January bearable.',
     topicId: 'weatherization',
-    // Spec asked for window_drafts_seal — does not exist; substituted
-    // weatherization_diy_air_sealing (same intent, fully authored).
-    defaultScopeVariantId: 'weatherization_diy_air_sealing',
+    // v7.2.14: weatherization_diy_air_sealing flagged smartCartReady=false;
+    // re-pointed at the launch-ready window_weatherization scope so this
+    // tile doesn't 500 if anyone clicks it. Window scope also handles the
+    // air-sealing intent in editorial copy on the result page.
+    defaultScopeVariantId: 'window_weatherization',
     defaultScenarioId: 'already_have_basics',
     seasonality: 'winter',
     teaser: {
@@ -211,38 +314,6 @@ export const SMART_CART_CATEGORIES: SmartCartCategory[] = [
       'You are deciding heat pump vs better windows vs insulation upgrade',
       'You have an EVT audit quote and want it ranked against alternatives',
     ],
-    curationStatus: 'curated',
-  },
-  {
-    id: 'mudroom_entry',
-    label: 'Mudroom & entry',
-    iconSvg: ICON_MUD,
-    problem:
-      'The boots, the leashes, the snow shovel — staged so the rest of the house stays clean.',
-    topicId: 'outdoor',
-    // outdoor_mudroom_kit does not exist; mapped to outdoor_lake_season
-    // and flagged 'beta' until a true mudroom variant ships in v7.2.
-    defaultScopeVariantId: 'outdoor_lake_season',
-    defaultScenarioId: 'just_starting',
-    seasonality: 'mud',
-    teaser: {
-      buyCount: 4,
-      skipCount: 3,
-      spendLow: 80,
-      spendHigh: 240,
-      savingsLow: 60,
-      savingsHigh: 180,
-      payoffSentence:
-        'Avoids the all-in-one mudroom kit and the premium boot tray when a $25 WaterHog and a wall hook do the job.',
-    },
-    rightForYouIf: [
-      'It is mud season and the front door is losing the daily fight',
-      'You want a list of the 4-5 things that actually help, not a Container Store haul',
-    ],
-    notRightIfPointsToWorthIt: [
-      'You are debating a mudroom build-out or addition',
-    ],
-    // v7.2.14: removed beta — backed by launch-ready mudroom_entry_reset.
     curationStatus: 'curated',
   },
   {

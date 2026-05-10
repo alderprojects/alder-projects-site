@@ -9,7 +9,6 @@ import {
   buildArticle,
   buildBreadcrumbList,
   absUrl,
-  renderJsonLdScript,
 } from '@/lib/jsonld'
 import {
   SMART_CART_TOPIC_LANDINGS,
@@ -86,7 +85,7 @@ export default function SmartCartTopicPage({ params }: Props) {
         <script
           key={i}
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: renderJsonLdScript(s) }}
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(s) }}
         />
       ))}
       <main

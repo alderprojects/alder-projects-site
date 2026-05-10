@@ -16,6 +16,7 @@
 //   - Body length ≥ 7,000 chars
 
 import type { ContentSection, FaqItem } from './seasonal-guide-template'
+import type { SmartCartGuideCTAConfig } from '@/components/SmartCartGuideCTA'
 
 export type TopicId =
   | 'heat_pump'
@@ -58,6 +59,16 @@ export type TopicGuideContent = {
 
   byline?: string
   verifyDate: string
+
+  /**
+   * v7.2.14 fix-up — when set, the guide renders three Smart Cart CTAs:
+   *   1. Top-of-guide button after the lead paragraph.
+   *   2. Inline boxed CTA at the end of any section whose H2 contains
+   *      "What the $19.99 Smart Cart actually does".
+   *   3. Hero CTA at the bottom of the guide, replacing GuideFooter's
+   *      property-tool funnel.
+   */
+  smartCartCta?: SmartCartGuideCTAConfig
 }
 
 // Required H2 patterns (semantic, not literal). A topic guide

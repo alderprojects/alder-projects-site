@@ -17,8 +17,8 @@ function renderSmartCartBridge(slug: string) {
   if (slug.startsWith('window-replacement-')) {
     return (
       <SmartCartBridge
-        headline="Before you replace the windows:"
-        body="If the frames are intact but the house feels drafty, start with the $19.99 window weatherization list. It can buy you a winter and help you decide whether replacement is actually needed."
+        headline="Before you replace, try $80–$220 of weatherization."
+        body="Most pre-1990 Vermont windows have intact frames and air-leak drafts that film, weatherstripping, and removable seasonal caulk close for one winter. The Smart Cart shows you which products actually work — and which windows are genuinely past saving."
         topicSlug="window-weatherization-vermont"
         ctaText="See the window weatherization cart"
         secondaryText="Still need a pro? Continue to window installers below ↓"
@@ -28,8 +28,8 @@ function renderSmartCartBridge(slug: string) {
   if (slug.startsWith('basement-finishing-')) {
     return (
       <SmartCartBridge
-        headline="Before you finish the basement:"
-        body="Moisture problems are easier to catch before walls and flooring go in. Start with the $19.99 basement moisture prep list — or route straight to a pro if you have active water, mold, or foundation issues."
+        headline="Test for moisture before you finish."
+        body="The $19.99 diagnostic kit (hygrometer, moisture meter, water alarms, properly-sized dehumidifier, mold screen) pays for itself many times over by catching problems before they're walled in. Compare to a $20–50k finish project."
         topicSlug="basement-moisture-prep"
         ctaText="See the basement moisture prep cart"
         secondaryText="Active water, mold, or foundation cracks? Continue to basement contractors below ↓"

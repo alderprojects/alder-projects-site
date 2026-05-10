@@ -7791,8 +7791,8 @@ export const UNIVERSE: UniverseProduct[] = [
       topics: [
         "mudroom"
       ],
-      roles: [],
-      functions: [],
+      roles: ["furniture"],
+      functions: ["entry_bench", "shoe_storage", "mudroom_storage"],
       seasons: [
         "mud_season",
         "spring",
@@ -7828,8 +7828,8 @@ export const UNIVERSE: UniverseProduct[] = [
       topics: [
         "mudroom"
       ],
-      roles: [],
-      functions: [],
+      roles: ["furniture"],
+      functions: ["entry_bench", "shoe_storage", "mudroom_storage"],
       seasons: [
         "mud_season",
         "spring",
@@ -7865,8 +7865,8 @@ export const UNIVERSE: UniverseProduct[] = [
       topics: [
         "mudroom"
       ],
-      roles: [],
-      functions: [],
+      roles: ["furniture"],
+      functions: ["entry_bench", "shoe_storage", "mudroom_storage"],
       seasons: [
         "mud_season",
         "spring",
@@ -8174,5 +8174,216 @@ export const UNIVERSE: UniverseProduct[] = [
       slotId: "mudroom_floor_protection",
       tier: "sweet_spot"
     }
+  },
+
+  // ===== v7.2.14 — Window weatherization scope additions ===========
+  {
+    universeId: "window_shrink_film__duck_max_indoor_5_window_kit_budget",
+    rank: 100,
+    variant: {
+      productName: "Duck MAX Strength Indoor Window Insulator Kit (5-window)",
+      priceLow: 15,
+      priceHigh: 25,
+      affiliateUrl: "https://www.amazon.com/s?k=duck+max+strength+window+insulator+kit&tag=alderprojects-20",
+      imageUrl: "/product-images/categories/_topic-weatherization.svg",
+      productSpec: "62 in × 84 in shrink film for 5 windows up to 3' × 5'. Double-sided mounting tape. Hair dryer to shrink. One-winter use; remove in spring."
+    },
+    tags: {
+      topics: ["weatherization", "outdoor"],
+      roles: ["consumable_material", "preventer"],
+      functions: ["window_shrink_film", "draft_sealer"],
+      seasons: ["fall", "pre_winter", "closing_season"],
+      propertyTypes: [],
+      conditions: [],
+      alreadyHaveFlag: "has_window_film_current",
+      tier: "budget"
+    },
+    citations: ["Duck Brand product documentation", "DOE residential window insulation guidance"]
+  },
+  {
+    universeId: "window_shrink_film__3m_indoor_window_kit_5_window_sweet_spot",
+    rank: 100,
+    variant: {
+      productName: "3M Indoor Window Insulator Kit (5-window, premium film)",
+      priceLow: 25,
+      priceHigh: 40,
+      affiliateUrl: "https://www.amazon.com/s?k=3m+indoor+window+insulator+kit&tag=alderprojects-20",
+      imageUrl: "/product-images/categories/_topic-weatherization.svg",
+      productSpec: "Thicker, optically clearer film than budget kits. Higher tear strength. 62 in × 84 in for 5 windows. Better adhesion in cold rooms (basement, north walls)."
+    },
+    tags: {
+      topics: ["weatherization", "outdoor"],
+      roles: ["consumable_material", "preventer"],
+      functions: ["window_shrink_film", "draft_sealer"],
+      seasons: ["fall", "pre_winter", "closing_season"],
+      propertyTypes: [],
+      conditions: [],
+      alreadyHaveFlag: "has_window_film_current",
+      tier: "sweet_spot"
+    },
+    citations: ["3M Indoor Window Insulator Kit product documentation", "Wirecutter window film testing"]
+  },
+  {
+    universeId: "window_shrink_film__whole_house_10_window_pack_premium",
+    rank: 100,
+    variant: {
+      productName: "Whole-house 10-window film pack (Duck MAX or equivalent)",
+      priceLow: 60,
+      priceHigh: 100,
+      affiliateUrl: "https://www.amazon.com/s?k=window+insulator+kit+10+window+pack&tag=alderprojects-20",
+      imageUrl: "/product-images/categories/_topic-weatherization.svg",
+      productSpec: "10-window kit for whole-house coverage of a typical 2,000-2,500 sq ft Vermont home. Per-window cost lower than buying 2× 5-packs."
+    },
+    tags: {
+      topics: ["weatherization", "outdoor"],
+      roles: ["consumable_material", "preventer"],
+      functions: ["window_shrink_film", "draft_sealer"],
+      seasons: ["fall", "pre_winter", "closing_season"],
+      propertyTypes: [],
+      conditions: [],
+      alreadyHaveFlag: "has_window_film_current",
+      tier: "premium"
+    },
+    citations: ["Bulk window film economics analysis"]
+  },
+  {
+    universeId: "window_sealant__dap_seal_n_peel_removable_caulk_smoothing_tool",
+    rank: 100,
+    variant: {
+      productName: "DAP Seal 'N Peel removable caulk + smoothing tool",
+      priceLow: 20,
+      priceHigh: 35,
+      affiliateUrl: "https://www.amazon.com/s?k=dap+seal+n+peel+removable+caulk&tag=alderprojects-20",
+      imageUrl: "/product-images/categories/_topic-weatherization.svg",
+      productSpec: "Removable seasonal caulk: peels off cleanly in spring without damaging paint. 10 oz tube + steel-skeleton caulk gun + silicone smoothing tool. Two tubes typically cover an 8-window house."
+    },
+    tags: {
+      topics: ["weatherization", "outdoor", "home_repair"],
+      roles: ["consumable_material", "tool", "preventer"],
+      functions: ["weatherization_caulk", "draft_sealer"],
+      seasons: ["fall", "pre_winter", "closing_season"],
+      propertyTypes: [],
+      conditions: [],
+      alreadyHaveFlag: "has_seasonal_caulk",
+      tier: "sweet_spot"
+    },
+    citations: ["DAP Seal 'N Peel product datasheet", "Removable caulk vs permanent caulk for windows"]
+  },
+  {
+    universeId: "draft_detector__monoxivent_smoke_pencil_or_incense_diagnostic_kit",
+    rank: 100,
+    variant: {
+      productName: "Smoke pencil + IR thermometer diagnostic kit",
+      priceLow: 25,
+      priceHigh: 50,
+      affiliateUrl: "https://www.amazon.com/s?k=smoke+pencil+ir+thermometer+kit&tag=alderprojects-20",
+      imageUrl: "/product-images/categories/_topic-weatherization.svg",
+      productSpec: "Combustionless smoke pencil reveals air movement at frame edges. Pocket IR thermometer reads surface temperatures (failed-IGU detection, cold-spot mapping). Use both before buying any film or weatherstrip."
+    },
+    tags: {
+      topics: ["weatherization", "home_repair", "outdoor"],
+      roles: ["measurement_tool", "tool"],
+      functions: ["draft_detector"],
+      seasons: ["fall", "pre_winter", "year_round"],
+      propertyTypes: [],
+      conditions: [],
+      alreadyHaveFlag: "has_draft_detector",
+      tier: "sweet_spot"
+    },
+    citations: ["Building science blower-door diagnostic guidance", "IR thermometer building diagnostic use"]
+  },
+  {
+    universeId: "thermal_curtain__nicetown_thermal_insulated_blackout_panel_pair_budget",
+    rank: 100,
+    variant: {
+      productName: "NICETOWN thermal-insulated blackout curtain panel pair (functional, not designer)",
+      priceLow: 30,
+      priceHigh: 60,
+      affiliateUrl: "https://www.amazon.com/s?k=nicetown+thermal+insulated+blackout+curtain&tag=alderprojects-20",
+      imageUrl: "/product-images/categories/_topic-weatherization.svg",
+      productSpec: "Triple-weave thermal-insulated polyester. Blocks ~80% of conductive heat loss when closed. 52 × 84 in pair covers one large window or two small. Functional, not a designer fabric."
+    },
+    tags: {
+      topics: ["weatherization", "outdoor", "home_repair"],
+      roles: ["textile", "preventer"],
+      functions: ["insulated_curtain"],
+      seasons: ["fall", "winter", "pre_winter", "year_round"],
+      propertyTypes: [],
+      conditions: [],
+      alreadyHaveFlag: "has_thermal_curtains",
+      tier: "budget"
+    },
+    citations: ["NICETOWN thermal curtain product documentation", "DOE window covering thermal performance"]
+  },
+  {
+    universeId: "thermal_curtain__rose_home_fashion_thermal_lined_grommet_panel_sweet_spot",
+    rank: 100,
+    variant: {
+      productName: "Rose Home Fashion thermal-lined grommet curtain (full-thermal upgrade)",
+      priceLow: 80,
+      priceHigh: 140,
+      affiliateUrl: "https://www.amazon.com/s?k=rose+home+fashion+thermal+lined+curtain&tag=alderprojects-20",
+      imageUrl: "/product-images/categories/_topic-weatherization.svg",
+      productSpec: "Heavier thermal lining than budget tier. Better drape, suitable for living-room visibility. Same R-value range; the upgrade is appearance and durability."
+    },
+    tags: {
+      topics: ["weatherization", "outdoor", "home_repair"],
+      roles: ["textile", "preventer"],
+      functions: ["insulated_curtain"],
+      seasons: ["fall", "winter", "pre_winter", "year_round"],
+      propertyTypes: [],
+      conditions: [],
+      alreadyHaveFlag: "has_thermal_curtains",
+      tier: "sweet_spot"
+    },
+    citations: ["Rose Home Fashion product documentation", "DOE window covering thermal performance"]
+  },
+  {
+    universeId: "interior_storm__magnetic_acrylic_diy_storm_panel_premium",
+    rank: 100,
+    variant: {
+      productName: "DIY magnetic interior storm panel (acrylic, single-window)",
+      priceLow: 80,
+      priceHigh: 180,
+      affiliateUrl: "https://www.amazon.com/s?k=magnetic+interior+storm+window+acrylic&tag=alderprojects-20",
+      imageUrl: "/product-images/categories/_topic-weatherization.svg",
+      productSpec: "DIY magnetic-frame acrylic storm panel for one priority window — typically the worst-leaking single-pane in a long-term residence. Lower cost than custom Indow inserts ($400+); higher cost than film. Removable for summer."
+    },
+    tags: {
+      topics: ["weatherization", "outdoor", "home_repair"],
+      roles: ["preventer", "fixture"],
+      functions: ["interior_storm_panel"],
+      seasons: ["fall", "winter", "pre_winter"],
+      propertyTypes: [],
+      conditions: [],
+      alreadyHaveFlag: "has_interior_storm_panel",
+      tier: "sweet_spot"
+    },
+    citations: ["DIY interior storm panel comparisons", "DOE storm window guidance"]
+  },
+
+  // ===== v7.2.14 — Basement moisture prep additions ================
+  {
+    universeId: "basement_vapor_barrier__6_mil_polyethylene_sheeting_storage_protection_kit",
+    rank: 100,
+    variant: {
+      productName: "6-mil polyethylene vapor barrier sheeting + storage tote protection kit",
+      priceLow: 35,
+      priceHigh: 70,
+      affiliateUrl: "https://www.amazon.com/s?k=6+mil+polyethylene+vapor+barrier+sheeting&tag=alderprojects-20",
+      imageUrl: "/product-images/categories/_topic-home-repair.svg",
+      productSpec: "10 ft × 100 ft 6-mil polyethylene sheeting for sub-floor and storage protection. Pairs with airtight totes for items currently stored in the basement. Use under stored items + along wall-floor joint until finishing decisions are made."
+    },
+    tags: {
+      topics: ["home_repair", "outdoor"],
+      roles: ["consumable_material", "preventer"],
+      functions: ["vapor_barrier", "storage_protection"],
+      seasons: ["year_round"],
+      propertyTypes: [],
+      conditions: [],
+      alreadyHaveFlag: "has_vapor_barrier",
+      tier: "sweet_spot"
+    },
+    citations: ["EPA basement moisture management guidance", "Polyethylene vapor barrier residential applications"]
   },
 ]

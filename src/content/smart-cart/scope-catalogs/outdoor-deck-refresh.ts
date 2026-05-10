@@ -445,8 +445,8 @@ export const OUTDOOR_DECK_REFRESH: ScopeCatalog = {
       "marketingPitch": "\"Apply over slightly damp wood for best penetration.\"",
       "realReason": "This is wrong. Stain over damp wood (above 15% moisture) doesn't bond and peels within 6-12 months. The marketing claim about 'damp wood penetration' applies to specific water-based products, not the oil-based stains most homeowners use. Buy a moisture meter, verify dry, then stain.",
       "amountSaved": {
-        "low": 0,
-        "high": 0
+        "low": 90,
+        "high": 180
       },
       "appliesToScope": [
         "outdoor_deck_refresh"
@@ -530,8 +530,8 @@ export const OUTDOOR_DECK_REFRESH: ScopeCatalog = {
       "marketingPitch": "\"Mildew-blocking\" stains.",
       "realReason": "Mildew under stain doesn't disappear; it grows under the seal and causes the stain to bubble and peel. Clean with bleach + brightener FIRST. The 'mildew-blocking' claims are for prevention going forward, not for hiding existing growth.",
       "amountSaved": {
-        "low": 0,
-        "high": 0
+        "low": 90,
+        "high": 180
       },
       "appliesToScope": [
         "outdoor_deck_refresh"

@@ -475,4 +475,21 @@ export const KITCHEN_ORGANIZERS: ScopeCatalog = {
       alreadyHave: [],
     },
   },
+
+  // v7.2.14: scope-level metadata added to legacy v7.2.3 catalog so the
+  // result page can render the promise banner and route-out screen.
+  smartCartPromise:
+    'Spend $40-$200 to organize the kitchen so you stop buying duplicates and stop digging for things.',
+  primaryCustomerPain:
+    "Most kitchens accumulate $200-$400 of organizer products one impulse buy at a time over five years. Half don't fit, half are unused, and the drawer is still chaos.",
+  valueProposition:
+    'A focused $80-$200 kit (cutlery tray, drawer dividers, lazy susan, spice rack) replaces a $400-$800 Container Store splurge. Start with the structure that fits your cabinets, not a Pinterest board.',
+  routeOutRules: [
+    {
+      condition: 'planning_kitchen_remodel',
+      destination: 'verify_first',
+      reason:
+        'If cabinets are being replaced in the next 12 months, hold off on organizers — drawer and shelf dimensions will change. Buy these after the new kitchen is in.',
+    },
+  ],
 }

@@ -27,6 +27,12 @@ interface Props {
   tier: CartTier
   index: number
   hero?: boolean
+  /**
+   * v7.2.14 — when true, the tier alternatives drawer opens by default.
+   * Used by RecommendedPicksList when total picks ≤ 8 so the paid
+   * result doesn't feel hidden.
+   */
+  defaultOpen?: boolean
 }
 
 const TIER_LABEL_FRIENDLY: Record<CartTier, string> = {
@@ -35,8 +41,8 @@ const TIER_LABEL_FRIENDLY: Record<CartTier, string> = {
   budget: 'Best value',
 }
 
-export default function ProductPickCard({ slot, tier, index, hero }: Props) {
-  const [open, setOpen] = useState(false)
+export default function ProductPickCard({ slot, tier, index, hero, defaultOpen }: Props) {
+  const [open, setOpen] = useState(defaultOpen ?? false)
   const ctx = useOptionalCartSelectionContext()
   const variant: CartTierVariant = slot.tiers[tier] ?? slot.tiers.sweet_spot
   const usedTier: CartTier = slot.tiers[tier] ? tier : 'sweet_spot'
@@ -152,7 +158,7 @@ export default function ProductPickCard({ slot, tier, index, hero }: Props) {
               aria-expanded={open}
               className="inline-flex items-center text-sm text-[#1f3a2e] font-medium px-3 py-1.5 rounded-lg border border-[#e8e3d4] hover:bg-[#f5efe2]"
             >
-              Why this one? {open ? '▴' : '▾'}
+              See alternatives {open ? '▴' : '▾'}
             </button>
           </div>
         </div>

@@ -638,6 +638,56 @@ export function trackSmartCartAffiliateClicked(params: {
   })
 }
 
+// ---- v7.2.14 funnel-coverage events ---------------------------------
+//
+// Backfill events the v7.2.14 launch gates require:
+//   - topic_view: /smart-cart/topic/[slug] mount
+//   - guide_view: /guides/[slug] mount
+//   - route_out_click: user clicks a route-out destination
+//   - bridge_module_click: user clicks the contractor-page bridge CTA
+//
+// cart_start, checkout_start, purchase already covered by existing
+// helpers and the durable buyer-event log (src/lib/buyer-events.ts).
+
+export function trackTopicView(params: { slug: string; topicId?: string; scopeVariantId?: string }): void {
+  send('topic_view', {
+    slug: params.slug,
+    topic_id: params.topicId ?? '(none)',
+    scope_variant_id: params.scopeVariantId ?? '(none)',
+  })
+}
+
+export function trackGuideView(params: { slug: string; topicId?: string }): void {
+  send('guide_view', {
+    slug: params.slug,
+    topic_id: params.topicId ?? '(none)',
+  })
+}
+
+export function trackRouteOutClick(params: {
+  scopeVariantId: string
+  condition: string
+  destination: string
+  surface: 'result_page' | 'topic_page' | 'banner'
+}): void {
+  send('route_out_click', {
+    scope_variant_id: params.scopeVariantId,
+    condition: params.condition,
+    destination: params.destination,
+    surface: params.surface,
+  })
+}
+
+export function trackBridgeModuleClick(params: {
+  topicSlug: string
+  fromPage: string
+}): void {
+  send('bridge_module_click', {
+    topic_slug: params.topicSlug,
+    from_page: params.fromPage,
+  })
+}
+
 export function trackSmartCartUpgradeClicked(params: { cartId: string }): void {
   send('smart_cart_upgrade_clicked', { cart_id: params.cartId })
 }

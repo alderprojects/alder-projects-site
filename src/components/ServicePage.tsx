@@ -2,12 +2,42 @@ import Link from 'next/link'
 import Nav from '@/components/Nav'
 import Footer from '@/components/Footer'
 import GuideFooter from '@/components/GuideFooter'
+import SmartCartBridge from '@/components/SmartCartBridge'
 import {
   buildArticle,
   buildBreadcrumbList,
   buildLocalBusiness,
   absUrl,
 } from '@/lib/jsonld'
+
+// v7.2.14 — Smart Cart bridge selector.
+// Renders the appropriate bridge module based on slug pattern.
+// Returns null on slugs that don't have a paired pre-cart landing.
+function renderSmartCartBridge(slug: string) {
+  if (slug.startsWith('window-replacement-')) {
+    return (
+      <SmartCartBridge
+        headline="Before you replace the windows:"
+        body="If the frames are intact but the house feels drafty, start with the $19.99 window weatherization list. It can buy you a winter and help you decide whether replacement is actually needed."
+        topicSlug="window-weatherization-vermont"
+        ctaText="See the window weatherization cart"
+        secondaryText="Still need a pro? Continue to window installers below ↓"
+      />
+    )
+  }
+  if (slug.startsWith('basement-finishing-')) {
+    return (
+      <SmartCartBridge
+        headline="Before you finish the basement:"
+        body="Moisture problems are easier to catch before walls and flooring go in. Start with the $19.99 basement moisture prep list — or route straight to a pro if you have active water, mold, or foundation issues."
+        topicSlug="basement-moisture-prep"
+        ctaText="See the basement moisture prep cart"
+        secondaryText="Active water, mold, or foundation cracks? Continue to basement contractors below ↓"
+      />
+    )
+  }
+  return null
+}
 
 // Town × service page renderer.
 //
@@ -171,6 +201,12 @@ export default function ServicePage({
 
       {/* Body */}
       <div style={{ maxWidth: '720px', margin: '0 auto', padding: 'clamp(32px,5vw,48px) 24px 80px' }}>
+        {/* v7.2.14: Smart Cart bridge — show on pages where the cart is a
+            better first step for some users. The bridge does not replace
+            the pro funnel; severe cases continue down to the property
+            funnel and related-pages section. */}
+        {renderSmartCartBridge(content.slug)}
+
         {content.sections.map((section, i) => (
           <section key={i} style={{ marginBottom: '36px' }}>
             <h2

@@ -531,6 +531,9 @@ export default function Home() {
         </div>
       </section>
 
+      {/* ── v7.2.14: Before you spend thousands ─────────────────── */}
+      <BeforeYouSpendThousandsSection />
+
       {/* ── Sample cart, full ────────────────────────────────────── */}
       <section
         id="sample-cart"
@@ -985,5 +988,208 @@ function SampleCartRow({
         </span>
       )}
     </div>
+  )
+}
+
+// ============================================================================
+// v7.2.14 — "Before you spend thousands" section
+//
+// Four pilot Smart Cart tiles framed around the brand thesis: small
+// product lists that help homeowners avoid the expensive version of the
+// wrong project. Two pilots have dedicated topic landing pages (window,
+// basement); the other two open the curation modal directly via
+// data-curation-modal-* attributes so existing scopes get exposure
+// without needing new pages.
+// ============================================================================
+
+type CartTile =
+  | {
+      kind: 'topic-page'
+      title: string
+      subtitle: string
+      cta: string
+      href: string
+    }
+  | {
+      kind: 'modal'
+      title: string
+      subtitle: string
+      cta: string
+      topicAttr: string
+      scopeAttr: string
+    }
+
+const BEFORE_YOU_SPEND_TILES: CartTile[] = [
+  {
+    kind: 'topic-page',
+    title: 'Window weatherization',
+    subtitle: 'Close drafts before you replace windows',
+    cta: '$19.99 product list →',
+    href: '/smart-cart/topic/window-weatherization-vermont',
+  },
+  {
+    kind: 'topic-page',
+    title: 'Basement moisture prep',
+    subtitle: 'Check for water risk before finishing',
+    cta: '$19.99 product list →',
+    href: '/smart-cart/topic/basement-moisture-prep',
+  },
+  {
+    kind: 'modal',
+    title: 'Mudroom & entry reset',
+    subtitle: 'Solve mud-season chaos for a Vermont entry',
+    cta: '$19.99 product list →',
+    topicAttr: 'mudroom',
+    scopeAttr: 'mudroom_entry_reset',
+  },
+  {
+    kind: 'modal',
+    title: 'Moisture & smell prevention',
+    subtitle: 'Catch basement moisture before it becomes mold',
+    cta: '$19.99 product list →',
+    topicAttr: 'home_repair',
+    scopeAttr: 'home_moisture_control',
+  },
+]
+
+function BeforeYouSpendThousandsSection() {
+  return (
+    <section
+      style={{
+        padding: 'clamp(56px,8vw,96px) 24px',
+        background: C.paper,
+        borderTop: `1px solid ${C.line}`,
+      }}
+    >
+      <div style={{ maxWidth: 1080, margin: '0 auto' }}>
+        <p
+          style={{
+            fontFamily: FM,
+            fontSize: 11,
+            letterSpacing: '0.12em',
+            textTransform: 'uppercase',
+            color: C.accent,
+            margin: '0 0 14px',
+          }}
+        >
+          Before you spend thousands
+        </p>
+        <h2
+          style={{
+            fontFamily: FS,
+            fontSize: 'clamp(1.8rem, 4vw, 2.6rem)',
+            fontWeight: 600,
+            color: C.ink,
+            margin: '0 0 12px',
+            lineHeight: 1.15,
+          }}
+        >
+          Small product lists. Expensive mistakes avoided.
+        </h2>
+        <p
+          style={{
+            fontFamily: FB,
+            fontSize: 17,
+            color: C.inkSoft,
+            margin: '0 0 32px',
+            lineHeight: 1.6,
+            maxWidth: 640,
+          }}
+        >
+          Vermont-specific lists that help you avoid the expensive version of
+          the wrong project. Each is $19.99, one-time, no subscription.
+        </p>
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+            gap: 18,
+          }}
+        >
+          {BEFORE_YOU_SPEND_TILES.map((tile, i) => (
+            <BeforeYouSpendTile key={i} tile={tile} />
+          ))}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+function BeforeYouSpendTile({ tile }: { tile: CartTile }) {
+  const cardStyle: React.CSSProperties = {
+    display: 'flex',
+    flexDirection: 'column' as const,
+    gap: 10,
+    padding: '22px 22px 20px',
+    background: C.paper,
+    border: `1px solid ${C.line}`,
+    borderRadius: 6,
+    fontFamily: FB,
+    color: C.ink,
+    textDecoration: 'none',
+    cursor: 'pointer',
+    minHeight: 160,
+  }
+  const titleEl = (
+    <div
+      style={{
+        fontFamily: FS,
+        fontSize: 19,
+        fontWeight: 600,
+        color: C.ink,
+        lineHeight: 1.25,
+      }}
+    >
+      {tile.title}
+    </div>
+  )
+  const subtitleEl = (
+    <div
+      style={{
+        fontSize: 14,
+        color: C.inkSoft,
+        lineHeight: 1.55,
+        flexGrow: 1,
+      }}
+    >
+      {tile.subtitle}
+    </div>
+  )
+  const ctaEl = (
+    <div
+      style={{
+        marginTop: 8,
+        fontSize: 13,
+        color: C.accent,
+        fontWeight: 600,
+        letterSpacing: '0.02em',
+      }}
+    >
+      {tile.cta}
+    </div>
+  )
+
+  if (tile.kind === 'topic-page') {
+    return (
+      <a href={tile.href} style={cardStyle}>
+        {titleEl}
+        {subtitleEl}
+        {ctaEl}
+      </a>
+    )
+  }
+  return (
+    <button
+      type="button"
+      data-curation-modal-open
+      data-curation-modal-product="smart_cart"
+      data-curation-modal-topic={tile.topicAttr}
+      data-curation-modal-scope={tile.scopeAttr}
+      style={{ ...cardStyle, border: cardStyle.border, textAlign: 'left' as const, font: 'inherit' }}
+    >
+      {titleEl}
+      {subtitleEl}
+      {ctaEl}
+    </button>
   )
 }

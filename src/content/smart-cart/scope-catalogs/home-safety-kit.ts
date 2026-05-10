@@ -452,8 +452,8 @@ export const HOME_SAFETY_KIT: ScopeCatalog = {
       "marketingPitch": "Lifetime fire extinguisher.",
       "realReason": "Extinguisher pressure drops slowly over time. The gauge tells you the current state — green = good, red = recharge or replace. Untested extinguishers fail when needed. There's no 'lifetime' rating; certified service every 6 years and full replacement at 12 is the standard.",
       "amountSaved": {
-        "low": 0,
-        "high": 0
+        "low": 30,
+        "high": 80
       },
       "appliesToScope": [
         "home_safety_kit"
@@ -481,14 +481,9 @@ export const HOME_SAFETY_KIT: ScopeCatalog = {
     },
     {
       "id": "skip_first_aid_buried",
-      "type": "wrong_version",
+      "type": "wrong_category",
       "title": "First aid kit buried in basement closet",
-      "marketingPitch": "\"Kit is in storage, ready when needed.\"",
-      "realReason": "A first aid kit you can't find in 30 seconds isn't a first aid kit. The injury happens; you have minutes; you don't know which closet. Mount or place visibly in the kitchen — the place injuries happen most often.",
-      "amountSaved": {
-        "low": 0,
-        "high": 0
-      },
+      "realReason": "A first aid kit you can't find in 30 seconds isn't a first aid kit. The injury happens; you have minutes; you don't know which closet. Mount or place visibly in the kitchen — the place injuries happen most often. This is a placement issue, not a product upgrade.",
       "appliesToScope": [
         "home_safety_kit"
       ],

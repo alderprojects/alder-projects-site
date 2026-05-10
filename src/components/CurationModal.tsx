@@ -126,7 +126,9 @@ export default function CurationModal() {
 
   // Default scope variant when topic changes.
   useEffect(() => {
-    const list = SCOPE_VARIANTS[topic] ?? []
+    // v7.2.14: only consider ready variants when defaulting, otherwise
+    // the modal could land on a stub scope and 500 on result render.
+    const list = (SCOPE_VARIANTS[topic] ?? []).filter(v => v.smartCartReady)
     if (!list.length) {
       setScopeVariantId('')
       return
@@ -156,7 +158,9 @@ export default function CurationModal() {
   if (!open) return null
 
   const v7Topics = getV7Topics()
-  const variants = SCOPE_VARIANTS[topic] ?? []
+  // v7.2.14: filter to ready variants only so non-launched scopes
+  // (smartCartReady=false) cannot be selected and 500 the result page.
+  const variants = (SCOPE_VARIANTS[topic] ?? []).filter(v => v.smartCartReady)
   const cfg = product === 'smart_cart' ? CONFIG.products.smartCart : CONFIG.products.worthIt
   const refundCopy =
     product === 'smart_cart'

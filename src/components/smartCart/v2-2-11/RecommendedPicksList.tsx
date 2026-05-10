@@ -21,7 +21,10 @@ interface Props {
   startHereCount: number
 }
 
-const COLLAPSE_THRESHOLD = 4
+// v7.2.14 — raised from 4 to 8 so the paid result doesn't feel hidden.
+// Carts up to 8 picks default-expand; > 8 still collapses with explicit
+// "Show all N picks" toggle.
+const COLLAPSE_THRESHOLD = 8
 
 export default function RecommendedPicksList({
   slots,

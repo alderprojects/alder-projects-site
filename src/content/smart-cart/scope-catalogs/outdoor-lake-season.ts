@@ -619,4 +619,26 @@ export const OUTDOOR_LAKE_SEASON: ScopeCatalog = {
     premium: { selectedTier: 'premium', alreadyHave: [] },
     lake_property: { selectedTier: 'sweet_spot', alreadyHave: [] },
   },
+
+  // v7.2.14: scope-level metadata added to legacy v7.2.3 catalog.
+  smartCartPromise:
+    'Spend $200-$800 to open the lake house without losing the first weekend to broken or missing gear.',
+  primaryCustomerPain:
+    "Memorial Day at the lake usually starts with a Burlington run for the umbrella that didn't make it through winter, the missing dock cleat, and the cushions that mildewed in storage. The first day off becomes the first day shopping.",
+  valueProposition:
+    'A lake-rated kit (Sunbrella, marine-grade hardware, mosquito control, grill basics) ready on opening day. Cheaper than the trip-to-Burlington that becomes part of every Memorial Day.',
+  routeOutRules: [
+    {
+      condition: 'dock_structural_issues',
+      destination: 'small_pro',
+      reason:
+        'Dock decking, anchoring, or floats with structural issues need a marine pro, not Smart Cart. Failed dock hardware is a safety problem in lake water.',
+    },
+    {
+      condition: 'lake_property_first_year',
+      destination: 'verify_first',
+      reason:
+        "First season at a new lake property — wait through one summer before buying durable outdoor furniture. Sun exposure, wind direction, and storage logistics will shift what you actually need.",
+    },
+  ],
 }

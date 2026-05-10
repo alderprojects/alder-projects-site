@@ -332,10 +332,10 @@ export const UNIVERSAL_PROJECT_PREP: ScopeCatalog = {
       "type": "wrong_version",
       "title": "Photo documentation without scale reference",
       "marketingPitch": "\"Take some pictures of the kitchen and send to contractors.\"",
-      "realReason": "Photos without scale are visual only. Contractors quote off them but can't size. Include a tape measure or yardstick in the frame for reference. The photo with scale is 10x more useful for getting accurate quotes.",
+      "realReason": "Photos without scale are visual only. Contractors quote off them but can't size. Include a tape measure or yardstick in the frame for reference. The photo with scale is 10x more useful for getting accurate quotes — and avoids the wrong-size material order that runs $50-150 in returns and re-ordering.",
       "amountSaved": {
-        "low": 0,
-        "high": 0
+        "low": 40,
+        "high": 150
       },
       "appliesToScope": [
         "universal_project_prep"

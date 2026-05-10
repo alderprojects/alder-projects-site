@@ -33,6 +33,7 @@ export type TopicId =
   | 'mud_season'
   | 'well_septic'
   | 'general_orientation'
+  | 'home_repair' // v7.2.14 — basement moisture prep + future home-repair guides
 
 export type TopicGuideContent = {
   slug: string                    // 'vermont-heat-pump-rebate-stack-2026' (URL is /guides/{slug})

@@ -16,6 +16,7 @@ import { selectStartHere } from '@/lib/result-page-content'
 import RecommendedPicksList from './v2-2-11/RecommendedPicksList'
 import AddOnlyIfNeeded from './v2-2-11/AddOnlyIfNeeded'
 import SkipForNow from './v2-2-11/SkipForNow'
+import WhenToCallAPro from './v2-2-11/WhenToCallAPro'
 import WhyThesePicks from './v2-2-11/WhyThesePicks'
 import NotQuiteRight from './v2-2-11/NotQuiteRight'
 import CrossScopeDiscovery from './v2-2-11/CrossScopeDiscovery'
@@ -53,6 +54,11 @@ export default function V2ResultLayout({ cart }: Props) {
               <UrgencyBanner cart={cart} />
               <SmartCartValueBanner cart={cart} />
 
+              {/* v7.2.14 — savings disclaimer, conversion-trust copy. */}
+              <p className="mb-6 text-xs italic text-[#1a1f1a]/60">
+                Savings are avoided-overbuying estimates, not guaranteed rebates.
+              </p>
+
               <div className="lg:grid lg:grid-cols-3 lg:gap-6 items-start">
                 <div className="lg:col-span-2">
                   <StartHerePicks slots={heroSlots} tier={cart.selectedTier} />
@@ -67,6 +73,8 @@ export default function V2ResultLayout({ cart }: Props) {
                     <AddOnlyIfNeeded slots={addOnSlots} tier={cart.selectedTier} />
                   )}
                   <SkipForNow items={cart.skipList} />
+                  {/* v7.2.14 — trust callout listing scope route-outs. */}
+                  <WhenToCallAPro cart={cart} />
                   <WhyThesePicks cart={cart} />
                   <NotQuiteRight cart={cart} />
                   <CrossScopeDiscovery scopeVariantId={cart.scopeVariantId} />

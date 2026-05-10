@@ -1,80 +1,87 @@
-// V7.2.7 — Smart Cart V2 result page layout, refactored.
+// V7.2.11 — Smart Cart V2 result page, refreshed.
 //
-// Two-column desktop layout: main content (recommended picks, add-ons,
-// skip-for-now, already-have) + sticky sidebar (cart summary, why
-// these picks, not quite right). Mobile collapses to single column.
+// Composition of v2-2-11/* sections. Mobile-first ordering; desktop
+// shifts to two-column with sticky sidebar. Conditional banners
+// (route-out, urgency) render at top when their data is present.
 //
-// Conditional banners render above the main content when their data
-// is present: route-out (replaces everything), urgency, bundle
-// prompts.
-//
-// Server-renderable. The only client island is ProductImage (onError
-// fallback).
+// Old behavior preserved as V2ResultLayoutLegacy.tsx for rollback.
 
 import Footer from '@/components/Footer'
-import { TIER_LABEL } from '@/lib/smart-cart-model'
 import type { SmartCartV2Output } from '@/lib/smart-cart-model'
-import CartActions from './CartActions'
-import ValueProofBar from './sections/ValueProofBar'
-import UrgencyBanner from './sections/UrgencyBanner'
+
+import SmartCartResultPageHeader from './v2-2-11/SmartCartResultPageHeader'
+import SmartCartValueBanner from './v2-2-11/SmartCartValueBanner'
+import StartHerePicks, { selectStartHere } from './v2-2-11/StartHerePicks'
+import RecommendedPicksList from './v2-2-11/RecommendedPicksList'
+import AddOnlyIfNeeded from './v2-2-11/AddOnlyIfNeeded'
+import SkipForNow from './v2-2-11/SkipForNow'
+import WhyThesePicks from './v2-2-11/WhyThesePicks'
+import NotQuiteRight from './v2-2-11/NotQuiteRight'
+import CrossScopeDiscovery from './v2-2-11/CrossScopeDiscovery'
+import PhotoBetaStrip from './v2-2-11/PhotoBetaStrip'
+import CartSummarySidebar from './v2-2-11/CartSummarySidebar'
 import RouteOutBanner from './sections/RouteOutBanner'
-import RecommendedPicksSection from './sections/RecommendedPicksSection'
-import AddOnSection from './sections/AddOnSection'
-import SkipForNowSection from './sections/SkipForNowSection'
-import AlreadyHaveSection from './sections/AlreadyHaveSection'
-import BundlePromptsSection from './sections/BundlePromptsSection'
-import CartSummary from './sections/CartSummary'
-import WhyThesePicks from './sections/WhyThesePicks'
-import NotQuiteRight from './sections/NotQuiteRight'
+import UrgencyBanner from './sections/UrgencyBanner'
+import CartActions from './CartActions'
 
 type Props = { cart: SmartCartV2Output }
 
 export default function V2ResultLayout({ cart }: Props) {
   const coreSlots = cart.slots.filter(s => s.slotKind === 'core')
   const addOnSlots = cart.slots.filter(s => s.slotKind === 'addon')
-  const itemCount = coreSlots.length + addOnSlots.length
+  const heroSlots = selectStartHere(coreSlots)
+  const heroIds = new Set(heroSlots.map(s => s.slotId))
+  // The full list shows the non-hero core slots (deduped against Start Here)
+  const fullListSlots = coreSlots.filter(s => !heroIds.has(s.slotId))
 
   return (
-    <main className="min-h-screen bg-[#fbf8f1] text-[#1a1f1a] print:bg-white">
+    <main className="min-h-screen bg-[#fbf8f1] text-[#1a1f1a] print:bg-white pb-24 lg:pb-0">
       <Header cart={cart} />
 
       <div className="max-w-6xl mx-auto px-4 py-8 md:py-12">
-        <TitleBlock cart={cart} />
-
         {cart.routedOut ? (
-          <RouteOutBanner cart={cart} />
+          <>
+            <SmartCartResultPageHeader cart={cart} />
+            <RouteOutBanner cart={cart} />
+          </>
         ) : (
           <>
+            <SmartCartResultPageHeader cart={cart} />
             <UrgencyBanner cart={cart} />
-            <ValueProofBar cart={cart} />
+            <SmartCartValueBanner cart={cart} />
 
             <div className="lg:grid lg:grid-cols-3 lg:gap-6 items-start">
               <div className="lg:col-span-2">
-                <RecommendedPicksSection slots={coreSlots} tier={cart.selectedTier} />
+                <StartHerePicks slots={heroSlots} tier={cart.selectedTier} />
+                {fullListSlots.length > 0 && (
+                  <RecommendedPicksList
+                    slots={fullListSlots}
+                    tier={cart.selectedTier}
+                    startHereCount={heroSlots.length}
+                  />
+                )}
                 {addOnSlots.length > 0 && (
-                  <AddOnSection slots={addOnSlots} tier={cart.selectedTier} />
+                  <AddOnlyIfNeeded slots={addOnSlots} tier={cart.selectedTier} />
                 )}
-                {cart.bundlePrompts && cart.bundlePrompts.length > 0 && (
-                  <BundlePromptsSection prompts={cart.bundlePrompts} />
-                )}
-                <SkipForNowSection items={cart.skipList} />
-                {cart.nextBestGaps && cart.nextBestGaps.length > 0 && (
-                  <AlreadyHaveSection gaps={cart.nextBestGaps} />
-                )}
-              </div>
-
-              <aside className="lg:col-span-1 lg:sticky lg:top-6 space-y-4 mt-6 lg:mt-0">
-                <CartSummary cart={cart} itemCount={itemCount} />
+                <SkipForNow items={cart.skipList} />
                 <WhyThesePicks cart={cart} />
                 <NotQuiteRight cart={cart} />
-              </aside>
+                <CrossScopeDiscovery scopeVariantId={cart.scopeVariantId} />
+                <PhotoBetaStrip />
+              </div>
+
+              <div className="lg:col-span-1">
+                <CartSummarySidebar
+                  cart={cart}
+                  coreSlots={coreSlots}
+                  tier={cart.selectedTier}
+                />
+              </div>
             </div>
           </>
         )}
 
-        <CrossSellComingSoon />
-
-        <p className="mt-8 text-xs text-[#1a1f1a]/60 text-center">
+        <p className="mt-8 text-xs text-[#1a1f1a]/55 text-center">
           30-day link to view your cart. Saved at{' '}
           <code>{`/smart-cart/result/${cart.cartId}`}</code>.
         </p>
@@ -85,74 +92,51 @@ export default function V2ResultLayout({ cart }: Props) {
   )
 }
 
-// ---------- Header / Title ------------------------------------------
+// ---------- Top nav --------------------------------------------------
 
 function Header({ cart }: { cart: SmartCartV2Output }) {
   return (
-    <header className="bg-white border-b border-[#e8e3d4] print:hidden">
-      <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between gap-4">
+    <header className="bg-white border-b border-[#e8e3d4] print:hidden sticky top-0 z-30">
+      <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
         <a href="/" className="flex items-baseline gap-2 text-[#1f3a2e]">
-          <span className="font-display text-2xl">Smart Cart</span>
-          <span className="text-xs uppercase tracking-wide text-[#1a1f1a]/55">
-            by Alder
+          <span className="font-display text-2xl">Alder</span>
+          <span className="hidden sm:inline text-xs uppercase tracking-wide text-[#1a1f1a]/55">
+            Vermont home projects
           </span>
         </a>
-        <CartActions
-          cartId={cart.cartId}
-          topic={cart.topic}
-          initialScopeVariantId={cart.scopeVariantId}
-          initialScenario={cart.scenario}
-          respinCount={cart.respinCount ?? 0}
-        />
-      </div>
-      <div className="max-w-6xl mx-auto px-4 pb-4 flex items-center gap-2 text-[#1f3a2e]">
-        <CheckCircleIcon />
-        <span className="font-display text-xl">Your Smart Cart is ready</span>
+        <nav className="hidden md:flex items-center gap-5 text-sm text-[#1a1f1a]/85">
+          <a href="/" className="hover:text-[#1f3a2e]">
+            Projects
+          </a>
+          <a href="/" className="hover:text-[#1f3a2e]">
+            Guides &amp; Ideas
+          </a>
+          <a
+            href="/smart-cart"
+            className="text-[#1f3a2e] font-medium underline-offset-4 underline decoration-[#1f3a2e]/30"
+          >
+            Smart Cart
+          </a>
+          <a href="/about" className="hover:text-[#1f3a2e]">
+            About
+          </a>
+          <span
+            className="text-xs uppercase tracking-wide bg-[#f5efe2] text-[#1a1f1a]/65 px-2 py-1 rounded"
+            aria-label="Region"
+          >
+            Vermont
+          </span>
+        </nav>
+        <div className="flex items-center gap-2">
+          <CartActions
+            cartId={cart.cartId}
+            topic={cart.topic}
+            initialScopeVariantId={cart.scopeVariantId}
+            initialScenario={cart.scenario}
+            respinCount={cart.respinCount ?? 0}
+          />
+        </div>
       </div>
     </header>
-  )
-}
-
-function TitleBlock({ cart }: { cart: SmartCartV2Output }) {
-  return (
-    <div className="mb-4 text-sm text-[#1a1f1a]/80">
-      <strong>Built for:</strong> {cart.scopeLabel} · {cart.scenarioLabel} ·{' '}
-      <span className="lowercase">{TIER_LABEL[cart.selectedTier]}</span>
-    </div>
-  )
-}
-
-// ---------- Cross-sell ----------------------------------------------
-
-function CrossSellComingSoon() {
-  return (
-    <aside className="mt-10 bg-[#1f3a2e] text-white rounded-xl p-6 md:p-8 grid md:grid-cols-3 gap-4 items-center">
-      <div className="md:col-span-2">
-        <div className="text-xs uppercase tracking-wide text-white/70 mb-2">
-          Coming back
-        </div>
-        <h3 className="font-display text-xl mb-2">
-          Wondering whether to organize what you have, or whether this project
-          is the right one to start with?
-        </h3>
-        <p className="text-sm text-white/85">
-          Worth-It Plan is being rebuilt — get notified when it returns.
-        </p>
-      </div>
-      <a
-        href="/worth-it"
-        className="bg-white text-[#1f3a2e] font-medium px-5 py-3 rounded-lg hover:bg-[#f5efe2] inline-block text-center"
-      >
-        Get notified →
-      </a>
-    </aside>
-  )
-}
-
-function CheckCircleIcon() {
-  return (
-    <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
-      <path d="M12 2a10 10 0 100 20 10 10 0 000-20zm-1.2 14.7l-4.5-4.5 1.4-1.4 3.1 3.1 6.8-6.8 1.4 1.4-8.2 8.2z" />
-    </svg>
   )
 }

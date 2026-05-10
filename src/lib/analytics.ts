@@ -749,3 +749,60 @@ export function trackUpgradeCompleted(params: {
     from_cart_id: params.fromCartId,
   })
 }
+
+// =====================================================================
+// v7.2.11 — Smart Cart result-page events
+// =====================================================================
+//
+// Generic wrapper for the result-page refresh's many small events.
+// Each event takes a free-form props object and is forwarded to GA4
+// (when present) with snake_case parameter keys.
+
+export type ResultPageEvent =
+  | 'smart_cart_result_view'
+  | 'result_header_view'
+  | 'value_banner_view'
+  | 'savings_methodology_expand'
+  | 'start_here_view'
+  | 'start_here_card_click'
+  | 'start_here_expand_to_full'
+  | 'product_card_view'
+  | 'product_card_expand_why_this'
+  | 'product_save'
+  | 'product_quantity_change'
+  | 'retailer_click'
+  | 'skip_card_view'
+  | 'skipped_item_add_anyway'
+  | 'keep_skipped_click'
+  | 'addon_card_view'
+  | 'addon_add_click'
+  | 'cross_scope_card_view'
+  | 'cross_scope_card_click'
+  | 'adjust_cart_click'
+  | 'adjust_cart_chip_click'
+  | 'primary_cta_view_retailers_buy_click'
+  | 'retailer_modal_open'
+  | 'retailer_modal_product_click'
+  | 'save_for_later_click'
+  | 'share_click'
+  | 'download_click'
+  | 'print_click'
+  | 'not_right_click'
+  | 'photo_beta_click'
+  | 'photo_beta_signup_submit'
+
+export function trackResultPageEvent(
+  event: ResultPageEvent,
+  params: Record<string, string | number | boolean | undefined> = {},
+): void {
+  // Normalize undefineds to '(none)' for GA4 readability
+  const cleaned: Record<string, unknown> = {}
+  for (const [k, v] of Object.entries(params)) {
+    cleaned[k] = v === undefined ? '(none)' : v
+  }
+  send(event, cleaned)
+  if (typeof window !== 'undefined' && process.env.NODE_ENV !== 'production') {
+    // eslint-disable-next-line no-console
+    console.debug(`[analytics] ${event}`, cleaned)
+  }
+}

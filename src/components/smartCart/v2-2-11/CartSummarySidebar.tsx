@@ -27,6 +27,13 @@ interface Props {
   tier: CartTier
 }
 
+function pickCountLabel(coreCount: number, addOnCount: number): string {
+  if (coreCount === 0 && addOnCount === 0) return 'No picks'
+  if (addOnCount === 0) return `${coreCount} core ${coreCount === 1 ? 'pick' : 'picks'}`
+  if (coreCount === 0) return `${addOnCount} optional ${addOnCount === 1 ? 'add-on' : 'add-ons'}`
+  return `${coreCount} core + ${addOnCount} optional`
+}
+
 export default function CartSummarySidebar({
   cart,
   coreSlots,
@@ -55,6 +62,12 @@ export default function CartSummarySidebar({
   const showSelectedView = selection.customized
   const selectedCount = selection.selectedCount
   const totalSelectable = allSelectableSlots.length
+  // v7.2.13 — precise item-count language. Disambiguates "11 items"
+  // (which conflated core + addons + skip into a single number) into
+  // "5 core + 3 optional" so buyers see what they're actually buying.
+  const headerLabel = showSelectedView
+    ? `${selectedCount} of ${totalSelectable} selected`
+    : pickCountLabel(coreSlots.length, addOnSlots.length)
 
   function onPrimaryCTA() {
     trackResultPageEvent('primary_cta_view_retailers_buy_click', {
@@ -91,14 +104,23 @@ export default function CartSummarySidebar({
     <>
       <aside className="hidden lg:block lg:sticky lg:top-6">
         <div className="bg-white border border-[#e8e3d4] rounded-xl p-5 shadow-sm">
-          <div className="flex items-baseline justify-between mb-4">
+          <div className="flex items-baseline justify-between mb-4 gap-2">
             <h3 className="font-display text-lg text-[#1a1f1a]">Cart summary</h3>
-            <span className="text-xs text-[#1a1f1a]/65 px-2 py-0.5 rounded-full bg-[#f5efe2]">
-              {showSelectedView
-                ? `${selectedCount} of ${totalSelectable}`
-                : `${cart.slots.length} items`}
+            <span className="text-xs text-[#1a1f1a]/65 px-2 py-0.5 rounded-full bg-[#f5efe2] whitespace-nowrap">
+              {headerLabel}
             </span>
           </div>
+
+          {!showSelectedView && (
+            <p className="text-xs text-[#1a1f1a]/65 mb-3 leading-snug">
+              Cart includes {coreSlots.length}{' '}
+              {coreSlots.length === 1 ? 'core pick' : 'core picks'}
+              {addOnSlots.length > 0
+                ? ` and ${addOnSlots.length} optional ${addOnSlots.length === 1 ? 'add-on' : 'add-ons'}`
+                : ''}
+              .
+            </p>
+          )}
 
           {showSelectedView && (
             <p className="text-xs text-[#1a1f1a]/65 mb-3 leading-snug">
@@ -205,6 +227,7 @@ export default function CartSummarySidebar({
         totalSelectable={totalSelectable}
         selectedTotal={selectedTotal}
         canBuy={canBuy}
+        headerLabel={headerLabel}
       />
 
       <RetailerBuyModal
@@ -253,6 +276,7 @@ function MobileBottomSheet({
   totalSelectable,
   selectedTotal,
   canBuy,
+  headerLabel,
 }: {
   cart: SmartCartV2Output
   onPrimary: () => void
@@ -263,6 +287,7 @@ function MobileBottomSheet({
   totalSelectable: number
   selectedTotal: { low: number; high: number }
   canBuy: boolean
+  headerLabel: string
 }) {
   const [expanded, setExpanded] = useState(false)
   const fee = CONFIG.products.smartCart.priceUsd
@@ -275,7 +300,7 @@ function MobileBottomSheet({
     : formatPriceRange(leanCartLow, leanCartHigh)
   const totalLabel = showSelectedView
     ? `${selectedCount} of ${totalSelectable} selected`
-    : 'Estimated total'
+    : headerLabel
 
   return (
     <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-[#e8e3d4] shadow-[0_-4px_12px_rgba(0,0,0,0.05)]">

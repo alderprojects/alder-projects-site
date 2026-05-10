@@ -44,6 +44,13 @@ export default function SmartCartValueBanner({ cart }: Props) {
       : null
   const selectedCount = selection?.selectedCount ?? 0
 
+  // v7.2.13 — Real skip examples for the methodology dropdown.
+  // SkipItemV2.amountSaved is { low, high } | undefined; we format as
+  // a price range string for display.
+  const skipExamples = (cart.skipList ?? [])
+    .filter(s => !!s.amountSaved)
+    .slice(0, 5)
+
   useEffect(() => {
     trackResultPageEvent('value_banner_view', {
       scope_variant_id: cart.scopeVariantId,
@@ -106,20 +113,35 @@ export default function SmartCartValueBanner({ cart }: Props) {
       </button>
 
       {methodologyOpen && (
-        <div className="mt-3 bg-white/5 rounded-md p-4 text-sm text-white/85 space-y-2">
-          <p className="font-medium text-white/95">
-            Avoided spend buckets we count:
+        <div className="mt-3 bg-white/5 rounded-md p-4 text-sm text-white/85 space-y-3">
+          <p className="font-medium text-white/95">How we estimate avoided spend:</p>
+          <p className="text-white/80 leading-snug">
+            Alder compares your recommended cart against common overbuy paths —
+            premium kits or custom versions you don&rsquo;t need yet, duplicate
+            organizers or tools, wrong-fit products that often get returned,
+            and remodel-level purchases before the small fix is tested.
           </p>
-          <ul className="space-y-1.5 list-disc list-inside">
-            <li>Premium-tier picks the cart skips when sweet-spot is enough</li>
-            <li>Duplicate or unnecessary products avoided</li>
-            <li>Wrong-fit categories not bought before measuring</li>
-            <li>Custom or remodel-level items deferred</li>
-            <li>Lower-impact items skipped for now</li>
-          </ul>
-          <p className="text-white/65 italic">
-            Estimated, not guaranteed. Final spend varies by retailer, date,
-            and which picks you actually buy.
+          {skipExamples.length > 0 && (
+            <>
+              <p className="font-medium text-white/95 pt-1">Skipped in this cart:</p>
+              <ul className="space-y-1 list-disc list-inside text-white/80">
+                {skipExamples.map(s => (
+                  <li key={s.id}>
+                    <span>{s.title}</span>
+                    {s.amountSaved && (
+                      <span className="text-white/65">
+                        {' '}— avoided ~{formatPriceRange(s.amountSaved.low, s.amountSaved.high)}
+                      </span>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </>
+          )}
+          <p className="text-white/65 italic text-xs pt-1">
+            Avoided spend is estimated from skipped categories and common
+            overbuy paths. Your actual savings depends on what you would have
+            bought otherwise.
           </p>
         </div>
       )}

@@ -28,6 +28,8 @@ import {
 } from '@/lib/storage'
 import { buildSmartCart, type SmartCartInput } from '@/lib/buildSmartCart'
 import { buildSmartCartV2 } from '@/lib/buildSmartCartV2'
+import { logBuyerEvent, hashEmail } from '@/lib/buyer-events'
+import { readSessionFromCookies } from '@/lib/session-tracking'
 import { buildWorthItPlan, type WorthItInput } from '@/lib/buildWorthItPlan'
 import { inferSeason } from '@/lib/season-helpers'
 import {
@@ -146,6 +148,41 @@ async function handleSessionCompleted(session: Stripe.Checkout.Session) {
       )
       await saveSmartCart(cart)
       await sendSmartCartReceiptEmailV2(cart, cart.customerEmail)
+      // v7.2.13 — buyer event log for durable analytics. Wrapped in
+      // try/catch so analytics failure never blocks cart creation.
+      // SmartCartV2Output doesn't carry a structured town/townTier
+      // today; we pass customerProvidedAddress as `town` so the admin
+      // analytics view shows what we have. v7.3+ can add structured
+      // town fields to the cart.
+      try {
+        const session = readSessionFromCookies()
+        await logBuyerEvent({
+          eventType: 'cart_created',
+          cartId: cart.cartId,
+          customerEmailHash: hashEmail(cart.customerEmail),
+          topic: cart.topic,
+          scopeVariantId: cart.scopeVariantId,
+          scenario: cart.scenario,
+          town: cart.customerProvidedAddress ?? null,
+          townTier: null,
+          fee: CONFIG.products.smartCart.priceUsd,
+          leanCartLow: cart.savings.leanCartLow,
+          leanCartHigh: cart.savings.leanCartHigh,
+          avoidedSpendLow: cart.savings.potentialSavingsLow,
+          avoidedSpendHigh: cart.savings.potentialSavingsHigh,
+          selectedSlotCount: null,
+          totalSlotCount: cart.slots.length,
+          refundReason: null,
+          refundedAt: null,
+          utmSource: session.utmSource,
+          utmMedium: session.utmMedium,
+          utmCampaign: session.utmCampaign,
+          referrer: session.referrer,
+          sessionId: session.sessionId || null,
+        })
+      } catch (err) {
+        console.error('[buyer-events] cart_created log failed', err)
+      }
       // V7.2.1 — Worth-It is paused. Skip the T+72h upgrade-offer
       // schedule until Worth-It returns.
       return

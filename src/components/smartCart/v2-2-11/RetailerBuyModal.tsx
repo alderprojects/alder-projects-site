@@ -110,7 +110,7 @@ export default function RetailerBuyModal({
             <p className="text-xs text-[#1a1f1a]/65 mt-0.5">
               {slots.length === 0
                 ? 'No items selected yet.'
-                : `${slots.length} item${slots.length === 1 ? '' : 's'} selected`}
+                : `${slots.length} item${slots.length === 1 ? '' : 's'} selected. View budget or premium alternatives inside each item card.`}
             </p>
           </div>
           <button

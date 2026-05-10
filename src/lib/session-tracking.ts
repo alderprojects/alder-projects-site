@@ -9,8 +9,15 @@
 // Cookie: alder_session_id, 24h rolling, refreshed on activity.
 // Lightweight — no PII, no tracking pixels.
 
+// NOTE: this module is imported by both src/middleware.ts (Edge runtime)
+// and src/app/api/webhook/stripe/route.ts (Node runtime). Edge Runtime
+// has no Node `crypto` module, so we use the Web Crypto API
+// (`globalThis.crypto.getRandomValues`) which is available in both.
+// `next/headers` cookies() is only safe to call from server components
+// / route handlers, not from middleware — readSessionFromCookies is
+// only called from the webhook route.
+
 import { cookies } from 'next/headers'
-import { randomBytes } from 'crypto'
 
 export interface SessionInfo {
   sessionId: string
@@ -54,7 +61,13 @@ export function readSessionFromCookies(): SessionInfo {
 }
 
 export function generateSessionId(): string {
-  return `sess_${Date.now().toString(36)}_${randomBytes(8).toString('hex')}`
+  // Web Crypto API — works in Edge Runtime (middleware) and Node alike.
+  const bytes = new Uint8Array(8)
+  globalThis.crypto.getRandomValues(bytes)
+  const hex = Array.from(bytes)
+    .map(b => b.toString(16).padStart(2, '0'))
+    .join('')
+  return `sess_${Date.now().toString(36)}_${hex}`
 }
 
 export function buildSessionCookies(

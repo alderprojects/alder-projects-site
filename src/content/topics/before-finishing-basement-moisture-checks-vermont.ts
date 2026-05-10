@@ -130,7 +130,7 @@ export const BEFORE_FINISHING_BASEMENT_MOISTURE_CHECKS_VERMONT_CONTENT: TopicGui
 
 **Persistent musty smell with no visible water and humidity already under 60%.** Often hidden mold behind existing finished surfaces or in inaccessible spaces. Mold inspector first ($250-500 in Vermont) before any further work.
 
-**Trap:** assuming the Smart Cart's $80-$300 of testing equipment can substitute for a $250-500 professional assessment when the situation is already showing red flags. The cart is a screening kit for ambiguous cases. Clear cases need pros. **What to do:** start at /basement-finishing-vermont (or your county's basement contractor page) for vetted Vermont specialists, or /waterproofing-vermont if water intrusion is the primary concern.`,
+**Trap:** assuming the Smart Cart's $80-$300 of testing equipment can substitute for a $250-500 professional assessment when the situation is already showing red flags. The cart is a screening kit for ambiguous cases. Clear cases need pros. **What to do:** start at /basement-finishing-vermont (or your county's basement contractor page) for vetted Vermont specialists. That page also routes you to a waterproofing or foundation pro when active water or structural issues are the primary concern — so you don't need to hunt for a separate listing.`,
     },
   ],
 
@@ -180,4 +180,17 @@ export const BEFORE_FINISHING_BASEMENT_MOISTURE_CHECKS_VERMONT_CONTENT: TopicGui
 
   byline: 'Alder Projects editorial team',
   verifyDate: '2026-05-10',
+
+  // v7.2.14 fix-up — pairs guide with the basement moisture prep scope
+  // and renders the 3 in-guide CTAs.
+  smartCartCta: {
+    topicId: 'home_repair',
+    scopeVariantId: 'basement_moisture_prep',
+    scenario: 'just_starting',
+    tier: 'sweet_spot',
+    topicPageSlug: 'basement-moisture-prep',
+    heroHeadline: 'Test before you finish.',
+    heroBody:
+      "A $80–$300 diagnostic kit (hygrometer, moisture meter, water alarms, properly-sized dehumidifier, mold screen) tells you whether the basement is dry enough to finish — before you commit $20-50k to the bigger project.",
+  },
 }

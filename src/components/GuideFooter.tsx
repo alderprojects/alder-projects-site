@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { getSourcesForGuide } from '@/content/facts'
+import SmartCartGuideCTA, { type SmartCartGuideCTAConfig } from '@/components/SmartCartGuideCTA'
 
 // E-E-A-T scaffold rendered at the bottom of every content page.
 //
@@ -19,6 +20,12 @@ type GuideFooterProps = {
   challengeUrl?: string           // mailto link to flag errors
   funnelTownPrefill?: string      // pre-fill the property tool form for a specific town
   funnelLabel?: string            // override default funnel CTA copy
+  /**
+   * v7.2.14 fix-up — when set, replaces the property-tool funnel hero
+   * with a Smart Cart hero CTA. The property-tool funnel is suppressed
+   * entirely (not duplicated below).
+   */
+  smartCartCta?: SmartCartGuideCTAConfig
 }
 
 const INK = '#1C2B1A'
@@ -44,6 +51,7 @@ export default function GuideFooter({
   challengeUrl,
   funnelTownPrefill,
   funnelLabel,
+  smartCartCta,
 }: GuideFooterProps) {
   const sources = getSourcesForGuide(factIds)
   const challenge =
@@ -167,43 +175,47 @@ export default function GuideFooter({
         </p>
       </div>
 
-      {/* Property tool funnel — the only CTA */}
-      <div
-        style={{
-          padding: '28px 24px',
-          backgroundColor: INK,
-          color: CREAM,
-          marginBottom: '40px',
-        }}
-      >
-        <p
+      {/* CTA — Smart Cart hero (v7.2.14 pilot guides) OR property-tool funnel (default). */}
+      {smartCartCta ? (
+        <SmartCartGuideCTA variant="hero" {...smartCartCta} />
+      ) : (
+        <div
           style={{
-            fontFamily: "'Playfair Display', Georgia, serif",
-            fontSize: '20px',
-            fontWeight: 500,
+            padding: '28px 24px',
+            backgroundColor: INK,
             color: CREAM,
-            lineHeight: 1.4,
-            margin: '0 0 12px',
+            marginBottom: '40px',
           }}
         >
-          {funnelCopy}
-        </p>
-        <Link
-          href={funnelHref}
-          style={{
-            display: 'inline-block',
-            fontSize: '14px',
-            fontFamily: 'monospace',
-            letterSpacing: '0.06em',
-            color: SAGE,
-            textDecoration: 'none',
-            borderBottom: `1px solid ${SAGE}`,
-            paddingBottom: '2px',
-          }}
-        >
-          Enter your address &mdash; we synthesize the rest &rarr;
-        </Link>
-      </div>
+          <p
+            style={{
+              fontFamily: "'Playfair Display', Georgia, serif",
+              fontSize: '20px',
+              fontWeight: 500,
+              color: CREAM,
+              lineHeight: 1.4,
+              margin: '0 0 12px',
+            }}
+          >
+            {funnelCopy}
+          </p>
+          <Link
+            href={funnelHref}
+            style={{
+              display: 'inline-block',
+              fontSize: '14px',
+              fontFamily: 'monospace',
+              letterSpacing: '0.06em',
+              color: SAGE,
+              textDecoration: 'none',
+              borderBottom: `1px solid ${SAGE}`,
+              paddingBottom: '2px',
+            }}
+          >
+            Enter your address &mdash; we synthesize the rest &rarr;
+          </Link>
+        </div>
+      )}
     </footer>
   )
 }

@@ -119,7 +119,7 @@ For these windows, $80-$220 of weatherization kit closes 70-90% of the air leaka
 
 **Custom / historic preservation specialist** — for historic windows where standard replacement is wrong. Wood-sash restoration with custom storm inserts can preserve original frames while solving the energy problem. Cost: $400-800/window for restoration vs. $1,200-1,800 for like-for-like custom replacement. Slower but right for pre-1900 homes.
 
-**Trap:** hiring a general contractor for window replacement when the project is just windows. GC markups (15-30%) and scheduling complications usually make the GC the wrong choice for a pure-window project. **What to do:** start at /window-installer-vermont (or your county's window-installer page) for vetted Vermont specialists. The Smart Cart is a stopgap, not a substitute for the right pro.`,
+**Trap:** hiring a general contractor for window replacement when the project is just windows. GC markups (15-30%) and scheduling complications usually make the GC the wrong choice for a pure-window project. **What to do:** start at /window-replacement-vermont (or your county's window-replacement page) for vetted Vermont window specialists. The Smart Cart is a stopgap, not a substitute for the right pro.`,
     },
   ],
 
@@ -171,4 +171,17 @@ For these windows, $80-$220 of weatherization kit closes 70-90% of the air leaka
 
   byline: 'Alder Projects editorial team',
   verifyDate: '2026-05-10',
+
+  // v7.2.14 fix-up — pairs guide with the window weatherization scope
+  // and renders the 3 in-guide CTAs.
+  smartCartCta: {
+    topicId: 'weatherization',
+    scopeVariantId: 'window_weatherization',
+    scenario: 'just_starting',
+    tier: 'sweet_spot',
+    topicPageSlug: 'window-weatherization-vermont',
+    heroHeadline: 'One winter pass. Decide replacement next year.',
+    heroBody:
+      'A $80–$220 weatherization kit closes 70-90% of felt drafts on most pre-1990 Vermont windows for one winter — and tells you which ones are genuinely past saving.',
+  },
 }

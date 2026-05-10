@@ -3,6 +3,8 @@ import Nav from '@/components/Nav'
 import Footer from '@/components/Footer'
 import GuideFooter from '@/components/GuideFooter'
 import PageViewEvent from '@/components/PageViewEvent'
+import SmartCartGuideCTA from '@/components/SmartCartGuideCTA'
+import CurationModal from '@/components/CurationModal'
 import {
   buildArticle,
   buildBreadcrumbList,
@@ -119,6 +121,11 @@ export default function TopicGuide({
       </div>
 
       <div style={{ maxWidth: '720px', margin: '0 auto', padding: 'clamp(40px,6vw,64px) 24px 80px' }}>
+        {/* v7.2.14 fix-up — CTA #1: top-of-guide */}
+        {content.smartCartCta && (
+          <SmartCartGuideCTA variant="top" {...content.smartCartCta} />
+        )}
+
         {content.sections.map((section, i) => (
           <section key={i} style={{ marginBottom: '40px' }}>
             <h2
@@ -146,6 +153,11 @@ export default function TopicGuide({
                 {renderInlineMarkdown(para)}
               </p>
             ))}
+            {/* v7.2.14 fix-up — CTA #2: end of "What the $19.99..." section */}
+            {content.smartCartCta &&
+              /^What the \$19\.99 Smart Cart actually does/i.test(section.h2) && (
+                <SmartCartGuideCTA variant="inline" {...content.smartCartCta} />
+              )}
           </section>
         ))}
 
@@ -242,8 +254,12 @@ export default function TopicGuide({
           byline={content.byline}
           verifyDate={content.verifyDate}
           factIds={content.factIds}
+          smartCartCta={content.smartCartCta}
         />
       </div>
+
+      {/* v7.2.14 fix-up — mount CurationModal so the in-guide CTAs work. */}
+      {content.smartCartCta && <CurationModal />}
 
       <Footer />
     </div>

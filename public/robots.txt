@@ -1,10 +1,35 @@
+# Alder Projects — alderprojects.com
+# Vermont home project shopping tools and Buy/Skip/Wait guides
+
 User-agent: *
 Allow: /
-Disallow: /thanks
-Disallow: /contractors/welcome
-Disallow: /property/
-Disallow: /api/
-Disallow: /chat
-Disallow: /plan
 
+# Disallow common admin / API / private paths
+Disallow: /api/
+Disallow: /admin/
+Disallow: /_next/
+
+# Smart Cart result pages (personalized, 30-day TTL) — should not be crawled
+Disallow: /smart-cart/result/
+
+# Sitemap location
 Sitemap: https://alderprojects.com/sitemap.xml
+
+# Specific bot policies
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /

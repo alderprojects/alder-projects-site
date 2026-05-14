@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://alderprojects.com/</loc><changefreq>weekly</changefreq><priority>1.0</priority></url>
+  <url><loc>https://alderprojects.com/smart-cart</loc><changefreq>weekly</changefreq><priority>1.0</priority></url>
+  <url><loc>https://alderprojects.com/calculator</loc><changefreq>monthly</changefreq><priority>0.95</priority></url>
+  <url><loc>https://alderprojects.com/tools</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://alderprojects.com/guides</loc><changefreq>weekly</changefreq><priority>0.95</priority></url>
+  <url><loc>https://alderprojects.com/plan</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://alderprojects.com/faq</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://alderprojects.com/contractors</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <!-- v7.2.16 BSW pillar + supporting (8) -->
+  <url><loc>https://alderprojects.com/guides/how-to-shop-for-home-projects-without-overspending</loc><changefreq>monthly</changefreq><priority>0.95</priority></url>
+  <url><loc>https://alderprojects.com/guides/windows-buy-skip-wait</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://alderprojects.com/guides/basement-buy-skip-wait</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://alderprojects.com/guides/lake-season-buy-skip-wait</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://alderprojects.com/guides/kitchen-refresh-buy-skip-wait</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://alderprojects.com/guides/the-5-question-test-before-any-home-purchase</loc><changefreq>monthly</changefreq><priority>0.85</priority></url>
+  <url><loc>https://alderprojects.com/guides/vermont-home-project-cost-reality-2026</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://alderprojects.com/guides/home-improvement-buy-timing-calendar</loc><changefreq>monthly</changefreq><priority>0.85</priority></url>
+  <!-- v7.2.16 comparison pages (5) -->
+  <url><loc>https://alderprojects.com/guides/windowdressers-vs-indow-vs-diy-window-inserts-vermont</loc><changefreq>monthly</changefreq><priority>0.85</priority></url>
+  <url><loc>https://alderprojects.com/guides/brightech-vs-pottery-barn-vs-restoration-hardware-string-lights</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://alderprojects.com/guides/polywood-vs-highwood-vs-frontgate-adirondack-chairs</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://alderprojects.com/guides/weber-spirit-vs-big-green-egg-vs-kamado-joe-real-cost</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://alderprojects.com/guides/cabinet-pulls-designer-vs-mid-tier-real-difference</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <!-- v7.2.16 Vermont best of (3) -->
+  <url><loc>https://alderprojects.com/guides/best-hardware-stores-in-vermont</loc><changefreq>monthly</changefreq><priority>0.85</priority></url>
+  <url><loc>https://alderprojects.com/guides/best-paint-stores-in-vermont</loc><changefreq>monthly</changefreq><priority>0.85</priority></url>
+  <url><loc>https://alderprojects.com/guides/best-lumber-yards-in-vermont</loc><changefreq>monthly</changefreq><priority>0.85</priority></url>
+  <!-- Existing contractor-focused guides -->
+  <url><loc>https://alderprojects.com/guides/how-much-does-kitchen-remodel-cost-vermont</loc><changefreq>monthly</changefreq><priority>0.85</priority></url>
+  <url><loc>https://alderprojects.com/guides/how-to-find-contractor-vermont</loc><changefreq>monthly</changefreq><priority>0.85</priority></url>
+  <url><loc>https://alderprojects.com/guides/vermont-renovation-permit-guide</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://alderprojects.com/guides/what-to-ask-contractor-before-hiring</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://alderprojects.com/guides/how-long-does-bathroom-remodel-take-vermont</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://alderprojects.com/guides/how-much-does-deck-cost-vermont</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://alderprojects.com/guides/how-much-does-roof-replacement-cost-vermont</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://alderprojects.com/guides/vermont-contractor-red-flags</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://alderprojects.com/guides/renovating-vermont-home-winter</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <!-- Existing high-priority service pages -->
+  <url><loc>https://alderprojects.com/window-replacement-vermont</loc><changefreq>monthly</changefreq><priority>0.85</priority></url>
+  <url><loc>https://alderprojects.com/kitchen-remodeling-vermont</loc><changefreq>monthly</changefreq><priority>0.85</priority></url>
+  <url><loc>https://alderprojects.com/bathroom-remodeling-vermont</loc><changefreq>monthly</changefreq><priority>0.85</priority></url>
+  <url><loc>https://alderprojects.com/deck-builders-vermont</loc><changefreq>monthly</changefreq><priority>0.85</priority></url>
+  <url><loc>https://alderprojects.com/basement-finishing-vermont</loc><changefreq>monthly</changefreq><priority>0.85</priority></url>
+  <url><loc>https://alderprojects.com/roofing-contractors-vermont</loc><changefreq>monthly</changefreq><priority>0.85</priority></url>
+  <url><loc>https://alderprojects.com/home-additions-vermont</loc><changefreq>monthly</changefreq><priority>0.85</priority></url>
+  <url><loc>https://alderprojects.com/electrical-contractors-vermont</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://alderprojects.com/plumbing-contractors-vermont</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://alderprojects.com/hvac-contractors-vermont</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://alderprojects.com/general-contractors-vermont</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://alderprojects.com/painting-contractors-vermont</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+</urlset>

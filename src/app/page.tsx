@@ -3,6 +3,7 @@ import Link from 'next/link'
 import Nav from '@/components/Nav'
 import Footer from '@/components/Footer'
 import EmailCaptureV8 from '@/components/EmailCaptureV8'
+import SeasonalHero from '@/components/SeasonalHero'
 
 // V8 homepage — "The Receipt." Conversion-focused single-funnel page
 // for the $19.99 Smart Cart. Single primary CTA above the fold; the
@@ -297,132 +298,8 @@ export default function Home() {
       />
       <Nav />
 
-      {/* ── Hero ─────────────────────────────────────────────────── */}
-      <section
-        style={{
-          padding: 'clamp(56px,8vw,112px) 24px clamp(40px,6vw,64px)',
-          borderBottom: `1px solid ${C.lineSoft}`,
-        }}
-      >
-        <div
-          style={{
-            maxWidth: 1120,
-            margin: '0 auto',
-            display: 'grid',
-            gridTemplateColumns: 'minmax(0,1fr)',
-            gap: 'clamp(32px, 5vw, 64px)',
-            alignItems: 'center',
-          }}
-          className="v8-hero-grid"
-        >
-          {/* Left: copy column */}
-          <div>
-            <div
-              style={{
-                fontFamily: FM,
-                fontSize: 11,
-                letterSpacing: '0.14em',
-                textTransform: 'uppercase',
-                color: C.sage,
-                marginBottom: 22,
-              }}
-            >
-              Smart Cart · Vermont edition
-            </div>
-            <h1
-              style={{
-                fontFamily: FS,
-                fontWeight: 600,
-                fontSize: 'clamp(2.2rem, 5vw, 3.6rem)',
-                lineHeight: 1.05,
-                letterSpacing: '-0.02em',
-                color: C.ink,
-                margin: '0 0 18px',
-              }}
-            >
-              The shopping list for your{' '}
-              <em style={{ fontStyle: 'italic', color: C.accent }}>next</em>{' '}
-              Vermont home project.
-            </h1>
-            <p
-              style={{
-                fontFamily: FB,
-                fontSize: 17,
-                fontWeight: 400,
-                lineHeight: 1.55,
-                color: C.inkSoft,
-                margin: '0 0 28px',
-                maxWidth: 560,
-              }}
-            >
-              Tell us the project. We send back the buy list, the skip list, and the two
-              or three things that are different here than in the box-store guide.
-            </p>
-
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 16, alignItems: 'center' }}>
-              <Link
-                href="/smart-cart"
-                style={{
-                  display: 'inline-block',
-                  padding: '14px 26px',
-                  background: C.accent,
-                  color: '#FAF7F2',
-                  fontFamily: FB,
-                  fontSize: 15,
-                  fontWeight: 600,
-                  letterSpacing: '0.01em',
-                  borderRadius: 4,
-                  border: 'none',
-                  cursor: 'pointer',
-                }}
-              >
-                Get the Smart Cart — $19.99
-              </Link>
-              <a
-                href="#sample-cart"
-                style={{
-                  fontFamily: FB,
-                  fontSize: 14,
-                  color: C.ink,
-                  textDecoration: 'underline',
-                  textUnderlineOffset: 4,
-                }}
-              >
-                See a sample cart
-              </a>
-            </div>
-
-            <p
-              style={{
-                fontFamily: FB,
-                fontSize: 13,
-                fontStyle: 'italic',
-                color: C.inkSoft,
-                margin: '18px 0 0',
-              }}
-            >
-              One skipped cabinet pull pays for the cart twice.
-            </p>
-
-            <p
-              style={{
-                fontFamily: FM,
-                fontSize: 12,
-                letterSpacing: '0.06em',
-                color: C.inkFaint,
-                margin: '22px 0 0',
-              }}
-            >
-              Built in Montpelier · 30-day refund · No subscription · No account
-            </p>
-          </div>
-
-          {/* Right: receipt */}
-          <div style={{ maxWidth: 460, justifySelf: 'center', width: '100%' }}>
-            <ReceiptCard />
-          </div>
-        </div>
-      </section>
+      {/* ── Hero (v7.2.17 SeasonalHero) ─────────────────────────── */}
+      <SeasonalHero />
 
       {/* ── Stat tiles ───────────────────────────────────────────── */}
       <section

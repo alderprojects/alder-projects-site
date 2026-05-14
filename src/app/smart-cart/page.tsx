@@ -22,8 +22,48 @@ export const metadata: Metadata = {
 export default function SmartCartPreSalePage() {
   return (
     <>
+      <div
+        style={{
+          backgroundColor: '#1C2B1A',
+          borderBottom: '1px solid rgba(122,155,111,0.2)',
+          padding: '10px 20px',
+          textAlign: 'center',
+        }}
+      >
+        <p
+          style={{
+            fontSize: '12px',
+            fontFamily: "'DM Sans', system-ui, sans-serif",
+            color: 'rgba(245,239,224,0.85)',
+            margin: 0,
+          }}
+        >
+          <span style={{ color: '#7A9B6F', marginRight: '8px' }}>✓</span>
+          $19.99 with full refund in the first 24 hours, no questions asked.
+        </p>
+      </div>
       <Nav />
       <SalesPageClient product="smart_cart" />
+      <div
+        style={{
+          maxWidth: '720px',
+          margin: '32px auto',
+          padding: '20px',
+          backgroundColor: 'rgba(122,155,111,0.06)',
+          borderRadius: '4px',
+          borderLeft: '3px solid #7A9B6F',
+        }}
+      >
+        <p style={{ fontSize: '13px', color: 'rgba(28,43,26,0.75)', margin: '0 0 10px 0', lineHeight: 1.55 }}>
+          <strong>Want to understand the method first?</strong> The Buy/Skip/Wait pillar guide walks through four real Vermont projects and the dollar logic behind each recommendation.
+        </p>
+        <a
+          href="/guides/how-to-shop-for-home-projects-without-overspending?utm_source=smart_cart_presale&utm_medium=back_link&utm_campaign=method_pillar"
+          style={{ fontSize: '13px', color: '#C8732A', textDecoration: 'none', fontWeight: 600 }}
+        >
+          Read the Buy/Skip/Wait method →
+        </a>
+      </div>
       <CurationModal />
       <Footer />
     </>

@@ -7,6 +7,7 @@ import { zoningSummaryForPrompt } from '@/data/zoning'
 import { handymanSummaryForPrompt } from '@/data/handyman'
 import { vettingSummaryForPrompt } from '@/data/contractor-vetting'
 import { sequencesSummaryForPrompt } from '@/data/sequences'
+import { SMART_CART_CONTEXT } from '@/lib/smart-cart-context'
 
 // Site is Vermont-only today. Data is state-tagged so NH/ME/MA can be
 // added later; until then every accessor is called with this constant.
@@ -303,6 +304,8 @@ WHAT NOT TO DO:
 - Don't ignore refund-risk topics — disclaim them honestly
 
 ==== END STRATEGY ====
+
+${SMART_CART_CONTEXT}
 `
 
 type Message = { role: 'user' | 'assistant'; content: string }

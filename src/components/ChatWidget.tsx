@@ -2,6 +2,10 @@
 
 import { useState, useRef, useEffect } from 'react'
 import Script from 'next/script'
+import {
+  segmentChatMessage,
+  SmartCartCtaCard,
+} from '@/components/SmartCartCtaCard'
 
 type Message = { role: 'user' | 'assistant'; content: string }
 
@@ -215,7 +219,15 @@ export default function ChatWidget({
                   border: m.role === 'assistant' ? '1px solid #e5e0d4' : 'none',
                 }}
               >
-                {m.content}
+                {m.role === 'assistant'
+                  ? segmentChatMessage(m.content).map((seg, j) =>
+                      seg.kind === 'text' ? (
+                        <span key={j}>{seg.text}</span>
+                      ) : (
+                        <SmartCartCtaCard key={j} cta={seg.cta} />
+                      ),
+                    )
+                  : m.content}
               </div>
             </div>
           ))}

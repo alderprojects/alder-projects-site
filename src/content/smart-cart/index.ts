@@ -33,6 +33,9 @@ import { MUDROOM_ENTRY_RESET } from './scope-catalogs/mudroom-entry-reset'
 // V7.2.14 — pilot catalogs
 import { WINDOW_WEATHERIZATION } from './scope-catalogs/window-weatherization'
 import { BASEMENT_MOISTURE_PREP } from './scope-catalogs/basement-moisture-prep'
+// V7.2.18 — seasonal + grill scopes
+import { MEMORIAL_DAY_WEEKEND } from './scope-catalogs/memorial-day-weekend'
+import { GRILL_PURCHASE } from './scope-catalogs/grill-purchase'
 
 const CATALOGS: ScopeCatalog[] = [
   KITCHEN_ORGANIZERS,
@@ -56,6 +59,9 @@ const CATALOGS: ScopeCatalog[] = [
   // V7.2.14
   WINDOW_WEATHERIZATION,
   BASEMENT_MOISTURE_PREP,
+  // V7.2.18
+  MEMORIAL_DAY_WEEKEND,
+  GRILL_PURCHASE,
 ]
 
 // ---------- Catalog lookup ------------------------------------------

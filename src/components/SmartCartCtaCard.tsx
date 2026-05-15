@@ -1,32 +1,43 @@
 /**
- * v7.2.18-B3 — Smart Cart CTA card.
+ * v7.2.18-B3 — Smart Cart / Worth-It CTA card.
  *
- * Rendered inside chat assistant messages in place of raw smart-cart URLs.
- * Detects a Smart Cart URL pattern in the assistant's reply, parses the
- * scope param, and renders a tappable card with scope name + price + CTA.
+ * Rendered inside chat assistant messages in place of raw product URLs.
+ * Detects a Smart Cart or Worth-It URL pattern in the assistant's reply,
+ * parses the scope/plan param, and renders a tappable card with name +
+ * price + CTA.
+ *
+ * v7.2.18-B6 extends the original Smart Cart-only renderer to also catch
+ * Worth-It Plan URLs (/worth-it?...) so the bot can offer either product
+ * inline and the UI swaps them for tappable cards.
  *
  * The bot's prompt (see SMART_CART_CONTEXT) instructs it to emit the URL
  * inline; this UI suppresses the raw URL and replaces it with the card so
- * mobile taps land on the right scope without users having to copy-paste.
+ * mobile taps land on the right scope/plan without users copy-pasting.
  */
 
 import { SMART_CART_SCOPES } from '@/lib/smart-cart-context'
 
 // ---------- URL parsing ---------------------------------------------------
 
-// Match either absolute (https://alderprojects.com/smart-cart?...) or
-// relative (/smart-cart?...) Smart Cart URLs. Capture the query string.
-const SMART_CART_URL_RE =
-  /(?:https?:\/\/(?:www\.)?alderprojects\.com)?(\/smart-cart\?[^\s)]+)/g
+// Match either absolute (https://alderprojects.com/{smart-cart|worth-it}?...)
+// or relative (/{smart-cart|worth-it}?...) URLs. Capture the path + query.
+const CHAT_CTA_URL_RE =
+  /(?:https?:\/\/(?:www\.)?alderprojects\.com)?(\/(?:smart-cart|worth-it)\?[^\s)]+)/g
 
-export type ChatSmartCartCta = {
+export type ChatCtaProduct = 'smart_cart' | 'worth_it'
+
+export type ChatCta = {
+  product: ChatCtaProduct
   rawUrl: string // the matched URL text in the message
   href: string // normalized relative href for Next Link
-  scopeId: string | null
+  scopeId: string | null // smart-cart scope OR worth-it plan id
   topic: string | null
-  scopeLabel: string // "Memorial Day weekend cookout" etc.
+  scopeLabel: string // "Memorial Day weekend cookout" / "Worth-It Plan"
   leanCartHint: string // 3-5 word summary
 }
+
+// Back-compat alias for v7.2.18-B3 callers.
+export type ChatSmartCartCta = ChatCta
 
 const SCOPE_LEAN_CART_HINTS: Record<string, string> = {
   window_weatherization: 'Drafts, gaps, films — the $100 fix.',
@@ -42,18 +53,35 @@ const SCOPE_LEAN_CART_HINTS: Record<string, string> = {
   grill_purchase: 'Right tier without the upsell.',
 }
 
-function parseSmartCartUrl(rawUrl: string): ChatSmartCartCta {
+function parseCtaUrl(rawUrl: string): ChatCta {
   const href = rawUrl.replace(/^https?:\/\/(?:www\.)?alderprojects\.com/, '')
-  // Use URL parser on a dummy base so relative paths parse cleanly.
+  const product: ChatCtaProduct = href.startsWith('/worth-it')
+    ? 'worth_it'
+    : 'smart_cart'
   let scopeId: string | null = null
   let topic: string | null = null
   try {
     const u = new URL(href, 'https://alderprojects.com')
-    scopeId = u.searchParams.get('scope')
+    // Worth-It uses ?plan= where Smart Cart uses ?scope=. Read either.
+    scopeId = u.searchParams.get('scope') ?? u.searchParams.get('plan')
     topic = u.searchParams.get('topic')
   } catch {
     /* ignore */
   }
+
+  if (product === 'worth_it') {
+    return {
+      product,
+      rawUrl,
+      href,
+      scopeId,
+      topic,
+      scopeLabel: 'Worth-It Plan',
+      leanCartHint:
+        'Ranked playbook for your property — what to do first, where the DIY stop line is.',
+    }
+  }
+
   const scopeRecord = scopeId
     ? SMART_CART_SCOPES.find(s => s.id === scopeId)
     : null
@@ -61,22 +89,22 @@ function parseSmartCartUrl(rawUrl: string): ChatSmartCartCta {
   const leanCartHint =
     (scopeId && SCOPE_LEAN_CART_HINTS[scopeId]) ||
     'Real picks, real Vermont notes.'
-  return { rawUrl, href, scopeId, topic, scopeLabel, leanCartHint }
+  return { product, rawUrl, href, scopeId, topic, scopeLabel, leanCartHint }
 }
 
 // ---------- Renderer -----------------------------------------------------
 
 /**
- * Detect all Smart Cart URLs in a chat message. Returns ordered segments:
- * each is either plain text (which the caller renders as-is) or a CTA card.
+ * Detect all Smart Cart / Worth-It URLs in a chat message. Returns ordered
+ * segments: each is either plain text (rendered as-is) or a CTA card.
  */
 export function segmentChatMessage(
   content: string,
-): Array<{ kind: 'text'; text: string } | { kind: 'cta'; cta: ChatSmartCartCta }> {
-  const out: Array<{ kind: 'text'; text: string } | { kind: 'cta'; cta: ChatSmartCartCta }> = []
+): Array<{ kind: 'text'; text: string } | { kind: 'cta'; cta: ChatCta }> {
+  const out: Array<{ kind: 'text'; text: string } | { kind: 'cta'; cta: ChatCta }> = []
   let lastIndex = 0
   // RegExp.exec with global flag mutates lastIndex; reset before iterating.
-  const re = new RegExp(SMART_CART_URL_RE.source, 'g')
+  const re = new RegExp(CHAT_CTA_URL_RE.source, 'g')
   let m: RegExpExecArray | null
   while ((m = re.exec(content)) !== null) {
     const rawUrl = m[0]
@@ -85,7 +113,7 @@ export function segmentChatMessage(
       const text = content.slice(lastIndex, start)
       out.push({ kind: 'text', text })
     }
-    out.push({ kind: 'cta', cta: parseSmartCartUrl(rawUrl) })
+    out.push({ kind: 'cta', cta: parseCtaUrl(rawUrl) })
     lastIndex = start + rawUrl.length
   }
   if (lastIndex < content.length) {
@@ -96,7 +124,18 @@ export function segmentChatMessage(
 
 // ---------- Card UI ------------------------------------------------------
 
-export function SmartCartCtaCard({ cta }: { cta: ChatSmartCartCta }) {
+export function SmartCartCtaCard({ cta }: { cta: ChatCta }) {
+  const isWorthIt = cta.product === 'worth_it'
+  const eyebrow = isWorthIt ? 'Worth-It Plan' : 'Smart Cart'
+  const headline = isWorthIt
+    ? cta.scopeLabel === 'Worth-It Plan'
+      ? 'Your Worth-It Plan'
+      : `Your ${cta.scopeLabel} plan`
+    : `Your ${cta.scopeLabel} cart`
+  const priceLine = isWorthIt
+    ? '$39 · 24-hour full refund'
+    : '$19.99 · 24-hour full refund'
+  const ctaLabel = isWorthIt ? 'Build my plan →' : 'Build it now →'
   return (
     <a
       href={cta.href}
@@ -113,16 +152,16 @@ export function SmartCartCtaCard({ cta }: { cta: ChatSmartCartCta }) {
       }}
     >
       <div style={{ fontSize: '11px', fontFamily: 'monospace', letterSpacing: '0.1em', textTransform: 'uppercase', color: '#7A9B6F', marginBottom: '4px' }}>
-        Smart Cart
+        {eyebrow}
       </div>
       <div style={{ fontFamily: "'Playfair Display', Georgia, serif", fontSize: '16px', fontWeight: 600, marginBottom: '4px', lineHeight: 1.25 }}>
-        Your {cta.scopeLabel} cart
+        {headline}
       </div>
       <div style={{ fontSize: '13px', color: 'rgba(245,239,224,0.7)', marginBottom: '10px', lineHeight: 1.45 }}>
         {cta.leanCartHint}
       </div>
       <div style={{ fontSize: '11px', fontFamily: 'monospace', color: 'rgba(245,239,224,0.55)', marginBottom: '10px' }}>
-        $19.99 · 24-hour full refund
+        {priceLine}
       </div>
       <div
         style={{
@@ -135,7 +174,7 @@ export function SmartCartCtaCard({ cta }: { cta: ChatSmartCartCta }) {
           borderRadius: '3px',
         }}
       >
-        Build it now →
+        {ctaLabel}
       </div>
     </a>
   )

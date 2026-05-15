@@ -301,6 +301,9 @@ export default function Home() {
       {/* ── Hero (v7.2.17 SeasonalHero) ─────────────────────────── */}
       <SeasonalHero />
 
+      {/* ── v7.2.18-A5: First-time entry strip + curated guide grid ── */}
+      <FirstTimeEntrySection />
+
       {/* ── Stat tiles ───────────────────────────────────────────── */}
       <section
         style={{
@@ -1068,5 +1071,261 @@ function BeforeYouSpendTile({ tile }: { tile: CartTile }) {
       {subtitleEl}
       {ctaEl}
     </button>
+  )
+}
+
+// ============================================================================
+// v7.2.18-A5 — First-time entry strip + curated guide grid.
+//
+// Soft entry for visitors who landed on the seasonal hero but aren't ready to
+// buy. Three top-of-funnel doors (what we are / how we save / free chat), six
+// curated guides, then a single Smart Cart CTA at the bottom — not inside each
+// card. Matches the homepage's existing token palette and type system.
+// ============================================================================
+
+const FIRST_TIME_ENTRIES: { eyebrow: string; title: string; body: string; href: string }[] = [
+  {
+    eyebrow: 'New here?',
+    title: 'What we are',
+    body: 'A Vermont-built shopping list service for one home project at a time. No subscription, no contractor referral fees, no upsell.',
+    href: '/guides',
+  },
+  {
+    eyebrow: 'The method',
+    title: 'How we save you money',
+    body: 'Buy / Skip / Wait — a real Vermont read on which products are worth it, which are designer markup, and which to wait on.',
+    href: '/guides/how-to-shop-for-home-projects-without-overspending?utm_source=homepage&utm_medium=entry_strip&utm_campaign=method',
+  },
+  {
+    eyebrow: 'Just ask',
+    title: 'Free chat for Vermont homeowners',
+    body: 'Heat pumps, rebates, kitchen costs, when to schedule. Real answers from a Vermont local. No signup.',
+    href: '/chat?utm_source=homepage&utm_medium=entry_strip&utm_campaign=free_chat',
+  },
+]
+
+const CURATED_GUIDES: { label: string; sub: string; href: string }[] = [
+  { label: 'Lake Season', sub: 'Patio, lights, grill, bug control — what to buy this weekend.', href: '/guides/lake-season-buy-skip-wait' },
+  { label: 'Kitchen Refresh', sub: 'Hardware swap, faucet, lighting. The $260 lift, not the $20k remodel.', href: '/guides/kitchen-refresh-buy-skip-wait' },
+  { label: 'Windows', sub: 'Weatherize before you replace. The $200 fix vs the $14,000 quote.', href: '/guides/windows-buy-skip-wait' },
+  { label: 'Basement', sub: 'Diagnostic before finishing. The $40 test that prevents the $30k mistake.', href: '/guides/basement-buy-skip-wait' },
+  { label: 'Grills', sub: 'Weber vs BGE vs Kamado Joe — which one actually fits your cookout.', href: '/guides/weber-spirit-vs-big-green-egg-vs-kamado-joe-real-cost' },
+  { label: 'Buy-Timing Calendar', sub: 'When patio drops, when grills clear, when paint moves. Month-by-month.', href: '/guides/home-improvement-buy-timing-calendar' },
+]
+
+function FirstTimeEntrySection() {
+  return (
+    <section
+      style={{
+        padding: 'clamp(48px,7vw,80px) 24px',
+        borderBottom: `1px solid ${C.lineSoft}`,
+        background: C.bg,
+      }}
+    >
+      <div style={{ maxWidth: 1120, margin: '0 auto' }}>
+        <p
+          style={{
+            fontFamily: FM,
+            fontSize: 11,
+            letterSpacing: '0.12em',
+            textTransform: 'uppercase',
+            color: C.sage,
+            margin: '0 0 14px',
+          }}
+        >
+          First time here?
+        </p>
+        <h2
+          style={{
+            fontFamily: FS,
+            fontSize: 'clamp(1.7rem, 3.6vw, 2.4rem)',
+            fontWeight: 600,
+            color: C.ink,
+            margin: '0 0 28px',
+            lineHeight: 1.15,
+            maxWidth: 720,
+          }}
+        >
+          Three doors in. Pick the one that matches where you are.
+        </h2>
+
+        {/* ── Three entry points ───────────────────────────────── */}
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+            gap: 16,
+            marginBottom: 48,
+          }}
+        >
+          {FIRST_TIME_ENTRIES.map((entry, i) => (
+            <Link
+              key={i}
+              href={entry.href}
+              style={{
+                display: 'block',
+                padding: '22px 22px 20px',
+                background: C.card,
+                border: `1px solid ${C.line}`,
+                borderRadius: 6,
+                textDecoration: 'none',
+                color: C.ink,
+              }}
+            >
+              <div
+                style={{
+                  fontFamily: FM,
+                  fontSize: 11,
+                  letterSpacing: '0.1em',
+                  textTransform: 'uppercase',
+                  color: C.accent,
+                  marginBottom: 8,
+                }}
+              >
+                {entry.eyebrow}
+              </div>
+              <div
+                style={{
+                  fontFamily: FS,
+                  fontSize: 19,
+                  fontWeight: 600,
+                  color: C.ink,
+                  marginBottom: 8,
+                  lineHeight: 1.25,
+                }}
+              >
+                {entry.title}
+              </div>
+              <div
+                style={{
+                  fontFamily: FB,
+                  fontSize: 14,
+                  color: C.inkSoft,
+                  lineHeight: 1.55,
+                }}
+              >
+                {entry.body}
+              </div>
+              <div
+                style={{
+                  fontFamily: FB,
+                  fontSize: 13,
+                  color: C.accent,
+                  fontWeight: 600,
+                  marginTop: 12,
+                }}
+              >
+                Open →
+              </div>
+            </Link>
+          ))}
+        </div>
+
+        {/* ── Curated guides ───────────────────────────────────── */}
+        <p
+          style={{
+            fontFamily: FM,
+            fontSize: 11,
+            letterSpacing: '0.12em',
+            textTransform: 'uppercase',
+            color: C.accent,
+            margin: '0 0 14px',
+          }}
+        >
+          The shortlist
+        </p>
+        <h3
+          style={{
+            fontFamily: FS,
+            fontSize: 'clamp(1.4rem, 3vw, 1.8rem)',
+            fontWeight: 600,
+            color: C.ink,
+            margin: '0 0 22px',
+            lineHeight: 1.2,
+          }}
+        >
+          Six guides that cover most Vermont projects.
+        </h3>
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+            gap: 12,
+            marginBottom: 36,
+          }}
+        >
+          {CURATED_GUIDES.map((g, i) => (
+            <Link
+              key={i}
+              href={g.href}
+              style={{
+                display: 'block',
+                padding: '18px 20px',
+                background: C.card,
+                border: `1px solid ${C.line}`,
+                borderRadius: 6,
+                textDecoration: 'none',
+                color: C.ink,
+              }}
+            >
+              <div
+                style={{
+                  fontFamily: FS,
+                  fontSize: 17,
+                  fontWeight: 600,
+                  color: C.ink,
+                  marginBottom: 6,
+                  lineHeight: 1.25,
+                }}
+              >
+                {g.label}{' '}
+                <span aria-hidden="true" style={{ color: C.accent, fontFamily: FM, fontSize: 13 }}>
+                  →
+                </span>
+              </div>
+              <div style={{ fontFamily: FB, fontSize: 13, color: C.inkSoft, lineHeight: 1.55 }}>
+                {g.sub}
+              </div>
+            </Link>
+          ))}
+        </div>
+
+        {/* ── Single Smart Cart CTA at section bottom ────────── */}
+        <div
+          style={{
+            textAlign: 'center',
+            paddingTop: 24,
+            borderTop: `1px dashed ${C.line}`,
+          }}
+        >
+          <p
+            style={{
+              fontFamily: FB,
+              fontSize: 14,
+              color: C.inkSoft,
+              margin: '0 0 14px',
+            }}
+          >
+            Or skip the reading — tell us the project and we&apos;ll build the cart.
+          </p>
+          <Link
+            href="/smart-cart?utm_source=homepage&utm_medium=entry_strip&utm_campaign=section_bottom"
+            style={{
+              display: 'inline-block',
+              padding: '12px 24px',
+              background: C.accent,
+              color: '#FAF7F2',
+              fontFamily: FB,
+              fontSize: 14,
+              fontWeight: 600,
+              borderRadius: 4,
+              textDecoration: 'none',
+            }}
+          >
+            Build a Smart Cart — $19.99 →
+          </Link>
+        </div>
+      </div>
+    </section>
   )
 }

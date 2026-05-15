@@ -150,13 +150,50 @@ export default function Calculator() {
             )}
 
             <div style={{ marginTop: '16px', padding: '16px', backgroundColor: '#1C2B1A', borderRadius: '3px' }}>
-              <p style={{ fontSize: '13px', color: 'rgba(245,239,224,0.75)', margin: '0 0 10px 0', lineHeight: 1.55 }}>
-                Get a personalized Buy / Skip / Wait list for your specific project — real product picks, dollar amounts saved per skip, buy-timing for each item.
-              </p>
-              <Link href="/smart-cart?utm_source=calculator&utm_medium=tool&utm_campaign=cta_after_estimate" style={{ display: 'inline-block', padding: '10px 18px', backgroundColor: '#C8732A', color: '#FAF7F2', fontSize: '13px', fontWeight: 600, borderRadius: '2px', textDecoration: 'none' }}>
-                Build My Smart Cart — $19.99 →
-              </Link>
-              <p style={{ fontSize: '11px', color: 'rgba(245,239,224,0.5)', margin: '8px 0 0 0' }}>24-hour full refund.</p>
+              {(() => {
+                // v7.2.18-B7 — route to Worth-It Plan for projects where the
+                // estimate midpoint exceeds $25k; Smart Cart for everything
+                // smaller. Secondary always offers free chat with the
+                // calculator context pre-filled.
+                const midpoint = Math.round((low + high) / 2)
+                const isWorthIt = midpoint > 25000
+                const chatPrefill = `I am planning a ${project!.label.toLowerCase()} in ${LOCS[locId].label} — estimated ${fmt(low)} to ${fmt(high)}.`
+                const chatHref = `/chat?prefill=${encodeURIComponent(chatPrefill)}&utm_source=calculator&utm_medium=tool&utm_campaign=ask_after_estimate`
+                if (isWorthIt) {
+                  return (
+                    <>
+                      <p style={{ fontSize: '13px', color: 'rgba(245,239,224,0.75)', margin: '0 0 10px 0', lineHeight: 1.55 }}>
+                        A project this size needs more than a shopping list. The Worth-It Plan is the ranked playbook for your property — what to do first, alternates, where the DIY stop line is.
+                      </p>
+                      <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', alignItems: 'center' }}>
+                        <Link href="/worth-it?utm_source=calculator&utm_medium=tool&utm_campaign=cta_after_estimate" style={{ display: 'inline-block', padding: '10px 18px', backgroundColor: '#C8732A', color: '#FAF7F2', fontSize: '13px', fontWeight: 600, borderRadius: '2px', textDecoration: 'none' }}>
+                          Get the Worth-It Plan — $39 →
+                        </Link>
+                        <Link href={chatHref} style={{ display: 'inline-block', padding: '10px 18px', backgroundColor: 'transparent', color: '#F5EFE0', border: '1px solid rgba(245,239,224,0.3)', fontSize: '13px', fontWeight: 600, borderRadius: '2px', textDecoration: 'none' }}>
+                          Ask Alder a question
+                        </Link>
+                      </div>
+                      <p style={{ fontSize: '11px', color: 'rgba(245,239,224,0.5)', margin: '8px 0 0 0' }}>24-hour full refund · or free chat first.</p>
+                    </>
+                  )
+                }
+                return (
+                  <>
+                    <p style={{ fontSize: '13px', color: 'rgba(245,239,224,0.75)', margin: '0 0 10px 0', lineHeight: 1.55 }}>
+                      Get a personalized Buy / Skip / Wait list for your specific project — real product picks, dollar amounts saved per skip, buy-timing for each item.
+                    </p>
+                    <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', alignItems: 'center' }}>
+                      <Link href="/smart-cart?utm_source=calculator&utm_medium=tool&utm_campaign=cta_after_estimate" style={{ display: 'inline-block', padding: '10px 18px', backgroundColor: '#C8732A', color: '#FAF7F2', fontSize: '13px', fontWeight: 600, borderRadius: '2px', textDecoration: 'none' }}>
+                        Build My Smart Cart — $19.99 →
+                      </Link>
+                      <Link href={chatHref} style={{ display: 'inline-block', padding: '10px 18px', backgroundColor: 'transparent', color: '#F5EFE0', border: '1px solid rgba(245,239,224,0.3)', fontSize: '13px', fontWeight: 600, borderRadius: '2px', textDecoration: 'none' }}>
+                        Ask Alder a question
+                      </Link>
+                    </div>
+                    <p style={{ fontSize: '11px', color: 'rgba(245,239,224,0.5)', margin: '8px 0 0 0' }}>24-hour full refund · or free chat first.</p>
+                  </>
+                )
+              })()}
             </div>
           </div>
         )}

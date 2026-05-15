@@ -72,12 +72,27 @@ export type GuidePageMeta = {
   breadcrumbs?: { name: string; url: string }[]
 }
 
+// v7.2.18-A6 — opt-in three-tier Smart Cart CTA stack. When this prop
+// is set on a guide, GuidePage renders:
+//   - a thin "skip the reading" bar above the hero
+//   - an inline "here's how this looks in a real Smart Cart →" link
+//     after the first body section
+//   - a side-by-side "Build the Smart Cart" + "Read another guide" pair
+//     at the bottom, alongside the existing related-guides cluster
+// All three placements share the same Smart Cart URL so UTM tagging
+// matches across the page.
+export type GuidePageSmartCartCta = {
+  href: string
+}
+
 export default function GuidePage({
   content,
   meta,
+  smartCartCta,
 }: {
   content: GuidePageContent
   meta?: GuidePageMeta
+  smartCartCta?: GuidePageSmartCartCta
 }) {
   const schemas = meta ? buildSchemas(content, meta) : []
 
@@ -91,6 +106,15 @@ export default function GuidePage({
         />
       ))}
       <Nav />
+      {smartCartCta && (
+        <div style={{ backgroundColor: '#1C2B1A', borderBottom: '1px solid rgba(122,155,111,0.2)', padding: '12px 20px', textAlign: 'center' }}>
+          <p style={{ fontSize: '13px', fontFamily: "'DM Sans', system-ui, sans-serif", color: 'rgba(245,239,224,0.8)', margin: 0 }}>
+            <span style={{ color: '#7A9B6F', marginRight: '10px' }}>&#10003;</span>
+            Want to skip the reading? Build your Smart Cart in 90 seconds —{' '}
+            <Link href={smartCartCta.href} style={{ color: '#C8732A', textDecoration: 'underline', fontWeight: 600 }}>$19.99 &rarr;</Link>
+          </p>
+        </div>
+      )}
       <div style={{ backgroundColor: '#1C2B1A', padding: 'clamp(96px,10vw,120px) 24px clamp(40px,6vw,64px)', borderBottom: '1px solid rgba(122,155,111,0.1)' }}>
         <div style={{ maxWidth: '720px', margin: '0 auto' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
@@ -103,17 +127,28 @@ export default function GuidePage({
       </div>
       <div style={{ maxWidth: '720px', margin: '0 auto', padding: 'clamp(40px,6vw,64px) 24px 80px' }}>
         {content.sections.map((section, i) => (
-          <div key={i} style={{ marginBottom: '40px' }}>
-            <h2 style={{ fontFamily: "'Playfair Display', Georgia, serif", fontSize: 'clamp(1.2rem,2.5vw,1.6rem)', fontWeight: 600, color: '#1C2B1A', marginBottom: '14px' }}>{section.heading}</h2>
-            <p style={{ fontSize: '15px', color: 'rgba(28,43,26,0.75)', lineHeight: 1.85, marginBottom: section.list ? '14px' : 0 }}>{section.body}</p>
-            {section.list && (
-              <ul style={{ margin: 0, padding: '0 0 0 20px', listStyle: 'none' }}>
-                {section.list.map((item, j) => (
-                  <li key={j} style={{ fontSize: '15px', color: 'rgba(28,43,26,0.75)', lineHeight: 1.85, paddingLeft: '8px', position: 'relative' }}>
-                    <span style={{ position: 'absolute', left: '-14px', color: '#7A9B6F' }}>&#10003;</span>{item}
-                  </li>
-                ))}
-              </ul>
+          <div key={i}>
+            <div style={{ marginBottom: '40px' }}>
+              <h2 style={{ fontFamily: "'Playfair Display', Georgia, serif", fontSize: 'clamp(1.2rem,2.5vw,1.6rem)', fontWeight: 600, color: '#1C2B1A', marginBottom: '14px' }}>{section.heading}</h2>
+              <p style={{ fontSize: '15px', color: 'rgba(28,43,26,0.75)', lineHeight: 1.85, marginBottom: section.list ? '14px' : 0 }}>{section.body}</p>
+              {section.list && (
+                <ul style={{ margin: 0, padding: '0 0 0 20px', listStyle: 'none' }}>
+                  {section.list.map((item, j) => (
+                    <li key={j} style={{ fontSize: '15px', color: 'rgba(28,43,26,0.75)', lineHeight: 1.85, paddingLeft: '8px', position: 'relative' }}>
+                      <span style={{ position: 'absolute', left: '-14px', color: '#7A9B6F' }}>&#10003;</span>{item}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+            {smartCartCta && i === 0 && (
+              <div style={{ margin: '0 0 40px', padding: '14px 18px', borderLeft: '3px solid #C8732A', backgroundColor: 'rgba(200,115,42,0.06)' }}>
+                <p style={{ fontSize: '14px', fontFamily: "'DM Sans', system-ui, sans-serif", color: 'rgba(28,43,26,0.78)', margin: 0, lineHeight: 1.55 }}>
+                  <Link href={smartCartCta.href} style={{ color: '#C8732A', textDecoration: 'none', fontWeight: 600 }}>
+                    Here&rsquo;s how this looks in a real Smart Cart &rarr;
+                  </Link>
+                </p>
+              </div>
             )}
           </div>
         ))}
@@ -125,6 +160,16 @@ export default function GuidePage({
             <Link href="/plan" style={{ display: 'inline-block', padding: '12px 24px', border: '1px solid rgba(122,155,111,0.35)', color: 'rgba(245,239,224,0.7)', fontSize: '14px', borderRadius: '2px', textDecoration: 'none' }}>Start Planning First</Link>
           </div>
         </div>
+        {smartCartCta && (
+          <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', margin: '0 0 32px' }}>
+            <Link href={smartCartCta.href} style={{ display: 'inline-block', padding: '14px 26px', backgroundColor: '#C8732A', color: '#FAF7F2', fontWeight: 600, fontSize: '14px', borderRadius: '3px', textDecoration: 'none' }}>
+              Build the Smart Cart &mdash; $19.99 &rarr;
+            </Link>
+            <Link href="/guides" style={{ display: 'inline-block', padding: '14px 26px', border: '1px solid rgba(28,43,26,0.18)', color: '#1C2B1A', fontWeight: 600, fontSize: '14px', borderRadius: '3px', textDecoration: 'none' }}>
+              Read another guide
+            </Link>
+          </div>
+        )}
         {content.faqs && content.faqs.length > 0 && (
           <div style={{ marginBottom: '48px' }}>
             <h2 style={{ fontFamily: "'Playfair Display', Georgia, serif", fontSize: 'clamp(1.2rem,2.5vw,1.6rem)', fontWeight: 600, color: '#1C2B1A', marginBottom: '20px' }}>Frequently Asked Questions</h2>

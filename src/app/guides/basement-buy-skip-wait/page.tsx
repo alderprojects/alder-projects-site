@@ -137,7 +137,7 @@ export default function Page() {
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }} />
-      <GuidePage content={content} />
+      <GuidePage content={content} smartCartCta={{ href: content.ctaHref }} />
     </>
   )
 }

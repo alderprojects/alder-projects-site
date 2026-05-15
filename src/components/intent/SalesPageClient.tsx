@@ -32,7 +32,16 @@ import PricingCTA from './PricingCTA'
 
 type Product = 'smart_cart' | 'worth_it'
 
-type Props = { product: Product }
+type Props = {
+  product: Product
+  // v7.2.18 — optional URL-param-driven pre-selection. When the visitor
+  // arrives at /smart-cart?scope=memorial_day_weekend the server passes
+  // the param through; we look up the matching category tile and start
+  // there instead of the default first-curated.
+  initialTopic?: string
+  initialScope?: string
+  initialScenario?: string
+}
 
 const SCENARIO_LABELS: Record<string, string> = {
   just_starting: 'Just starting',
@@ -49,7 +58,12 @@ const WHY_VARIANT_BY_SCOPE: Record<string, Why1999Variant> = {
   basement_moisture_prep: 'basement',
 }
 
-export default function SalesPageClient({ product }: Props) {
+export default function SalesPageClient({
+  product,
+  initialTopic,
+  initialScope,
+  initialScenario,
+}: Props) {
   const cfg =
     product === 'smart_cart'
       ? CONFIG.products.smartCart
@@ -57,11 +71,17 @@ export default function SalesPageClient({ product }: Props) {
   const items =
     product === 'smart_cart' ? SMART_CART_CATEGORIES : WORTH_IT_DECISIONS
 
-  // Default to the first 'curated' item; fall back to the first overall.
-  const defaultId = useMemo(
-    () => items.find(i => i.curationStatus === 'curated')?.id ?? items[0].id,
-    [items],
-  )
+  // v7.2.18 — URL-param pre-selection. If ?scope= matches a category's
+  // defaultScopeVariantId, start on that tile. Otherwise default to the
+  // first 'curated' item (or first overall if none are curated).
+  const defaultId = useMemo(() => {
+    if (initialScope) {
+      const match = items.find(i => i.defaultScopeVariantId === initialScope)
+      if (match) return match.id
+    }
+    return items.find(i => i.curationStatus === 'curated')?.id ?? items[0].id
+  }, [items, initialScope])
+
   const [selectedId, setSelectedId] = useState<string>(defaultId)
   const selected = items.find(i => i.id === selectedId) ?? items[0]
 
@@ -70,7 +90,16 @@ export default function SalesPageClient({ product }: Props) {
       ? (selected as SmartCartCategory).topicId
       : (selected as WorthItDecision).primaryTopicId
   const scope = selected.defaultScopeVariantId
-  const scenario = selected.defaultScenarioId
+  // v7.2.18 — scenario URL param overrides category default if the
+  // user kept their tile selection at the URL-matched category.
+  const scenario =
+    initialScenario && selectedId === defaultId
+      ? (initialScenario as typeof selected.defaultScenarioId)
+      : selected.defaultScenarioId
+  // initialTopic is currently consumed only by the URL→tile match;
+  // the topic for the CTA derives from the resolved category. The
+  // reference below keeps TS from flagging the prop as unused.
+  void initialTopic
   const teaser = selected.teaser
 
   const selectorItems: IntentSelectorItem[] = items.map(i => ({

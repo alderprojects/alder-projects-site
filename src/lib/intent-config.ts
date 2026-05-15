@@ -29,6 +29,8 @@ export type SmartCartCategoryId =
   | 'winterizing'
   | 'opening_the_house'
   | 'small_repair'
+  | 'memorial_day_weekend' // v7.2.18 — seasonal scope
+  | 'grill_purchase' // v7.2.18 — year-round grill scope
 
 export type WorthItDecisionId =
   | 'refresh_vs_remodel'
@@ -118,6 +120,11 @@ const ICON_PHONE =
   'M3 5a2 2 0 012-2h2.5l1.5 4-2 1.5a11 11 0 005 5L17 11l4 1.5V15a2 2 0 01-2 2 16 16 0 01-16-16V5z'
 const ICON_LEAF =
   'M5 19c2-12 8-14 16-14-1 11-7 14-15 14l-1-1 1-2c2-1 6-3 8-7-3 3-7 5-9 6 0 1 0 2 1 3-1 1-1 1-1 1z'
+// v7.2.18 — Memorial Day + grill icons.
+const ICON_FLAG =
+  'M5 3v18h2v-7h11l-2-4 2-4H7V3H5z'
+const ICON_GRILL =
+  'M5 6h14v2H5V6zm-1 4h16l-1 6a3 3 0 01-3 3H8a3 3 0 01-3-3l-1-6zm5 10h2l1 2h-4l1-2zm6 0h2l1 2h-4l1-2z'
 
 // ---------- Smart Cart categories -----------------------------------
 
@@ -374,6 +381,70 @@ export const SMART_CART_CATEGORIES: SmartCartCategory[] = [
       'A free property profile already covers single-task help — try that first',
     ],
     curationStatus: 'coming_soon',
+  },
+  // ===== v7.2.18 — seasonal + grill scopes =====
+  {
+    id: 'memorial_day_weekend',
+    label: 'Memorial Day weekend',
+    iconSvg: ICON_FLAG,
+    problem:
+      'Hosting Memorial Day weekend. The cookout setup without paying peak prices on patio furniture, designer string lights, or "Memorial Day exclusive" bundles.',
+    topicId: 'outdoor',
+    defaultScopeVariantId: 'memorial_day_weekend',
+    defaultScenarioId: 'just_starting',
+    seasonality: 'summer',
+    teaser: {
+      buyCount: 5,
+      skipCount: 6,
+      spendLow: 320,
+      spendHigh: 720,
+      savingsLow: 160,
+      savingsHigh: 560,
+      payoffSentence:
+        "Catches the genuine Weber Memorial Day window and commercial-grade string lights; skips premium grills (real buy window is July), full patio sets (November), designer lights, and \"MD bundle\" packages.",
+    },
+    rightForYouIf: [
+      "You're hosting Memorial Day weekend and need the setup dialed in by Saturday",
+      'You want the cookout essentials without overspending on peak-season patio markups',
+      "You'd rather buy the genuine deals now and wait on items that hit real discounts in fall",
+    ],
+    notRightIfPointsToWorthIt: [
+      'You are sequencing a multi-year outdoor renovation (dock + deck + landscaping)',
+      'You want a vetted Vermont contractor to build a screen porch or pergola',
+    ],
+    curationStatus: 'curated',
+  },
+  {
+    id: 'grill_purchase',
+    label: 'Grills',
+    iconSvg: ICON_GRILL,
+    problem:
+      'Buying a grill is a $400 to $3,000 decision and the upsell is brutal. The right tier for your actual use case, plus the real buy window for premium gear.',
+    topicId: 'outdoor',
+    defaultScopeVariantId: 'grill_purchase',
+    defaultScenarioId: 'just_starting',
+    seasonality: 'summer',
+    teaser: {
+      buyCount: 3,
+      skipCount: 5,
+      spendLow: 480,
+      spendHigh: 2400,
+      savingsLow: 170,
+      savingsHigh: 1000,
+      payoffSentence:
+        'Lands the right Weber tier plus a brand-fit cover and tool set; skips sub-$300 grills (die in 2 VT seasons), "smart" Wi-Fi grills, starter bundles, and pellet lock-in pricing.',
+    },
+    rightForYouIf: [
+      "You're buying your first real grill and not sure which tier you actually need",
+      "You've outgrown the entry-level kettle and your old Weber is rusting out",
+      "You're being upsold on a $2,500 premium grill and want an honest read on whether it's worth it",
+      'Vermont winters destroyed your last grill in 3 seasons and you want one that lasts',
+    ],
+    notRightIfPointsToWorthIt: [
+      'You want a built-in outdoor kitchen with gas line, hardscape, and pergola',
+      'You are deciding between propane line install vs natural gas conversion',
+    ],
+    curationStatus: 'curated',
   },
 ]
 

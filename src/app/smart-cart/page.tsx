@@ -19,7 +19,18 @@ export const metadata: Metadata = {
   robots: { index: true, follow: true },
 }
 
-export default function SmartCartPreSalePage() {
+// v7.2.18 — read topic/scope/scenario URL params so CTAs from
+// the homepage hero, guide pages, and the chat bot's tappable cards
+// can pre-select a scope tile and pre-fill the curation modal.
+type Props = {
+  searchParams?: { topic?: string; scope?: string; scenario?: string }
+}
+
+export default function SmartCartPreSalePage({ searchParams }: Props) {
+  const initialTopic = searchParams?.topic
+  const initialScope = searchParams?.scope
+  const initialScenario = searchParams?.scenario
+
   return (
     <>
       <div
@@ -43,7 +54,12 @@ export default function SmartCartPreSalePage() {
         </p>
       </div>
       <Nav />
-      <SalesPageClient product="smart_cart" />
+      <SalesPageClient
+        product="smart_cart"
+        initialTopic={initialTopic}
+        initialScope={initialScope}
+        initialScenario={initialScenario}
+      />
       <div
         style={{
           maxWidth: '720px',

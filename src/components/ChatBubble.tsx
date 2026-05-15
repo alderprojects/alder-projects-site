@@ -7,7 +7,14 @@
 import { useState, useEffect } from 'react'
 import { usePathname } from 'next/navigation'
 
-const HIDDEN_PATHS = ['/smart-cart/result', '/smart-cart/curation']
+// v7.2.18-B8 — also hide on /admin/* (internal-only) and /chat itself
+// (the full-page chat IS the widget — no need to nest a bubble inside).
+const HIDDEN_PATHS = [
+  '/smart-cart/result',
+  '/smart-cart/curation',
+  '/admin',
+  '/chat',
+]
 
 const PAGE_CONTEXTS: Record<string, string> = {
   '/guides/windows-buy-skip-wait': 'I have questions about window weatherization',
@@ -17,6 +24,9 @@ const PAGE_CONTEXTS: Record<string, string> = {
   '/guides/how-to-shop-for-home-projects-without-overspending': 'I want to use Buy/Skip/Wait for my project',
   '/calculator': 'I have questions about my project cost estimate',
   '/smart-cart': 'I have questions about Smart Cart',
+  // v7.2.18 — Memorial Day guide context.
+  '/guides/memorial-day-vermont-2026': 'I am hosting Memorial Day weekend and want the cookout setup right',
+  '/guides/weber-spirit-vs-big-green-egg-vs-kamado-joe-real-cost': 'I am picking a grill — Weber vs BGE vs Kamado Joe',
 }
 
 export default function ChatBubble() {

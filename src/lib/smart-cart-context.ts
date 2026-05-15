@@ -97,6 +97,40 @@ WHAT NOT TO DO:
 - Don't dismiss the user's question to pivot to Smart Cart.
 - Don't mention contractor lead routing — the contractor pipeline is paused.
 - Don't claim Smart Cart includes contractor matching. It doesn't.
+
+INTENT MODE — DECISION vs EDUCATION (v7.2.18)
+=============================================
+Before answering, classify the user's most recent message into one of two modes:
+
+DECISION MODE — they're trying to make a purchase decision now. Signals:
+- "don't let me overspend"
+- "what should I buy"
+- "which one [should I get / is better]"
+- "help me decide"
+- "is X worth it"
+- "Memorial Day", "this weekend", "ready to pull the trigger"
+- "I'm at the store" / "I'm shopping for"
+
+EDUCATION MODE — they're trying to understand something. Signals:
+- "how does X work"
+- "what should I know about Y"
+- "what's the difference between"
+- "can you explain"
+- "I'm researching" / "trying to learn"
+
+DECISION mode response shape:
+- Surface the Smart Cart offer within the first 6 lines of your response, BEFORE the deep answer.
+- Use this exact phrasing for the offer: "I can build you a personalized [scope] shopping list — exact picks, what to skip, what to wait on. $19.99, 24-hour full refund. Want me to set it up?"
+- Then answer their underlying question concisely.
+- After the cart is offered (either accepted or pending), close with: "If you grab the cart now, you'll have the picks in your inbox before you finish your coffee. Or ask me anything else first — I'm here."
+
+EDUCATION mode response shape:
+- Answer their question fully first. Give the framework, the math, the real Vermont specifics.
+- THEN offer Smart Cart at the bottom if their question maps to one of the 11 live scopes.
+- Keep current closing language for education-mode (helpful, not pushy).
+
+Mixed signals → default to EDUCATION mode. Better to over-explain than under-explain.
+
 `;
 
 export const SMART_CART_SCOPES = [
@@ -109,6 +143,9 @@ export const SMART_CART_SCOPES = [
   { id: 'outdoor_seasonal_opening', topic: 'outdoor', label: 'Spring camp opening', tier1Cost: '$60-180', avoidedSpend: '$400-1,500' },
   { id: 'kitchen_cosmetic_refresh', topic: 'kitchen', label: 'Kitchen cosmetic refresh', tier1Cost: '$260-480', avoidedSpend: '$1,200-2,500' },
   { id: 'kitchen_cabinet_hardware_swap', topic: 'kitchen', label: 'Cabinet hardware swap', tier1Cost: '$80-180', avoidedSpend: '$300-800' },
+  // v7.2.18 — Memorial Day weekend + Grill purchase scopes.
+  { id: 'memorial_day_weekend', topic: 'outdoor', label: 'Memorial Day weekend cookout', tier1Cost: '$320-720', avoidedSpend: '$160-560' },
+  { id: 'grill_purchase', topic: 'outdoor', label: 'Grill purchase', tier1Cost: '$480-695', avoidedSpend: '$170-1,000' },
 ] as const
 
 export type ScopeId = typeof SMART_CART_SCOPES[number]['id']
@@ -119,6 +156,10 @@ export type ScopeId = typeof SMART_CART_SCOPES[number]['id']
  */
 export function inferScopeFromMessage(message: string): ScopeId | null {
   const m = message.toLowerCase()
+  // v7.2.18 — match Memorial Day and grill scopes BEFORE the generic outdoor
+  // patterns so "memorial day grill" routes to the more specific scope.
+  if (/memorial day|md weekend|hosting (this )?weekend|cookout this weekend/.test(m)) return 'memorial_day_weekend'
+  if (/buy(ing)? a grill|grill purchase|new grill|which grill|weber spirit|weber genesis|big green egg|bge|kamado joe|kamado grill/.test(m)) return 'grill_purchase'
   if (/draft|drafty|cold window|weatherize|weatherstrip|window film/.test(m)) return 'window_weatherization'
   if (/wet basement|humid basement|moisture|sump|french drain|encapsulat/.test(m)) return 'basement_moisture_prep'
   if (/mudroom|entry|boot tray|coat rack/.test(m)) return 'mudroom_entry_reset'

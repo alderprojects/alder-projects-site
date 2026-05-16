@@ -87,7 +87,7 @@ const content = {
     },
   ],
   ctaHeading: `Get your personalized lake-season cart`,
-  ctaBody: `$19.99. 24-hour refund. Named designer-markup skip list, real product picks across tiers, buy-timing calendar that saves 30-50%.`,
+  ctaBody: `$19.99. 30-day refund. Named designer-markup skip list, real product picks across tiers, buy-timing calendar that saves 30-50%.`,
   ctaHref: `/smart-cart?utm_source=guide&utm_medium=article&utm_campaign=lake_bsw`,
   relatedGuides: [
     {

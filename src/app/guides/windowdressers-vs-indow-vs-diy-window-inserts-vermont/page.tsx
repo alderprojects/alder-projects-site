@@ -99,7 +99,7 @@ const content = {
     },
   ],
   ctaHeading: `Get your personalized window cart`,
-  ctaBody: `$19.99. 24-hour refund. Smart Cart picks the right option for your specific situation and timeline — and tells you when to skip the inserts entirely.`,
+  ctaBody: `$19.99. 30-day refund. Smart Cart picks the right option for your specific situation and timeline — and tells you when to skip the inserts entirely.`,
   ctaHref: `/smart-cart?utm_source=guide&utm_medium=article&utm_campaign=wd_vs_indow`,
   relatedGuides: [
     {

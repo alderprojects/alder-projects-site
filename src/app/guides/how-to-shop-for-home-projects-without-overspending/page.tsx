@@ -81,13 +81,13 @@ const content = {
     },
     {
       heading: `How Smart Cart does this for you`,
-      body: `The walked examples above are general method. Smart Cart is the personalized version — $19.99, 24-hour refund. You pick your project (window weatherization, basement moisture prep, lake season setup, kitchen refresh, cabinet hardware swap, mudroom reset, and more), your scenario (just starting, already shopping, tight budget, premium picks, just curious), and Smart Cart returns the Buy list with real product names, the Skip list with dollar amounts saved per skip, the Wait list with month-by-month buy-timing, and route-out advice on when to call a pro. Most carts deliver $400-3,000 in savings on the first project alone.`,
+      body: `The walked examples above are general method. Smart Cart is the personalized version — $19.99, 30-day refund. You pick your project (window weatherization, basement moisture prep, lake season setup, kitchen refresh, cabinet hardware swap, mudroom reset, and more), your scenario (just starting, already shopping, tight budget, premium picks, just curious), and Smart Cart returns the Buy list with real product names, the Skip list with dollar amounts saved per skip, the Wait list with month-by-month buy-timing, and route-out advice on when to call a pro. Most carts deliver $400-3,000 in savings on the first project alone.`,
     },
   ],
   faqs: [
     {
       q: `Is $19.99 worth it for a shopping list?`,
-      a: `If your project has any meaningful budget — anything above $500 — the answer is almost always yes. Smart Cart is designed to save more than $19.99 in skip moves alone on the first project. If it doesn't, the 24-hour refund covers you.`,
+      a: `If your project has any meaningful budget — anything above $500 — the answer is almost always yes. Smart Cart is designed to save more than $19.99 in skip moves alone on the first project. If it doesn't, the 30-day refund covers you.`,
     },
     {
       q: `How is this different from Wirecutter?`,
@@ -107,11 +107,11 @@ const content = {
     },
     {
       q: `What's the refund policy?`,
-      a: `Full refund within 24 hours of purchase, no questions asked, if the Smart Cart doesn't match your situation.`,
+      a: `Full refund within 30 days of purchase, no questions asked, if the Smart Cart doesn't match your situation.`,
     },
   ],
   ctaHeading: `Try the method on your project`,
-  ctaBody: `$19.99. 24-hour refund. Covers nine project scopes today, more rolling out monthly. Built in Vermont, works wherever you live in cold-climate Northeast.`,
+  ctaBody: `$19.99. 30-day refund. Covers nine project scopes today, more rolling out monthly. Built in Vermont, works wherever you live in cold-climate Northeast.`,
   ctaHref: `/smart-cart?utm_source=guide&utm_medium=article&utm_campaign=method_pillar`,
   relatedGuides: [
     {

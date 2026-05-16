@@ -50,7 +50,7 @@ export default function SmartCartPreSalePage({ searchParams }: Props) {
           }}
         >
           <span style={{ color: '#7A9B6F', marginRight: '8px' }}>✓</span>
-          $19.99 with full refund in the first 24 hours, no questions asked.
+          $19.99 with full refund within 30 days, no questions asked.
         </p>
       </div>
       <Nav />

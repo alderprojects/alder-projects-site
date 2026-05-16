@@ -83,7 +83,7 @@ const content = {
     },
   ],
   ctaHeading: `Get your personalized lake-season cart`,
-  ctaBody: `$19.99. 24-hour refund. Smart Cart picks the right grill tier for your specific outdoor situation and cooking habits.`,
+  ctaBody: `$19.99. 30-day refund. Smart Cart picks the right grill tier for your specific outdoor situation and cooking habits.`,
   ctaHref: `/smart-cart?utm_source=guide&utm_medium=article&utm_campaign=grills_vs`,
   relatedGuides: [
     {

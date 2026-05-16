@@ -83,7 +83,7 @@ const content = {
     },
   ],
   ctaHeading: `Get your project shopping list`,
-  ctaBody: `$19.99. 24-hour refund. Smart Cart tells you which paint actually matters for your specific project — and which premium upcharges to skip.`,
+  ctaBody: `$19.99. 30-day refund. Smart Cart tells you which paint actually matters for your specific project — and which premium upcharges to skip.`,
   ctaHref: `/smart-cart?utm_source=guide&utm_medium=article&utm_campaign=paint_vt`,
   relatedGuides: [
     {

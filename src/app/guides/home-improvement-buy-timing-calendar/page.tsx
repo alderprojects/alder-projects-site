@@ -144,7 +144,7 @@ const content = {
     },
   ],
   ctaHeading: `Get your timing-aware shopping list`,
-  ctaBody: `$19.99. 24-hour refund. Smart Cart builds the buy / skip / wait list for your project with buy-timing applied to every item.`,
+  ctaBody: `$19.99. 30-day refund. Smart Cart builds the buy / skip / wait list for your project with buy-timing applied to every item.`,
   ctaHref: `/smart-cart?utm_source=guide&utm_medium=article&utm_campaign=buy_timing`,
   relatedGuides: [
     {

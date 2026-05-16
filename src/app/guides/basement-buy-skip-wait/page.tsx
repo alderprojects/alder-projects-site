@@ -89,7 +89,7 @@ const content = {
     },
   ],
   ctaHeading: `Get your personalized basement cart`,
-  ctaBody: `$19.99. 24-hour refund. The diagnostic-first product list, named skip-list, and clear route-outs to professionals when the problem is beyond DIY.`,
+  ctaBody: `$19.99. 30-day refund. The diagnostic-first product list, named skip-list, and clear route-outs to professionals when the problem is beyond DIY.`,
   ctaHref: `/smart-cart?utm_source=guide&utm_medium=article&utm_campaign=basement_bsw`,
   relatedGuides: [
     {

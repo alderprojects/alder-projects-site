@@ -83,7 +83,7 @@ const content = {
     },
   ],
   ctaHeading: `Get your personalized kitchen refresh cart`,
-  ctaBody: `$19.99. 24-hour refund. Smart Cart picks the right cabinet hardware tier for your specific kitchen budget and aesthetic.`,
+  ctaBody: `$19.99. 30-day refund. Smart Cart picks the right cabinet hardware tier for your specific kitchen budget and aesthetic.`,
   ctaHref: `/smart-cart?utm_source=guide&utm_medium=article&utm_campaign=pulls_vs`,
   relatedGuides: [
     {

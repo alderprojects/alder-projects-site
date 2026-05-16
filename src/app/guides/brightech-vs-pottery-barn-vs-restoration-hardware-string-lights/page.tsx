@@ -87,7 +87,7 @@ const content = {
     },
   ],
   ctaHeading: `Get your personalized lake-season cart`,
-  ctaBody: `$19.99. 24-hour refund. Smart Cart picks the right tier for your specific outdoor situation and budget.`,
+  ctaBody: `$19.99. 30-day refund. Smart Cart picks the right tier for your specific outdoor situation and budget.`,
   ctaHref: `/smart-cart?utm_source=guide&utm_medium=article&utm_campaign=lights_vs`,
   relatedGuides: [
     {

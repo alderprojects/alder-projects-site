@@ -82,7 +82,7 @@ const content = {
     },
   ],
   ctaHeading: `Get your personalized kitchen refresh cart`,
-  ctaBody: `$19.99. 24-hour refund. The 3-move core list, named skip list, and cabinet hardware / faucet / lighting picks across budget tiers.`,
+  ctaBody: `$19.99. 30-day refund. The 3-move core list, named skip list, and cabinet hardware / faucet / lighting picks across budget tiers.`,
   ctaHref: `/smart-cart?utm_source=guide&utm_medium=article&utm_campaign=kitchen_bsw`,
   relatedGuides: [
     {

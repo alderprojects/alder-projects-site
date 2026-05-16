@@ -88,7 +88,7 @@ const content = {
     },
   ],
   ctaHeading: `Get your personalized window weatherization cart`,
-  ctaBody: `$19.99. 24-hour refund. Real product picks, named skip-list with dollar amounts saved, and route-out logic on when to call a pro.`,
+  ctaBody: `$19.99. 30-day refund. Real product picks, named skip-list with dollar amounts saved, and route-out logic on when to call a pro.`,
   ctaHref: `/smart-cart?utm_source=guide&utm_medium=article&utm_campaign=windows_bsw`,
   relatedGuides: [
     {

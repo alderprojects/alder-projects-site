@@ -133,8 +133,8 @@ export function SmartCartCtaCard({ cta }: { cta: ChatCta }) {
       : `Your ${cta.scopeLabel} plan`
     : `Your ${cta.scopeLabel} cart`
   const priceLine = isWorthIt
-    ? '$39 · 24-hour full refund'
-    : '$19.99 · 24-hour full refund'
+    ? '$39 · 30-day refund'
+    : '$19.99 · 30-day refund'
   const ctaLabel = isWorthIt ? 'Build my plan →' : 'Build it now →'
   return (
     <a

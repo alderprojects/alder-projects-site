@@ -117,7 +117,7 @@ const content = {
     },
   ],
   ctaHeading: `Apply this to your specific project`,
-  ctaBody: `$19.99. 24-hour refund. Smart Cart applies Buy / Skip / Wait with Vermont-tuned product picks and cost data.`,
+  ctaBody: `$19.99. 30-day refund. Smart Cart applies Buy / Skip / Wait with Vermont-tuned product picks and cost data.`,
   ctaHref: `/smart-cart?utm_source=guide&utm_medium=article&utm_campaign=vt_cost`,
   relatedGuides: [
     {

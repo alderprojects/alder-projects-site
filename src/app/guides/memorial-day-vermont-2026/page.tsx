@@ -208,7 +208,7 @@ export default function MemorialDayVermont2026() {
         <div style={STYLES.ctaBlock}>
           <h3 style={STYLES.ctaH3}>Ready to plan your weekend?</h3>
           <p style={STYLES.ctaP}>
-            <strong style={{ color: '#F5EFE0' }}>Opening the lake camp or running a cookout?</strong> The Memorial Day Smart Cart gives you the lean cart for this weekend specifically — what to grab now, what looks tempting but isn&rsquo;t worth it, what to wait on. 24-hour full refund if it doesn&rsquo;t match your situation.
+            <strong style={{ color: '#F5EFE0' }}>Opening the lake camp or running a cookout?</strong> The Memorial Day Smart Cart gives you the lean cart for this weekend specifically — what to grab now, what looks tempting but isn&rsquo;t worth it, what to wait on. 30-day refund if it doesn&rsquo;t match your situation.
           </p>
           <Link href="/smart-cart?topic=outdoor&scope=memorial_day_weekend&utm_source=memorial_day_2026&utm_medium=cta_block" style={STYLES.ctaPrimary}>Build my Smart Cart — $19.99 →</Link>
           <Link href="/guides/lake-season-buy-skip-wait" style={STYLES.ctaSecondary}>Read the Lake Season guide</Link>

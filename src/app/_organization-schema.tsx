@@ -7,7 +7,7 @@ export default function OrganizationSchema() {
     name: 'Alder Projects',
     url: 'https://alderprojects.com',
     logo: 'https://alderprojects.com/logo.png',
-    description: 'Vermont home project shopping tools and Buy/Skip/Wait guides. Smart Cart $19.99 with 24-hour refund.',
+    description: 'Vermont home project shopping tools and Buy/Skip/Wait guides. Smart Cart $19.99 with 30-day refund.',
     sameAs: [
       'https://alderprojects.com',
     ],

@@ -173,7 +173,7 @@ export default function Calculator() {
                           Ask Alder a question
                         </Link>
                       </div>
-                      <p style={{ fontSize: '11px', color: 'rgba(245,239,224,0.5)', margin: '8px 0 0 0' }}>24-hour full refund · or free chat first.</p>
+                      <p style={{ fontSize: '11px', color: 'rgba(245,239,224,0.5)', margin: '8px 0 0 0' }}>30-day refund · or free chat first.</p>
                     </>
                   )
                 }
@@ -190,7 +190,7 @@ export default function Calculator() {
                         Ask Alder a question
                       </Link>
                     </div>
-                    <p style={{ fontSize: '11px', color: 'rgba(245,239,224,0.5)', margin: '8px 0 0 0' }}>24-hour full refund · or free chat first.</p>
+                    <p style={{ fontSize: '11px', color: 'rgba(245,239,224,0.5)', margin: '8px 0 0 0' }}>30-day refund · or free chat first.</p>
                   </>
                 )
               })()}

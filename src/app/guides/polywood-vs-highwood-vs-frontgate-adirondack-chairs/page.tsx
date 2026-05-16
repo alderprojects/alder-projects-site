@@ -81,7 +81,7 @@ const content = {
     },
   ],
   ctaHeading: `Get your personalized lake-season cart`,
-  ctaBody: `$19.99. 24-hour refund. Smart Cart picks the right Adirondack chair tier for your specific setup and budget.`,
+  ctaBody: `$19.99. 30-day refund. Smart Cart picks the right Adirondack chair tier for your specific setup and budget.`,
   ctaHref: `/smart-cart?utm_source=guide&utm_medium=article&utm_campaign=adirondack_vs`,
   relatedGuides: [
     {

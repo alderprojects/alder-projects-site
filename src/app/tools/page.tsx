@@ -50,7 +50,7 @@ export default function ToolsIndex() {
             </Link>
 
             <Link href="/smart-cart?utm_source=tools_index&utm_medium=card" style={{ display: 'block', padding: '28px', backgroundColor: '#1C2B1A', borderRadius: '4px', textDecoration: 'none' }}>
-              <span style={{ fontSize: '10px', fontFamily: 'monospace', letterSpacing: '0.1em', textTransform: 'uppercase', color: '#C8732A', display: 'block', marginBottom: '10px' }}>$19.99 · 24-hour refund</span>
+              <span style={{ fontSize: '10px', fontFamily: 'monospace', letterSpacing: '0.1em', textTransform: 'uppercase', color: '#C8732A', display: 'block', marginBottom: '10px' }}>$19.99 · 30-day refund</span>
               <h2 style={{ fontFamily: "'Playfair Display', Georgia, serif", fontSize: '22px', fontWeight: 600, color: '#F5EFE0', marginBottom: '10px' }}>Smart Cart</h2>
               <p style={{ fontSize: '14px', color: 'rgba(245,239,224,0.7)', lineHeight: 1.6, marginBottom: '16px' }}>Personalized buy/skip/wait list for your specific project. Real product picks, dollar amounts saved per skip, buy-timing for each item. Covers 9 project scopes.</p>
               <span style={{ fontSize: '13px', color: '#C8732A', fontWeight: 600 }}>Build my Smart Cart →</span>

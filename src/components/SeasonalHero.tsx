@@ -84,7 +84,7 @@ export default function SeasonalHero() {
         </div>
 
         <p style={{ fontSize: '11px', fontFamily: 'monospace', color: 'rgba(245,239,224,0.35)', marginTop: '20px', marginBottom: 0 }}>
-          $19.99 · 24-hour full refund · Built in Vermont
+          $19.99 · 30-day refund · Built in Vermont
         </p>
       </div>
     </section>

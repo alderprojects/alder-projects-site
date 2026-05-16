@@ -46,7 +46,7 @@ const content = {
     },
     {
       heading: `How Smart Cart applies the test`,
-      body: `Smart Cart runs all five questions automatically against each item. The Buy list passes all five for your scenario. The Skip list fails Question 4 (wrong tier) or Question 1 (won't be used). The Wait list fails Question 2 (cheaper soon). The Savings Snapshot at the bottom shows the dollar amount the test produced for your specific project. $19.99, 24-hour refund, covers nine project scopes today.`,
+      body: `Smart Cart runs all five questions automatically against each item. The Buy list passes all five for your scenario. The Skip list fails Question 4 (wrong tier) or Question 1 (won't be used). The Wait list fails Question 2 (cheaper soon). The Savings Snapshot at the bottom shows the dollar amount the test produced for your specific project. $19.99, 30-day refund, covers nine project scopes today.`,
     },
   ],
   faqs: [
@@ -72,7 +72,7 @@ const content = {
     },
   ],
   ctaHeading: `Try the test on your project`,
-  ctaBody: `$19.99. 24-hour refund. Get the personalized Buy / Skip / Wait list for your specific project, with the test already applied to every item.`,
+  ctaBody: `$19.99. 30-day refund. Get the personalized Buy / Skip / Wait list for your specific project, with the test already applied to every item.`,
   ctaHref: `/smart-cart?utm_source=guide&utm_medium=article&utm_campaign=fiveq_test`,
   relatedGuides: [
     {

@@ -86,7 +86,7 @@ const content = {
     },
   ],
   ctaHeading: `Get your project shopping list`,
-  ctaBody: `$19.99. 24-hour refund. Smart Cart tells you what to buy, what to skip, and what to wait on — usable at any of the Vermont stores above.`,
+  ctaBody: `$19.99. 30-day refund. Smart Cart tells you what to buy, what to skip, and what to wait on — usable at any of the Vermont stores above.`,
   ctaHref: `/smart-cart?utm_source=guide&utm_medium=article&utm_campaign=hardware_vt`,
   relatedGuides: [
     {

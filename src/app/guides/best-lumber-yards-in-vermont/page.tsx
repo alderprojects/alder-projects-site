@@ -86,7 +86,7 @@ const content = {
     },
   ],
   ctaHeading: `Get your project material list`,
-  ctaBody: `$19.99. 24-hour refund. Smart Cart's project lists include material quantities and tier guidance — usable at any Vermont yard.`,
+  ctaBody: `$19.99. 30-day refund. Smart Cart's project lists include material quantities and tier guidance — usable at any Vermont yard.`,
   ctaHref: `/smart-cart?utm_source=guide&utm_medium=article&utm_campaign=lumber_vt`,
   relatedGuides: [
     {

@@ -193,9 +193,7 @@ function EvidenceForm({ tokenRow, status }: { tokenRow: any; status?: string }) 
         Vermont-specific evidence for each item below. This gets baked into the live catalog entry.
       </p>
 
-      <form method="POST" action={`/admin/catalog-review/action/${tokenRow.token}`}>
-        <input type="hidden" name="action" value="supply_evidence_submit" />
-
+      <form action={submitEvidence.bind(null, tokenRow.token)}>
         {evidenceFields.map((field) => (
           <div key={field} style={fieldGroupStyle}>
             <label style={labelStyle}>
@@ -251,23 +249,28 @@ function evidencePlaceholder(field: string): string {
 }
 
 // =============================================================================
-// POST HANDLER (form submit)
+// SERVER ACTION — form submit
 // =============================================================================
+//
+// Bound to the form via `<form action={submitEvidence.bind(null, token)}>`.
+// Server actions are the App Router replacement for the named POST export
+// pattern — page.tsx cannot export both default (page) AND POST (handler).
 
-export async function POST(request: Request, { params }: { params: { token: string } }) {
+async function submitEvidence(token: string, formData: FormData): Promise<void> {
+  'use server'
+
   const tokenRow = await prisma.reviewActionToken.findUnique({
-    where: { token: params.token },
+    where: { token },
     include: { candidate: true },
   })
 
   if (!tokenRow || tokenRow.consumedAt || tokenRow.expiresAt < new Date()) {
-    return new Response('Token invalid', { status: 410 })
+    redirect(`/admin/catalog-review/action/${token}?status=invalid`)
   }
   if (tokenRow.action !== 'supply_evidence' || !tokenRow.candidate) {
-    return new Response('Wrong action type', { status: 400 })
+    redirect(`/admin/catalog-review/action/${token}?status=wrong_action`)
   }
 
-  const formData = await request.formData()
   const uniqueAngle = formData.get('uniqueAngle')?.toString() || ''
   const evidenceSupplied: Record<string, string> = {}
   // Array.from() side-steps the FormDataIterator type that needs
@@ -278,7 +281,6 @@ export async function POST(request: Request, { params }: { params: { token: stri
     }
   }
 
-  // Consume token + update candidate
   await prisma.reviewActionToken.update({
     where: { id: tokenRow.id },
     data: { consumedAt: new Date() },
@@ -303,8 +305,7 @@ export async function POST(request: Request, { params }: { params: { token: stri
     },
   })
 
-  // Redirect to the same page with status=success
-  return redirect(`/admin/catalog-review/action/${params.token}?status=success`)
+  redirect(`/admin/catalog-review/action/${token}?status=success`)
 }
 
 // =============================================================================

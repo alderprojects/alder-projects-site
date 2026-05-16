@@ -9,8 +9,8 @@ const content = {
     "townName": "Vermont",
     "townSlug": null,
     "county": null,
-    "metaTitle": "Window replacement in Vermont — what it actually costs in 2026",
-    "metaDescription": "What window replacement actually costs across Vermont in 2026. Rebates that stack, contractors to vet, timing that works for the Vermont calendar.",
+    "metaTitle": "Vermont Window Replacement 2026: $800-$1,500/Window — Or $200 Weatherize First",
+    "metaDescription": "Real Vermont window replacement costs ($800-$1,500/window installed). Plus: how $200 of weatherization may delay $14K replacement by 5 years. Free guide + contractor list.",
     "h1": "Window replacement in Vermont — costs, rebates, contractor reality",
     "leadParagraph": "Vermont window replacement costs vary 30-40% between the resort-tier towns (Stowe, Manchester, Woodstock), the Burlington metro, and the rural belt. Statewide median runs at one number; your specific town's number runs at a different one. Get bids that know your specific Vermont sub-market, not generic regional pricing.",
     "sections": [
@@ -55,12 +55,12 @@ const content = {
   }
 
 export const metadata: Metadata = {
-  title: "Window replacement in Vermont — what it actually costs in 2026",
-  description: "What window replacement actually costs across Vermont in 2026. Rebates that stack, contractors to vet, timing that works for the Vermont calendar.",
+  title: "Vermont Window Replacement 2026: $800-$1,500/Window — Or $200 Weatherize First",
+  description: "Real Vermont window replacement costs ($800-$1,500/window installed). Plus: how $200 of weatherization may delay $14K replacement by 5 years. Free guide + contractor list.",
   alternates: { canonical: `https://alderprojects.com${PATH}` },
   openGraph: {
-    title: "Window replacement in Vermont — what it actually costs in 2026",
-    description: "What window replacement actually costs across Vermont in 2026. Rebates that stack, contractors to vet, timing that works for the Vermont calendar.",
+    title: "Vermont Window Replacement 2026: $800-$1,500/Window — Or $200 Weatherize First",
+    description: "Real Vermont window replacement costs ($800-$1,500/window installed). Plus: how $200 of weatherization may delay $14K replacement by 5 years. Free guide + contractor list.",
     url: `https://alderprojects.com${PATH}`,
     type: 'article',
   },

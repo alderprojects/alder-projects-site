@@ -9,8 +9,8 @@ const content = {
     "townName": "Vermont",
     "townSlug": null,
     "county": null,
-    "metaTitle": "Basement finishing in Vermont — what it actually costs in 2026",
-    "metaDescription": "What basement finish actually costs across Vermont in 2026. Rebates that stack, contractors to vet, timing that works for the Vermont calendar.",
+    "metaTitle": "Vermont Basement Finishing 2026: $30-80/sq ft + The $40 Diagnostic First",
+    "metaDescription": "Real Vermont basement finishing costs ($30-80/sf). Plus the $40 moisture diagnostic that prevents the $30K mistake. Free guide + contractor verification.",
     "h1": "Basement finishing in Vermont — costs, rebates, contractor reality",
     "leadParagraph": "Vermont basement finish costs vary 30-40% between the resort-tier towns (Stowe, Manchester, Woodstock), the Burlington metro, and the rural belt. Statewide median runs at one number; your specific town's number runs at a different one. Get bids that know your specific Vermont sub-market, not generic regional pricing.",
     "sections": [
@@ -54,12 +54,12 @@ const content = {
   }
 
 export const metadata: Metadata = {
-  title: "Basement finishing in Vermont — what it actually costs in 2026",
-  description: "What basement finish actually costs across Vermont in 2026. Rebates that stack, contractors to vet, timing that works for the Vermont calendar.",
+  title: "Vermont Basement Finishing 2026: $30-80/sq ft + The $40 Diagnostic First",
+  description: "Real Vermont basement finishing costs ($30-80/sf). Plus the $40 moisture diagnostic that prevents the $30K mistake. Free guide + contractor verification.",
   alternates: { canonical: `https://alderprojects.com${PATH}` },
   openGraph: {
-    title: "Basement finishing in Vermont — what it actually costs in 2026",
-    description: "What basement finish actually costs across Vermont in 2026. Rebates that stack, contractors to vet, timing that works for the Vermont calendar.",
+    title: "Vermont Basement Finishing 2026: $30-80/sq ft + The $40 Diagnostic First",
+    description: "Real Vermont basement finishing costs ($30-80/sf). Plus the $40 moisture diagnostic that prevents the $30K mistake. Free guide + contractor verification.",
     url: `https://alderprojects.com${PATH}`,
     type: 'article',
   },

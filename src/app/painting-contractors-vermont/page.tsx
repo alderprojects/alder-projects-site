@@ -9,8 +9,8 @@ const content = {
     "townName": "Vermont",
     "townSlug": null,
     "county": null,
-    "metaTitle": "Painting in Vermont — what it actually costs in 2026",
-    "metaDescription": "What paint job actually costs across Vermont in 2026. Rebates that stack, contractors to vet, timing that works for the Vermont calendar.",
+    "metaTitle": "Vermont Painting Contractors 2026: Real $/sq ft + When DIY Beats Hiring",
+    "metaDescription": "Real Vermont painting costs by scope. Plus when DIY beats hiring (most interior, some exterior). Free with contractor verification list.",
     "h1": "Painting in Vermont — costs, rebates, contractor reality",
     "leadParagraph": "Vermont paint job costs vary 30-40% between the resort-tier towns (Stowe, Manchester, Woodstock), the Burlington metro, and the rural belt. Statewide median runs at one number; your specific town's number runs at a different one. Get bids that know your specific Vermont sub-market, not generic regional pricing.",
     "sections": [
@@ -53,12 +53,12 @@ const content = {
   }
 
 export const metadata: Metadata = {
-  title: "Painting in Vermont — what it actually costs in 2026",
-  description: "What paint job actually costs across Vermont in 2026. Rebates that stack, contractors to vet, timing that works for the Vermont calendar.",
+  title: "Vermont Painting Contractors 2026: Real $/sq ft + When DIY Beats Hiring",
+  description: "Real Vermont painting costs by scope. Plus when DIY beats hiring (most interior, some exterior). Free with contractor verification list.",
   alternates: { canonical: `https://alderprojects.com${PATH}` },
   openGraph: {
-    title: "Painting in Vermont — what it actually costs in 2026",
-    description: "What paint job actually costs across Vermont in 2026. Rebates that stack, contractors to vet, timing that works for the Vermont calendar.",
+    title: "Vermont Painting Contractors 2026: Real $/sq ft + When DIY Beats Hiring",
+    description: "Real Vermont painting costs by scope. Plus when DIY beats hiring (most interior, some exterior). Free with contractor verification list.",
     url: `https://alderprojects.com${PATH}`,
     type: 'article',
   },

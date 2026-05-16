@@ -9,8 +9,8 @@ const content = {
     "townName": "Vermont",
     "townSlug": null,
     "county": null,
-    "metaTitle": "General contractor in Vermont — what it actually costs in 2026",
-    "metaDescription": "What general contractor project actually costs across Vermont in 2026. Rebates that stack, contractors to vet, timing that works for the Vermont calendar.",
+    "metaTitle": "Vermont General Contractors 2026: Verification + Pre-Hire Test",
+    "metaDescription": "Verified Vermont GC list + Secretary of State registry check + the 5-question pre-hire test that flags red flags before signing. Free.",
     "h1": "General contractor in Vermont — costs, rebates, contractor reality",
     "leadParagraph": "Vermont general contractor project costs vary 30-40% between the resort-tier towns (Stowe, Manchester, Woodstock), the Burlington metro, and the rural belt. Statewide median runs at one number; your specific town's number runs at a different one. Get bids that know your specific Vermont sub-market, not generic regional pricing.",
     "sections": [
@@ -55,12 +55,12 @@ const content = {
   }
 
 export const metadata: Metadata = {
-  title: "General contractor in Vermont — what it actually costs in 2026",
-  description: "What general contractor project actually costs across Vermont in 2026. Rebates that stack, contractors to vet, timing that works for the Vermont calendar.",
+  title: "Vermont General Contractors 2026: Verification + Pre-Hire Test",
+  description: "Verified Vermont GC list + Secretary of State registry check + the 5-question pre-hire test that flags red flags before signing. Free.",
   alternates: { canonical: `https://alderprojects.com${PATH}` },
   openGraph: {
-    title: "General contractor in Vermont — what it actually costs in 2026",
-    description: "What general contractor project actually costs across Vermont in 2026. Rebates that stack, contractors to vet, timing that works for the Vermont calendar.",
+    title: "Vermont General Contractors 2026: Verification + Pre-Hire Test",
+    description: "Verified Vermont GC list + Secretary of State registry check + the 5-question pre-hire test that flags red flags before signing. Free.",
     url: `https://alderprojects.com${PATH}`,
     type: 'article',
   },

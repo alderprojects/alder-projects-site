@@ -9,8 +9,8 @@ const content = {
     "townName": "Vermont",
     "townSlug": null,
     "county": null,
-    "metaTitle": "Bathroom remodeling in Vermont — what it actually costs in 2026",
-    "metaDescription": "What bathroom remodel actually costs across Vermont in 2026. Rebates that stack, contractors to vet, timing that works for the Vermont calendar.",
+    "metaTitle": "Vermont Bathroom Remodel 2026: $5K-$55K — Or $480 Refresh Before Spending Big",
+    "metaDescription": "Real Vermont bath remodel ranges. $5-12K refresh, $12-28K mid, $25-55K full. Plus the $480 cosmetic refresh that may be all you need. Free.",
     "h1": "Bathroom remodeling in Vermont — costs, rebates, contractor reality",
     "leadParagraph": "Vermont bathroom remodel costs vary 30-40% between the resort-tier towns (Stowe, Manchester, Woodstock), the Burlington metro, and the rural belt. Statewide median runs at one number; your specific town's number runs at a different one. Get bids that know your specific Vermont sub-market, not generic regional pricing.",
     "sections": [
@@ -55,12 +55,12 @@ const content = {
   }
 
 export const metadata: Metadata = {
-  title: "Bathroom remodeling in Vermont — what it actually costs in 2026",
-  description: "What bathroom remodel actually costs across Vermont in 2026. Rebates that stack, contractors to vet, timing that works for the Vermont calendar.",
+  title: "Vermont Bathroom Remodel 2026: $5K-$55K — Or $480 Refresh Before Spending Big",
+  description: "Real Vermont bath remodel ranges. $5-12K refresh, $12-28K mid, $25-55K full. Plus the $480 cosmetic refresh that may be all you need. Free.",
   alternates: { canonical: `https://alderprojects.com${PATH}` },
   openGraph: {
-    title: "Bathroom remodeling in Vermont — what it actually costs in 2026",
-    description: "What bathroom remodel actually costs across Vermont in 2026. Rebates that stack, contractors to vet, timing that works for the Vermont calendar.",
+    title: "Vermont Bathroom Remodel 2026: $5K-$55K — Or $480 Refresh Before Spending Big",
+    description: "Real Vermont bath remodel ranges. $5-12K refresh, $12-28K mid, $25-55K full. Plus the $480 cosmetic refresh that may be all you need. Free.",
     url: `https://alderprojects.com${PATH}`,
     type: 'article',
   },

@@ -9,8 +9,8 @@ const content = {
     "townName": "Vermont",
     "townSlug": null,
     "county": null,
-    "metaTitle": "HVAC contractor in Vermont — what it actually costs in 2026",
-    "metaDescription": "What HVAC project actually costs across Vermont in 2026. Rebates that stack, contractors to vet, timing that works for the Vermont calendar.",
+    "metaTitle": "Vermont HVAC + Heat Pump Rebates 2026: EVT Stack Up to $3,000",
+    "metaDescription": "Real 2026 Vermont heat pump rebate stack. EVT $1,000-3,000. Plus utility adders. What stacks, what does not, what to ask before quoting. Free.",
     "h1": "HVAC contractor in Vermont — costs, rebates, contractor reality",
     "leadParagraph": "Vermont HVAC project costs vary 30-40% between the resort-tier towns (Stowe, Manchester, Woodstock), the Burlington metro, and the rural belt. Statewide median runs at one number; your specific town's number runs at a different one. Get bids that know your specific Vermont sub-market, not generic regional pricing.",
     "sections": [
@@ -60,12 +60,12 @@ const content = {
   }
 
 export const metadata: Metadata = {
-  title: "HVAC contractor in Vermont — what it actually costs in 2026",
-  description: "What HVAC project actually costs across Vermont in 2026. Rebates that stack, contractors to vet, timing that works for the Vermont calendar.",
+  title: "Vermont HVAC + Heat Pump Rebates 2026: EVT Stack Up to $3,000",
+  description: "Real 2026 Vermont heat pump rebate stack. EVT $1,000-3,000. Plus utility adders. What stacks, what does not, what to ask before quoting. Free.",
   alternates: { canonical: `https://alderprojects.com${PATH}` },
   openGraph: {
-    title: "HVAC contractor in Vermont — what it actually costs in 2026",
-    description: "What HVAC project actually costs across Vermont in 2026. Rebates that stack, contractors to vet, timing that works for the Vermont calendar.",
+    title: "Vermont HVAC + Heat Pump Rebates 2026: EVT Stack Up to $3,000",
+    description: "Real 2026 Vermont heat pump rebate stack. EVT $1,000-3,000. Plus utility adders. What stacks, what does not, what to ask before quoting. Free.",
     url: `https://alderprojects.com${PATH}`,
     type: 'article',
   },

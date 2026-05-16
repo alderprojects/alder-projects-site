@@ -9,8 +9,8 @@ const content = {
     "townName": "Stowe",
     "townSlug": "stowe-vt",
     "county": "Lamoille County",
-    "metaTitle": "Deck building in Stowe, VT — costs, rebates, what to know",
-    "metaDescription": "What deck build actually costs in Stowe, VT in 2026. Rebates that stack, contractors to vet, timing that works. Built for Stowe homeowners.",
+    "metaTitle": "Stowe VT Deck Builders 2026: Real Costs $30-85/sq ft (or DIY for less)",
+    "metaDescription": "What deck-building actually costs in Stowe — $30-40/sf PT, $60-85/sf composite. Plus when to skip the contractor and DIY a deck refresh for $340.",
     "h1": "Deck building in Stowe, VT — costs, contractors, rebates",
     "leadParagraph": "Resort-premium tier. Cost basis runs 30-40% above statewide median. Mountain Road design review applies to any visible exterior work. Stowe Village historic district constrains exterior changes within the district boundary. Deck building in Stowe runs at 1.30-1.45× statewide median. Get bids that know the Stowe reality, not generic Vermont pricing.",
     "sections": [
@@ -54,12 +54,12 @@ const content = {
   }
 
 export const metadata: Metadata = {
-  title: "Deck building in Stowe, VT — costs, rebates, what to know",
-  description: "What deck build actually costs in Stowe, VT in 2026. Rebates that stack, contractors to vet, timing that works. Built for Stowe homeowners.",
+  title: "Stowe VT Deck Builders 2026: Real Costs $30-85/sq ft (or DIY for less)",
+  description: "What deck-building actually costs in Stowe — $30-40/sf PT, $60-85/sf composite. Plus when to skip the contractor and DIY a deck refresh for $340.",
   alternates: { canonical: `https://alderprojects.com${PATH}` },
   openGraph: {
-    title: "Deck building in Stowe, VT — costs, rebates, what to know",
-    description: "What deck build actually costs in Stowe, VT in 2026. Rebates that stack, contractors to vet, timing that works. Built for Stowe homeowners.",
+    title: "Stowe VT Deck Builders 2026: Real Costs $30-85/sq ft (or DIY for less)",
+    description: "What deck-building actually costs in Stowe — $30-40/sf PT, $60-85/sf composite. Plus when to skip the contractor and DIY a deck refresh for $340.",
     url: `https://alderprojects.com${PATH}`,
     type: 'article',
   },

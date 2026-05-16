@@ -3,6 +3,7 @@ import Nav from '@/components/Nav'
 import Footer from '@/components/Footer'
 import GuideFooter from '@/components/GuideFooter'
 import SmartCartBridge from '@/components/SmartCartBridge'
+import ContractorDiyBanner from '@/components/ContractorDiyBanner'
 import {
   buildArticle,
   buildBreadcrumbList,
@@ -205,6 +206,11 @@ export default function ServicePage({
 
       {/* Body */}
       <div style={{ maxWidth: '720px', margin: '0 auto', padding: 'clamp(32px,5vw,48px) 24px 80px' }}>
+        {/* v7.2.19-PATCH2: DIY-first capture banner. Self-hides on routes
+            not in CONTRACTOR_PAGE_SCOPE_MAP, so safe to mount on every
+            service page. Renders above the existing v7.2.14 SmartCartBridge
+            so the DIY-vs-contractor framing lands before deeper content. */}
+        <ContractorDiyBanner />
         {/* v7.2.14: Smart Cart bridge — show on pages where the cart is a
             better first step for some users. The bridge does not replace
             the pro funnel; severe cases continue down to the property

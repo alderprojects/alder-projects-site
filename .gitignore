@@ -40,3 +40,17 @@ next-env.d.ts
 
 # v7.2.7 image-pipeline working dir; processed webp/jpg are committed
 public/product-images/_raw/
+
+# Read v1 — vision eval test photos are not committed (privacy + size).
+# Only directory structure (.gitkeep) and README are tracked.
+test-photos/**
+!test-photos/README.md
+!test-photos/*/
+!test-photos/**/.gitkeep
+
+# Read v1 — vision eval HTML reports
+/eval-results/
+
+# Read v1 — Prisma generated client (regenerated on install)
+/prisma/migrations/.skip
+/node_modules/.prisma/

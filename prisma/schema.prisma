@@ -1,0 +1,565 @@
+// =============================================================================
+// Alder Projects — Read v1 (v7.3.1) data graph schema
+// =============================================================================
+//
+// Purpose: foundation for photo-aware Smart Cart, Alder Read, and the
+// long-horizon acquisition asset (Zillow-primary, Angi-secondary).
+//
+// Design principles:
+//   1. State-keyed from day one. Vermont is the first market; the schema
+//      handles N states without refactor.
+//   2. Event log is the source of truth. Relational tables are projections.
+//   3. RoomSnapshots are immutable. The delta between snapshots is the
+//      outcome signal that compounds.
+//   4. valuation_delta is computed, not stored. Pipeline lives in code.
+//   5. Photo extraction schema is forward-compatible with Tier 3 fields
+//      (defects, products) — add fields, don't redesign.
+//
+// Migration: this replaces any prior schema. Run via:
+//   npx prisma migrate dev --name read-v1-foundation
+//
+// =============================================================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// =============================================================================
+// IDENTITY LAYER
+// =============================================================================
+
+model User {
+  id              String    @id @default(cuid())
+  email           String    @unique
+  emailVerifiedAt DateTime?
+  displayName     String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  deletedAt       DateTime?
+
+  // Auth
+  sessions     Session[]
+  magicLinks   MagicLink[]
+  consents     Consent[]
+
+  // Membership
+  householdMembers HouseholdMember[]
+
+  // Carts, projects, outcomes
+  smartCarts SmartCart[]
+  events     EventLog[] @relation("EventActor")
+
+  @@index([email])
+  @@index([createdAt])
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  userAgent String?
+  ip        String?
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+model MagicLink {
+  id         String    @id @default(cuid())
+  userId     String
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash  String    @unique
+  purpose    String // "signin" | "claim"
+  expiresAt  DateTime
+  consumedAt DateTime?
+  createdAt  DateTime  @default(now())
+
+  @@index([userId])
+  @@index([tokenHash])
+}
+
+// =============================================================================
+// HOUSEHOLD + PROPERTY LAYER
+// =============================================================================
+
+model Household {
+  id        String   @id @default(cuid())
+  name      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  members    HouseholdMember[]
+  properties Property[]
+  projects   Project[]
+}
+
+model HouseholdMember {
+  id          String    @id @default(cuid())
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  householdId String
+  household   Household @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  role        String    @default("owner") // "owner" | "member"
+  joinedAt    DateTime  @default(now())
+
+  @@unique([userId, householdId])
+  @@index([householdId])
+}
+
+model Property {
+  id                String    @id @default(cuid())
+  householdId       String
+  household         Household @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  nickname          String?
+  // Normalized address fields — canonical lowercase, no punctuation
+  addressLine1Norm  String
+  addressLine2Norm  String?
+  cityNorm          String
+  state             String // "VT" | "NH" | "ME" — state-keyed from day one
+  zip               String
+  county            String?
+  // Property facts
+  yearBuilt         Int?
+  yearBuiltEstimate Boolean   @default(false) // true = inferred, false = known
+  sqftLiving        Int?
+  lotSqft           Int?
+  propertyType      String? // "single_family" | "condo" | "multi_family" | "other"
+  // Baseline market value (from Zillow API, county assessor, etc.)
+  valuationBaseline Int? // dollars
+  valuationSourceAt DateTime?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  profiles        PropertyProfile[]
+  rooms           Room[]
+  projects        Project[]
+  valuationDeltas ValuationDelta[]
+
+  @@unique([addressLine1Norm, cityNorm, state, zip])
+  @@index([state, zip])
+  @@index([householdId])
+}
+
+model PropertyProfile {
+  id         String   @id @default(cuid())
+  propertyId String
+  property   Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  snapshotAt DateTime @default(now())
+  // Full fetched profile — public records, GIS, climate, comps, rebate
+  // eligibility, code tier, etc. JSON for flexibility; specific queries
+  // pull fields out via Postgres JSON operators.
+  profileJson Json
+  // Versioning for the fetcher itself
+  fetcherVersion String
+
+  @@index([propertyId, snapshotAt])
+}
+
+// =============================================================================
+// ROOM + PHOTO LAYER (the Zillow-primary moat)
+// =============================================================================
+
+model Room {
+  id           String   @id @default(cuid())
+  propertyId   String
+  property     Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  roomType     String // "kitchen" | "bathroom" | "living_room" | "bedroom" | "deck" | "basement" | "mudroom" | "exterior" | "other"
+  name         String? // user-supplied nickname, e.g. "main bath"
+  sqftEstimate Int?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  snapshots RoomSnapshot[]
+
+  @@index([propertyId, roomType])
+}
+
+model RoomSnapshot {
+  // Immutable. Each capture event creates a new RoomSnapshot.
+  // The delta between RoomSnapshots is the outcome signal that
+  // compounds the data asset's value over time.
+  id                    String   @id @default(cuid())
+  roomId                String
+  room                  Room     @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  snapshotAt            DateTime @default(now())
+  // Capture context — "initial" before a project, "outcome" after
+  captureContext        String // "initial" | "outcome" | "periodic" | "pre_listing"
+  // Derived condition score (0-100). Computed from vision extractions on
+  // photos belonging to this snapshot. Null until extractions complete.
+  conditionScore        Int?
+  // Finish era estimate (e.g. "1990s", "2010s"). Most-confident era across
+  // photos in this snapshot.
+  finishEra             String?
+  // Inferred last renovation year, if any. Null = no inference.
+  lastRenovatedEstimate Int?
+  // Confidence in the snapshot-level fields above (0-1)
+  confidence            Float?
+  // Triggering event (e.g. Smart Cart purchase, Alder Read order, +60d email)
+  triggeredByEventId    String?
+
+  photos      Photo[]
+  outcomesIn  Outcome[] @relation("OutcomeAfterSnapshot")
+
+  @@index([roomId, snapshotAt])
+  @@index([captureContext])
+}
+
+model Photo {
+  id               String       @id @default(cuid())
+  roomSnapshotId   String
+  roomSnapshot     RoomSnapshot @relation(fields: [roomSnapshotId], references: [id], onDelete: Cascade)
+  // Storage
+  blobUrl          String // Vercel Blob signed URL or S3 path
+  blobKey          String       @unique
+  mimeType         String
+  bytes            Int
+  widthPx          Int?
+  heightPx         Int?
+  // Integrity + dedup
+  perceptualHash   String // 64-bit pHash, hex-encoded
+  exifStrippedAt   DateTime?
+  // Capture metadata (user-supplied at upload)
+  captureMethod    String // "camera" | "library" | "import"
+  uploadedAt       DateTime     @default(now())
+  // Consent flags at time of upload (snapshot of consent record)
+  consentFlagsJson Json
+  // Soft delete (consent revocation)
+  hiddenAt         DateTime?
+
+  extractions VisionExtraction[]
+
+  @@index([roomSnapshotId])
+  @@index([perceptualHash])
+}
+
+model VisionExtraction {
+  id              String    @id @default(cuid())
+  photoId         String
+  photo           Photo     @relation(fields: [photoId], references: [id], onDelete: Cascade)
+  // Model + prompt versioning — re-extraction is allowed when the prompt
+  // is improved; old extractions stay in the table for audit + replay.
+  modelVersion    String // e.g. "claude-3-5-sonnet-vision-20241022"
+  promptVersion   String // e.g. "v1.0.0"
+  // Structured output — see lib/vision/extract.ts for schema. Tier 2 today,
+  // Tier 3 fields (defects, products) added later without schema migration.
+  extractionJson  Json
+  overallConfidence Float
+  // Manual review trail
+  reviewStatus    String    @default("pending") // "pending" | "approved" | "corrected" | "rejected"
+  reviewedById    String?
+  reviewedAt      DateTime?
+  reviewerNotes   String?
+  correctedJson   Json? // if reviewStatus = "corrected", the human-corrected output
+  // Cost accounting
+  apiCostCents    Int?
+  createdAt       DateTime  @default(now())
+
+  @@index([photoId])
+  @@index([reviewStatus, createdAt])
+  @@index([overallConfidence])
+}
+
+// =============================================================================
+// VALUATION DELTA (Zillow-primary derived field, computed nightly)
+// =============================================================================
+
+model ValuationDelta {
+  // The headline derived field for the Zillow acquisition narrative.
+  // Computed per property nightly from baseline + room snapshots + comps.
+  // Stored as snapshots so the trajectory is queryable over time.
+  id                     String   @id @default(cuid())
+  propertyId             String
+  property               Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  computedAt             DateTime @default(now())
+  // The inputs
+  baselineEstimateDollars Int // baseline market value at compute time
+  baselineSource         String // "zillow_api" | "county_assessor" | "internal_comps"
+  // Alder's adjusted estimate
+  alderAdjustedDollars   Int
+  // The delta
+  deltaDollars           Int // alderAdjusted - baseline
+  deltaPct               Float // delta / baseline
+  // Model attribution
+  modelVersion           String
+  inputsHash             String // hash of all inputs, for cache + audit
+  // Component contributions (per-room dollar attribution)
+  attributionJson        Json
+  confidence             Float
+
+  @@index([propertyId, computedAt])
+  @@index([inputsHash])
+}
+
+// =============================================================================
+// PROJECT + LEAD LAYER (Angi-secondary)
+// =============================================================================
+
+model Project {
+  id                String     @id @default(cuid())
+  householdId       String
+  household         Household  @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  propertyId        String?
+  property          Property?  @relation(fields: [propertyId], references: [id])
+  topic             String // "kitchen" | "bathroom" | "outdoor" | "mudroom" | "weatherization" | ...
+  scopeVariant      String? // matches scope catalog in code
+  // Project lane — DIY / handyman / small pro / contractor. The Angi-pitch field.
+  lane              String? // "diy" | "handyman" | "small_pro" | "contractor" | "verify_first" | "hold"
+  intentDepthScore  Float? // 0-1; how committed is the user to this project
+  budgetBand        String? // "under_5k" | "5k_15k" | "15k_50k" | "50k_plus"
+  timelineBand      String? // "now" | "3_months" | "6_12_months" | "exploring"
+  status            String     @default("active") // "active" | "completed" | "abandoned"
+  createdAt         DateTime   @default(now())
+  updatedAt         DateTime   @updatedAt
+
+  smartCarts  SmartCart[]
+  leadIntents LeadIntent[]
+  outcomes    Outcome[]
+
+  @@index([householdId, status])
+  @@index([propertyId, status])
+  @@index([topic, scopeVariant])
+}
+
+model SmartCart {
+  id            String    @id @default(cuid())
+  projectId     String
+  project       Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  userId        String?
+  user          User?     @relation(fields: [userId], references: [id])
+  // Pricing experiment cohort assignment (frozen at first impression)
+  priceCohort   String // "free_with_photo" | "p9_99_with_photo" | "p29_no_photo_required"
+  pricePaidCents Int
+  // Photo signal at time of cart synthesis
+  photoCount    Int       @default(0)
+  photoAttached Boolean   @default(false)
+  // Output snapshot — the rendered cart at purchase time
+  cartJson      Json
+  // Synthesis prompt version (so we can replay later)
+  synthesisVersion String
+  // Lifecycle
+  status        String    @default("pending") // "pending" | "purchased" | "refunded"
+  purchasedAt   DateTime?
+  refundedAt    DateTime?
+  refundReason  String?
+  stripeChargeId String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([userId])
+  @@index([projectId])
+  @@index([status, purchasedAt])
+  @@index([priceCohort, purchasedAt])
+}
+
+model LeadIntent {
+  id                 String    @id @default(cuid())
+  projectId          String
+  project            Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  lane               String // matches Project.lane
+  contractorFitScoreJson Json? // per-contractor fit scores at routing time
+  status             String    @default("new") // "new" | "matched" | "accepted" | "declined" | "expired"
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+
+  acceptances ContractorAcceptance[]
+
+  @@index([projectId])
+  @@index([lane, status])
+}
+
+model Contractor {
+  // Slim contractor table. Full prospect/onboarding state stays in the
+  // existing Google Sheets ContractorProspects/ContractorsDB; this is
+  // the projection of approved contractors into the relational DB.
+  id            String   @id @default(cuid())
+  externalId    String?  @unique // PROS-####/CON-#### IDs from sheets
+  businessName  String
+  email         String
+  phone         String?
+  trades        String[] // ["painting", "electrical", ...]
+  serviceAreas  String[] // ["chittenden_vt", "addison_vt", ...]
+  state         String
+  status        String   @default("approved") // "approved" | "paused" | "removed"
+  leadTier      String? // "tier1" | "tier2" | "tier3" — pricing band
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  acceptances ContractorAcceptance[]
+
+  @@index([state, status])
+}
+
+model ContractorAcceptance {
+  id           String     @id @default(cuid())
+  leadIntentId String
+  leadIntent   LeadIntent @relation(fields: [leadIntentId], references: [id], onDelete: Cascade)
+  contractorId String
+  contractor   Contractor @relation(fields: [contractorId], references: [id])
+  action       String // "previewed" | "accepted" | "declined" | "ignored"
+  feePaidCents Int? // null if not accepted
+  stripeChargeId String?
+  actionAt     DateTime   @default(now())
+
+  @@index([leadIntentId])
+  @@index([contractorId, actionAt])
+}
+
+model Outcome {
+  // The +60d after-photo capture event. Completes the Zillow valuation
+  // story by linking project intent → action → before/after photos →
+  // spend reality → revised valuation.
+  id                     String        @id @default(cuid())
+  projectId              String
+  project                Project       @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  afterPhotosSnapshotId  String?
+  afterPhotosSnapshot    RoomSnapshot? @relation("OutcomeAfterSnapshot", fields: [afterPhotosSnapshotId], references: [id])
+  completedAt            DateTime?
+  spendActualCents       Int?
+  contractorUsed         String?
+  userReportedJson       Json? // free-form user notes
+  createdAt              DateTime      @default(now())
+
+  @@index([projectId])
+}
+
+// =============================================================================
+// EVENT LOG (source of truth, append-only)
+// =============================================================================
+
+model EventLog {
+  id           String   @id @default(cuid())
+  // Event metadata
+  eventType    String // see lib/events/types.ts for enum
+  eventVersion String   @default("v1")
+  occurredAt   DateTime @default(now())
+  // Actor
+  actorId      String? // userId if signed in
+  actor        User?    @relation("EventActor", fields: [actorId], references: [id])
+  anonId       String? // VisitorSession.anonId if not signed in
+  // Subject — the entity the event acted upon
+  subjectType  String? // "Property" | "SmartCart" | "Photo" | "Project" | ...
+  subjectId    String?
+  // Payload — typed per eventType (see lib/events/types.ts)
+  payloadJson  Json
+  // Context
+  sessionId    String?
+  source       String? // "web" | "email" | "admin" | "system" | "cron"
+
+  @@index([eventType, occurredAt])
+  @@index([actorId, occurredAt])
+  @@index([anonId, occurredAt])
+  @@index([subjectType, subjectId])
+}
+
+// =============================================================================
+// CONSENT (granular, per-purpose, versioned)
+// =============================================================================
+
+model Consent {
+  id        String    @id @default(cuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  // Purpose — what is the data used for
+  purpose   String // "personal_recommendations" | "product_improvement" | "valuation_research" | "marketing"
+  dataType  String // "photos" | "address" | "smart_cart_history" | "behavioral"
+  granted   Boolean
+  version   String // e.g. "v1.0.0" — privacy policy version at time of consent
+  grantedAt DateTime  @default(now())
+  revokedAt DateTime?
+  source    String // "signup" | "settings" | "modal_inline"
+
+  @@unique([userId, purpose, dataType])
+  @@index([userId])
+}
+
+// =============================================================================
+// CATALOG (Smart Cart universe — price refresh tracking)
+// =============================================================================
+
+model CatalogProduct {
+  // Optional projection of the Smart Cart universe into the DB.
+  // For weeks 1-12, the universe stays in source (src/content/smart-cart/
+  // universe.ts) and this table is unused. Migrate to DB-backed when the
+  // universe exceeds ~1,000 SKUs and source file management is too heavy.
+  universeId        String    @id
+  productName       String
+  amazonAsin        String?   @unique
+  affiliateUrl      String
+  priceLow          Float
+  priceHigh         Float
+  tier              String // "budget" | "sweet_spot" | "premium"
+  availability      String    @default("in_stock") // "in_stock" | "limited" | "out_of_stock" | "unknown"
+  unavailableReason String?
+  tagsJson          Json
+  lastRefreshedAt   DateTime?
+  updatedAt         DateTime  @updatedAt
+
+  snapshots CatalogPriceSnapshot[]
+
+  @@index([availability])
+  @@index([tier, availability])
+}
+
+model CatalogPriceSnapshot {
+  // Append-only price history per refresh run. Used for:
+  //   1. Audit when a buyer disputes a quoted price
+  //   2. Future "price has dropped" email nudges
+  //   3. Drift analysis over time
+  //   4. Catalog quality metrics (uptime, stability)
+  id           String   @id @default(cuid())
+  universeId   String
+  product      CatalogProduct? @relation(fields: [universeId], references: [universeId])
+  asin         String
+  priceLow     Float
+  priceHigh    Float
+  availability String
+  capturedAt   DateTime @default(now())
+
+  @@index([universeId, capturedAt])
+  @@index([asin, capturedAt])
+}
+
+// =============================================================================
+// VISITOR SESSION (pre-signin signal capture)
+// =============================================================================
+
+model VisitorSession {
+  id         String   @id @default(cuid())
+  anonId     String   @unique
+  // All signals captured pre-signin — topic interest, scope variant probed,
+  // calculator inputs, chat snippets, etc. JSON for flexibility.
+  signalsJson Json
+  // First touch attribution
+  firstSource String? // "organic" | "direct" | "pinterest" | "reddit" | ...
+  firstUtm   Json?
+  firstSeenAt DateTime @default(now())
+  lastSeenAt  DateTime @default(now())
+  // If/when claimed by a signed-in user
+  claimedByUserId String?
+  claimedAt       DateTime?
+
+  @@index([anonId])
+  @@index([claimedByUserId])
+}
+
+// =============================================================================
+// END OF SCHEMA
+// =============================================================================
+//
+// Indexes to consider adding after first month of production data:
+//   - Composite on Photo (uploadedAt, roomSnapshotId) if review queue
+//     paginates by time
+//   - Partial index on VisionExtraction where reviewStatus = 'pending'
+//     if review queue grows large
+//   - GIN index on Property.profileJson if specific JSON queries become
+//     hot (e.g. zip-code-level rebate eligibility)
+//
+// =============================================================================

@@ -551,6 +551,158 @@ model VisitorSession {
 }
 
 // =============================================================================
+// EXPANSION LAYER (Job 2 — catalog expansion + review + GSC feedback)
+// =============================================================================
+// Added in the v7.3.1 expansion bundle. Five new models that ride on top of
+// the foundation schema:
+//
+//   CatalogExpansionCandidate  LLM-proposed catalog additions with Google-
+//                              aligned commodity-risk + evidence gates
+//   RecommendationChange       Refresh-cron-flagged changes for the review
+//                              queue (distinct from CatalogPriceSnapshot
+//                              which stays append-only history)
+//   ReviewActionToken          Signed single-use tokens for one-click email
+//                              approve/reject/supply_evidence
+//   GscPageStats               Search Console weekly snapshot with the
+//                              aiOverviewLikely inferred signal
+//   PhotoContentUse            Per-photo opt-in for public SEO content use
+//                              (separate, higher-bar consent from personal
+//                              recommendations). Linked to Photo by photoId
+//                              in application code, not FK — keeps the
+//                              consent layer decoupled from the data layer.
+// =============================================================================
+
+model CatalogExpansionCandidate {
+  // States:
+  //   draft           created by expansion cron
+  //   pending_review  in the 5 AM digest, awaiting admin action
+  //   needs_evidence  approved but commodity-risk requires evidence pre-publish
+  //   approved        evidence supplied (if needed), publish-ready
+  //   published       wired into live universe / scope catalog
+  //   rejected        killed by admin, kept for audit
+  //   ignored         no action; auto-expires after 30 days
+  id                    String    @id @default(cuid())
+  scopeId               String
+  candidateType         String // "product" | "skip_item" | "route_out" | "new_scope" | "guide_section"
+  title                 String
+  rationale             String
+  proposedSlot          String?
+  proposedTier          String?
+  proposedAffiliateUrl  String?
+  proposedPriceRange    String?
+  commodityRiskScore    Int // 0-100; higher = more commodity-like
+  evidenceNeededJson    Json
+  evidenceSuppliedJson  Json?
+  uniqueAngle           String?
+  llmModelVersion       String
+  llmPromptVersion      String
+  estimatedBuyerValue   String?
+  riskLevelJson         Json
+  status                String    @default("draft")
+  reviewedById          String?
+  reviewedAt            DateTime?
+  reviewerNotes         String?
+  publishedAt           DateTime?
+  publishedAsJson       Json?
+  expiresAt             DateTime?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  actionTokens ReviewActionToken[]
+
+  @@index([status, createdAt])
+  @@index([scopeId, status])
+  @@index([commodityRiskScore])
+}
+
+model RecommendationChange {
+  // Distinct from CatalogPriceSnapshot — that's append-only history of every
+  // refresh; this is the actionable review queue (rows that need admin eyes).
+  id              String    @id @default(cuid())
+  universeId      String
+  productName     String
+  asin            String?
+  changeType      String // "price_jump" | "price_drop" | "unavailable" | "asin_not_found" | "url_redirect"
+  oldValue        String
+  newValue        String
+  pctChange       Float?
+  riskTier        String // "auto_safe" | "needs_review" | "never_auto"
+  status          String    @default("pending_review") // "pending_review" | "approved" | "rejected" | "auto_published" | "ignored"
+  reviewedById    String?
+  reviewedAt      DateTime?
+  reviewerNotes   String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  actionTokens ReviewActionToken[]
+
+  @@index([status, createdAt])
+  @@index([universeId])
+  @@index([riskTier, status])
+}
+
+model ReviewActionToken {
+  // 32-byte random hex token, single-use, 7-day expiry. Bound to
+  // (subject_id, action) — token for "approve candidate X" cannot be used
+  // to approve candidate Y. No login required; the token IS the auth.
+  id              String    @id @default(cuid())
+  token           String    @unique
+  action          String // "approve" | "reject" | "approve_low_confidence" | "supply_evidence"
+  candidateId     String?
+  candidate       CatalogExpansionCandidate? @relation(fields: [candidateId], references: [id], onDelete: Cascade)
+  changeId        String?
+  change          RecommendationChange?      @relation(fields: [changeId], references: [id], onDelete: Cascade)
+  issuedAt        DateTime  @default(now())
+  expiresAt       DateTime
+  consumedAt      DateTime?
+  consumedFromIp  String?
+
+  @@index([token])
+  @@index([expiresAt])
+  @@index([candidateId])
+  @@index([changeId])
+}
+
+model GscPageStats {
+  // GSC doesn't expose an AI Overview field. We infer:
+  //   rising impressions AND falling CTR → being summarized in AI Overviews
+  id                       String   @id @default(cuid())
+  pageUrl                  String
+  windowStart              DateTime
+  windowEnd                DateTime
+  impressions              Int
+  clicks                   Int
+  ctr                      Float
+  avgPosition              Float
+  topQueriesJson           Json
+  aiOverviewLikely         Boolean  @default(false)
+  publishedFromCandidateId String?
+  createdAt                DateTime @default(now())
+
+  @@unique([pageUrl, windowStart])
+  @@index([windowStart])
+  @@index([publishedFromCandidateId])
+}
+
+model PhotoContentUse {
+  // Public SEO use consent — higher bar than personal_recommendations.
+  id               String    @id @default(cuid())
+  photoId          String    @unique
+  granted          Boolean
+  grantedAt        DateTime  @default(now())
+  revokedAt        DateTime?
+  allowGuides      Boolean   @default(true)
+  allowOutcomes    Boolean   @default(true)
+  allowMarketing   Boolean   @default(false) // ads/social — separate higher bar
+  attributionStyle String    @default("anonymous") // "anonymous" | "first_name_only" | "full_name"
+  consentVersion   String
+  source           String // "smart_cart_modal" | "outcome_email" | "settings_page"
+
+  @@index([granted, allowGuides])
+  @@index([granted, allowOutcomes])
+}
+
+// =============================================================================
 // END OF SCHEMA
 // =============================================================================
 //

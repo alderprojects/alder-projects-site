@@ -282,12 +282,21 @@ export interface ExtractOutput {
  *     queue with status="rejected".
  */
 export async function extractFromPhoto(input: ExtractInput): Promise<ExtractOutput> {
-  const userContent: Anthropic.Messages.ContentBlockParam[] = [
+  // The SDK 0.30 image block only supports base64-encoded sources (URL
+  // sources were added in a later SDK rev). resolveImageSource accepts
+  // either a Vercel Blob URL (fetches + encodes) or a data URI (parses
+  // out the base64) so eval.ts can keep passing data URIs.
+  const { data: imageData, mediaType } = await resolveImageSource(input)
+
+  const userContent: Array<
+    Anthropic.Messages.TextBlockParam | Anthropic.Messages.ImageBlockParam
+  > = [
     {
       type: 'image',
       source: {
-        type: 'url',
-        url: input.photoBlobUrl,
+        type: 'base64',
+        data: imageData,
+        media_type: mediaType,
       },
     },
   ]
@@ -366,6 +375,36 @@ export async function extractFromPhoto(input: ExtractInput): Promise<ExtractOutp
     shouldReview,
     reviewReason,
   }
+}
+
+// =============================================================================
+// IMAGE SOURCE RESOLUTION
+// =============================================================================
+
+type AllowedMediaType = 'image/jpeg' | 'image/png' | 'image/webp' | 'image/gif'
+
+async function resolveImageSource(input: ExtractInput): Promise<{
+  data: string
+  mediaType: AllowedMediaType
+}> {
+  if (input.photoBlobUrl.startsWith('data:')) {
+    const match = input.photoBlobUrl.match(/^data:([^;]+);base64,(.+)$/)
+    if (!match) {
+      throw new VisionExtractionError('invalid_data_uri', 'Could not parse data URI')
+    }
+    const [, mimeStr, b64] = match
+    return { data: b64, mediaType: mimeStr as AllowedMediaType }
+  }
+
+  const resp = await fetch(input.photoBlobUrl)
+  if (!resp.ok) {
+    throw new VisionExtractionError(
+      'fetch_failed',
+      `Could not fetch photo ${input.photoBlobUrl}: HTTP ${resp.status}`
+    )
+  }
+  const buf = Buffer.from(await resp.arrayBuffer())
+  return { data: buf.toString('base64'), mediaType: input.mimeType }
 }
 
 // =============================================================================

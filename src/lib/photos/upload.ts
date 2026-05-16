@@ -100,13 +100,34 @@ export async function processAndUploadPhoto(input: UploadInput): Promise<Process
   const blobKey = `photos/${input.userId}/${sha.substring(0, 16)}.${outputExt}`
 
   // 5. Upload. addRandomSuffix:false because the key is already unique.
-  const blob = await put(blobKey, processed, {
-    access: 'public',
-    contentType: outputMime,
-    addRandomSuffix: false,
-    // allowOverwrite: same content → same key → identical bytes; safe.
-    allowOverwrite: true,
-  })
+  // @vercel/blob 0.27 has no `allowOverwrite` option — same-content
+  // uploads at the same content-addressed key will throw if the blob
+  // already exists. Catch that one case and return the existing URL
+  // (idempotent re-upload). Any other error propagates.
+  let blob: { url: string }
+  try {
+    blob = await put(blobKey, processed, {
+      access: 'public',
+      contentType: outputMime,
+      addRandomSuffix: false,
+    })
+  } catch (e) {
+    const msg = (e as Error).message || ''
+    if (/already exists|conflict/i.test(msg)) {
+      // Reconstruct the public URL from the known key.
+      const storeHost = process.env.BLOB_STORE_HOSTNAME // optional override
+      if (storeHost) {
+        blob = { url: `https://${storeHost}/${blobKey}` }
+      } else {
+        throw new PhotoUploadError(
+          'blob_exists_no_hostname',
+          'Blob already exists; set BLOB_STORE_HOSTNAME to reconstruct URL or use a unique key.'
+        )
+      }
+    } else {
+      throw e
+    }
+  }
 
   return {
     blobUrl: blob.url,

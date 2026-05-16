@@ -270,7 +270,9 @@ export async function POST(request: Request, { params }: { params: { token: stri
   const formData = await request.formData()
   const uniqueAngle = formData.get('uniqueAngle')?.toString() || ''
   const evidenceSupplied: Record<string, string> = {}
-  for (const [k, v] of formData.entries()) {
+  // Array.from() side-steps the FormDataIterator type that needs
+  // --downlevelIteration; this repo's tsconfig doesn't set a target.
+  for (const [k, v] of Array.from(formData.entries())) {
     if (k.startsWith('evidence_') && typeof v === 'string') {
       evidenceSupplied[k.substring('evidence_'.length)] = v
     }

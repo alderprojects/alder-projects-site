@@ -1,35 +1,38 @@
 /**
- * v7.3.3-B Cart Synthesis Route — dual-synthesis (V1 + V2) for basement.
+ * v7.3.3-C-PR2 Cart Synthesis Route — LearningStore flywheel pipeline.
  *
  * POST /api/cart/synthesize
  * Body: { projectId: string }
  *
- * Pulls all confirmed vision extractions for the project's photos,
- * synthesizes the basement_moisture cart twice (without + with photo
- * signal), persists both + the diff + the kill-metric boolean.
- *
- * v7.3.3-C-PR1 bridge: VisionExtraction rows now store the OPEN shape
- * (features[]+overall_photo_category+notes). To keep the 3 existing
- * basement rules firing during the PR1->PR2 window, this route detects
- * open-shape rows and runs the openFeaturesToBasementExtraction shim.
- * The shim + this branch get deleted in PR2 when synthesis pivots to
- * LearningStore signature lookup.
+ * What changed from PR1.x:
+ *   - Pivoted from synthesize-v2 (basement-only, 3 hardcoded rules,
+ *     basement-scope universe filter) to synthesize-v3 (LearningStore
+ *     cache lookup + per-feature LLM synthesis on cache miss).
+ *   - VisionExtractions are now queried by visitorAnonId across the
+ *     last 24 hours, NOT by current Project. This fixes the
+ *     cross-project Photo issue from PR1 retests where reused Photos
+ *     stayed associated with their original project's RoomSnapshot
+ *     and were invisible to synthesize on the new project.
+ *   - Catalog universe is no longer scope-filtered. The full curated
+ *     catalog is loaded by synthesize-v3 and passed to the per-feature
+ *     LLM as candidate products.
  *
  * Anonymous-flow only for v7.3.3. Project owner verified via anonId
  * cookie. 404 (not 403) if owner mismatch, to avoid leaking existence.
+ *
+ * The persisted SmartCart row keeps its existing column shape so the
+ * result page render stays backwards-compat (cartJson /
+ * cartItemsJsonWithPhotos). New fields land in payloadJson on the
+ * EventLog for observability.
  */
 
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { prisma } from '@/lib/db'
 import { ensureVisitorSession } from '@/lib/visitor/session'
-import { synthesizeBasementCart } from '@/lib/smart-cart/synthesize-v2'
+import { synthesizeCartV3 } from '@/lib/smart-cart/synthesize-v3'
 import { logEvent } from '@/lib/events/log'
-import {
-  openFeaturesToBasementExtraction,
-  type BasementExtraction,
-} from '@/lib/vision/extract'
-import { isOpenExtractionShape } from '@/lib/vision/prompt'
+import { isOpenExtractionShape, type OpenExtraction } from '@/lib/vision/prompt'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -38,6 +41,13 @@ export const maxDuration = 10
 const BodySchema = z.object({
   projectId: z.string(),
 })
+
+// PR2: pull features from photos uploaded by this anon visitor in the
+// recent window. Wider than "this project's photos" because the
+// upload route's find-or-create may have kept the Photo linked to an
+// older project's RoomSnapshot. The flywheel cares about the
+// visitor's current intent, not the project boundary.
+const RECENT_PHOTO_WINDOW_MS = 24 * 60 * 60 * 1000 // 24h
 
 export async function POST(req: NextRequest): Promise<NextResponse> {
   let body: z.infer<typeof BodySchema>
@@ -65,56 +75,51 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     return NextResponse.json({ ok: false, error: 'project_not_found' }, { status: 404 })
   }
   if (project.visitorAnonId !== anonId) {
-    // Owner mismatch — return 404 to not leak existence.
     return NextResponse.json({ ok: false, error: 'project_not_found' }, { status: 404 })
   }
 
-  // Pull confirmed extractions for this project's snapshots
-  const snaps = await prisma.roomSnapshot.findMany({
-    where: { projectId: project.id },
-    include: {
-      photos: {
-        where: { blobConfirmedAt: { not: null } },
-        include: { extractions: { orderBy: { createdAt: 'desc' }, take: 1 } },
-      },
+  // PR2: pull VisionExtractions for ALL the visitor's recent
+  // (24h window) confirmed photos, not just those linked to this
+  // project's RoomSnapshots. This intentionally bypasses the
+  // project->snapshot->photo join because find-or-create reuses Photos
+  // across requests and they keep their original snapshot binding.
+  const recentSince = new Date(Date.now() - RECENT_PHOTO_WINDOW_MS)
+  const photos = await prisma.photo.findMany({
+    where: {
+      visitorAnonId: anonId,
+      blobConfirmedAt: { not: null },
+      uploadedAt: { gte: recentSince },
     },
+    include: {
+      extractions: { orderBy: { createdAt: 'desc' }, take: 1 },
+    },
+    orderBy: { uploadedAt: 'desc' },
   })
 
-  // v7.3.3-C-PR1: extractionJson now stores the open shape. Detect
-  // shape per row, apply the bridge shim for open rows, treat legacy
-  // basement-shape rows as-is. Empty arrays / non-objects skipped.
-  const extractions: BasementExtraction[] = []
-  for (const snap of snaps) {
-    for (const photo of snap.photos) {
-      const ex = photo.extractions[0]
-      if (!ex) continue
-      const json = ex.extractionJson as unknown
-      if (!json || typeof json !== 'object') continue
-      if (isOpenExtractionShape(json)) {
-        extractions.push(openFeaturesToBasementExtraction(json))
-      } else {
-        // Legacy v7.3.3-B basement-shape row (none exist in prod today
-        // because every B extraction failed with the 404 model error,
-        // but defensive code is cheap).
-        extractions.push(json as BasementExtraction)
-      }
-    }
-  }
-
-  const result = await synthesizeBasementCart({
-    projectId: project.id,
-    extractions,
+  // Flatten to OpenFeatures. Only photos with a successful new-shape
+  // extraction contribute features. Legacy basement-shape rows are
+  // skipped because the v2->v3 migration intentionally doesn't try to
+  // back-port them (no such rows exist in prod — every v7.3.3-B
+  // extraction failed with the model-404).
+  const features = photos.flatMap((p) => {
+    const ex = p.extractions[0]
+    if (!ex) return []
+    const json = ex.extractionJson as unknown
+    if (!isOpenExtractionShape(json)) return []
+    return (json as OpenExtraction).features
   })
+
+  const result = await synthesizeCartV3({ features })
 
   const cart = await prisma.smartCart.create({
     data: {
       projectId: project.id,
       visitorAnonId: anonId,
-      synthesisVersion: extractions.length > 0 ? 'v2_photo' : 'v1_baseline',
-      // priceCohort/pricePaidCents stay null during anon beta — set at
-      // Stripe webhook time when purchase completes (v7.3.7 pricing A/B).
-      photoCount: extractions.length,
-      photoAttached: extractions.length > 0,
+      synthesisVersion: 'v3_learning_store',
+      photoCount: photos.filter((p) => p.extractions.length > 0).length,
+      photoAttached: features.length > 0,
+      // Cart shape compatible with PR1.x ResultView via the
+      // SynthCartItemV3 fields that overlap SynthCartItem.
       cartJson: result.withPhotos as never,
       cartItemsJsonWithoutPhotos: result.withoutPhotos as never,
       cartItemsJsonWithPhotos: result.withPhotos as never,
@@ -131,12 +136,17 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     source: 'web',
     payload: {
       projectId: project.id,
-      photoCount: extractions.length,
+      photoCount: photos.filter((p) => p.extractions.length > 0).length,
+      featureCountIn: result.meta.featureCountIn,
+      uniqueSignatures: result.meta.uniqueSignatures,
+      cacheHits: result.meta.cacheHits,
+      cacheMisses: result.meta.cacheMisses,
+      llmCallsRan: result.meta.llmCallsRan,
+      llmCallsSkipped: result.meta.llmCallsSkipped,
+      llmTotalCostCents: result.meta.llmTotalCostCents,
+      llmTotalLatencyMs: result.meta.llmTotalLatencyMs,
       photoChangedRecommendation: result.photoChangedRecommendation,
-      itemsAdded: result.changeSummary.itemsAdded.length,
-      itemsRemoved: result.changeSummary.itemsRemoved.length,
-      tierShifts: result.changeSummary.tierShifts.length,
-      laneShifts: result.changeSummary.laneShifts.length,
+      itemCount: result.withPhotos.length,
     },
   })
 
@@ -146,5 +156,6 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     cart: result.withPhotos,
     photoChangedRecommendation: result.photoChangedRecommendation,
     changeSummary: result.changeSummary,
+    meta: result.meta,
   })
 }

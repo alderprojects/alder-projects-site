@@ -802,6 +802,27 @@ model GscPageStats {
   @@index([publishedFromCandidateId])
 }
 
+// =============================================================================
+// HANDOFF TOKENS (v7.3.3-B1: desktop -> mobile QR handoff)
+// =============================================================================
+//
+// Lets a desktop visitor scan a QR code on their phone, redeem a token,
+// and continue under the same alder_anon_id cookie on mobile. The token
+// is single-use + 5-min TTL. anonId is the visitor's id being handed off.
+
+model HandoffToken {
+  id             String    @id @default(cuid())
+  tokenHash      String    @unique // SHA-256 hash of the raw token (raw token never stored)
+  anonId         String // the visitor session being handed off
+  createdAt      DateTime  @default(now())
+  expiresAt      DateTime
+  consumedAt     DateTime?
+  consumedFromIp String?
+
+  @@index([anonId])
+  @@index([expiresAt])
+}
+
 model PhotoContentUse {
   // Public SEO use consent — higher bar than personal_recommendations.
   id               String    @id @default(cuid())

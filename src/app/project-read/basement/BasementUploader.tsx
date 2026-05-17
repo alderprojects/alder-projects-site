@@ -185,7 +185,11 @@ export function BasementUploader() {
           type="file"
           accept="image/*"
           multiple
-          capture="environment"
+          // No `capture` attribute. On iOS Safari, capture="environment"
+          // forces the camera (single shot only) — blocks multi-select.
+          // Without it, mobile users get the system picker showing
+          // photo library (multi-select works) PLUS "Take Photo" as a
+          // submenu, so both paths are preserved.
           className="hidden"
           onChange={(e) => onFilesSelected(e.target.files)}
         />

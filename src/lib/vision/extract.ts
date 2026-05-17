@@ -524,3 +524,179 @@ function nullableEnum(v: string | undefined): string | null {
   if (v === undefined || v === 'unclear') return null
   return v
 }
+
+// =============================================================================
+// V7.3.3-B: BASEMENT-SPECIFIC EXTRACTION FOR PHOTO READER BETA
+// =============================================================================
+//
+// Distinct from extractFromPhoto above — basement_moisture beta uses a
+// tighter schema with explicit moisture-signal enums tuned for the
+// dual-synthesis rules in lib/smart-cart/synthesize-v2. Single category
+// for v7.3.3; other categories continue to use extractFromPhoto's
+// general-purpose path.
+
+export interface BasementVisibleFeature {
+  feature: string
+  confidence: number
+}
+
+export type BasementMoistureSignal =
+  | 'efflorescence'
+  | 'staining'
+  | 'active_water'
+  | 'visible_cracks'
+  | 'rust_on_metal'
+  | 'musty_indicators_visual'
+  | 'sump_pump_present'
+  | 'dehumidifier_present'
+  | 'vapor_barrier_visible'
+  | 'none_visible'
+
+export interface BasementExtraction {
+  roomTypeConfirmed: boolean
+  detectedRoomType: string
+  finishState: 'unfinished' | 'partially_finished' | 'finished' | 'unknown'
+  visibleFeatures: BasementVisibleFeature[]
+  moistureSignals: BasementMoistureSignal[]
+  overallConfidence: number
+  promptVersion: string
+}
+
+const BASEMENT_SYSTEM_PROMPT = `You analyze homeowner-uploaded basement photos to assist a home-improvement shopping recommendation engine.
+
+YOU MUST:
+- Return strict JSON matching the provided schema
+- Stick to visible facts only
+- Use the moistureSignals enum exactly — no other values
+- Provide overallConfidence as a 0-1 number reflecting how well the photo supports the extraction
+
+YOU MUST NOT:
+- Make value judgments ("this basement looks bad")
+- Estimate cost or savings of any work
+- Infer income, demographics, neighborhood, or homeowner characteristics
+- Recommend specific products
+- Diagnose mold, structural damage, electrical issues, or safety hazards
+- Suggest remediation steps
+
+If the photo is not actually a basement, set roomTypeConfirmed: false and overallConfidence: 0, and leave other fields at defaults.`
+
+const BASEMENT_USER_PROMPT = `Analyze this basement photo. Return JSON only, matching this schema (no markdown fences):
+
+{
+  "roomTypeConfirmed": boolean,
+  "detectedRoomType": string,
+  "finishState": "unfinished" | "partially_finished" | "finished" | "unknown",
+  "visibleFeatures": [{"feature": string, "confidence": 0-1}],
+  "moistureSignals": ["efflorescence" | "staining" | "active_water" | "visible_cracks" | "rust_on_metal" | "musty_indicators_visual" | "sump_pump_present" | "dehumidifier_present" | "vapor_barrier_visible" | "none_visible"],
+  "overallConfidence": 0-1,
+  "promptVersion": "${PROMPT_VERSION}"
+}`
+
+const ALLOWED_MOISTURE_SIGNALS: ReadonlySet<string> = new Set<BasementMoistureSignal>([
+  'efflorescence',
+  'staining',
+  'active_water',
+  'visible_cracks',
+  'rust_on_metal',
+  'musty_indicators_visual',
+  'sump_pump_present',
+  'dehumidifier_present',
+  'vapor_barrier_visible',
+  'none_visible',
+])
+
+const ALLOWED_FINISH_STATES = ['unfinished', 'partially_finished', 'finished', 'unknown'] as const
+
+/**
+ * Inline, synchronous basement-photo extraction for the v7.3.3 photo
+ * reader beta. ~3-7 second latency per call against claude vision.
+ * Caller (upload route) must budget for this within the Vercel Hobby
+ * 10s function timeout.
+ *
+ * Throws on any failure (Anthropic API error, schema parse failure,
+ * etc.). Caller catches and records VisionExtraction.reviewStatus
+ * appropriately.
+ */
+export async function extractFromImage(opts: {
+  imageBuffer: Buffer
+  contextRoomType: 'basement'
+  scope: 'basement_moisture'
+}): Promise<BasementExtraction> {
+  if (!process.env.ANTHROPIC_API_KEY) {
+    throw new Error('ANTHROPIC_API_KEY not set')
+  }
+  const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
+
+  const base64 = opts.imageBuffer.toString('base64')
+
+  const resp = await client.messages.create({
+    model: MODEL_VERSION,
+    max_tokens: 1500,
+    system: BASEMENT_SYSTEM_PROMPT,
+    messages: [
+      {
+        role: 'user',
+        content: [
+          {
+            type: 'image',
+            source: { type: 'base64', media_type: 'image/jpeg', data: base64 },
+          },
+          { type: 'text', text: BASEMENT_USER_PROMPT },
+        ],
+      },
+    ],
+  })
+
+  const text = resp.content
+    .filter((c): c is { type: 'text'; text: string } => c.type === 'text')
+    .map((c) => c.text)
+    .join('')
+
+  const cleaned = text
+    .replace(/^```(?:json)?\s*/gm, '')
+    .replace(/```\s*$/gm, '')
+    .trim()
+
+  let parsed: unknown
+  try {
+    parsed = JSON.parse(cleaned)
+  } catch {
+    throw new Error(`Vision response was not parseable JSON: ${cleaned.slice(0, 200)}`)
+  }
+
+  return validateBasementExtraction(parsed)
+}
+
+function validateBasementExtraction(raw: unknown): BasementExtraction {
+  if (typeof raw !== 'object' || raw === null) {
+    throw new Error('Vision response is not an object')
+  }
+  const r = raw as Record<string, unknown>
+
+  const finishState = typeof r.finishState === 'string' && (ALLOWED_FINISH_STATES as readonly string[]).includes(r.finishState)
+    ? (r.finishState as BasementExtraction['finishState'])
+    : 'unknown'
+
+  const moistureSignalsRaw = Array.isArray(r.moistureSignals) ? r.moistureSignals : []
+  const moistureSignals = moistureSignalsRaw
+    .filter((s): s is BasementMoistureSignal => typeof s === 'string' && ALLOWED_MOISTURE_SIGNALS.has(s))
+
+  const visibleFeaturesRaw = Array.isArray(r.visibleFeatures) ? r.visibleFeatures : []
+  const visibleFeatures = visibleFeaturesRaw
+    .filter((f): f is { feature: string; confidence: number } =>
+      typeof f === 'object' && f !== null &&
+      typeof (f as Record<string, unknown>).feature === 'string' &&
+      typeof (f as Record<string, unknown>).confidence === 'number'
+    )
+    .map((f) => ({ feature: f.feature, confidence: Math.max(0, Math.min(1, f.confidence)) }))
+
+  return {
+    roomTypeConfirmed: !!r.roomTypeConfirmed,
+    detectedRoomType: typeof r.detectedRoomType === 'string' ? r.detectedRoomType : 'unknown',
+    finishState,
+    visibleFeatures,
+    moistureSignals,
+    overallConfidence: typeof r.overallConfidence === 'number' ? Math.max(0, Math.min(1, r.overallConfidence)) : 0,
+    promptVersion: PROMPT_VERSION,
+  }
+}

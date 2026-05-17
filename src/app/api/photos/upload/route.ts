@@ -166,7 +166,18 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     })
   }
 
-  // 6. Create Photo row (blobUrl filled after blob write succeeds)
+  // 6. Find-or-create Photo on (visitorAnonId, blobKey).
+  //
+  // v7.3.3-C-PR1.1: same-anon re-upload of the same content-addressed
+  // bytes reuses the existing Photo row instead of failing with the
+  // unique-constraint violation that surfaced as `photo_create_failed`.
+  // The global unique on blobKey was dropped in the matching migration;
+  // dedup is now per-anon at the application layer.
+  //
+  // On reuse: skip blob upload (the blob already exists), skip new
+  // VisionExtraction if a successful one already exists for this Photo.
+  // Useful both for retests and for users who hit the back button +
+  // re-add the same photo.
   const consentFlags = {
     personal_recommendations: true, // implicit — can't use the service without it
     product_improvement: body.consents.product_improvement,
@@ -175,36 +186,44 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
   }
 
   let photo
+  let reusedExistingPhoto = false
   try {
-    photo = await prisma.photo.create({
-      data: {
-        roomSnapshotId: snap.id,
-        blobUrl: '', // filled after blob write
-        blobKey,
-        mimeType: 'image/jpeg',
-        bytes: processed.length,
-        widthPx,
-        heightPx,
-        perceptualHash: dhash,
-        exifStrippedAt: new Date(),
-        captureMethod: 'web_upload',
-        consentFlagsJson: consentFlags as never,
-        visitorAnonId: anonId,
-      },
+    const existing = await prisma.photo.findFirst({
+      where: { visitorAnonId: anonId, blobKey },
+      orderBy: { uploadedAt: 'desc' },
     })
+    if (existing) {
+      reusedExistingPhoto = true
+      photo = existing
+    } else {
+      photo = await prisma.photo.create({
+        data: {
+          roomSnapshotId: snap.id,
+          blobUrl: '', // filled after blob write
+          blobKey,
+          mimeType: 'image/jpeg',
+          bytes: processed.length,
+          widthPx,
+          heightPx,
+          perceptualHash: dhash,
+          exifStrippedAt: new Date(),
+          captureMethod: 'web_upload',
+          consentFlagsJson: consentFlags as never,
+          visitorAnonId: anonId,
+        },
+      })
+    }
   } catch (e) {
-    // Most likely cause: duplicate blobKey (same content-addressed key
-    // from a prior upload of the identical image). Don't dedup across
-    // sessions during beta — fail cleanly with a friendly message.
     return NextResponse.json(
       { ok: false, error: 'photo_create_failed', detail: (e as Error).message.slice(0, 200) },
-      { status: 409 }
+      { status: 500 }
     )
   }
 
   // Write consent rows for this anon visitor — one per purpose. Each
   // row is dataType=photo, source=anon_upload. Linked to a User on email
   // claim (PR 7.3.3-C reassigns rows from anonId to userId).
+  // skipDuplicates handles the reuse case where consents already exist.
   await prisma.consent.createMany({
     data: [
       { anonId, purpose: 'personal_recommendations', dataType: 'photo', granted: true, version: CONSENT_VERSION, source: 'anon_upload' },
@@ -212,39 +231,42 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       { anonId, purpose: 'valuation_research', dataType: 'photo', granted: body.consents.valuation_research, version: CONSENT_VERSION, source: 'anon_upload' },
       { anonId, purpose: 'public_content_use', dataType: 'photo', granted: body.consents.public_content_use, version: CONSENT_VERSION, source: 'anon_upload' },
     ],
-    skipDuplicates: true, // partial unique on (anonId, purpose, dataType) — re-uploads update existing rows is acceptable behavior
+    skipDuplicates: true,
   })
 
-  // 7. Blob upload (content-addressed key; no random suffix)
-  let blobUrl: string
-  try {
-    const blob = await put(blobKey, processed, {
-      access: 'public',
-      contentType: 'image/jpeg',
-      addRandomSuffix: false,
+  // 7. Blob upload (content-addressed key; no random suffix). Skipped
+  // when reusing an existing Photo whose blob is already confirmed.
+  if (!reusedExistingPhoto || !photo.blobConfirmedAt) {
+    let blobUrl: string
+    try {
+      const blob = await put(blobKey, processed, {
+        access: 'public',
+        contentType: 'image/jpeg',
+        addRandomSuffix: false,
+      })
+      blobUrl = blob.url
+    } catch (e) {
+      // Blob write failed — Photo row exists but is orphaned. Cleanup
+      // cron will sweep it (Photo.blobConfirmedAt is null).
+      return NextResponse.json(
+        {
+          ok: false,
+          error: 'blob_write_failed',
+          detail: (e as Error).message.slice(0, 200),
+          photoId: photo.id,
+        },
+        { status: 502 }
+      )
+    }
+
+    photo = await prisma.photo.update({
+      where: { id: photo.id },
+      data: { blobUrl, blobConfirmedAt: new Date() },
     })
-    blobUrl = blob.url
-  } catch (e) {
-    // Blob write failed — Photo row exists but is orphaned. Cleanup cron
-    // will sweep it (Photo.blobConfirmedAt is null).
-    return NextResponse.json(
-      {
-        ok: false,
-        error: 'blob_write_failed',
-        detail: (e as Error).message.slice(0, 200),
-        photoId: photo.id,
-      },
-      { status: 502 }
-    )
   }
 
-  await prisma.photo.update({
-    where: { id: photo.id },
-    data: { blobUrl, blobConfirmedAt: new Date() },
-  })
-
   await logEvent({
-    eventType: 'PHOTO_UPLOADED',
+    eventType: reusedExistingPhoto ? 'PHOTO_REUSED' : 'PHOTO_UPLOADED',
     subjectType: 'Photo',
     subjectId: photo.id,
     anonId,
@@ -253,14 +275,58 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       projectId: project.id,
       scope: body.scope,
       bytes: processed.length,
+      reusedExistingPhoto,
     },
   })
 
   // 8. Inline vision extraction (the long-pole step). On failure, route
   // still returns 200 — Photo + RoomSnapshot are saved, synthesizer
   // treats this photo as "no signal."
+  //
+  // PR1.1: when reusing an existing Photo, skip re-extraction if a
+  // prior VisionExtraction succeeded. If the prior extraction failed
+  // (the v7.3.3-B 404 case for everyone) we DO re-run, so retests
+  // recover automatically.
   let extractionResult: Awaited<ReturnType<typeof extractOpenFeatures>> | null = null
   let extractionError: string | null = null
+  let reusedExistingExtraction = false
+
+  if (reusedExistingPhoto) {
+    const priorExtraction = await prisma.visionExtraction.findFirst({
+      where: { photoId: photo.id },
+      orderBy: { createdAt: 'desc' },
+    })
+    // overallConfidence > 0 indicates a parsed extraction (failures
+    // never write a row at all; this guards against a hypothetical
+    // future where we DO write 0-conf rows on failure).
+    if (priorExtraction && priorExtraction.overallConfidence > 0) {
+      reusedExistingExtraction = true
+      const cached = priorExtraction.extractionJson as unknown as {
+        features?: Array<{ confidence: number }>
+        overall_photo_category?: string
+      }
+      const cachedConfidence =
+        cached.features && cached.features.length > 0
+          ? cached.features.reduce((acc, f) => acc + f.confidence, 0) / cached.features.length
+          : 0
+      return NextResponse.json({
+        ok: true,
+        photoId: photo.id,
+        projectId: project.id,
+        snapshotId: snap.id,
+        extraction: {
+          overallConfidence: cachedConfidence,
+          featureCount: cached.features?.length ?? 0,
+          overallCategory: cached.overall_photo_category ?? 'unclear',
+          features: cached.features ?? [],
+        },
+        extractionError: null,
+        reused: { photo: true, extraction: true },
+        durationMs: Date.now() - t0,
+      })
+    }
+  }
+
   try {
     extractionResult = await extractOpenFeatures({
       imageBuffer: processed,

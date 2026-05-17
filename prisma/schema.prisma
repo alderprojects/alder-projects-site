@@ -247,7 +247,12 @@ model Photo {
   roomSnapshot     RoomSnapshot @relation(fields: [roomSnapshotId], references: [id], onDelete: Cascade)
   // Storage
   blobUrl          String // Vercel Blob signed URL or S3 path
-  blobKey          String       @unique
+  // v7.3.3-C-PR1.1: dropped global unique on blobKey. Two anon
+  // visitors uploading the same content-addressed bytes are now
+  // separate Photo rows. Same-anon re-upload of same bytes is
+  // handled at the route layer (find-or-create on
+  // (visitorAnonId, blobKey)).
+  blobKey          String
   mimeType         String
   bytes            Int
   widthPx          Int?

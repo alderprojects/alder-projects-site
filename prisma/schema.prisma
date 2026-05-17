@@ -239,9 +239,47 @@ model Photo {
   hiddenAt         DateTime?
 
   extractions VisionExtraction[]
+  queueEntry  VisionExtractionQueue?
 
   @@index([roomSnapshotId])
   @@index([perceptualHash])
+}
+
+model VisionExtractionQueue {
+  // Postgres-backed work queue for the vision extraction pipeline.
+  // The every-minute Vercel cron at /api/cron/vision-extract claims
+  // pending rows (FOR UPDATE SKIP LOCKED), runs extractFromPhoto,
+  // writes the VisionExtraction row, and marks the queue entry
+  // completed. Failed attempts increment `attempts` and reset to
+  // pending until `attempts >= maxAttempts`, at which point the
+  // entry transitions to "abandoned" and routes to manual review.
+  //
+  // photoId is @unique so enqueue is idempotent — re-uploading the
+  // same photo (same content-addressed key) doesn't double-extract.
+  //
+  // Lifecycle:
+  //   pending     enqueued, waiting for a worker
+  //   processing  claimed by a worker (lockedAt + lockedBy set)
+  //   completed   VisionExtraction row exists; success
+  //   failed      last attempt errored; will retry up to maxAttempts
+  //   abandoned   exceeded maxAttempts; manual triage
+  id              String    @id @default(cuid())
+  photoId         String    @unique
+  photo           Photo     @relation(fields: [photoId], references: [id], onDelete: Cascade)
+  status          String    @default("pending")
+  priority        Int       @default(0) // higher = processed first; default 0 = FIFO by createdAt
+  lockedAt        DateTime?
+  lockedBy        String? // worker instance id (Vercel function id or hostname)
+  attempts        Int       @default(0)
+  maxAttempts     Int       @default(3)
+  lastAttemptAt   DateTime?
+  lastError       String?
+  completedAt     DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@index([status, priority, createdAt]) // primary worker query
+  @@index([status, lockedAt])            // stale-lock detection
 }
 
 model VisionExtraction {

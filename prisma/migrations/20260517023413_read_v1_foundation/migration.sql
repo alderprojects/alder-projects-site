@@ -142,6 +142,25 @@ CREATE TABLE "Photo" (
 );
 
 -- CreateTable
+CREATE TABLE "VisionExtractionQueue" (
+    "id" TEXT NOT NULL,
+    "photoId" TEXT NOT NULL,
+    "status" TEXT NOT NULL DEFAULT 'pending',
+    "priority" INTEGER NOT NULL DEFAULT 0,
+    "lockedAt" TIMESTAMP(3),
+    "lockedBy" TEXT,
+    "attempts" INTEGER NOT NULL DEFAULT 0,
+    "maxAttempts" INTEGER NOT NULL DEFAULT 3,
+    "lastAttemptAt" TIMESTAMP(3),
+    "lastError" TEXT,
+    "completedAt" TIMESTAMP(3),
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "VisionExtractionQueue_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "VisionExtraction" (
     "id" TEXT NOT NULL,
     "photoId" TEXT NOT NULL,
@@ -521,6 +540,15 @@ CREATE INDEX "Photo_roomSnapshotId_idx" ON "Photo"("roomSnapshotId");
 CREATE INDEX "Photo_perceptualHash_idx" ON "Photo"("perceptualHash");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "VisionExtractionQueue_photoId_key" ON "VisionExtractionQueue"("photoId");
+
+-- CreateIndex
+CREATE INDEX "VisionExtractionQueue_status_priority_createdAt_idx" ON "VisionExtractionQueue"("status", "priority", "createdAt");
+
+-- CreateIndex
+CREATE INDEX "VisionExtractionQueue_status_lockedAt_idx" ON "VisionExtractionQueue"("status", "lockedAt");
+
+-- CreateIndex
 CREATE INDEX "VisionExtraction_photoId_idx" ON "VisionExtraction"("photoId");
 
 -- CreateIndex
@@ -696,6 +724,9 @@ ALTER TABLE "RoomSnapshot" ADD CONSTRAINT "RoomSnapshot_roomId_fkey" FOREIGN KEY
 
 -- AddForeignKey
 ALTER TABLE "Photo" ADD CONSTRAINT "Photo_roomSnapshotId_fkey" FOREIGN KEY ("roomSnapshotId") REFERENCES "RoomSnapshot"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "VisionExtractionQueue" ADD CONSTRAINT "VisionExtractionQueue_photoId_fkey" FOREIGN KEY ("photoId") REFERENCES "Photo"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "VisionExtraction" ADD CONSTRAINT "VisionExtraction_photoId_fkey" FOREIGN KEY ("photoId") REFERENCES "Photo"("id") ON DELETE CASCADE ON UPDATE CASCADE;

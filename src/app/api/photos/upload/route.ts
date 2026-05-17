@@ -1,31 +1,44 @@
 /**
- * v7.3.3-B Photo Upload Route — anonymous-first basement photo reader.
+ * v7.3.3-C PR1 Photo Upload Route — anonymous-first OPEN photo reader.
  *
  * POST /api/photos/upload
  *
- * Single photo per request. Inline vision extraction. Vercel Hobby
- * 10-second function timeout is the binding constraint — the realistic
- * budget breakdown:
+ * Single photo per request. Inline vision extraction via the open
+ * extraction path (extractOpenFeatures). No category gating at upload
+ * time — the model decides what's in the photo. Vercel Hobby
+ * 10-second function timeout is the binding constraint:
  *   - sharp decode + EXIF strip + re-encode + dhash: 0.5-1s
  *   - Vercel Blob put: 0.5-1s
  *   - Prisma writes (4-5 rows): 0.3-0.6s
- *   - Claude vision call: 3-7s
+ *   - Claude vision call (open extraction): 3-8s
  *   - response serialization: <0.1s
  *   ----------------------------------------------------------------
- *   total worst case: ~9.5s. Tight. No batching, no retry chains.
+ *   total worst case: ~10.5s. Tight enough that we keep OPEN_MAX_TOKENS
+ *   at 4096 (not higher) to bound the vision call.
  *
  * If vision extraction fails or times out, the route still returns 200
- * with `extractionError` populated — the Photo and RoomSnapshot rows
- * are saved, and the synthesizer treats the photo as having no signal.
+ * with `extractionError` populated — the Photo + RoomSnapshot rows are
+ * saved, and the synthesizer treats the photo as having no signal.
  * Downstream UI shows "we couldn't read this photo, but kept it."
  *
  * Body shape (zod-validated):
- *   { projectId?: string, roomType: 'basement',
- *     scope: 'basement_moisture', imageBase64: string,
+ *   { projectId?: string,
+ *     roomType?: string,        // optional hint, telemetry only — not enforced
+ *     scope?: string,           // optional hint, telemetry only — not enforced
+ *     imageBase64: string,
  *     consents: { product_improvement, valuation_research, public_content_use } }
  *
  * Response on success: { ok: true, photoId, projectId, snapshotId,
- *   extraction: { overallConfidence, features } | null, extractionError }
+ *   extraction: { featureCount, overallCategory, features } | null,
+ *   extractionError }
+ *
+ * v7.3.3-C-PR1 changes from v7.3.3-B:
+ *   - Calls extractOpenFeatures (open vocab) instead of extractFromImage
+ *   - roomType + scope drop from literal('basement') / literal('basement_moisture')
+ *     to optional free string (telemetry only). No category gating.
+ *   - Hardcoded model string replaced with MODEL_VERSION constant
+ *   - Stored VisionExtraction.extractionJson is now the open shape
+ *     (features[], overall_photo_category, notes)
  */
 
 import { NextRequest, NextResponse } from 'next/server'
@@ -35,7 +48,7 @@ import { put } from '@vercel/blob'
 import { createHash } from 'crypto'
 import { prisma } from '@/lib/db'
 import { ensureVisitorSession } from '@/lib/visitor/session'
-import { extractFromImage } from '@/lib/vision/extract'
+import { extractOpenFeatures, MODEL_VERSION } from '@/lib/vision/extract'
 import { dhashFromBuffer } from '@/lib/photos/dhash'
 import { logEvent } from '@/lib/events/log'
 
@@ -45,8 +58,12 @@ export const maxDuration = 10
 
 const BodySchema = z.object({
   projectId: z.string().optional(),
-  roomType: z.literal('basement'),
-  scope: z.literal('basement_moisture'),
+  // roomType + scope are now optional telemetry hints. The extraction
+  // call ignores them — open extraction looks at what's actually in
+  // the photo. Kept in the body so existing /project-read/basement
+  // client code doesn't need to change in PR1.
+  roomType: z.string().optional(),
+  scope: z.string().optional(),
   // ~10MB upper guard on base64 (raw bytes after decode capped at ~7.5MB)
   imageBase64: z.string().min(100).max(15_000_000),
   consents: z.object({
@@ -242,27 +259,35 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
   // 8. Inline vision extraction (the long-pole step). On failure, route
   // still returns 200 — Photo + RoomSnapshot are saved, synthesizer
   // treats this photo as "no signal."
-  let extraction: Awaited<ReturnType<typeof extractFromImage>> | null = null
+  let extractionResult: Awaited<ReturnType<typeof extractOpenFeatures>> | null = null
   let extractionError: string | null = null
   try {
-    extraction = await extractFromImage({
+    extractionResult = await extractOpenFeatures({
       imageBuffer: processed,
-      contextRoomType: 'basement',
-      scope: 'basement_moisture',
+      mediaType: 'image/jpeg',
     })
+
+    // Compute a photo-level overall confidence as the mean of feature
+    // confidences. Returns 0 if zero features — open extraction can
+    // legitimately produce an empty array for a photo that shows
+    // nothing observable.
+    const featureMeanConfidence =
+      extractionResult.extraction.features.length > 0
+        ? extractionResult.extraction.features.reduce((acc, f) => acc + f.confidence, 0) /
+          extractionResult.extraction.features.length
+        : 0
 
     await prisma.visionExtraction.create({
       data: {
         photoId: photo.id,
-        modelVersion: 'claude-3-5-sonnet-20241022',
-        promptVersion: extraction.promptVersion,
-        extractionJson: extraction as never,
-        overallConfidence: extraction.overallConfidence,
-        // High-confidence = auto-approved during beta because
-        // /admin/photo-review UI isn't built yet (v7.3.4 backlog). Low-
-        // confidence stays "pending" until manual DB review.
-        reviewStatus: extraction.overallConfidence >= 0.7 ? 'approved' : 'pending',
-        apiCostCents: 0, // basement extraction is small; cost capture is v7.3.4 backlog
+        modelVersion: extractionResult.modelVersion,
+        promptVersion: extractionResult.promptVersion,
+        extractionJson: extractionResult.extraction as never,
+        overallConfidence: featureMeanConfidence,
+        // v7.3.3-C-PR1: auto-approve threshold removed. Open extraction
+        // gets all 'pending'; PR3 reaction capture is the curation layer.
+        reviewStatus: 'pending',
+        apiCostCents: Math.round(extractionResult.apiCostCents),
       },
     })
 
@@ -272,7 +297,17 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       subjectId: photo.id,
       anonId,
       source: 'web',
-      payload: { confidence: extraction.overallConfidence },
+      payload: {
+        confidence: featureMeanConfidence,
+        featureCount: extractionResult.extraction.features.length,
+        overallCategory: extractionResult.extraction.overall_photo_category,
+        modelVersion: extractionResult.modelVersion,
+        promptVersion: extractionResult.promptVersion,
+        latencyMs: extractionResult.latencyMs,
+        tokensIn: extractionResult.tokensIn,
+        tokensOut: extractionResult.tokensOut,
+        costCents: extractionResult.apiCostCents,
+      },
     })
   } catch (e) {
     extractionError = (e as Error).message
@@ -283,21 +318,37 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       subjectId: photo.id,
       anonId,
       source: 'web',
-      payload: { error: extractionError.slice(0, 500) },
+      payload: {
+        error: extractionError.slice(0, 500),
+        modelVersion: MODEL_VERSION,
+      },
     })
   }
+
+  // Response shape:
+  // - extraction: null on failure; otherwise the new open shape with a
+  //   precomputed overallConfidence so the existing BasementUploader UI
+  //   keeps rendering "Read clearly / partially / couldn't read" without
+  //   client changes
+  const responseExtraction = extractionResult
+    ? {
+        overallConfidence:
+          extractionResult.extraction.features.length > 0
+            ? extractionResult.extraction.features.reduce((acc, f) => acc + f.confidence, 0) /
+              extractionResult.extraction.features.length
+            : 0,
+        featureCount: extractionResult.extraction.features.length,
+        overallCategory: extractionResult.extraction.overall_photo_category,
+        features: extractionResult.extraction.features,
+      }
+    : null
 
   return NextResponse.json({
     ok: true,
     photoId: photo.id,
     projectId: project.id,
     snapshotId: snap.id,
-    extraction: extraction
-      ? {
-          overallConfidence: extraction.overallConfidence,
-          features: extraction.visibleFeatures,
-        }
-      : null,
+    extraction: responseExtraction,
     extractionError,
     durationMs: Date.now() - t0,
   })

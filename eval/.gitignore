@@ -1,0 +1,7 @@
+# Corpus photos stay local — may be large, may be your own/private
+corpus/*
+!corpus/.gitkeep
+
+# Eval run output stays local — regenerated on demand
+results/*
+!results/.gitkeep

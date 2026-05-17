@@ -8,6 +8,13 @@
  * synthesizes the basement_moisture cart twice (without + with photo
  * signal), persists both + the diff + the kill-metric boolean.
  *
+ * v7.3.3-C-PR1 bridge: VisionExtraction rows now store the OPEN shape
+ * (features[]+overall_photo_category+notes). To keep the 3 existing
+ * basement rules firing during the PR1->PR2 window, this route detects
+ * open-shape rows and runs the openFeaturesToBasementExtraction shim.
+ * The shim + this branch get deleted in PR2 when synthesis pivots to
+ * LearningStore signature lookup.
+ *
  * Anonymous-flow only for v7.3.3. Project owner verified via anonId
  * cookie. 404 (not 403) if owner mismatch, to avoid leaking existence.
  */
@@ -18,7 +25,11 @@ import { prisma } from '@/lib/db'
 import { ensureVisitorSession } from '@/lib/visitor/session'
 import { synthesizeBasementCart } from '@/lib/smart-cart/synthesize-v2'
 import { logEvent } from '@/lib/events/log'
-import type { BasementExtraction } from '@/lib/vision/extract'
+import {
+  openFeaturesToBasementExtraction,
+  type BasementExtraction,
+} from '@/lib/vision/extract'
+import { isOpenExtractionShape } from '@/lib/vision/prompt'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -69,14 +80,23 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     },
   })
 
+  // v7.3.3-C-PR1: extractionJson now stores the open shape. Detect
+  // shape per row, apply the bridge shim for open rows, treat legacy
+  // basement-shape rows as-is. Empty arrays / non-objects skipped.
   const extractions: BasementExtraction[] = []
   for (const snap of snaps) {
     for (const photo of snap.photos) {
       const ex = photo.extractions[0]
       if (!ex) continue
-      const json = ex.extractionJson as unknown as BasementExtraction
-      if (json && typeof json === 'object') {
-        extractions.push(json)
+      const json = ex.extractionJson as unknown
+      if (!json || typeof json !== 'object') continue
+      if (isOpenExtractionShape(json)) {
+        extractions.push(openFeaturesToBasementExtraction(json))
+      } else {
+        // Legacy v7.3.3-B basement-shape row (none exist in prod today
+        // because every B extraction failed with the 404 model error,
+        // but defensive code is cheap).
+        extractions.push(json as BasementExtraction)
       }
     }
   }

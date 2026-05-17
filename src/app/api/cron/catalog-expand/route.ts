@@ -11,7 +11,6 @@
  */
 
 import type { NextRequest } from 'next/server'
-import { runExpansion } from '@/lib/catalog/expand'
 
 export const dynamic = 'force-dynamic'
 export const maxDuration = 60
@@ -22,6 +21,8 @@ export async function GET(request: NextRequest): Promise<Response> {
     return new Response('Unauthorized', { status: 401 })
   }
 
+  // Disable check before dynamic import — keeps Anthropic client
+  // initialization out of skipped invocations.
   if (process.env.DISABLE_CATALOG_EXPAND_CRON === 'true') {
     return Response.json({ skipped: true, reason: 'DISABLE_CATALOG_EXPAND_CRON=true' })
   }
@@ -30,6 +31,7 @@ export async function GET(request: NextRequest): Promise<Response> {
   const url = new URL(request.url)
   const scopeOverride = url.searchParams.get('scope') || undefined
 
+  const { runExpansion } = await import('@/lib/catalog/expand')
   try {
     const result = await runExpansion({ scopeId: scopeOverride })
     return Response.json({ ok: true, ...result })

@@ -6,7 +6,6 @@
  */
 
 import type { NextRequest } from 'next/server'
-import { sendDailyDigest } from '@/lib/email/digest'
 
 export const dynamic = 'force-dynamic'
 export const maxDuration = 60
@@ -17,10 +16,14 @@ export async function GET(request: NextRequest): Promise<Response> {
     return new Response('Unauthorized', { status: 401 })
   }
 
+  // Disable check before dynamic import. (Marginal benefit here vs the
+  // other crons since the digest module is small, but consistent with
+  // the rest of the pattern.)
   if (process.env.DISABLE_DIGEST_EMAIL === 'true') {
     return Response.json({ skipped: true, reason: 'DISABLE_DIGEST_EMAIL=true' })
   }
 
+  const { sendDailyDigest } = await import('@/lib/email/digest')
   try {
     const result = await sendDailyDigest()
     return Response.json({ ok: true, ...result })

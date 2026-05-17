@@ -499,6 +499,9 @@ model EventLog {
   @@index([actorId, occurredAt])
   @@index([anonId, occurredAt])
   @@index([subjectType, subjectId])
+  // Standalone time index — existing composites all lead with another
+  // column, so they can't serve "all events in last X" queries efficiently.
+  @@index([occurredAt])
 }
 
 // =============================================================================

@@ -21,14 +21,17 @@ export async function GET(request: NextRequest): Promise<Response> {
     return new Response('Unauthorized', { status: 401 })
   }
 
-  if (process.env.DISABLE_VISION_EXTRACT_CRON === 'true') {
-    return Response.json({ skipped: true, reason: 'DISABLE_VISION_EXTRACT_CRON=true' })
+  // Canonical env var is DISABLE_VISION_CRON (matches Vercel + the
+  // other DISABLE_* flags). Route remains a stub until v7.3.3 ships the
+  // queue worker; honor the flag explicitly for consistency.
+  if (process.env.DISABLE_VISION_CRON === 'true') {
+    return Response.json({ skipped: true, reason: 'DISABLE_VISION_CRON=true' })
   }
 
-  // Week-1 stub. Replace in week 2 with queue polling + extract pipeline.
+  // Stub until v7.3.3. Replace with queue polling + extract pipeline.
   return Response.json({
     skipped: true,
-    reason: 'stub_until_week_2',
+    reason: 'stub_until_v7.3.3',
     note: 'Queue worker not yet implemented; no photos to extract.',
   })
 }

@@ -81,13 +81,21 @@ model MagicLink {
   userId     String
   user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   tokenHash  String    @unique
-  purpose    String // "signin" | "claim"
+  purpose    String // "signin" | "claim_anon_session"
+  // Email snapshot (denormalized from User) — preserved on the link
+  // so the v7.3.3-C claim flow can reference it after token consumption
+  // even if the User row was later deleted/renamed.
+  email      String?
+  // Per-purpose payload for claim flow: {anonId, cartId, ...}. Empty
+  // for ordinary signin links.
+  payloadJson Json?
   expiresAt  DateTime
   consumedAt DateTime?
   createdAt  DateTime  @default(now())
 
   @@index([userId])
   @@index([tokenHash])
+  @@index([purpose, expiresAt])
 }
 
 // =============================================================================
@@ -191,11 +199,26 @@ model RoomSnapshot {
   // The delta between RoomSnapshots is the outcome signal that
   // compounds the data asset's value over time.
   id                    String   @id @default(cuid())
-  roomId                String
-  room                  Room     @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  // roomId nullable from v7.3.3: anon-first photo upload happens before
+  // a Room hierarchy is constructed (no Property anchor for a new
+  // visitor). When the snapshot is anon-owned, roomId stays null and
+  // roomType holds the room kind directly.
+  roomId                String?
+  room                  Room?    @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  // Direct project link (v7.3.3) — anon flow attaches snapshot to a
+  // Project without going through the Property -> Room hierarchy.
+  projectId             String?
+  project               Project? @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  // Room type stored on the snapshot when there's no Room anchor
+  // (anon flow). Mirrors Room.roomType.
+  roomType              String?
+  // Anonymous-visitor owner. Set during anon photo upload; cleared
+  // once the visitor session is claimed by a User.
+  visitorAnonId         String?
   snapshotAt            DateTime @default(now())
-  // Capture context — "initial" before a project, "outcome" after
-  captureContext        String // "initial" | "outcome" | "periodic" | "pre_listing"
+  // Capture context — "initial" before a project, "outcome" after,
+  // "anon_photo_upload" for v7.3.3 anonymous photo reader flow.
+  captureContext        String // "initial" | "outcome" | "periodic" | "pre_listing" | "anon_photo_upload"
   // Derived condition score (0-100). Computed from vision extractions on
   // photos belonging to this snapshot. Null until extractions complete.
   conditionScore        Int?
@@ -214,6 +237,8 @@ model RoomSnapshot {
 
   @@index([roomId, snapshotAt])
   @@index([captureContext])
+  @@index([projectId])
+  @@index([visitorAnonId])
 }
 
 model Photo {
@@ -230,11 +255,18 @@ model Photo {
   // Integrity + dedup
   perceptualHash   String // 64-bit pHash, hex-encoded
   exifStrippedAt   DateTime?
+  // Confirms the blob write succeeded — set after Vercel Blob put()
+  // returns a URL. Photo rows with null blobConfirmedAt are orphans
+  // pending cleanup (anon cleanup cron sweeps them).
+  blobConfirmedAt  DateTime?
   // Capture metadata (user-supplied at upload)
-  captureMethod    String // "camera" | "library" | "import"
+  captureMethod    String // "camera" | "library" | "import" | "web_upload"
   uploadedAt       DateTime     @default(now())
   // Consent flags at time of upload (snapshot of consent record)
   consentFlagsJson Json
+  // Anonymous-visitor owner. Set during anon photo upload; cleared
+  // once the visitor session is claimed by a User.
+  visitorAnonId    String?
   // Soft delete (consent revocation)
   hiddenAt         DateTime?
 
@@ -243,6 +275,8 @@ model Photo {
 
   @@index([roomSnapshotId])
   @@index([perceptualHash])
+  @@index([visitorAnonId])
+  @@index([blobConfirmedAt])
 }
 
 model VisionExtractionQueue {
@@ -346,12 +380,19 @@ model ValuationDelta {
 
 model Project {
   id                String     @id @default(cuid())
-  householdId       String
-  household         Household  @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  // householdId nullable from v7.3.3: anon-first photo upload creates
+  // a Project before the visitor has any household anchor. Project gets
+  // attached to a Household when the visitor claims by email (v7.3.3-C).
+  householdId       String?
+  household         Household? @relation(fields: [householdId], references: [id], onDelete: Cascade)
   propertyId        String?
   property          Property?  @relation(fields: [propertyId], references: [id])
-  topic             String // "kitchen" | "bathroom" | "outdoor" | "mudroom" | "weatherization" | ...
+  topic             String // "kitchen" | "bathroom" | "outdoor" | "mudroom" | "weatherization" | "basement_moisture" | ...
   scopeVariant      String? // matches scope catalog in code
+  // Anonymous-visitor owner. Set during anon photo upload; cleared
+  // once the visitor session is claimed by a User (which assigns
+  // householdId).
+  visitorAnonId     String?
   // Project lane — DIY / handyman / small pro / contractor. The Angi-pitch field.
   lane              String? // "diy" | "handyman" | "small_pro" | "contractor" | "verify_first" | "hold"
   intentDepthScore  Float? // 0-1; how committed is the user to this project
@@ -361,13 +402,15 @@ model Project {
   createdAt         DateTime   @default(now())
   updatedAt         DateTime   @updatedAt
 
-  smartCarts  SmartCart[]
-  leadIntents LeadIntent[]
-  outcomes    Outcome[]
+  smartCarts    SmartCart[]
+  leadIntents   LeadIntent[]
+  outcomes      Outcome[]
+  roomSnapshots RoomSnapshot[]
 
   @@index([householdId, status])
   @@index([propertyId, status])
   @@index([topic, scopeVariant])
+  @@index([visitorAnonId])
 }
 
 model SmartCart {
@@ -376,14 +419,32 @@ model SmartCart {
   project       Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
   userId        String?
   user          User?     @relation(fields: [userId], references: [id])
-  // Pricing experiment cohort assignment (frozen at first impression)
-  priceCohort   String // "free_with_photo" | "p9_99_with_photo" | "p29_no_photo_required"
-  pricePaidCents Int
+  // Anonymous-visitor owner. Set when the cart is synthesized from
+  // anon photo upload; cleared on email claim.
+  visitorAnonId String?
+  // Pricing experiment cohort assignment (frozen at first impression).
+  // Nullable from v7.3.3: the photo-reader beta has no pricing cohort
+  // assignment until v7.3.7's A/B framework ships.
+  priceCohort   String? // "free_with_photo" | "p9_99_with_photo" | "p29_no_photo_required"
+  // Nullable from v7.3.3: anon-flow carts are unpurchased — pricePaidCents
+  // is set only at Stripe webhook time when purchase completes.
+  pricePaidCents Int?
   // Photo signal at time of cart synthesis
   photoCount    Int       @default(0)
   photoAttached Boolean   @default(false)
   // Output snapshot — the rendered cart at purchase time
   cartJson      Json
+  // Dual-synthesis snapshots (v7.3.3): every photo-equipped cart is
+  // synthesized twice — once without photo signal, once with — and both
+  // payloads stored. photoChangedRecommendation captures whether the
+  // photo signal flipped any item, tier, or lane. THIS IS THE KILL
+  // METRIC for the photo-moat thesis: if <40% of carts show
+  // photoChangedRecommendation=true by end of beta, the thesis fails.
+  cartItemsJsonWithoutPhotos Json?
+  cartItemsJsonWithPhotos    Json?
+  photoChangedRecommendation Boolean?
+  // Diff summary: {itemsAdded[], itemsRemoved[], tierShifts[], laneShifts[]}
+  changeSummaryJson          Json?
   // Synthesis prompt version (so we can replay later)
   synthesisVersion String
   // Lifecycle
@@ -399,6 +460,8 @@ model SmartCart {
   @@index([projectId])
   @@index([status, purchasedAt])
   @@index([priceCohort, purchasedAt])
+  @@index([visitorAnonId])
+  @@index([photoChangedRecommendation])
 }
 
 model LeadIntent {
@@ -510,19 +573,29 @@ model EventLog {
 
 model Consent {
   id        String    @id @default(cuid())
-  userId    String
-  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  // userId nullable from v7.3.3: anon-first photo upload records consent
+  // against an anonId before any User exists. On email claim, consent
+  // rows are reassigned to the User (and the corresponding userId/anonId
+  // pair becomes uniquely indexed at most one way).
+  userId    String?
+  user      User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  // Anonymous-visitor owner (mutually exclusive with userId — enforced
+  // by raw-SQL CHECK constraint added in the migration).
+  anonId    String?
   // Purpose — what is the data used for
-  purpose   String // "personal_recommendations" | "product_improvement" | "valuation_research" | "marketing"
-  dataType  String // "photos" | "address" | "smart_cart_history" | "behavioral"
+  purpose   String // "personal_recommendations" | "product_improvement" | "valuation_research" | "public_content_use" | "marketing"
+  dataType  String // "photos" | "address" | "smart_cart_history" | "behavioral" | "photo"
   granted   Boolean
-  version   String // e.g. "v1.0.0" — privacy policy version at time of consent
+  version   String? // e.g. "v1.0.0" — privacy policy version at time of consent (nullable for anon rows where version is captured per-session)
   grantedAt DateTime  @default(now())
   revokedAt DateTime?
-  source    String // "signup" | "settings" | "modal_inline"
+  source    String // "signup" | "settings" | "modal_inline" | "anon_upload"
 
-  @@unique([userId, purpose, dataType])
+  // Partial unique indexes for the two ownership modes are declared in
+  // the migration SQL (Prisma's @@unique doesn't support WHERE clauses).
+  // Likewise the "userId IS NOT NULL OR anonId IS NOT NULL" CHECK.
   @@index([userId])
+  @@index([anonId])
 }
 
 // =============================================================================

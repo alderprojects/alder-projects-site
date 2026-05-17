@@ -48,19 +48,28 @@ import {
 // =============================================================================
 
 export const PROMPT_VERSION = 'v1.0.0'
-// v7.3.3-C: claude-3-5-sonnet-20241022 returned 404 not_found_error on
-// every basement extraction during the v7.3.3-B retest. Bumped to the
-// model the chat route is already using successfully.
-export const MODEL_VERSION = 'claude-sonnet-4-5-20250929'
+// v7.3.3-C-PR1.3: switched from claude-sonnet-4-5-20250929 to
+// claude-haiku-4-5. Sonnet 4.5 vision was consistently taking >10s
+// on Hobby plan even after capping output tokens at 1500 (PR1.2),
+// breaking every upload with a 504. Haiku is ~3-5x faster (typical
+// 1-3s) at ~4x lower cost. Tradeoff: slightly lower per-feature
+// accuracy, acceptable for v7.3.3-C because PR3 reaction capture is
+// the curation layer that drives confidence scores in LearningStore
+// going forward.
+//
+// Model ID note: using the alias form (no date suffix), matching the
+// existing claude-opus-4-7 pattern in src/lib/catalog/expand.ts.
+// extractFromPhoto (the unused legacy v1.0.0 path) still references
+// MODEL_VERSION so it gets the upgrade too.
+export const MODEL_VERSION = 'claude-haiku-4-5'
 export const CONFIDENCE_THRESHOLD = 0.7
 export const MAX_TOKENS = 1024
-// Open extraction needs to fit within the Vercel Hobby 10s function
-// timeout. Per v7.3.3-C-PR1.2 retest: 4096 tokens caused 504s on every
-// upload (Sonnet 4.5 vision took 8-12s at that ceiling). Dropping to
-// 1500 keeps latency in the 3-6s range and corresponds to ~6-8
-// well-formed features per photo, which the eval data suggests is a
-// healthier output band than 15-25 features anyway.
-export const OPEN_MAX_TOKENS = 1500
+// Open extraction tokens cap. Bumped back up from 1500 (PR1.2) to
+// 2500 because Haiku is fast enough that we can afford richer output
+// without timing out. Real ceiling: ~3-5s for the API call leaves
+// ~5-7s for the rest of the route, comfortably under the 10s function
+// budget.
+export const OPEN_MAX_TOKENS = 2500
 
 // Re-export so callers can read both versions from a single import.
 export { OPEN_EXTRACTION_PROMPT_VERSION }
@@ -705,12 +714,13 @@ export async function extractOpenFeatures(opts: {
   // OpenExtractionParseError on failure.
   const extraction = parseModelOutput(rawText)
 
-  // Sonnet 4.5 pricing as of v7.3.3-C: $3/M input, $15/M output.
-  // Output dominates because vision call output is much larger than
-  // input for a typical extraction.
+  // Haiku 4.5 pricing as of v7.3.3-C-PR1.3: ~$1/M input, ~$5/M output.
+  // (Sonnet 4.5 was $3/$15.) Output dominates total cost because vision
+  // call output is much larger than the text portion of the input; the
+  // image is comparatively cheap once tokenized.
   const tokensIn = resp.usage.input_tokens
   const tokensOut = resp.usage.output_tokens
-  const apiCostCents = Math.ceil((tokensIn * 0.0003 + tokensOut * 0.0015) * 100) / 100
+  const apiCostCents = Math.ceil((tokensIn * 0.0001 + tokensOut * 0.0005) * 100) / 100
 
   return {
     extraction,

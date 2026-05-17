@@ -38,7 +38,10 @@ import { z } from 'zod'
  * or OpenExtractionSchema. Stored on every VisionExtraction row so we
  * can replay or re-eval across prompt versions.
  */
-export const OPEN_EXTRACTION_PROMPT_VERSION = 'open-v1.0.1'
+// v1.0.2: model class changed from Sonnet 4.5 to Haiku 4.5 in PR1.3.
+// Prompt text unchanged from v1.0.1; version bump exists so we can
+// distinguish per-model extraction quality in the LearningStore retro.
+export const OPEN_EXTRACTION_PROMPT_VERSION = 'open-v1.0.2'
 
 // =============================================================================
 // CONTROLLED CATEGORY VOCABULARY

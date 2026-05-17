@@ -152,6 +152,14 @@ export function BasementUploader() {
     // synthesis (synthesize would only see 1 of the N photos).
     let runningProjectId: string | null = projectId
 
+    // PR2: track per-batch outcome so the error banner can be honest
+    // about what succeeded vs failed (the v7.3.3-C-PR1 retest surfaced
+    // confusion where 3 of 4 photos uploaded fine but the banner just
+    // said "Couldn't upload one photo" without surfacing the wins).
+    let succeeded = 0
+    let failed = 0
+    const failureMsgs: string[] = []
+
     for (const file of filesArr) {
       try {
         const r = await uploadOne(file, runningProjectId)
@@ -159,9 +167,30 @@ export function BasementUploader() {
         if (!projectId) setProjectId(r.projectId)
         results.push(r)
         setPhotos([...results]) // progressive render
+        succeeded += 1
       } catch (e) {
-        setErrorMsg(`Couldn't upload one photo: ${(e as Error).message}. The others continued.`)
+        failed += 1
+        failureMsgs.push((e as Error).message)
       }
+    }
+
+    if (failed > 0) {
+      const sample = failureMsgs[0] ?? 'unknown error'
+      if (succeeded > 0) {
+        setErrorMsg(
+          `${succeeded} of ${filesArr.length} photos uploaded. ${failed} failed: ${sample}${
+            failed > 1 ? ` (+${failed - 1} more)` : ''
+          }. You can continue with what loaded, or try the failed photos again.`
+        )
+      } else {
+        setErrorMsg(
+          `All ${filesArr.length} uploads failed: ${sample}${
+            failed > 1 ? ` (and ${failed - 1} more)` : ''
+          }. Try again.`
+        )
+      }
+    } else {
+      setErrorMsg('')
     }
     setStage('idle')
   }

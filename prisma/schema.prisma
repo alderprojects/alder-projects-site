@@ -847,6 +847,82 @@ model PhotoContentUse {
 }
 
 // =============================================================================
+// LEARNING STORE — v7.3.3-C-PR2
+// =============================================================================
+//
+// The strategic data asset of the photo-moat thesis. Maps normalized
+// feature signatures (e.g. "moisture_efflorescence:basement:moderate")
+// to recommendations, with reaction-count columns that drive the
+// confidence model.
+//
+// Every cart synthesis is a tree of LearningStore lookups:
+//   1. For each extracted feature in the photo, compute its signature
+//      via src/lib/learning/signature.ts.
+//   2. Look up the signature here. Hit -> use the cached recommendation
+//      (source='curated' OR source='ai_generated' with strong reactions).
+//      Miss -> run per-feature LLM synthesis, insert a new row with
+//      source='ai_generated' and zero reaction counts.
+//   3. Aggregate per-feature recommendations into the SmartCart.
+//
+// Reaction counts (PR3 wiring) drive a confidence function that's
+// intentionally simple in v0:
+//   confidence = thumbsUpCount / (thumbsUpCount + dismissCount + doesntApplyCount)
+//   gated by a minimum impressionCount threshold before any weight applies.
+//
+// Indexes are sized for query-by-signature performance (the hot path)
+// AND for aggregation analysis (cohort + distribution queries).
+//
+// Schema lives at the bottom of the file to keep the rest stable for
+// migrations during the v7.3.3-C series.
+model LearningStore {
+  id                  String   @id @default(cuid())
+  // Normalized signature, e.g. "dehumidifier_present:basement:moderate".
+  // Format: <type>:<categoryHint>:<severityBucket>. See
+  // src/lib/learning/signature.ts for the normalization function.
+  // Unique because each signature has at most one canonical
+  // recommendation at a time. Re-synthesis overwrites in place.
+  featureSignature    String   @unique
+
+  // Full recommendation payload — JSON because the shape is evolving
+  // through v7.3.3-C beta. See src/lib/learning/store.ts for the
+  // RecommendationPayload type definition.
+  recommendationPayload Json
+
+  // 'curated' = hand-seeded or human-promoted (high trust)
+  // 'ai_generated' = LLM-synthesized on first cache miss for this
+  //                  signature (trust grows with reactions)
+  source              String
+
+  // Reaction counts. PR3 wires the UI; PR2 just initializes to zero.
+  thumbsUpCount       Int      @default(0)
+  dismissCount        Int      @default(0)
+  doesntApplyCount    Int      @default(0)
+  // Times this recommendation was SHOWN to a visitor (PR3 increments
+  // on render). Distinct from the reaction counts so we can compute
+  // dismissal-as-fraction-of-impression for low-engagement detection.
+  impressionCount     Int      @default(0)
+
+  // Model + prompt versions for ai_generated entries, so we can
+  // re-evaluate stale recs when synthesis prompts change. Null for
+  // curated.
+  modelVersion        String?
+  promptVersion       String?
+
+  createdAt           DateTime @default(now())
+  // Set whenever a count column updates OR the payload is regenerated.
+  // Hot path for "find stale recs to re-synthesize" in v7.3.4.
+  lastUpdatedAt       DateTime @updatedAt
+
+  // Indexes:
+  //   - Primary lookup: by signature (covered by @unique)
+  //   - Cohort analysis: by source (curated vs ai_generated mix over time)
+  //   - Trust curve: by impressionCount (find well-tested vs untested recs)
+  @@index([source])
+  @@index([impressionCount])
+  @@index([lastUpdatedAt])
+}
+
+// =============================================================================
 // END OF SCHEMA
 // =============================================================================
 //

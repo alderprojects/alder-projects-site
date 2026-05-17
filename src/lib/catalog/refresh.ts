@@ -495,14 +495,26 @@ function signPaapiRequest(p: SignRequestParams): Record<string, string> {
 // =============================================================================
 
 async function loadUniverse(): Promise<UniverseProduct[]> {
-  // In production: read from src/content/smart-cart/universe.ts. For now,
-  // a stub that returns an empty array — wire to the actual universe import
-  // in the codebase.
+  // Reads from src/content/smart-cart/universe.ts (the registry the
+  // Smart Cart builder uses). Adapts the rich UniverseProduct shape
+  // (`variant.productName`, `variant.amazonAsin`, etc.) down to the
+  // flat shape this refresh worker expects.
   //
-  // Implementation note: if the universe stays as a TS source file rather
-  // than a DB table, this function imports it directly. If it migrates to
-  // a CatalogProduct table, this function queries that table.
-  return []
+  // If the universe ever migrates from TS source to a CatalogProduct
+  // table, swap this for a Prisma query — caller contract is unchanged.
+  const { getUniverse } = await import('@/content/smart-cart')
+  const real = getUniverse()
+  return real
+    .filter((u) => u.variant.amazonAsin) // refresh only cares about ASIN-backed entries
+    .map((u) => ({
+      universeId: u.universeId,
+      productName: u.variant.productName,
+      amazonAsin: u.variant.amazonAsin ?? null,
+      affiliateUrl: u.variant.affiliateUrl,
+      priceLow: u.variant.priceLow,
+      priceHigh: u.variant.priceHigh,
+      tier: u.tags.tier,
+    }))
 }
 
 async function updateProductPrice(universeId: string, priceLow: number, priceHigh: number): Promise<void> {

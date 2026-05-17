@@ -171,15 +171,59 @@ async function buildScopeContext(scopeId: string): Promise<ScopeContext> {
   // avoid proposing duplicates and to understand the structure it's
   // expanding.
   //
-  // In production this reads from src/content/smart-cart/scopes/<scopeId>.ts.
-  // For now, return a stub. Wire to actual scope catalog import when
-  // integrating into the codebase.
+  // Looks up the live ScopeCatalog from src/content/smart-cart/index.ts
+  // (the same registry the Smart Cart builder uses), then projects it
+  // down to the prose-friendly shape the LLM prompt expects. Falls back
+  // to empty context if the scope isn't registered yet — that keeps
+  // expansion-cron rotation forward-compatible with scope IDs that
+  // haven't been added to the registry.
+  const { getAllCatalogs } = await import('@/content/smart-cart')
+  const catalog = getAllCatalogs().find((c) => c.scopeVariantId === scopeId)
+
+  if (!catalog) {
+    console.warn(
+      `[catalog-expand] scopeId="${scopeId}" not found in registry; using empty context`
+    )
+    return {
+      scopeId,
+      existingProducts: [],
+      existingSkipItems: [],
+      existingRouteOuts: [],
+      scopeDescription: '',
+    }
+  }
+
+  // One ScopeContext "existingProducts" row per slot — slotLabel stands
+  // in for productName since slots resolve products via tierQueries at
+  // synthesis time rather than naming them directly. slotKind ("core"
+  // vs "addon") is the closest we have to tier at the slot level; the
+  // LLM uses both to understand what shape an additional slot might take.
+  const existingProducts = catalog.slots.map((s) => ({
+    slot: s.slotId,
+    tier: s.slotKind,
+    productName: s.slotLabel,
+  }))
+
+  // Scope description = the customer-facing promise + value prop +
+  // primary pain. Three short fields concatenated give the LLM real
+  // grounding without leaking the editorial-internal copy.
+  const scopeDescription = [
+    catalog.smartCartPromise,
+    catalog.primaryCustomerPain,
+    catalog.valueProposition,
+  ]
+    .filter(Boolean)
+    .join(' ')
+    .trim()
+
   return {
     scopeId,
-    existingProducts: [],
-    existingSkipItems: [],
-    existingRouteOuts: [],
-    scopeDescription: '',
+    existingProducts,
+    existingSkipItems: catalog.skipList.map((s) => s.title),
+    existingRouteOuts: (catalog.routeOutRules ?? []).map(
+      (r) => `${r.condition} -> ${r.destination}: ${r.reason}`
+    ),
+    scopeDescription,
   }
 }
 

@@ -1,17 +1,20 @@
 'use client'
 
 /**
- * v7.3.3-C-PR1 Photo Uploader — client component.
+ * v7.3.4-PR1.5 Photo Uploader — client component.
  *
- * Originally basement-only (v7.3.3-B). PR1 opens the funnel: the
- * uploader posts photos of anything around the home; server-side open
- * extraction figures out what's in the photo. UI copy updated. The
- * roomType/scope fields in the POST body are now telemetry hints, not
- * gating constraints, so we send 'auto' to signal that the client
- * didn't pre-classify.
+ * Renamed from BasementUploader. The component is open-domain — the
+ * server-side vision call decides what's in the photo, not the
+ * client. URL stays /project-read/basement for backwards compat with
+ * the Reddit beta cohort's bookmarks; the component name no longer
+ * advertises a category constraint that isn't real.
  *
  * Per-photo sequential upload (one POST per photo). UI shows per-photo
  * status with confidence indicator. Hard cap: 5 photos per session.
+ *
+ * roomType/scope in the POST body are telemetry hints, not gating
+ * constraints — we send 'auto' to signal that the client didn't
+ * pre-classify.
  *
  * Consent UI shows 3 checkboxes. personal_recommendations is implicit
  * (written server-side on upload) and lives in /privacy per the v7.3.3
@@ -33,7 +36,7 @@ interface UploadedPhoto {
 
 const MAX_PHOTOS = 5
 
-export function BasementUploader() {
+export function PhotoUploader() {
   const router = useRouter()
   const [stage, setStage] = useState<Stage>('idle')
   const [photos, setPhotos] = useState<UploadedPhoto[]>([])

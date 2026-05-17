@@ -1,34 +1,65 @@
 /**
  * Alder Read v1 — Vision Extraction
  *
- * Tier 2: structured extraction from a single uploaded photo via Claude
- * vision (claude-3-5-sonnet-20241022 or claude-3-7-sonnet). Output is a
- * strict JSON schema. Confidence under 0.7 routes to manual review.
+ * v7.3.3-C update: MODEL_VERSION bumped to claude-sonnet-4-5-20250929
+ * after the v7.3.3-B diagnostic showed every basement extraction was
+ * failing with 404 not_found_error on the deprecated
+ * claude-3-5-sonnet-20241022 model ID. Same model the chat route uses.
+ *
+ * Two extraction paths now coexist in this file:
+ *
+ *   1. extractFromPhoto (v1.0.0) — original Tier 2 closed-schema path
+ *      (room confirmation + era + per-room feature enums). Used by
+ *      legacy room-confirmation surfaces. Kept as-is.
+ *
+ *   2. extractFromImage (DEPRECATED, basement-only) — v7.3.3-B
+ *      basement-moisture path. After v7.3.3-C PR1 it delegates to
+ *      extractOpenFeatures + a shim that maps open-shape features to
+ *      the basement signal vocabulary. Kept callable so any legacy
+ *      caller doesn't break; new callers should use extractOpenFeatures.
+ *
+ *   3. extractOpenFeatures (v7.3.3-C, open extraction) — the new
+ *      strategic path. Looks at any home photo and returns a feature
+ *      array with type/location/condition/confidence/category_hint.
+ *      Prompt + schema live in src/lib/vision/prompt.ts so the eval
+ *      harness can import them without pulling the Anthropic client.
  *
  * The prompt is the product. The synthesis quality downstream depends
  * entirely on this file. Treat changes here as production deploys.
  *
  * Version history:
- *   v1.0.0 — initial Tier 2 schema (room confirmation, era, features,
- *            short condition note). No defect detection. No product
- *            identification.
- *
- * Tier 3 fields (defects_visible, damage_severity, product_identifications)
- * are NOT populated in this version. They are defined as optional in the
- * schema so downstream consumers can ignore missing fields without code
- * changes when Tier 3 ships.
+ *   v1.0.0      — initial Tier 2 closed-schema (room/era/features)
+ *   basement-v1 — v7.3.3-B basement-moisture extraction (now deprecated)
+ *   open-v1.0.0 — v7.3.3-C open extraction (current strategic path)
  */
 
 import Anthropic from '@anthropic-ai/sdk'
+import {
+  OPEN_EXTRACTION_PROMPT_VERSION,
+  PROMPT_SYSTEM,
+  PROMPT_USER,
+  parseModelOutput,
+  type OpenExtraction,
+  type OpenFeature,
+} from './prompt'
 
 // =============================================================================
 // CONFIG
 // =============================================================================
 
 export const PROMPT_VERSION = 'v1.0.0'
-export const MODEL_VERSION = 'claude-3-5-sonnet-20241022'
+// v7.3.3-C: claude-3-5-sonnet-20241022 returned 404 not_found_error on
+// every basement extraction during the v7.3.3-B retest. Bumped to the
+// model the chat route is already using successfully.
+export const MODEL_VERSION = 'claude-sonnet-4-5-20250929'
 export const CONFIDENCE_THRESHOLD = 0.7
 export const MAX_TOKENS = 1024
+// Open extraction can return 30+ features in a complex photo — give the
+// model headroom. Per-call cost capped well under a cent at Sonnet rates.
+export const OPEN_MAX_TOKENS = 4096
+
+// Re-export so callers can read both versions from a single import.
+export { OPEN_EXTRACTION_PROMPT_VERSION }
 
 // =============================================================================
 // EXTRACTION SCHEMA
@@ -562,37 +593,154 @@ export interface BasementExtraction {
   promptVersion: string
 }
 
-const BASEMENT_SYSTEM_PROMPT = `You analyze homeowner-uploaded basement photos to assist a home-improvement shopping recommendation engine.
+// v7.3.3-C: basement-only prompt + helpers removed. extractFromImage
+// now delegates to extractOpenFeatures + openFeaturesToBasementExtraction.
+// Shim lives at the bottom of this file.
 
-YOU MUST:
-- Return strict JSON matching the provided schema
-- Stick to visible facts only
-- Use the moistureSignals enum exactly — no other values
-- Provide overallConfidence as a 0-1 number reflecting how well the photo supports the extraction
+/**
+ * DEPRECATED in v7.3.3-C — kept callable for backwards compatibility.
+ *
+ * Now delegates to extractOpenFeatures (the open-vocabulary path) and
+ * converts the result to the basement-signal shape via the bridge shim.
+ * The bridge shim exists so the existing 3 basement rules in
+ * synthesize-v2.ts still fire during the PR1 → PR2 window. Shim will
+ * be deleted in PR2 when synthesis pivots to feature-signature lookup.
+ *
+ * New callers should use extractOpenFeatures directly.
+ */
+export async function extractFromImage(opts: {
+  imageBuffer: Buffer
+  contextRoomType?: 'basement'
+  scope?: 'basement_moisture'
+}): Promise<BasementExtraction> {
+  const { extraction } = await extractOpenFeatures({ imageBuffer: opts.imageBuffer })
+  return openFeaturesToBasementExtraction(extraction)
+}
 
-YOU MUST NOT:
-- Make value judgments ("this basement looks bad")
-- Estimate cost or savings of any work
-- Infer income, demographics, neighborhood, or homeowner characteristics
-- Recommend specific products
-- Diagnose mold, structural damage, electrical issues, or safety hazards
-- Suggest remediation steps
+// =============================================================================
+// V7.3.3-C: OPEN EXTRACTION (current strategic path)
+// =============================================================================
 
-If the photo is not actually a basement, set roomTypeConfirmed: false and overallConfidence: 0, and leave other fields at defaults.`
+export interface OpenExtractionResult {
+  /** The parsed + zod-validated extraction. */
+  extraction: OpenExtraction
+  /** Raw text the model returned, for replay + debugging. */
+  rawResponse: string
+  /** Model ID we called. */
+  modelVersion: string
+  /** Prompt version constant — bumped on any prompt or schema change. */
+  promptVersion: string
+  /** Estimated dollar cost in cents, computed from token usage. */
+  apiCostCents: number
+  /** Token counts for audit + per-call cost reporting. */
+  tokensIn: number
+  tokensOut: number
+  /** Server-side wall-clock latency for the API call. */
+  latencyMs: number
+}
 
-const BASEMENT_USER_PROMPT = `Analyze this basement photo. Return JSON only, matching this schema (no markdown fences):
+/**
+ * v7.3.3-C — open photo extraction.
+ *
+ * Sends the photo + open-vocab prompt to Claude vision. Returns the
+ * parsed feature array + meta. Throws on:
+ *   - Anthropic API error (network, auth, model 404, content policy)
+ *   - JSON parse failure
+ *   - zod schema validation failure
+ *
+ * Caller (api/photos/upload) wraps in try/catch and records
+ * VISION_EXTRACTION_FAILED with the error message. The Photo row is
+ * still saved so the synthesizer can later surface "we couldn't read
+ * this one."
+ *
+ * Latency budget: 3-8s on Sonnet 4.5 for a 2400px JPEG with
+ * OPEN_MAX_TOKENS=4096. Stays under the Vercel Hobby 10s function
+ * timeout with margin for sharp + blob + Prisma writes.
+ */
+export async function extractOpenFeatures(opts: {
+  imageBuffer: Buffer
+  /** Defaults to image/jpeg (upload route always normalizes to JPEG). */
+  mediaType?: 'image/jpeg' | 'image/png' | 'image/webp'
+}): Promise<OpenExtractionResult> {
+  if (!process.env.ANTHROPIC_API_KEY) {
+    throw new Error('ANTHROPIC_API_KEY not set')
+  }
+  const apiClient = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
+  const t0 = Date.now()
 
-{
-  "roomTypeConfirmed": boolean,
-  "detectedRoomType": string,
-  "finishState": "unfinished" | "partially_finished" | "finished" | "unknown",
-  "visibleFeatures": [{"feature": string, "confidence": 0-1}],
-  "moistureSignals": ["efflorescence" | "staining" | "active_water" | "visible_cracks" | "rust_on_metal" | "musty_indicators_visual" | "sump_pump_present" | "dehumidifier_present" | "vapor_barrier_visible" | "none_visible"],
-  "overallConfidence": 0-1,
-  "promptVersion": "${PROMPT_VERSION}"
-}`
+  const base64 = opts.imageBuffer.toString('base64')
 
-const ALLOWED_MOISTURE_SIGNALS: ReadonlySet<string> = new Set<BasementMoistureSignal>([
+  const resp = await apiClient.messages.create({
+    model: MODEL_VERSION,
+    max_tokens: OPEN_MAX_TOKENS,
+    system: PROMPT_SYSTEM,
+    messages: [
+      {
+        role: 'user',
+        content: [
+          {
+            type: 'image',
+            source: {
+              type: 'base64',
+              media_type: opts.mediaType ?? 'image/jpeg',
+              data: base64,
+            },
+          },
+          { type: 'text', text: PROMPT_USER },
+        ],
+      },
+    ],
+  })
+
+  const rawText = resp.content
+    .filter((c): c is { type: 'text'; text: string } => c.type === 'text')
+    .map((c) => c.text)
+    .join('')
+
+  // Parsing + zod validation happens here. parseModelOutput throws
+  // OpenExtractionParseError on failure.
+  const extraction = parseModelOutput(rawText)
+
+  // Sonnet 4.5 pricing as of v7.3.3-C: $3/M input, $15/M output.
+  // Output dominates because vision call output is much larger than
+  // input for a typical extraction.
+  const tokensIn = resp.usage.input_tokens
+  const tokensOut = resp.usage.output_tokens
+  const apiCostCents = Math.ceil((tokensIn * 0.0003 + tokensOut * 0.0015) * 100) / 100
+
+  return {
+    extraction,
+    rawResponse: rawText,
+    modelVersion: MODEL_VERSION,
+    promptVersion: OPEN_EXTRACTION_PROMPT_VERSION,
+    apiCostCents,
+    tokensIn,
+    tokensOut,
+    latencyMs: Date.now() - t0,
+  }
+}
+
+// =============================================================================
+// V7.3.3-C BRIDGE SHIM: open features -> basement extraction
+// =============================================================================
+//
+// Exists for one purpose: keep the 3 existing basement rules in
+// synthesize-v2.ts firing during the PR1 -> PR2 window. PR2 replaces
+// synthesize-v2 with feature-signature lookup against LearningStore;
+// at that point this shim gets deleted and BasementExtraction itself
+// can be retired.
+//
+// Mapping logic (intentionally minimal):
+//   - finishState <- look for unfinished_basement_walls /
+//     finished_basement_walls in features[].type, fall back to "unknown"
+//   - moistureSignals <- match feature.type against the
+//     BasementMoistureSignal enum directly (model is seeded with these
+//     exact strings in PROMPT_SYSTEM)
+//   - visibleFeatures <- one row per basement-category feature
+//   - overallConfidence <- mean of basement-category feature confidences,
+//     falls back to 0 if no basement features
+
+const BASEMENT_SIGNAL_VALUES: ReadonlySet<string> = new Set<BasementMoistureSignal>([
   'efflorescence',
   'staining',
   'active_water',
@@ -605,98 +753,87 @@ const ALLOWED_MOISTURE_SIGNALS: ReadonlySet<string> = new Set<BasementMoistureSi
   'none_visible',
 ])
 
-const ALLOWED_FINISH_STATES = ['unfinished', 'partially_finished', 'finished', 'unknown'] as const
-
-/**
- * Inline, synchronous basement-photo extraction for the v7.3.3 photo
- * reader beta. ~3-7 second latency per call against claude vision.
- * Caller (upload route) must budget for this within the Vercel Hobby
- * 10s function timeout.
- *
- * Throws on any failure (Anthropic API error, schema parse failure,
- * etc.). Caller catches and records VisionExtraction.reviewStatus
- * appropriately.
- */
-export async function extractFromImage(opts: {
-  imageBuffer: Buffer
-  contextRoomType: 'basement'
-  scope: 'basement_moisture'
-}): Promise<BasementExtraction> {
-  if (!process.env.ANTHROPIC_API_KEY) {
-    throw new Error('ANTHROPIC_API_KEY not set')
-  }
-  const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
-
-  const base64 = opts.imageBuffer.toString('base64')
-
-  const resp = await client.messages.create({
-    model: MODEL_VERSION,
-    max_tokens: 1500,
-    system: BASEMENT_SYSTEM_PROMPT,
-    messages: [
-      {
-        role: 'user',
-        content: [
-          {
-            type: 'image',
-            source: { type: 'base64', media_type: 'image/jpeg', data: base64 },
-          },
-          { type: 'text', text: BASEMENT_USER_PROMPT },
-        ],
-      },
-    ],
-  })
-
-  const text = resp.content
-    .filter((c): c is { type: 'text'; text: string } => c.type === 'text')
-    .map((c) => c.text)
-    .join('')
-
-  const cleaned = text
-    .replace(/^```(?:json)?\s*/gm, '')
-    .replace(/```\s*$/gm, '')
-    .trim()
-
-  let parsed: unknown
-  try {
-    parsed = JSON.parse(cleaned)
-  } catch {
-    throw new Error(`Vision response was not parseable JSON: ${cleaned.slice(0, 200)}`)
-  }
-
-  return validateBasementExtraction(parsed)
+// Some open-extraction types include a prefix or suffix. Strip common
+// ones so "moisture_efflorescence" still maps to "efflorescence" etc.
+const BASEMENT_SIGNAL_TYPE_ALIASES: Record<string, BasementMoistureSignal> = {
+  moisture_efflorescence: 'efflorescence',
+  water_staining: 'staining',
+  visible_cracks_wall: 'visible_cracks',
+  foundation_crack: 'visible_cracks',
+  rust_on_metal: 'rust_on_metal',
+  musty_indicators_visual: 'musty_indicators_visual',
+  sump_pump_present: 'sump_pump_present',
+  dehumidifier_present: 'dehumidifier_present',
+  vapor_barrier_visible: 'vapor_barrier_visible',
+  active_water: 'active_water',
 }
 
-function validateBasementExtraction(raw: unknown): BasementExtraction {
-  if (typeof raw !== 'object' || raw === null) {
-    throw new Error('Vision response is not an object')
+export function openFeaturesToBasementExtraction(
+  open: OpenExtraction
+): BasementExtraction {
+  // Only consider features the model categorized as basement (or
+  // category_hint=unclear, just in case — some moisture features
+  // could plausibly belong elsewhere but we don't want to drop a
+  // dehumidifier in a utility room shot).
+  const basementFeatures = open.features.filter(
+    (f) => f.category_hint === 'basement' || f.category_hint === 'unclear'
+  )
+
+  // moistureSignals: direct enum match OR aliased match
+  const moistureSignals: BasementMoistureSignal[] = []
+  for (const f of basementFeatures) {
+    if (BASEMENT_SIGNAL_VALUES.has(f.type)) {
+      moistureSignals.push(f.type as BasementMoistureSignal)
+    } else if (BASEMENT_SIGNAL_TYPE_ALIASES[f.type]) {
+      moistureSignals.push(BASEMENT_SIGNAL_TYPE_ALIASES[f.type]!)
+    }
   }
-  const r = raw as Record<string, unknown>
+  // Dedup
+  const dedupedSignals = Array.from(new Set(moistureSignals))
 
-  const finishState = typeof r.finishState === 'string' && (ALLOWED_FINISH_STATES as readonly string[]).includes(r.finishState)
-    ? (r.finishState as BasementExtraction['finishState'])
-    : 'unknown'
+  // finishState from type pattern match
+  let finishState: BasementExtraction['finishState'] = 'unknown'
+  for (const f of basementFeatures) {
+    if (f.type === 'finished_basement_walls') {
+      finishState = 'finished'
+      break
+    }
+    if (f.type === 'unfinished_basement_walls') {
+      finishState = 'unfinished'
+      break
+    }
+  }
 
-  const moistureSignalsRaw = Array.isArray(r.moistureSignals) ? r.moistureSignals : []
-  const moistureSignals = moistureSignalsRaw
-    .filter((s): s is BasementMoistureSignal => typeof s === 'string' && ALLOWED_MOISTURE_SIGNALS.has(s))
+  // visibleFeatures: one per basement-category feature, condition as label
+  const visibleFeatures: BasementVisibleFeature[] = basementFeatures.map((f) => ({
+    feature: f.type,
+    confidence: f.confidence,
+  }))
 
-  const visibleFeaturesRaw = Array.isArray(r.visibleFeatures) ? r.visibleFeatures : []
-  const visibleFeatures = visibleFeaturesRaw
-    .filter((f): f is { feature: string; confidence: number } =>
-      typeof f === 'object' && f !== null &&
-      typeof (f as Record<string, unknown>).feature === 'string' &&
-      typeof (f as Record<string, unknown>).confidence === 'number'
-    )
-    .map((f) => ({ feature: f.feature, confidence: Math.max(0, Math.min(1, f.confidence)) }))
+  // overallConfidence: mean of basement features, or 0 if none. We
+  // intentionally don't fall back to overall_photo_category confidence
+  // because that's not a field in the open shape — the photo-level
+  // category is categorical, not confidence-weighted.
+  const overallConfidence =
+    basementFeatures.length > 0
+      ? basementFeatures.reduce((acc, f) => acc + f.confidence, 0) / basementFeatures.length
+      : 0
+
+  const roomTypeConfirmed =
+    open.overall_photo_category === 'basement' ||
+    basementFeatures.length > 0
 
   return {
-    roomTypeConfirmed: !!r.roomTypeConfirmed,
-    detectedRoomType: typeof r.detectedRoomType === 'string' ? r.detectedRoomType : 'unknown',
+    roomTypeConfirmed,
+    detectedRoomType: open.overall_photo_category,
     finishState,
     visibleFeatures,
-    moistureSignals,
-    overallConfidence: typeof r.overallConfidence === 'number' ? Math.max(0, Math.min(1, r.overallConfidence)) : 0,
-    promptVersion: PROMPT_VERSION,
+    moistureSignals: dedupedSignals,
+    overallConfidence,
+    promptVersion: OPEN_EXTRACTION_PROMPT_VERSION,
   }
 }
+
+// Re-export the open types so callers can import everything from
+// '@/lib/vision/extract' without needing two import statements.
+export type { OpenExtraction, OpenFeature }

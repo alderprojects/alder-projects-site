@@ -1,7 +1,14 @@
 'use client'
 
 /**
- * v7.3.3-B Basement Photo Uploader — client component.
+ * v7.3.3-C-PR1 Photo Uploader — client component.
+ *
+ * Originally basement-only (v7.3.3-B). PR1 opens the funnel: the
+ * uploader posts photos of anything around the home; server-side open
+ * extraction figures out what's in the photo. UI copy updated. The
+ * roomType/scope fields in the POST body are now telemetry hints, not
+ * gating constraints, so we send 'auto' to signal that the client
+ * didn't pre-classify.
  *
  * Per-photo sequential upload (one POST per photo). UI shows per-photo
  * status with confidence indicator. Hard cap: 5 photos per session.
@@ -52,8 +59,10 @@ export function BasementUploader() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         projectId: projectId ?? undefined,
-        roomType: 'basement',
-        scope: 'basement_moisture',
+        // PR1: roomType/scope are telemetry hints only — open extraction
+        // ignores them. 'auto' = client did not pre-classify.
+        roomType: 'auto',
+        scope: 'auto',
         imageBase64: base64,
         consents,
       }),
@@ -202,13 +211,15 @@ export function BasementUploader() {
           {stage === 'uploading'
             ? 'Uploading…'
             : photos.length === 0
-              ? 'Send 1-5 basement photos'
+              ? 'Send 1-5 photos'
               : photos.length >= MAX_PHOTOS
                 ? `${MAX_PHOTOS}-photo limit reached`
                 : 'Add more photos'}
         </button>
         <p className="mt-2 text-xs text-gray-500">
-          Up to {MAX_PHOTOS} photos. Wide shots help more than close-ups. Capture corners, the floor, and any sump or dehumidifier.
+          Up to {MAX_PHOTOS} photos. Wide shots help more than close-ups. Anything
+          you want a read on — basement walls, kitchen counters, deck boards,
+          roof from the ground, electrical panel, gutters.
         </p>
       </section>
 
@@ -241,7 +252,7 @@ export function BasementUploader() {
           onClick={synthesize}
           className="w-full rounded-lg bg-gray-900 px-6 py-4 font-medium text-white hover:bg-black"
         >
-          See my basement read
+          See my read
         </button>
       )}
 

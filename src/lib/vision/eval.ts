@@ -1,242 +1,345 @@
 /**
- * Vision Prompt Evaluation Harness
+ * v7.3.3-C-PR1 — Open Vision Extraction Eval Harness
+ *
+ * Replaces the v1.0.0 closed-schema eval. Runs extractOpenFeatures
+ * against every photo in eval/corpus/, writes per-photo JSON results
+ * + a markdown summary to eval/results/<ISO timestamp>/.
  *
  * Usage:
- *   1. Drop 20-50 test photos into /test-photos/ (categorized by room type
- *      in subfolders: kitchen/, bathroom/, deck/, etc.)
- *   2. Run: npx tsx lib/vision/eval.ts
- *   3. Outputs eval-results-<timestamp>.html — open in browser, review
- *      each extraction side-by-side with the original photo.
+ *   1. Drop CC photos into /eval/corpus/ (jpg, jpeg, png, webp).
+ *      Subfolder structure is optional and used only for labeling in
+ *      the report — e.g. eval/corpus/basement/*.jpg, eval/corpus/kitchen/*.jpg
+ *   2. Run: `npm run vision:eval` (or `npx tsx src/lib/vision/eval.ts`)
+ *   3. Inspect eval/results/<timestamp>/summary.md
  *
- * This is the week-1 quality gate. The vision prompt is the product;
- * before week 2 ships Smart Cart synthesis that reads from extractions,
- * we need to see the prompt produce reliable output across the full
- * range of real photos.
+ * Per the v7.3.3-C brief the eval is informational, not a gate. The
+ * goals are:
+ *   - Confirm extractOpenFeatures works on a diverse photo set
+ *   - Measure feature-count + category distribution
+ *   - Surface low-confidence patterns
+ *   - Track per-call latency + token cost
  *
- * Pass criteria:
- *   - Room type correct on >95% of clear photos
- *   - Era estimate within 1 decade of ground truth on >80% of photos
- *   - Boolean features (under_cabinet_lighting, backsplash_present) correct
- *     on >90% of cases where the answer is determinable
- *   - condition_note_short is factual, no value judgments, on 100% of cases
+ * The "pass criteria" from v1.0.0 (room-type accuracy, value-judgment
+ * detection) don't apply to open extraction the same way. New criteria
+ * are emergent — we'll define them once we see real-corpus output.
  *
- * If any of the above fails, the prompt needs revision before week 2 ships.
+ * Requires ANTHROPIC_API_KEY in env. The script intentionally does NOT
+ * load Prisma — eval should not touch the database.
  */
 
 import { promises as fs } from 'fs'
 import path from 'path'
-import { extractFromPhoto, type ExtractOutput, VisionExtractionError } from './extract'
+import { extractOpenFeatures, MODEL_VERSION, OPEN_EXTRACTION_PROMPT_VERSION } from './extract'
+import type { OpenExtraction } from './prompt'
+import { OpenExtractionParseError } from './prompt'
 
-const TEST_PHOTOS_DIR = path.join(process.cwd(), 'test-photos')
-const RESULTS_DIR = path.join(process.cwd(), 'eval-results')
+const CORPUS_DIR = path.join(process.cwd(), 'eval', 'corpus')
+const RESULTS_DIR = path.join(process.cwd(), 'eval', 'results')
 
 interface EvalCase {
   filename: string
   fullPath: string
-  expectedRoomType: string // from subfolder name
-  result?: ExtractOutput
+  /** Subfolder name, if any. Used only for labeling in the report. */
+  label: string | null
+  extraction?: OpenExtraction
+  latencyMs?: number
+  tokensIn?: number
+  tokensOut?: number
+  apiCostCents?: number
   error?: string
 }
 
 async function main() {
-  await fs.mkdir(RESULTS_DIR, { recursive: true })
-
-  // Walk test-photos/ — each subfolder is a room type
-  const subfolders = await fs.readdir(TEST_PHOTOS_DIR, { withFileTypes: true })
-  const cases: EvalCase[] = []
-  for (const entry of subfolders) {
-    if (!entry.isDirectory()) continue
-    const roomType = entry.name
-    const photos = await fs.readdir(path.join(TEST_PHOTOS_DIR, roomType))
-    for (const photo of photos) {
-      if (!/\.(jpg|jpeg|png|webp)$/i.test(photo)) continue
-      cases.push({
-        filename: photo,
-        fullPath: path.join(TEST_PHOTOS_DIR, roomType, photo),
-        expectedRoomType: roomType,
-      })
-    }
+  if (!process.env.ANTHROPIC_API_KEY) {
+    console.error('ANTHROPIC_API_KEY not set. Add it to .env.local and re-run.')
+    process.exit(1)
   }
 
-  console.log(`Running ${cases.length} extractions...`)
+  try {
+    await fs.access(CORPUS_DIR)
+  } catch {
+    console.error(`Corpus directory not found: ${CORPUS_DIR}`)
+    console.error('Drop test photos there. See eval/README.md for instructions.')
+    process.exit(1)
+  }
 
-  // For each case, upload to a temp public URL (or use a local server) and
-  // call the extractor. In real CI, this would use a fixture-server; for
-  // initial dev, point at a Vercel Blob staging bucket or pass data URIs.
-  // For this harness, we assume the user has already uploaded photos to
-  // a public bucket and passes URLs; or the harness reads local files and
-  // converts to data URIs (simpler for week-1 testing).
+  const cases = await collectCases(CORPUS_DIR)
+  if (cases.length === 0) {
+    console.error(`No photos found in ${CORPUS_DIR}.`)
+    console.error('Supported formats: jpg, jpeg, png, webp.')
+    process.exit(1)
+  }
+
+  console.log(`[eval] running open extraction on ${cases.length} photos`)
+  console.log(`[eval] model=${MODEL_VERSION} prompt=${OPEN_EXTRACTION_PROMPT_VERSION}`)
+
+  const startedAt = new Date()
+  const runDir = path.join(RESULTS_DIR, startedAt.toISOString().replace(/[:.]/g, '-'))
+  await fs.mkdir(runDir, { recursive: true })
+
   for (let i = 0; i < cases.length; i++) {
-    const c = cases[i]
-    console.log(`[${i + 1}/${cases.length}] ${c.expectedRoomType}/${c.filename}`)
+    const c = cases[i]!
+    const labelPrefix = c.label ? `${c.label}/` : ''
+    process.stdout.write(`[${i + 1}/${cases.length}] ${labelPrefix}${c.filename} ... `)
     try {
-      const buf = await fs.readFile(c.fullPath)
-      const mime = c.filename.match(/\.(jpe?g)$/i)
-        ? 'image/jpeg'
-        : c.filename.match(/\.png$/i)
-          ? 'image/png'
-          : 'image/webp'
-      const dataUri = `data:${mime};base64,${buf.toString('base64')}`
-      c.result = await extractFromPhoto({
-        photoBlobUrl: dataUri,
-        mimeType: mime as 'image/jpeg' | 'image/png' | 'image/webp',
-        userRoomTypeHint: c.expectedRoomType,
-      })
+      const buffer = await fs.readFile(c.fullPath)
+      const mediaType = mediaTypeFor(c.filename)
+      const result = await extractOpenFeatures({ imageBuffer: buffer, mediaType })
+      c.extraction = result.extraction
+      c.latencyMs = result.latencyMs
+      c.tokensIn = result.tokensIn
+      c.tokensOut = result.tokensOut
+      c.apiCostCents = result.apiCostCents
+      console.log(
+        `ok (${result.extraction.features.length} features, ${result.latencyMs}ms, ${result.apiCostCents.toFixed(2)}¢)`
+      )
     } catch (e) {
-      if (e instanceof VisionExtractionError) {
+      if (e instanceof OpenExtractionParseError) {
         c.error = `${e.code}: ${e.message}`
       } else {
         c.error = (e as Error).message
       }
+      console.log(`FAIL — ${c.error.slice(0, 100)}`)
     }
   }
 
-  // Compute pass-rate stats
-  const stats = computeStats(cases)
-  console.log('\n=== EVAL STATS ===')
-  console.log(JSON.stringify(stats, null, 2))
+  // Write per-case JSON files
+  for (const c of cases) {
+    const safeName = `${c.label ?? 'root'}__${c.filename}.json`.replace(/[^a-zA-Z0-9_.\-]/g, '_')
+    await fs.writeFile(
+      path.join(runDir, safeName),
+      JSON.stringify(
+        {
+          filename: c.filename,
+          label: c.label,
+          extraction: c.extraction ?? null,
+          latencyMs: c.latencyMs,
+          tokensIn: c.tokensIn,
+          tokensOut: c.tokensOut,
+          apiCostCents: c.apiCostCents,
+          error: c.error ?? null,
+        },
+        null,
+        2
+      )
+    )
+  }
 
-  // Write HTML report
-  const htmlPath = path.join(RESULTS_DIR, `eval-${Date.now()}.html`)
-  await fs.writeFile(htmlPath, buildHtmlReport(cases, stats))
-  console.log(`\nReport written: ${htmlPath}`)
+  // Write summary
+  const summary = computeSummary(cases)
+  const summaryMd = renderSummary(summary, cases, startedAt)
+  await fs.writeFile(path.join(runDir, 'summary.md'), summaryMd)
+  await fs.writeFile(path.join(runDir, 'summary.json'), JSON.stringify(summary, null, 2))
+
+  console.log(`\n[eval] results: ${runDir}`)
+  console.log(`[eval] open summary.md for the report`)
 }
 
-function computeStats(cases: EvalCase[]) {
-  let total = 0
-  let succeeded = 0
-  let roomTypeCorrect = 0
-  let highConfidence = 0
-  let valueJudgmentInNote = 0
-  let totalCostCents = 0
+function mediaTypeFor(filename: string): 'image/jpeg' | 'image/png' | 'image/webp' {
+  if (/\.png$/i.test(filename)) return 'image/png'
+  if (/\.webp$/i.test(filename)) return 'image/webp'
+  return 'image/jpeg'
+}
 
-  // Heuristic: condition_note_short should not contain value-judgment words.
-  // Catches the most common failure mode where the model slips into
-  // "dated", "outdated", "old", "needs work", "modern" framing.
-  const VALUE_JUDGMENT_WORDS = [
-    'dated',
-    'outdated',
-    'old-fashioned',
-    'modern',
-    'beautiful',
-    'ugly',
-    'nice',
-    'needs work',
-    'needs replacement',
-    'needs updating',
-    'in need of',
-    'should be',
-    'should replace',
-  ]
-
-  for (const c of cases) {
-    total++
-    if (!c.result) continue
-    succeeded++
-    totalCostCents += c.result.apiCostCents
-    if (c.result.extraction.room_type_confirmed === c.expectedRoomType) {
-      roomTypeCorrect++
+async function collectCases(root: string): Promise<EvalCase[]> {
+  const cases: EvalCase[] = []
+  const entries = await fs.readdir(root, { withFileTypes: true })
+  // Top-level files (no subfolder)
+  for (const entry of entries) {
+    if (entry.isFile() && isImage(entry.name)) {
+      cases.push({
+        filename: entry.name,
+        fullPath: path.join(root, entry.name),
+        label: null,
+      })
     }
-    if (c.result.extraction.overall_confidence >= 0.7) {
-      highConfidence++
-    }
-    const note = c.result.extraction.condition_note_short.toLowerCase()
-    if (VALUE_JUDGMENT_WORDS.some((w) => note.includes(w))) {
-      valueJudgmentInNote++
+    if (entry.isDirectory()) {
+      const subentries = await fs.readdir(path.join(root, entry.name), { withFileTypes: true })
+      for (const sub of subentries) {
+        if (sub.isFile() && isImage(sub.name)) {
+          cases.push({
+            filename: sub.name,
+            fullPath: path.join(root, entry.name, sub.name),
+            label: entry.name,
+          })
+        }
+      }
     }
   }
+  return cases
+}
+
+function isImage(name: string): boolean {
+  return /\.(jpe?g|png|webp)$/i.test(name)
+}
+
+interface EvalSummary {
+  total: number
+  succeeded: number
+  failed: number
+  successPct: number
+  // Feature-count distribution
+  featureCount: { min: number; mean: number; max: number; median: number }
+  // Mean confidence across all features in all photos
+  meanFeatureConfidence: number
+  // How many photos returned at least one feature with confidence >= 0.7
+  photosWithUsefulFeature: number
+  // Category distribution (overall_photo_category)
+  overallCategoryDistribution: Record<string, number>
+  // Feature-type frequency (top 30)
+  topFeatureTypes: Array<{ type: string; count: number }>
+  // Cost
+  totalCostCents: number
+  meanCostCents: number
+  // Latency
+  meanLatencyMs: number
+  // Notes — how often was a note returned non-empty
+  photosWithNotes: number
+}
+
+function computeSummary(cases: EvalCase[]): EvalSummary {
+  const succeeded = cases.filter((c) => !!c.extraction)
+  const failed = cases.filter((c) => !c.extraction)
+
+  const featureCounts = succeeded.map((c) => c.extraction!.features.length).sort((a, b) => a - b)
+  const allFeatures = succeeded.flatMap((c) => c.extraction!.features)
+  const allConfidences = allFeatures.map((f) => f.confidence)
+
+  const meanFeatureConfidence =
+    allConfidences.length > 0
+      ? allConfidences.reduce((a, b) => a + b, 0) / allConfidences.length
+      : 0
+
+  const photosWithUsefulFeature = succeeded.filter((c) =>
+    c.extraction!.features.some((f) => f.confidence >= 0.7)
+  ).length
+
+  const overallCategoryDistribution: Record<string, number> = {}
+  for (const c of succeeded) {
+    const cat = c.extraction!.overall_photo_category
+    overallCategoryDistribution[cat] = (overallCategoryDistribution[cat] ?? 0) + 1
+  }
+
+  const typeCounts: Record<string, number> = {}
+  for (const f of allFeatures) {
+    typeCounts[f.type] = (typeCounts[f.type] ?? 0) + 1
+  }
+  const topFeatureTypes = Object.entries(typeCounts)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 30)
+    .map(([type, count]) => ({ type, count }))
+
+  const totalCostCents = succeeded.reduce((acc, c) => acc + (c.apiCostCents ?? 0), 0)
+  const totalLatencyMs = succeeded.reduce((acc, c) => acc + (c.latencyMs ?? 0), 0)
+
+  const photosWithNotes = succeeded.filter(
+    (c) => c.extraction!.notes && c.extraction!.notes.trim().length > 0
+  ).length
 
   return {
-    total,
-    succeeded,
-    succeeded_pct: total ? Math.round((succeeded / total) * 1000) / 10 : 0,
-    room_type_correct: roomTypeCorrect,
-    room_type_correct_pct: succeeded ? Math.round((roomTypeCorrect / succeeded) * 1000) / 10 : 0,
-    high_confidence: highConfidence,
-    high_confidence_pct: succeeded ? Math.round((highConfidence / succeeded) * 1000) / 10 : 0,
-    value_judgment_in_note: valueJudgmentInNote,
-    value_judgment_pct: succeeded ? Math.round((valueJudgmentInNote / succeeded) * 1000) / 10 : 0,
-    total_cost_cents: totalCostCents,
-    avg_cost_cents_per_photo: succeeded ? Math.round((totalCostCents / succeeded) * 100) / 100 : 0,
+    total: cases.length,
+    succeeded: succeeded.length,
+    failed: failed.length,
+    successPct: cases.length > 0 ? Math.round((succeeded.length / cases.length) * 1000) / 10 : 0,
+    featureCount: {
+      min: featureCounts[0] ?? 0,
+      max: featureCounts[featureCounts.length - 1] ?? 0,
+      median: featureCounts[Math.floor(featureCounts.length / 2)] ?? 0,
+      mean:
+        featureCounts.length > 0
+          ? Math.round((featureCounts.reduce((a, b) => a + b, 0) / featureCounts.length) * 100) /
+            100
+          : 0,
+    },
+    meanFeatureConfidence: Math.round(meanFeatureConfidence * 1000) / 1000,
+    photosWithUsefulFeature,
+    overallCategoryDistribution,
+    topFeatureTypes,
+    totalCostCents: Math.round(totalCostCents * 100) / 100,
+    meanCostCents:
+      succeeded.length > 0 ? Math.round((totalCostCents / succeeded.length) * 100) / 100 : 0,
+    meanLatencyMs:
+      succeeded.length > 0 ? Math.round(totalLatencyMs / succeeded.length) : 0,
+    photosWithNotes,
   }
 }
 
-function buildHtmlReport(cases: EvalCase[], stats: ReturnType<typeof computeStats>): string {
-  return `<!DOCTYPE html>
-<html>
-<head>
-<title>Alder Vision Prompt Eval — ${new Date().toISOString()}</title>
-<style>
-  body { font-family: -apple-system, system-ui, sans-serif; max-width: 1400px; margin: 2rem auto; padding: 0 1rem; color: #222; }
-  h1 { font-weight: 500; }
-  .stats { background: #f5f5f5; padding: 1rem 1.5rem; border-radius: 8px; margin-bottom: 2rem; }
-  .stats div { margin: 0.25rem 0; font-size: 14px; }
-  .stats .good { color: #1d9e75; }
-  .stats .bad { color: #d85a30; }
-  .case { display: grid; grid-template-columns: 320px 1fr; gap: 1.5rem; padding: 1rem 0; border-top: 1px solid #eee; }
-  .case img { width: 100%; max-height: 240px; object-fit: cover; border-radius: 6px; }
-  .case .meta { font-size: 12px; color: #666; margin-top: 0.25rem; }
-  .case pre { background: #f9f9f9; padding: 0.75rem; border-radius: 6px; font-size: 12px; overflow-x: auto; line-height: 1.4; }
-  .case .note { background: #fffae5; padding: 0.5rem 0.75rem; border-radius: 4px; font-size: 13px; margin-bottom: 0.5rem; }
-  .case .error { background: #fde8e8; color: #a32d2d; padding: 0.5rem 0.75rem; border-radius: 4px; font-size: 13px; }
-  .case .mismatch { background: #fde8e8; padding: 4px 8px; border-radius: 3px; font-size: 12px; color: #a32d2d; }
-  .case .match { background: #e1f5ee; padding: 4px 8px; border-radius: 3px; font-size: 12px; color: #0f6e56; }
-</style>
-</head>
-<body>
-<h1>Alder Vision Prompt — Eval Results</h1>
-<div class="stats">
-  <div>Total photos: <strong>${stats.total}</strong></div>
-  <div>Succeeded: <strong>${stats.succeeded}</strong> (${stats.succeeded_pct}%)</div>
-  <div class="${stats.room_type_correct_pct >= 95 ? 'good' : 'bad'}">Room type correct: <strong>${stats.room_type_correct}/${stats.succeeded}</strong> (${stats.room_type_correct_pct}%) — target ≥95%</div>
-  <div>High confidence (≥0.7): <strong>${stats.high_confidence}</strong> (${stats.high_confidence_pct}%)</div>
-  <div class="${stats.value_judgment_pct === 0 ? 'good' : 'bad'}">Value judgment in note: <strong>${stats.value_judgment_in_note}</strong> (${stats.value_judgment_pct}%) — target 0%</div>
-  <div>Total API cost: <strong>$${(stats.total_cost_cents / 100).toFixed(2)}</strong></div>
-  <div>Avg per photo: <strong>${stats.avg_cost_cents_per_photo}¢</strong></div>
-</div>
-${cases
-  .map((c) => {
-    const imgB64 = `data:image;base64,${''}` // omitted to keep report small; serve from disk instead
-    if (c.error) {
-      return `<div class="case">
-  <div><img src="${path.relative(RESULTS_DIR, c.fullPath)}"/><div class="meta">${c.expectedRoomType}/${c.filename}</div></div>
-  <div class="error"><strong>ERROR:</strong> ${escapeHtml(c.error)}</div>
-</div>`
-    }
-    const r = c.result!
-    const e = r.extraction
-    const match = e.room_type_confirmed === c.expectedRoomType
-    return `<div class="case">
-  <div>
-    <img src="${path.relative(RESULTS_DIR, c.fullPath)}"/>
-    <div class="meta">
-      ${c.expectedRoomType}/${c.filename}<br/>
-      ${match ? '<span class="match">room match</span>' : `<span class="mismatch">expected ${c.expectedRoomType}, got ${e.room_type_confirmed}</span>`}
-      &nbsp; conf ${e.overall_confidence.toFixed(2)}
-      ${r.shouldReview ? ' &nbsp; <span class="mismatch">REVIEW</span>' : ''}
-    </div>
-  </div>
-  <div>
-    <div class="note"><strong>Note:</strong> ${escapeHtml(e.condition_note_short)}</div>
-    <pre>${escapeHtml(JSON.stringify(e, null, 2))}</pre>
-  </div>
-</div>`
-  })
-  .join('\n')}
-</body>
-</html>`
-}
+function renderSummary(s: EvalSummary, cases: EvalCase[], startedAt: Date): string {
+  const failedCases = cases.filter((c) => !!c.error)
+  const lowConfCases = cases
+    .filter((c) => c.extraction && c.extraction.features.length > 0)
+    .filter((c) => {
+      const mean =
+        c.extraction!.features.reduce((acc, f) => acc + f.confidence, 0) /
+        c.extraction!.features.length
+      return mean < 0.6
+    })
 
-function escapeHtml(s: string): string {
-  return s
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;')
+  const categoryRows = Object.entries(s.overallCategoryDistribution)
+    .sort((a, b) => b[1] - a[1])
+    .map(([cat, count]) => `| ${cat} | ${count} |`)
+    .join('\n')
+
+  const topTypesRows = s.topFeatureTypes
+    .map((t) => `| ${t.type} | ${t.count} |`)
+    .join('\n')
+
+  return `# Vision Eval Summary
+
+- **Started**: ${startedAt.toISOString()}
+- **Model**: ${MODEL_VERSION}
+- **Prompt version**: ${OPEN_EXTRACTION_PROMPT_VERSION}
+
+## Run
+
+| Metric | Value |
+| --- | --- |
+| Total photos | ${s.total} |
+| Succeeded | ${s.succeeded} (${s.successPct}%) |
+| Failed | ${s.failed} |
+| Photos with ≥1 feature ≥0.7 conf | ${s.photosWithUsefulFeature} |
+| Photos with non-empty notes | ${s.photosWithNotes} |
+| Mean feature confidence | ${s.meanFeatureConfidence} |
+| Mean latency / photo | ${s.meanLatencyMs}ms |
+| Mean cost / photo | ${s.meanCostCents}¢ |
+| Total run cost | ${s.totalCostCents}¢ |
+
+## Feature count distribution
+
+| Stat | Value |
+| --- | --- |
+| Min | ${s.featureCount.min} |
+| Median | ${s.featureCount.median} |
+| Mean | ${s.featureCount.mean} |
+| Max | ${s.featureCount.max} |
+
+## overall_photo_category distribution
+
+| Category | Count |
+| --- | --- |
+${categoryRows || '| _no successful runs_ | 0 |'}
+
+## Top feature types
+
+| Type | Count |
+| --- | --- |
+${topTypesRows || '| _no features extracted_ | 0 |'}
+
+## Failed cases
+
+${failedCases.length === 0 ? '_none_' : failedCases.map((c) => `- \`${c.label ?? 'root'}/${c.filename}\` — ${c.error?.slice(0, 200)}`).join('\n')}
+
+## Low-confidence cases (mean feature conf < 0.6)
+
+${lowConfCases.length === 0 ? '_none_' : lowConfCases.map((c) => `- \`${c.label ?? 'root'}/${c.filename}\` — ${c.extraction!.features.length} features`).join('\n')}
+
+---
+
+Per-photo JSON files in this directory. Open any one for the full extraction.
+`
 }
 
 main().catch((e) => {
-  console.error(e)
+  console.error('[eval] fatal:', e)
   process.exit(1)
 })

@@ -1,4 +1,7 @@
 // V7 — Smart Cart result page (post-sale).
+// v7.3.4-PR1: added Prisma SmartCart fallback lookup so v3 carts
+// (LearningStore flywheel, synthesisVersion='v3_learning_store')
+// render here too. v1 + v2 paths untouched.
 
 import { notFound } from 'next/navigation'
 import Footer from '@/components/Footer'
@@ -10,7 +13,9 @@ import type { SmartCartV2Output } from '@/lib/smart-cart-model'
 import { getGeneralSkipPrinciples } from '@/content/skip-list'
 import CartActions from '@/components/smartCart/CartActions'
 import V2ResultLayout from '@/components/smartCart/V2ResultLayout'
+import { V3CartView, type CartItemV3 } from '@/components/smartCart/V3CartView'
 import { enrichCartWithCurrentImages } from '@/lib/smart-cart-images'
+import { prisma } from '@/lib/db'
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
@@ -18,29 +23,58 @@ export const revalidate = 0
 type Props = { params: { cartId: string } }
 
 export default async function SmartCartResultPage({ params }: Props) {
-  const cart = await getSmartCart(params.cartId)
-  if (!cart) {
-    notFound()
-  }
-  // V7.2.1 — discriminate on cart.version. v1 (legacy) carts keep
-  // the existing layout; v2 carts render the tiered-slot layout.
-  if (isV2Cart(cart)) {
-    if (cart.refunded) return <V2Refunded cart={cart} />
-    if (new Date(cart.expiresAt).getTime() < Date.now()) {
-      return <V2Expired cart={cart} />
+  // PR1 dispatch order:
+  //   1. KV (existing v1/v2 carts via getSmartCart)
+  //   2. Prisma SmartCart (v3 carts written by /api/cart/synthesize)
+  // Namespaces are disjoint — a cartId hits at most one store.
+  const kvCart = await getSmartCart(params.cartId)
+  if (kvCart) {
+    if (isV2Cart(kvCart)) {
+      if (kvCart.refunded) return <V2Refunded cart={kvCart} />
+      if (new Date(kvCart.expiresAt).getTime() < Date.now()) {
+        return <V2Expired cart={kvCart} />
+      }
+      // V7.2.10 — backfill imageUrl from current universe for carts
+      // saved before the image pipeline existed.
+      return <V2ResultLayout cart={enrichCartWithCurrentImages(kvCart)} />
     }
-    // V7.2.10 — backfill imageUrl from current universe for carts
-    // saved before the image pipeline existed.
-    return <V2ResultLayout cart={enrichCartWithCurrentImages(cart)} />
+    if (kvCart.refunded) return <RefundedCart cart={kvCart} />
+    if (new Date(kvCart.expiresAt).getTime() < Date.now()) {
+      return <ExpiredCart cart={kvCart} />
+    }
+    return <SmartCartResult cart={kvCart} />
   }
 
-  if (cart.refunded) {
-    return <RefundedCart cart={cart} />
+  // Prisma fallback — v3 carts. No ownership check here because
+  // pre-paid free-beta v3 carts already live at the
+  // /project-read/basement/result/[cartId] path with anon-cookie
+  // auth. Carts that flow through Stripe webhook in PR3 will be
+  // tagged is_paid (or similar) and may add ownership at that point.
+  const prismaCart = await prisma.smartCart.findUnique({
+    where: { id: params.cartId },
+  })
+  if (!prismaCart) notFound()
+  if (prismaCart.synthesisVersion === 'v3_learning_store') {
+    const items =
+      ((prismaCart.cartItemsJsonWithPhotos ??
+        prismaCart.cartJson) as unknown as CartItemV3[]) ?? []
+    return (
+      <main className="mx-auto max-w-3xl px-4 py-8">
+        <V3CartView
+          cartId={prismaCart.id}
+          items={items}
+          // No email-save here: paid carts get the upgrade-offer
+          // email scheduled via Stripe webhook (PR3); free-beta
+          // carts have email-save under their own URL.
+          showEmailSave={false}
+          heading="Your Smart Cart"
+        />
+      </main>
+    )
   }
-  if (new Date(cart.expiresAt).getTime() < Date.now()) {
-    return <ExpiredCart cart={cart} />
-  }
-  return <SmartCartResult cart={cart} />
+  // Unknown synthesisVersion in Prisma — render nothing for now.
+  // Worth-It carts also live in Prisma but render at their own URL.
+  notFound()
 }
 
 function V2Refunded({ cart }: { cart: SmartCartV2Output }) {

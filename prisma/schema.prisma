@@ -920,6 +920,52 @@ model LearningStore {
   @@index([source])
   @@index([impressionCount])
   @@index([lastUpdatedAt])
+
+  feedback LearningStoreFeedback[]
+}
+
+// =============================================================================
+// LEARNING STORE FEEDBACK — v7.3.4-PR1
+// =============================================================================
+//
+// Captures freeform "doesn't apply" feedback text from the v7.3.4
+// reaction UI. Separate table because each LearningStore signature
+// can accumulate many feedback rows over time, freeform text varies
+// in length, and we want timestamped + anon-id-attributed records
+// for the v7.3.4 retro + the v7.5 chat-refinement feature to read
+// against.
+//
+// Why a new table vs. a JSON array column on LearningStore:
+//   - Hot path (synthesize) reads recommendationPayload + counts. We
+//     do NOT want unbounded JSON array growth on a row that's read
+//     by every synthesis request.
+//   - Aggregation queries (group by signature, count over time) are
+//     trivial on a real table, awkward on json_array_elements.
+//   - GDPR / consent revocation: a future "delete my feedback"
+//     operation is a simple delete-by-anonId.
+model LearningStoreFeedback {
+  id              String        @id @default(cuid())
+  learningStoreId String
+  learningStore   LearningStore @relation(fields: [learningStoreId], references: [id], onDelete: Cascade)
+  // Anon-owned during v7.3.4; will be re-keyed to userId in PR3
+  // when email-claim flow lands.
+  anonId          String
+  // SmartCart this feedback was given in the context of. Lets us
+  // tie freeform text back to which exact rendered recommendation
+  // the visitor was reacting to (the same signature may have been
+  // synthesized with different surrounding context in different
+  // carts).
+  cartId          String
+  // Reaction type that triggered the freeform capture. Today
+  // 'doesnt_apply' is the only one with a text payload; future
+  // PRs may add 'dismiss_with_reason' etc.
+  reactionType    String
+  feedbackText    String
+  createdAt       DateTime      @default(now())
+
+  @@index([learningStoreId])
+  @@index([anonId])
+  @@index([cartId])
 }
 
 // =============================================================================

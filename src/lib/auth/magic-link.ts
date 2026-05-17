@@ -117,15 +117,35 @@ export async function requestMagicLink(emailRaw: string): Promise<RequestResult>
     process.env.MAGIC_LINK_FROM_EMAIL ?? 'Alder Read <read@alderprojects.com>'
 
   try {
-    await resend.emails.send({
+    // Resend SDK 6.x returns { data, error } and does NOT throw on
+    // 4xx/5xx API responses — sandbox-sender rejections, unverified
+    // domain bounces, etc. all come back via the `error` field. The
+    // try/catch below only catches network/runtime exceptions.
+    const result = await resend.emails.send({
       from: fromAddress,
       to: email,
       subject: 'Sign in to Alder Read',
       html: buildEmailHtml(link),
       text: buildEmailText(link),
     })
+    if (result.error) {
+      console.error(
+        '[magic-link] Resend API rejected send',
+        JSON.stringify({
+          name: result.error.name,
+          message: result.error.message,
+          from: fromAddress,
+          to: email,
+        })
+      )
+      return { ok: true, reason: 'email_send_failed' }
+    }
+    console.log(
+      '[magic-link] Resend accepted send',
+      JSON.stringify({ id: result.data?.id, from: fromAddress, to: email })
+    )
   } catch (e) {
-    console.error('Magic link email send failed:', (e as Error).message)
+    console.error('[magic-link] email send threw:', (e as Error).message)
     return { ok: true, reason: 'email_send_failed' }
   }
 

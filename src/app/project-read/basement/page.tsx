@@ -21,7 +21,7 @@
  */
 
 import type { Metadata } from 'next'
-import { BasementUploader } from './BasementUploader'
+import { PhotoUploader } from './PhotoUploader'
 import { HandoffQR } from './HandoffQR'
 
 export const metadata: Metadata = {
@@ -52,7 +52,7 @@ export default function PhotoReadPage() {
 
       <HandoffQR />
 
-      <BasementUploader />
+      <PhotoUploader />
     </main>
   )
 }

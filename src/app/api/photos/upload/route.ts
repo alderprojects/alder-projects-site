@@ -392,10 +392,9 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
   }
 
   // Response shape:
-  // - extraction: null on failure; otherwise the new open shape with a
-  //   precomputed overallConfidence so the existing BasementUploader UI
-  //   keeps rendering "Read clearly / partially / couldn't read" without
-  //   client changes
+  // - extraction: null on failure; otherwise the open shape with a
+  //   precomputed overallConfidence so the PhotoUploader UI can render
+  //   "Read clearly / partially / couldn't read" without recomputing.
   const responseExtraction = extractionResult
     ? {
         overallConfidence:

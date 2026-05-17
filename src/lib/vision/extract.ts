@@ -1,36 +1,32 @@
 /**
- * Alder Read v1 — Vision Extraction
+ * Alder Read — Vision Extraction
  *
- * v7.3.3-C update: MODEL_VERSION bumped to claude-sonnet-4-5-20250929
- * after the v7.3.3-B diagnostic showed every basement extraction was
- * failing with 404 not_found_error on the deprecated
- * claude-3-5-sonnet-20241022 model ID. Same model the chat route uses.
- *
- * Two extraction paths now coexist in this file:
+ * Two extraction paths in this file:
  *
  *   1. extractFromPhoto (v1.0.0) — original Tier 2 closed-schema path
- *      (room confirmation + era + per-room feature enums). Used by
- *      legacy room-confirmation surfaces. Kept as-is.
+ *      (room confirmation + era + per-room feature enums). Used by a
+ *      future room-confirmation surface; currently only referenced by
+ *      src/lib/vision/eval.ts's legacy code path.
  *
- *   2. extractFromImage (DEPRECATED, basement-only) — v7.3.3-B
- *      basement-moisture path. After v7.3.3-C PR1 it delegates to
- *      extractOpenFeatures + a shim that maps open-shape features to
- *      the basement signal vocabulary. Kept callable so any legacy
- *      caller doesn't break; new callers should use extractOpenFeatures.
+ *   2. extractOpenFeatures (v7.3.3-C, current strategic path) — open
+ *      vocabulary photo extraction. Looks at any home photo and
+ *      returns a feature array with
+ *      type/location/condition/confidence/category_hint plus an
+ *      overall photo category. Prompt + schema live in
+ *      src/lib/vision/prompt.ts so the eval harness can import them
+ *      without pulling the Anthropic client.
  *
- *   3. extractOpenFeatures (v7.3.3-C, open extraction) — the new
- *      strategic path. Looks at any home photo and returns a feature
- *      array with type/location/condition/confidence/category_hint.
- *      Prompt + schema live in src/lib/vision/prompt.ts so the eval
- *      harness can import them without pulling the Anthropic client.
- *
- * The prompt is the product. The synthesis quality downstream depends
+ * The prompt is the product. Synthesis quality downstream depends
  * entirely on this file. Treat changes here as production deploys.
  *
  * Version history:
  *   v1.0.0      — initial Tier 2 closed-schema (room/era/features)
- *   basement-v1 — v7.3.3-B basement-moisture extraction (now deprecated)
- *   open-v1.0.0 — v7.3.3-C open extraction (current strategic path)
+ *   open-v1.0.0 — v7.3.3-C open extraction
+ *   open-v1.0.2 — v7.3.3-C-PR1.3 model swap to Haiku 4.5 + token cap
+ *
+ * v7.3.4-PR1.5 removed the v7.3.3-B basement-only types and the
+ * openFeaturesToBasementExtraction shim now that synthesize-v3
+ * (LearningStore flywheel) is the only synthesis path.
  */
 
 import Anthropic from '@anthropic-ai/sdk'
@@ -570,69 +566,18 @@ function nullableEnum(v: string | undefined): string | null {
 }
 
 // =============================================================================
-// V7.3.3-B: BASEMENT-SPECIFIC EXTRACTION FOR PHOTO READER BETA
-// =============================================================================
-//
-// Distinct from extractFromPhoto above — basement_moisture beta uses a
-// tighter schema with explicit moisture-signal enums tuned for the
-// dual-synthesis rules in lib/smart-cart/synthesize-v2. Single category
-// for v7.3.3; other categories continue to use extractFromPhoto's
-// general-purpose path.
-
-export interface BasementVisibleFeature {
-  feature: string
-  confidence: number
-}
-
-export type BasementMoistureSignal =
-  | 'efflorescence'
-  | 'staining'
-  | 'active_water'
-  | 'visible_cracks'
-  | 'rust_on_metal'
-  | 'musty_indicators_visual'
-  | 'sump_pump_present'
-  | 'dehumidifier_present'
-  | 'vapor_barrier_visible'
-  | 'none_visible'
-
-export interface BasementExtraction {
-  roomTypeConfirmed: boolean
-  detectedRoomType: string
-  finishState: 'unfinished' | 'partially_finished' | 'finished' | 'unknown'
-  visibleFeatures: BasementVisibleFeature[]
-  moistureSignals: BasementMoistureSignal[]
-  overallConfidence: number
-  promptVersion: string
-}
-
-// v7.3.3-C: basement-only prompt + helpers removed. extractFromImage
-// now delegates to extractOpenFeatures + openFeaturesToBasementExtraction.
-// Shim lives at the bottom of this file.
-
-/**
- * DEPRECATED in v7.3.3-C — kept callable for backwards compatibility.
- *
- * Now delegates to extractOpenFeatures (the open-vocabulary path) and
- * converts the result to the basement-signal shape via the bridge shim.
- * The bridge shim exists so the existing 3 basement rules in
- * synthesize-v2.ts still fire during the PR1 → PR2 window. Shim will
- * be deleted in PR2 when synthesis pivots to feature-signature lookup.
- *
- * New callers should use extractOpenFeatures directly.
- */
-export async function extractFromImage(opts: {
-  imageBuffer: Buffer
-  contextRoomType?: 'basement'
-  scope?: 'basement_moisture'
-}): Promise<BasementExtraction> {
-  const { extraction } = await extractOpenFeatures({ imageBuffer: opts.imageBuffer })
-  return openFeaturesToBasementExtraction(extraction)
-}
-
-// =============================================================================
 // V7.3.3-C: OPEN EXTRACTION (current strategic path)
 // =============================================================================
+//
+// v7.3.4-PR1.5 removed the legacy basement-only types
+// (BasementExtraction, BasementMoistureSignal, BasementVisibleFeature),
+// the deprecated extractFromImage wrapper, and the
+// openFeaturesToBasementExtraction shim. Those existed only to bridge
+// v7.3.3-B's basement-only synthesize-v2 path through to the open
+// extraction switchover. synthesize-v2 is gone, the shim is gone,
+// and this file now houses only the open path (plus the older v1.0.0
+// closed-schema extractFromPhoto kept for a future room-confirmation
+// surface — currently only referenced by src/lib/vision/eval.ts).
 
 export interface OpenExtractionResult {
   /** The parsed + zod-validated extraction. */
@@ -731,120 +676,6 @@ export async function extractOpenFeatures(opts: {
     tokensIn,
     tokensOut,
     latencyMs: Date.now() - t0,
-  }
-}
-
-// =============================================================================
-// V7.3.3-C BRIDGE SHIM: open features -> basement extraction
-// =============================================================================
-//
-// Exists for one purpose: keep the 3 existing basement rules in
-// synthesize-v2.ts firing during the PR1 -> PR2 window. PR2 replaces
-// synthesize-v2 with feature-signature lookup against LearningStore;
-// at that point this shim gets deleted and BasementExtraction itself
-// can be retired.
-//
-// Mapping logic (intentionally minimal):
-//   - finishState <- look for unfinished_basement_walls /
-//     finished_basement_walls in features[].type, fall back to "unknown"
-//   - moistureSignals <- match feature.type against the
-//     BasementMoistureSignal enum directly (model is seeded with these
-//     exact strings in PROMPT_SYSTEM)
-//   - visibleFeatures <- one row per basement-category feature
-//   - overallConfidence <- mean of basement-category feature confidences,
-//     falls back to 0 if no basement features
-
-const BASEMENT_SIGNAL_VALUES: ReadonlySet<string> = new Set<BasementMoistureSignal>([
-  'efflorescence',
-  'staining',
-  'active_water',
-  'visible_cracks',
-  'rust_on_metal',
-  'musty_indicators_visual',
-  'sump_pump_present',
-  'dehumidifier_present',
-  'vapor_barrier_visible',
-  'none_visible',
-])
-
-// Some open-extraction types include a prefix or suffix. Strip common
-// ones so "moisture_efflorescence" still maps to "efflorescence" etc.
-const BASEMENT_SIGNAL_TYPE_ALIASES: Record<string, BasementMoistureSignal> = {
-  moisture_efflorescence: 'efflorescence',
-  water_staining: 'staining',
-  visible_cracks_wall: 'visible_cracks',
-  foundation_crack: 'visible_cracks',
-  rust_on_metal: 'rust_on_metal',
-  musty_indicators_visual: 'musty_indicators_visual',
-  sump_pump_present: 'sump_pump_present',
-  dehumidifier_present: 'dehumidifier_present',
-  vapor_barrier_visible: 'vapor_barrier_visible',
-  active_water: 'active_water',
-}
-
-export function openFeaturesToBasementExtraction(
-  open: OpenExtraction
-): BasementExtraction {
-  // Only consider features the model categorized as basement (or
-  // category_hint=unclear, just in case — some moisture features
-  // could plausibly belong elsewhere but we don't want to drop a
-  // dehumidifier in a utility room shot).
-  const basementFeatures = open.features.filter(
-    (f) => f.category_hint === 'basement' || f.category_hint === 'unclear'
-  )
-
-  // moistureSignals: direct enum match OR aliased match
-  const moistureSignals: BasementMoistureSignal[] = []
-  for (const f of basementFeatures) {
-    if (BASEMENT_SIGNAL_VALUES.has(f.type)) {
-      moistureSignals.push(f.type as BasementMoistureSignal)
-    } else if (BASEMENT_SIGNAL_TYPE_ALIASES[f.type]) {
-      moistureSignals.push(BASEMENT_SIGNAL_TYPE_ALIASES[f.type]!)
-    }
-  }
-  // Dedup
-  const dedupedSignals = Array.from(new Set(moistureSignals))
-
-  // finishState from type pattern match
-  let finishState: BasementExtraction['finishState'] = 'unknown'
-  for (const f of basementFeatures) {
-    if (f.type === 'finished_basement_walls') {
-      finishState = 'finished'
-      break
-    }
-    if (f.type === 'unfinished_basement_walls') {
-      finishState = 'unfinished'
-      break
-    }
-  }
-
-  // visibleFeatures: one per basement-category feature, condition as label
-  const visibleFeatures: BasementVisibleFeature[] = basementFeatures.map((f) => ({
-    feature: f.type,
-    confidence: f.confidence,
-  }))
-
-  // overallConfidence: mean of basement features, or 0 if none. We
-  // intentionally don't fall back to overall_photo_category confidence
-  // because that's not a field in the open shape — the photo-level
-  // category is categorical, not confidence-weighted.
-  const overallConfidence =
-    basementFeatures.length > 0
-      ? basementFeatures.reduce((acc, f) => acc + f.confidence, 0) / basementFeatures.length
-      : 0
-
-  const roomTypeConfirmed =
-    open.overall_photo_category === 'basement' ||
-    basementFeatures.length > 0
-
-  return {
-    roomTypeConfirmed,
-    detectedRoomType: open.overall_photo_category,
-    finishState,
-    visibleFeatures,
-    moistureSignals: dedupedSignals,
-    overallConfidence,
-    promptVersion: OPEN_EXTRACTION_PROMPT_VERSION,
   }
 }
 

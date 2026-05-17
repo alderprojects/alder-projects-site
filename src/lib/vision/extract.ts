@@ -54,9 +54,13 @@ export const PROMPT_VERSION = 'v1.0.0'
 export const MODEL_VERSION = 'claude-sonnet-4-5-20250929'
 export const CONFIDENCE_THRESHOLD = 0.7
 export const MAX_TOKENS = 1024
-// Open extraction can return 30+ features in a complex photo — give the
-// model headroom. Per-call cost capped well under a cent at Sonnet rates.
-export const OPEN_MAX_TOKENS = 4096
+// Open extraction needs to fit within the Vercel Hobby 10s function
+// timeout. Per v7.3.3-C-PR1.2 retest: 4096 tokens caused 504s on every
+// upload (Sonnet 4.5 vision took 8-12s at that ceiling). Dropping to
+// 1500 keeps latency in the 3-6s range and corresponds to ~6-8
+// well-formed features per photo, which the eval data suggests is a
+// healthier output band than 15-25 features anyway.
+export const OPEN_MAX_TOKENS = 1500
 
 // Re-export so callers can read both versions from a single import.
 export { OPEN_EXTRACTION_PROMPT_VERSION }

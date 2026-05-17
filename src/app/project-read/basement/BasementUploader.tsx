@@ -46,11 +46,19 @@ export function BasementUploader() {
   })
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  async function uploadOne(file: File): Promise<UploadedPhoto> {
+  async function uploadOne(
+    file: File,
+    // PR1.2: explicit projectId param. The outer for-loop tracks the
+    // running projectId in a local variable to work around React's
+    // async setState — without this, every photo in a batch read a
+    // stale closure value and the server created a new Project per
+    // photo (EventLog confirmed 4 photos -> 4 separate projects).
+    runningProjectId: string | null
+  ): Promise<UploadedPhoto> {
     const reader = new FileReader()
     const base64 = await new Promise<string>((resolve, reject) => {
       reader.onload = () => resolve(reader.result as string)
-      reader.onerror = reject
+      reader.onerror = () => reject(new Error('Could not read photo file'))
       reader.readAsDataURL(file)
     })
 
@@ -58,7 +66,7 @@ export function BasementUploader() {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        projectId: projectId ?? undefined,
+        projectId: runningProjectId ?? undefined,
         // PR1: roomType/scope are telemetry hints only — open extraction
         // ignores them. 'auto' = client did not pre-classify.
         roomType: 'auto',
@@ -68,7 +76,27 @@ export function BasementUploader() {
       }),
     })
 
-    const json = (await res.json()) as {
+    // PR1.2: check res.ok BEFORE attempting res.json(). On a Vercel
+    // function timeout (504) or other infrastructure failure the
+    // response body is HTML, and res.json() throws a SyntaxError that
+    // iOS Safari surfaces as "The string did not match the expected
+    // pattern" — useless to the user. Map common status codes to
+    // human-readable messages and fall back to raw text otherwise.
+    if (!res.ok) {
+      if (res.status === 504) {
+        throw new Error('Upload timed out — the server took too long. Try again, or try a smaller photo.')
+      }
+      if (res.status === 502) {
+        throw new Error('Storage write failed — try again in a moment.')
+      }
+      if (res.status === 413) {
+        throw new Error('Photo is too large — try a smaller one.')
+      }
+      const text = await res.text().catch(() => '')
+      throw new Error(`Upload failed (HTTP ${res.status}). ${text.slice(0, 120)}`)
+    }
+
+    let json: {
       ok: boolean
       error?: string
       photoId?: string
@@ -76,10 +104,15 @@ export function BasementUploader() {
       extraction?: { overallConfidence: number; features: unknown[] } | null
       extractionError?: string | null
     }
-    if (!res.ok || !json.ok) {
+    try {
+      json = await res.json()
+    } catch {
+      throw new Error('Server returned an unreadable response. Please try again.')
+    }
+
+    if (!json.ok) {
       throw new Error(json.error ?? 'upload_failed')
     }
-    if (!projectId && json.projectId) setProjectId(json.projectId)
 
     const conf = json.extraction?.overallConfidence ?? null
     const status: UploadedPhoto['status'] = json.extractionError
@@ -111,9 +144,19 @@ export function BasementUploader() {
     const filesArr = Array.from(files).slice(0, room)
     const results: UploadedPhoto[] = [...photos]
 
+    // PR1.2: track projectId locally through the loop. React's
+    // setProjectId is async, so before this fix every photo in a
+    // multi-photo batch saw a stale closure value and the server
+    // created a new Project per photo. EventLog confirmed: 4 photos
+    // ended up in 4 different projects, which broke multi-photo cart
+    // synthesis (synthesize would only see 1 of the N photos).
+    let runningProjectId: string | null = projectId
+
     for (const file of filesArr) {
       try {
-        const r = await uploadOne(file)
+        const r = await uploadOne(file, runningProjectId)
+        runningProjectId = r.projectId
+        if (!projectId) setProjectId(r.projectId)
         results.push(r)
         setPhotos([...results]) // progressive render
       } catch (e) {

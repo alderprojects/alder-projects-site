@@ -10,7 +10,6 @@
  */
 
 import type { NextRequest } from 'next/server'
-import { runGscSync } from '@/lib/gsc/feedback'
 
 export const dynamic = 'force-dynamic'
 export const maxDuration = 300
@@ -21,10 +20,13 @@ export async function GET(request: NextRequest): Promise<Response> {
     return new Response('Unauthorized', { status: 401 })
   }
 
+  // Disable check before dynamic import — keeps GSC client + private-key
+  // JWT signer out of skipped invocations.
   if (process.env.DISABLE_GSC_CRON === 'true') {
     return Response.json({ skipped: true, reason: 'DISABLE_GSC_CRON=true' })
   }
 
+  const { runGscSync } = await import('@/lib/gsc/feedback')
   try {
     const result = await runGscSync()
     return Response.json({ ok: true, ...result })

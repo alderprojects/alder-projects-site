@@ -14,7 +14,6 @@
  */
 
 import type { NextRequest } from 'next/server'
-import { runCatalogRefresh } from '@/lib/catalog/refresh'
 
 export const dynamic = 'force-dynamic'
 export const maxDuration = 300 // 5 minutes — catalog refresh of 220 SKUs runs ~3-4 minutes
@@ -27,10 +26,14 @@ export async function GET(request: NextRequest): Promise<Response> {
 
   // Allow opt-out via env flag — useful during the 4-week build if the
   // staging cron is noisy or the PA-API quota is shared with manual runs.
+  // Check before dynamic import so worker module's load-time side effects
+  // (Anthropic client init, Prisma singleton resolution) don't fire on
+  // skipped invocations.
   if (process.env.DISABLE_CATALOG_CRON === 'true') {
     return Response.json({ skipped: true, reason: 'DISABLE_CATALOG_CRON=true' })
   }
 
+  const { runCatalogRefresh } = await import('@/lib/catalog/refresh')
   try {
     const summary = await runCatalogRefresh({ dryRun: false, write: true })
     return Response.json({

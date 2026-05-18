@@ -8,12 +8,24 @@
 // The actual SmartCart synthesis runs after the Stripe webhook
 // confirms payment (commit 21), so we never charge for a cart that
 // the engine cannot build.
+//
+// v7.3.4-PR3: accepts productSource + photoPreviewMeta from the
+// CurationModal when the visitor arrived via the photo side panel
+// (introduced in PR2). productSource is stamped into Stripe Payment
+// Link metadata so the webhook can dispatch to synthesizeCartV3
+// against the visitor's recent VisionExtractions instead of the
+// chat-funnel's buildSmartCart against topic/scope.
+//
+// anonId is read server-side from the cookie and persisted to the
+// pending row + Stripe metadata so the webhook can resolve which
+// visitor's photos to synthesize against.
 
 import { NextResponse } from 'next/server'
 import { CONFIG } from '@/lib/recommender-config'
 import { savePendingSmartCart } from '@/lib/storage'
 import { SCOPE_VARIANTS } from '@/lib/scope-variants'
 import { isV2Combination, getScenarioDefaults } from '@/content/smart-cart'
+import { getAnonId } from '@/lib/visitor/session'
 import type { TopicId } from '@/lib/property-modules'
 import type { BriefScenarioId } from '@/lib/recommender-config.types'
 import type { CartTier } from '@/lib/smart-cart-model'
@@ -31,6 +43,19 @@ type Body = {
   // SCENARIO_DEFAULTS when these are omitted.
   selectedTier?: CartTier
   alreadyHave?: string[]
+  // v7.3.4-PR3 — when present and 'photo', the webhook routes to
+  // synthesizeCartV3 against the visitor's recent extractions
+  // instead of buildSmartCart against topic/scope. Default 'chat'.
+  productSource?: 'chat' | 'photo'
+  // v7.3.4-PR3 — captured by the photo panel for retro analysis.
+  // Plumbed through pending + EventLog at webhook time.
+  photoPreviewMeta?: {
+    photoCount: number
+    featureCount: number
+    overallConfidence: number
+    dominantCategory: string | null
+    inferredScope: { topic: string; scopeVariantId: string; scenario: string } | null
+  } | null
 }
 
 export async function POST(req: Request) {
@@ -41,7 +66,17 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 })
   }
 
-  const { topic, scopeVariantId, scenario, email, address, selectedTier, alreadyHave } = body
+  const {
+    topic,
+    scopeVariantId,
+    scenario,
+    email,
+    address,
+    selectedTier,
+    alreadyHave,
+    productSource,
+    photoPreviewMeta,
+  } = body
   if (!topic || !scopeVariantId || !scenario || !email) {
     return NextResponse.json(
       { error: 'topic, scopeVariantId, scenario, and email are required' },
@@ -66,6 +101,13 @@ export async function POST(req: Request) {
     resolvedAlreadyHave = resolvedAlreadyHave ?? defaults.alreadyHave
   }
 
+  // v7.3.4-PR3: capture anon visitor id from cookie. Required for
+  // photo carts so the webhook can resolve which VisionExtractions
+  // to synthesize against. Optional for chat carts (no-op).
+  const anonId = await getAnonId()
+  const resolvedProductSource: 'chat' | 'photo' =
+    productSource === 'photo' && anonId ? 'photo' : 'chat'
+
   const cartId = generateCartId()
 
   await savePendingSmartCart(cartId, {
@@ -76,6 +118,10 @@ export async function POST(req: Request) {
     address: address || undefined,
     selectedTier: resolvedTier,
     alreadyHave: resolvedAlreadyHave,
+    // v7.3.4-PR3 fields — webhook reads these to choose engine.
+    productSource: resolvedProductSource,
+    anonId: anonId ?? undefined,
+    photoPreviewMeta: photoPreviewMeta ?? undefined,
   })
 
   const baseLink = process.env[CONFIG.products.smartCart.stripePaymentLinkEnvVar]
@@ -86,11 +132,19 @@ export async function POST(req: Request) {
     )
   }
 
-  const checkoutUrl = appendStripeMetadata(baseLink, {
+  // Stamp product_source + anon_id into the Stripe URL so the webhook
+  // can read them off the resulting session even if the pending KV
+  // row has expired (defense in depth — the pending row is the
+  // canonical source).
+  const metadata: Record<string, string> = {
     client_reference_id: cartId,
     prefilled_email: email,
     metadata_product_type: 'smart_cart',
-  })
+    metadata_product_source: resolvedProductSource,
+  }
+  if (anonId) metadata.metadata_anon_id = anonId
+
+  const checkoutUrl = appendStripeMetadata(baseLink, metadata)
 
   return NextResponse.json({ checkoutUrl, cartId })
 }

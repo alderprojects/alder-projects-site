@@ -222,7 +222,7 @@ export function PhotoPanel({
         if (json.featureCount > 0) {
           setPreview(json)
           setStage('preview_loading')
-          void loadTeaserPreview()
+          void loadPreview()
         }
       } catch {
         /* swallow — poll continues */
@@ -348,19 +348,26 @@ export function PhotoPanel({
     setStage('upload')
   }
 
-  // PR3.10: real-preview load — runs synthesizeCartV3 server-side and
-  // returns a teaser (lane counts + sample BUY + sample SKIP) on top
-  // of the basic feature summary. This is the "so what" persuasion
-  // bait the visitor sees before the paywall.
-  async function loadTeaserPreview() {
+  // PR3.11 — reverts PR3.10's teaser=1 path. Per user strategic
+  // direction: photo+intent feeds the EXISTING Smart Cart v1/v2
+  // engine, not a separate v3 path. The preview just confirms what
+  // we read (topic, feature count) and advances to the existing
+  // CurationModal sneak peek (step 1 of the new 3-step flow), where
+  // the chat-funnel's DynamicExampleCard already shows the v1/v2
+  // teaser. No need to run server-side synthesis here.
+  //
+  // PR3.10's teaser=1 synth was the cause of the "stuck on reading
+  // photos" bug — 5+ photos = 6 parallel LLM calls = ~10s = Vercel
+  // 504. Reverted.
+  async function loadPreview() {
     if (photos.length === 0 && !remoteSeenPhoto) return
     setStage('preview_loading')
     setErrorMsg('')
     try {
       const sinceParam = panelOpenedAtRef.current
-        ? `&since=${encodeURIComponent(panelOpenedAtRef.current.toISOString())}`
+        ? `?since=${encodeURIComponent(panelOpenedAtRef.current.toISOString())}`
         : ''
-      const res = await fetch(`/api/photos/preview?teaser=1${sinceParam}`, {
+      const res = await fetch(`/api/photos/preview${sinceParam}`, {
         method: 'POST',
       })
       if (!res.ok) throw new Error(`Preview failed (HTTP ${res.status})`)
@@ -435,14 +442,19 @@ export function PhotoPanel({
             userIntent={userIntent}
             onUserIntentChange={setUserIntent}
             onFilesSelected={onFilesSelected}
-            onPreview={loadTeaserPreview}
+            onPreview={loadPreview}
           />
         )}
 
-        {/* PREVIEW LOADING */}
+        {/* PREVIEW LOADING — PR3.11 added pulsing dots so the wait
+            feels active rather than hung. */}
         {stage === 'preview_loading' && (
-          <div className="rounded-lg bg-gray-100 p-4 text-center text-sm text-gray-700">
-            Reading your photos…
+          <div className="flex flex-col items-center gap-3 rounded-lg bg-gray-100 p-6 text-center text-sm text-gray-700">
+            <PulsingDots />
+            <span>Reading your photos…</span>
+            <span className="text-xs text-gray-500">
+              Usually 4–8 seconds per photo.
+            </span>
           </div>
         )}
 
@@ -452,7 +464,7 @@ export function PhotoPanel({
             {errorMsg || 'Something went wrong loading the preview.'}
             <button
               type="button"
-              onClick={loadTeaserPreview}
+              onClick={loadPreview}
               className="ml-2 underline"
             >
               Try again
@@ -544,14 +556,16 @@ function UploadStageView({
         subtitle="Scan with your phone to upload photos there. The preview will appear here automatically."
       />
 
-      {/* PR3.9 Bug #1: between PHOTO_UPLOADED and
-          VISION_EXTRACTION_COMPLETED (~4-6s), polling has seen a
-          Photo row but no features yet. Tell the desktop user that
-          the upload landed and we're reading it — better than
-          appearing to do nothing for ~5s. */}
+      {/* PR3.9 Bug #1 + PR3.11: between PHOTO_UPLOADED and
+          VISION_EXTRACTION_COMPLETED (~4-8s — can be longer on phone
+          uploads if the network was sluggish), polling has seen a
+          Photo row but no features yet. Pulsing dots give the
+          visitor visible feedback that work is happening so the
+          wait doesn't feel like a hang. */}
       {remoteSeenPhoto && (
-        <div className="mb-4 hidden rounded-lg border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-900 md:block">
-          Photo received from your phone — reading it now…
+        <div className="mb-4 hidden items-center gap-2 rounded-lg border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-900 md:flex">
+          <PulsingDots />
+          <span>Photo received from your phone — reading it now…</span>
         </div>
       )}
 
@@ -763,6 +777,29 @@ function PreviewView({
           topic picker to continue.
         </div>
       )}
+    </div>
+  )
+}
+
+// PR3.11 — "art of distraction" loading indicator. Three pulsing
+// dots that show work is happening during extraction wait. CSS-only,
+// no external deps. Uses Tailwind's animate-pulse with staggered
+// inline delays so the dots cycle.
+function PulsingDots() {
+  return (
+    <div className="inline-flex items-center gap-1">
+      <span
+        className="h-2 w-2 animate-pulse rounded-full bg-emerald-700"
+        style={{ animationDelay: '0ms', animationDuration: '1.2s' }}
+      />
+      <span
+        className="h-2 w-2 animate-pulse rounded-full bg-emerald-700"
+        style={{ animationDelay: '200ms', animationDuration: '1.2s' }}
+      />
+      <span
+        className="h-2 w-2 animate-pulse rounded-full bg-emerald-700"
+        style={{ animationDelay: '400ms', animationDuration: '1.2s' }}
+      />
     </div>
   )
 }

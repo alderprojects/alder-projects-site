@@ -38,7 +38,12 @@ const PHOTO_PANEL_ENABLED =
   process.env.NEXT_PUBLIC_PHOTO_PANEL_ENABLED === 'true'
 
 type ProductId = 'smart_cart' | 'worth_it'
-type Step = 0 | 1 | 2 | 3
+// v7.3.4-PR3.11: dropped the email-first gate (was old step 0).
+// New 3-step flow:
+//   0 = Project picker (formerly step 1)
+//   1 = Sneak peek (formerly step 2)
+//   2 = Confirm + email + tier + submit (formerly step 3)
+type Step = 0 | 1 | 2
 
 const TOPIC_LABELS: Partial<Record<TopicId, string>> = {
   kitchen: 'Kitchen',
@@ -225,29 +230,14 @@ export default function CurationModal() {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s.trim())
   }
 
-  async function continueFromEmail() {
-    setError(null)
-    if (!isValidEmail(email)) {
-      setError('Enter a valid email address.')
-      return
-    }
-    // Fire-and-forget intent start. Don't block UX on this.
-    const sourcePageUrl =
-      typeof window !== 'undefined' ? window.location.href : ''
-    void fetch('/api/intent/start', {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ email, product, sourcePageUrl }),
-    }).catch(() => {
-      /* swallow — intent capture is best-effort */
-    })
-    setStep(1)
-  }
+  // v7.3.4-PR3.11: continueFromEmail removed — email step gone.
+  // Visitor enters email on the Confirm step now. intent_start
+  // fires from submit() instead.
 
   async function continueToSneakPeek() {
     setError(null)
     setTeaserLoading(true)
-    setStep(2)
+    setStep(1)
     try {
       const params = new URLSearchParams({
         product,
@@ -269,8 +259,26 @@ export default function CurationModal() {
   }
 
   async function submit() {
-    setSubmitting(true)
     setError(null)
+    // PR3.11: email moved from the gated step 0 to the Confirm step.
+    // Validate here before submitting checkout.
+    if (!isValidEmail(email)) {
+      setError('Enter a valid email address so we can email you the cart link.')
+      return
+    }
+    setSubmitting(true)
+    // PR3.11: intent_start fires here (was in continueFromEmail
+    // before the email step was dropped). Fire-and-forget; failure
+    // never blocks checkout.
+    const sourcePageUrl =
+      typeof window !== 'undefined' ? window.location.href : ''
+    void fetch('/api/intent/start', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ email, product, sourcePageUrl }),
+    }).catch(() => {
+      /* swallow */
+    })
     const endpoint =
       product === 'smart_cart' ? '/api/smart-cart/checkout' : '/api/worth-it/checkout'
     try {
@@ -343,7 +351,7 @@ export default function CurationModal() {
             disappears once the visitor has invested in scope picking
             so it doesn't compete with the primary path. Flag-gated
             until v7.3.4-PR3 webhook routing lands. */}
-        {PHOTO_PANEL_ENABLED && (step === 0 || step === 1) && (
+        {PHOTO_PANEL_ENABLED && step === 0 && (
           <button
             type="button"
             onClick={() => {
@@ -366,33 +374,11 @@ export default function CurationModal() {
 
         <StepIndicator step={step} />
 
+        {/* PR3.11: dropped the email-first gate. Step 0 is now the
+            Project picker (was step 1). Email is captured on the
+            Confirm step (now step 2) where it sits naturally next
+            to the price + refund window. */}
         {step === 0 && (
-          <div className="space-y-5">
-            <Field label="Where should we send your unlock link?">
-              <input
-                type="email"
-                value={email}
-                onChange={e => setEmail(e.target.value)}
-                placeholder="you@example.com"
-                className="w-full bg-white border border-[#e8e3d4] rounded-md px-3 py-2"
-              />
-              <p className="mt-2 text-xs text-[#1a1f1a]/70">
-                We email the link the moment your {cfg.productName.toLowerCase()} is ready.
-                We never sell your email.
-              </p>
-            </Field>
-            {error && <ErrorBanner text={error} />}
-            <button
-              type="button"
-              onClick={continueFromEmail}
-              className="w-full bg-[#1f3a2e] hover:bg-[#162a21] text-white font-medium px-6 py-3 rounded-lg transition-colors"
-            >
-              Continue →
-            </button>
-          </div>
-        )}
-
-        {step === 1 && (
           <div className="space-y-5">
             <Field label="Project topic">
               <select
@@ -457,27 +443,21 @@ export default function CurationModal() {
               </Field>
             )}
 
-            <div className="flex gap-3">
-              <button
-                type="button"
-                onClick={() => setStep(0)}
-                className="px-4 py-3 border border-[#e8e3d4] rounded-lg text-sm"
-              >
-                ← Back
-              </button>
-              <button
-                type="button"
-                onClick={continueToSneakPeek}
-                disabled={!scopeVariantId}
-                className="flex-1 bg-[#1f3a2e] hover:bg-[#162a21] disabled:opacity-50 text-white font-medium px-6 py-3 rounded-lg transition-colors"
-              >
-                Show my sneak peek →
-              </button>
-            </div>
+            {/* PR3.11: no Back button on step 0 — modal opens here. */}
+            {error && <ErrorBanner text={error} />}
+            <button
+              type="button"
+              onClick={continueToSneakPeek}
+              disabled={!scopeVariantId}
+              className="w-full bg-[#1f3a2e] hover:bg-[#162a21] disabled:opacity-50 text-white font-medium px-6 py-3 rounded-lg transition-colors"
+            >
+              Show my sneak peek →
+            </button>
           </div>
         )}
 
-        {step === 2 && (
+        {/* PR3.11: Sneak peek is now step 1 (was step 2). */}
+        {step === 1 && (
           <div className="space-y-5">
             {teaserLoading && (
               <p className="text-sm text-[#1a1f1a]/70">Building your preview…</p>
@@ -494,14 +474,14 @@ export default function CurationModal() {
             <div className="flex gap-3">
               <button
                 type="button"
-                onClick={() => setStep(1)}
+                onClick={() => setStep(0)}
                 className="px-4 py-3 border border-[#e8e3d4] rounded-lg text-sm"
               >
                 ← Tweak my answers
               </button>
               <button
                 type="button"
-                onClick={() => setStep(3)}
+                onClick={() => setStep(2)}
                 disabled={!teaser}
                 className="flex-1 bg-[#1f3a2e] hover:bg-[#162a21] disabled:opacity-50 text-white font-medium px-6 py-3 rounded-lg transition-colors"
               >
@@ -532,17 +512,17 @@ export default function CurationModal() {
               setPhotoPrefilledFromPanel(true)
               setPhotoPreviewMeta(meta)
               setPhotoPanelOpen(false)
-              setStep(3)
+              // PR3.11: photo path advances to Confirm (now step 2).
+              setStep(2)
             }}
           />
         )}
 
-        {step === 3 && (
+        {/* PR3.11: Confirm is now step 2 (was step 3). Email input
+            lives here — was previously a gated step 0, dropped to
+            cut the 4-step flow to 3 steps. */}
+        {step === 2 && (
           <div className="space-y-5">
-            {/* v7.3.4-PR2 banner: when the visitor arrived at step 3
-                via the photo panel, surface a tiny inline note so they
-                know their topic was pre-filled from their photos and
-                not silently guessed. */}
             {photoPrefilledFromPanel && (
               <p className="text-xs text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-md p-2">
                 Pre-filled from your photos. You can change topic/scope above if needed.
@@ -558,15 +538,32 @@ export default function CurationModal() {
                 <li>Topic: <strong>{TOPIC_LABELS[topic] ?? topic}</strong></li>
                 <li>Scope: <strong>{scopeLabel}</strong></li>
                 <li>Scenario: <strong>{SCENARIO_LABELS[scenario] ?? scenario}</strong></li>
-                <li>Email: <strong>{email}</strong></li>
                 {address && <li>Address: <strong>{address}</strong></li>}
               </ul>
             </div>
+
+            {/* PR3.11: email input lives here now, not on a gated
+                step 0. We email the cart link the moment Stripe
+                webhook fires. */}
+            <Field label="Where should we email your cart?">
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="you@example.com"
+                className="w-full bg-white border border-[#e8e3d4] rounded-md px-3 py-2"
+              />
+              <p className="mt-2 text-xs text-[#1a1f1a]/70">
+                We email the link the moment your {cfg.productName.toLowerCase()} is ready.
+                We never sell your email.
+              </p>
+            </Field>
+
             {error && <ErrorBanner text={error} />}
             <div className="flex gap-3">
               <button
                 type="button"
-                onClick={() => setStep(2)}
+                onClick={() => setStep(1)}
                 className="px-4 py-3 border border-[#e8e3d4] rounded-lg text-sm"
               >
                 ← Back
@@ -574,7 +571,7 @@ export default function CurationModal() {
               <button
                 type="button"
                 onClick={submit}
-                disabled={submitting}
+                disabled={submitting || !email}
                 className="flex-1 bg-[#1f3a2e] hover:bg-[#162a21] disabled:opacity-50 text-white font-medium px-6 py-3 rounded-lg transition-colors"
               >
                 {submitting ? 'Loading…' : 'Continue to checkout →'}
@@ -588,7 +585,9 @@ export default function CurationModal() {
 }
 
 function StepIndicator({ step }: { step: Step }) {
-  const labels = ['Email', 'Project', 'Sneak peek', 'Confirm']
+  // PR3.11: dropped 'Email' (was step 0). Email input lives on
+  // Confirm now. 4 steps -> 3.
+  const labels = ['Project', 'Sneak peek', 'Confirm']
   return (
     <div className="flex items-center gap-1.5 mb-6 text-[10px] uppercase tracking-wide">
       {labels.map((l, i) => (

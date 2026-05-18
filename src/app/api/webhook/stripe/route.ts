@@ -42,11 +42,12 @@ import type { CartTier } from '@/lib/smart-cart-model'
 import {
   sendSmartCartReceiptEmail,
   sendSmartCartReceiptEmailV2,
-  sendPhotoCartReceiptEmail,
   sendWorthItDeliveryEmail,
   sendUpgradeCompleteEmail,
 } from '@/lib/email'
-import { buildCartFromPhotos } from '@/lib/photos/build-cart-from-photos'
+// v7.3.4-PR3.11 — buildCartFromPhotos + sendPhotoCartReceiptEmail no
+// longer called from this webhook. They stay in the codebase for the
+// future Project Read product + free-beta /project-read/home flow.
 
 export const dynamic = 'force-dynamic'
 
@@ -125,47 +126,28 @@ async function handleSessionCompleted(session: Stripe.Checkout.Session) {
     if (!pending) throw new Error(`No pending Smart Cart for ${cartId}`)
     const buyerEmail = customerEmail || pending.email
 
-    // v7.3.4-PR3 — photo path. When the visitor came through the
-    // photo side panel, productSource was stamped 'photo' on the
-    // pending row (and on Stripe metadata as a backup). Run
-    // synthesizeCartV3 against their recent extractions instead of
-    // buildSmartCart against topic/scope. The result persists to
-    // Prisma SmartCart (not KV) with the cartId as the row id, so
-    // /smart-cart/result/[cartId] dispatches to V3CartView via
-    // PR1's KV-first-then-Prisma fallback.
-    const stripeProductSource =
-      session.metadata?.product_source
-      ?? readQueryParam(session, 'metadata_product_source')
-    const productSource =
-      (pending.productSource ?? stripeProductSource ?? 'chat') as 'photo' | 'chat'
-
-    if (productSource === 'photo') {
-      const anonId =
-        pending.anonId
-        ?? session.metadata?.anon_id
-        ?? readQueryParam(session, 'metadata_anon_id')
-      if (!anonId) {
-        throw new Error(
-          `Photo cart ${cartId}: no anonId on pending row or Stripe metadata`
-        )
-      }
-      const built = await buildCartFromPhotos({
-        cartId,
-        anonId,
-        customerEmail: buyerEmail,
-      })
-      await sendPhotoCartReceiptEmail({
-        cartId: built.cartId,
-        toEmail: buyerEmail,
-        itemCount: built.itemCount,
-        photoCount: built.photoCount,
-      })
-      // Email-claim flow (mint User from email + reassign anon rows)
-      // is intentionally NOT wired here in PR3. It ships as a follow-up
-      // (v7.3.4-PR3.5) so this webhook change can be reviewed cleanly
-      // without touching the identity layer in the same PR.
-      return
-    }
+    // v7.3.4-PR3.11 — photo path no longer takes a separate webhook
+    // branch. Per user strategic direction: "intent+photo just sharpens
+    // smart cart category (project) then list (sneak peak). this should
+    // feed BAU shopping recommendation using current chatbot engine."
+    //
+    // The photo path now sets pending.topic / pending.scopeVariantId /
+    // pending.scenario from photo inference at modal-submit time (via
+    // onPaywallProceed in CurationModal pre-filling those fields).
+    // The webhook reads those fields the same way it does for chat
+    // carts and runs the EXISTING v1/v2 builder. No separate v3
+    // synthesis on the paid path.
+    //
+    // v3 (synthesizeCartV3 / buildCartFromPhotos / LearningStore)
+    // remains in the codebase for the future Project Read diagnostic
+    // product (v7.5+) and for the free-beta /project-read/home flow.
+    // Both /api/cart/synthesize and buildCartFromPhotos are still
+    // there; they just aren't called from this paid webhook anymore.
+    //
+    // PR3 introduced productSource routing here; PR3.11 reverts that
+    // branch. The metadata is still captured in pending for telemetry
+    // (PHOTO_CART_PAID style EventLog rows can still distinguish
+    // source) but doesn't change the synthesis engine.
 
     // V7.2.1 — route to v2 builder when the (topic, scope) is in the
     // v2 catalog; otherwise fall back to legacy v1 path.

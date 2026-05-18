@@ -42,9 +42,11 @@ import type { CartTier } from '@/lib/smart-cart-model'
 import {
   sendSmartCartReceiptEmail,
   sendSmartCartReceiptEmailV2,
+  sendPhotoCartReceiptEmail,
   sendWorthItDeliveryEmail,
   sendUpgradeCompleteEmail,
 } from '@/lib/email'
+import { buildCartFromPhotos } from '@/lib/photos/build-cart-from-photos'
 
 export const dynamic = 'force-dynamic'
 
@@ -55,6 +57,12 @@ type PendingSmartCartInput = Omit<SmartCartInput, 'season' | 'customerEmail'> & 
   // Optional and ignored for legacy v1 carts.
   selectedTier?: CartTier
   alreadyHave?: string[]
+  // v7.3.4-PR3 — photo-source fields written by the PR3 checkout
+  // route. When productSource === 'photo' the webhook bypasses
+  // buildSmartCart and runs buildCartFromPhotos against anonId.
+  productSource?: 'chat' | 'photo'
+  anonId?: string
+  photoPreviewMeta?: unknown
 }
 type PendingWorthItInput = Omit<WorthItInput, 'season' | 'customerEmail'> & {
   email: string
@@ -116,6 +124,48 @@ async function handleSessionCompleted(session: Stripe.Checkout.Session) {
     const pending = (await getPendingSmartCart(cartId)) as PendingSmartCartInput | null
     if (!pending) throw new Error(`No pending Smart Cart for ${cartId}`)
     const buyerEmail = customerEmail || pending.email
+
+    // v7.3.4-PR3 — photo path. When the visitor came through the
+    // photo side panel, productSource was stamped 'photo' on the
+    // pending row (and on Stripe metadata as a backup). Run
+    // synthesizeCartV3 against their recent extractions instead of
+    // buildSmartCart against topic/scope. The result persists to
+    // Prisma SmartCart (not KV) with the cartId as the row id, so
+    // /smart-cart/result/[cartId] dispatches to V3CartView via
+    // PR1's KV-first-then-Prisma fallback.
+    const stripeProductSource =
+      session.metadata?.product_source
+      ?? readQueryParam(session, 'metadata_product_source')
+    const productSource =
+      (pending.productSource ?? stripeProductSource ?? 'chat') as 'photo' | 'chat'
+
+    if (productSource === 'photo') {
+      const anonId =
+        pending.anonId
+        ?? session.metadata?.anon_id
+        ?? readQueryParam(session, 'metadata_anon_id')
+      if (!anonId) {
+        throw new Error(
+          `Photo cart ${cartId}: no anonId on pending row or Stripe metadata`
+        )
+      }
+      const built = await buildCartFromPhotos({
+        cartId,
+        anonId,
+        customerEmail: buyerEmail,
+      })
+      await sendPhotoCartReceiptEmail({
+        cartId: built.cartId,
+        toEmail: buyerEmail,
+        itemCount: built.itemCount,
+        photoCount: built.photoCount,
+      })
+      // Email-claim flow (mint User from email + reassign anon rows)
+      // is intentionally NOT wired here in PR3. It ships as a follow-up
+      // (v7.3.4-PR3.5) so this webhook change can be reviewed cleanly
+      // without touching the identity layer in the same PR.
+      return
+    }
 
     // V7.2.1 — route to v2 builder when the (topic, scope) is in the
     // v2 catalog; otherwise fall back to legacy v1 path.

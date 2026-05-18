@@ -137,6 +137,56 @@ export async function sendSmartCartReceiptEmail(
   await sendNow(envelope)
 }
 
+/**
+ * v7.3.4-PR3 — Receipt email for photo carts (synthesisVersion=v3).
+ *
+ * Distinct from sendSmartCartReceiptEmail* because the v3 cart row
+ * lives in Prisma (not KV) and doesn't have a SmartCartOutput
+ * structured shape — just the cartId + a summary count. Keeps the
+ * email envelope shape identical so the existing queue + admin
+ * index handle it the same way.
+ */
+export async function sendPhotoCartReceiptEmail(args: {
+  cartId: string
+  toEmail: string
+  itemCount: number
+  photoCount: number
+}): Promise<void> {
+  const baseUrl =
+    process.env.NEXT_PUBLIC_BASE_URL ?? 'https://www.alderprojects.com'
+  const cartUrl = `${baseUrl}/smart-cart/result/${args.cartId}`
+  const subject = `Your home photo Smart Cart is ready`
+  const body = `Thanks for your purchase.
+
+Your home photo Smart Cart is ready. We read ${args.photoCount} ${args.photoCount === 1 ? 'photo' : 'photos'} and turned them into ${args.itemCount} ${args.itemCount === 1 ? 'recommendation' : 'recommendations'} — what to buy, skip, wait on, and when to call a pro.
+
+Open your cart:
+${cartUrl}
+
+The link stays good for 30 days. ${CONFIG.products.smartCart.refundWindowHours}-hour refund window — email hello@alderprojects.com if anything's off.
+
+— Alder
+`
+  const envelope: EmailEnvelope = {
+    id: newEnvelopeId(),
+    type: 'smart_cart_receipt',
+    toEmail: args.toEmail,
+    subject,
+    body,
+    metadata: {
+      cartId: args.cartId,
+      synthesisVersion: 'v3_learning_store',
+      productSource: 'photo',
+    },
+    scheduledFor: new Date().toISOString(),
+    status: 'queued',
+    attempts: 0,
+    createdAt: new Date().toISOString(),
+  }
+  await enqueueEmail(envelope)
+  await sendNow(envelope)
+}
+
 // V7.2.1 — receipt email for v2 carts. Same envelope shape as v1 so
 // the queue and admin index stay homogeneous; only the body changes.
 export async function sendSmartCartReceiptEmailV2(

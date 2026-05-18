@@ -233,6 +233,19 @@ export function PhotoPanel({
     }
   }, [open, stage])
 
+  // PR3.12: 30s bail-out from preview_loading so a hung
+  // /api/photos/preview can't strand the visitor. Lives ABOVE the
+  // `if (!open) return null` early return so React always sees the
+  // same hook count across renders (Rules of Hooks).
+  useEffect(() => {
+    if (stage !== 'preview_loading') return
+    const t = setTimeout(() => {
+      setStage('upload')
+      setErrorMsg('Preview is taking longer than expected. Add or remove photos and try again.')
+    }, 30_000)
+    return () => clearTimeout(t)
+  }, [stage])
+
   if (!open) return null
 
   async function uploadOne(rawFile: File): Promise<UploadedPhoto> {
@@ -379,21 +392,13 @@ export function PhotoPanel({
     }
   }
 
-  // PR3.12: bail-out from preview_loading. If the /api/photos/preview
-  // call hangs (LLM slow, Vercel 504), the visitor should be able to
-  // back out to the upload stage rather than stare at the dots
-  // indefinitely. Also auto-bails after 30s as a hard ceiling.
+  // PR3.12: bail-out handler for the "Cancel and go back" button on
+  // preview_loading. The 30s auto-bail useEffect lives above the
+  // early return (Rules of Hooks); this is just the click handler.
   function bailOutOfPreviewLoading() {
     setStage('upload')
-    setErrorMsg('Preview is taking longer than expected. Add or remove photos and try again.')
+    setErrorMsg('Preview cancelled. Add or remove photos and try again.')
   }
-  useEffect(() => {
-    if (stage !== 'preview_loading') return
-    const t = setTimeout(() => {
-      bailOutOfPreviewLoading()
-    }, 30_000)
-    return () => clearTimeout(t)
-  }, [stage])
 
   function handleConfirmRead() {
     if (!preview) return

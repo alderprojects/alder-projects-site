@@ -28,6 +28,8 @@
 import { useEffect, useRef, useState } from 'react'
 import type { TopicId } from '@/lib/property-modules'
 import type { BriefScenarioId } from '@/lib/recommender-config.types'
+import { HandoffQRCard } from './HandoffQRCard'
+import { convertHeicIfNeeded } from '@/lib/photos/heic-client'
 
 // =============================================================================
 // LOCAL TYPES (mirror src/lib/photos/preview.ts to avoid server import)
@@ -141,9 +143,59 @@ export function PhotoPanel({
     setIsMobile(/iphone|ipad|ipod|android/i.test(navigator.userAgent))
   }, [])
 
+  // PR3.8 Fix A: poll /api/photos/preview every 5s while the panel is
+  // in upload stage so that photos uploaded from the desktop user's
+  // phone (via QR handoff) auto-advance the desktop session to the
+  // preview stage. Without this poll the desktop user has no way to
+  // know mobile upload succeeded; they're stuck staring at the QR.
+  //
+  // Polling only runs:
+  //   - When the panel is open AND in upload stage (not while
+  //     uploading, not while previewing — that'd be wasteful)
+  //   - When no photos have been uploaded from THIS device yet
+  //     (otherwise we'd double-progress past the user's own uploads)
+  useEffect(() => {
+    if (!open) return
+    if (stage !== 'upload') return
+    if (photos.length > 0) return // user has local uploads, don't auto-advance
+
+    let cancelled = false
+    let intervalId: ReturnType<typeof setInterval> | null = null
+
+    async function checkForRemoteUploads() {
+      try {
+        const res = await fetch('/api/photos/preview', { method: 'POST' })
+        if (!res.ok) return
+        const json = (await res.json()) as PreviewResponse
+        if (cancelled) return
+        if (json.photoCount > 0) {
+          // Remote upload detected — auto-advance to preview stage.
+          setPreview(json)
+          setStage('preview')
+        }
+      } catch {
+        /* swallow — poll continues */
+      }
+    }
+
+    // First poll after 5s (give the user time to set up the phone),
+    // then every 5s thereafter.
+    intervalId = setInterval(checkForRemoteUploads, 5000)
+    return () => {
+      cancelled = true
+      if (intervalId) clearInterval(intervalId)
+    }
+  }, [open, stage, photos.length])
+
   if (!open) return null
 
-  async function uploadOne(file: File): Promise<UploadedPhoto> {
+  async function uploadOne(rawFile: File): Promise<UploadedPhoto> {
+    // PR3.8: HEIC -> JPEG conversion before any upload work. iPhone
+    // default camera format is HEIC; sharp on Vercel doesn't decode
+    // HEIC, so the only path that works is client-side conversion.
+    // No-op for non-HEIC files.
+    const file = await convertHeicIfNeeded(rawFile)
+
     // PR3.7 §1.11: multipart/form-data — see PhotoUploader.tsx for the
     // full rationale (base64-in-JSON was failing on real iPhone JPEGs).
     const formData = new FormData()
@@ -389,10 +441,20 @@ function UploadStageView({
       </p>
       <p className="mb-4 text-xs text-gray-500">{CONSENT_VERSION_NOTE}</p>
 
+      {/* PR3.8 Fix A: QR for desktop -> mobile handoff inside the
+          Smart Cart modal. Hidden on mobile via the component's own
+          md: visibility classes. When the customer scans + uploads
+          from phone, the panel's polling effect auto-advances to
+          the preview stage. */}
+      <HandoffQRCard
+        variant="panel"
+        subtitle="Scan with your phone to upload photos there. The preview will appear here automatically."
+      />
+
       <input
         ref={fileInputRef}
         type="file"
-        accept="image/*"
+        accept="image/*,.heic,.heif"
         multiple
         className="hidden"
         onChange={(e) => onFilesSelected(e.target.files)}
@@ -401,7 +463,7 @@ function UploadStageView({
       <input
         ref={cameraInputRef}
         type="file"
-        accept="image/*"
+        accept="image/*,.heic,.heif"
         capture="environment"
         className="hidden"
         onChange={(e) => onFilesSelected(e.target.files)}

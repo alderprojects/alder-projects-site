@@ -70,6 +70,12 @@ export interface PreviewResult {
   /** Best-effort topic/scope inferred from the dominant category.
    *  Null when dominantCategory is null or maps to 'mixed'/'unclear'. */
   inferredScope: InferredScope | null
+  /** PR3.8: most-recent Project id owned by the visitor. Lets the
+   *  PhotoUploader's polling-driven synthesis call /api/cart/synthesize
+   *  with a real projectId even when the desktop session has no local
+   *  uploads (photos all came from phone via QR handoff). Null when
+   *  the visitor has no projects yet. */
+  recentProjectId: string | null
 }
 
 export interface ComputePreviewOptions {
@@ -99,6 +105,17 @@ export async function computePreview(opts: ComputePreviewOptions): Promise<Previ
     orderBy: { uploadedAt: 'desc' },
   })
 
+  // PR3.8 — recent project id for the polling-driven synthesis path
+  // (PhotoUploader on desktop, after photos arrive from mobile via
+  // QR handoff). The synthesize route requires a projectId for
+  // ownership check even though it queries photos by anonId.
+  const recentProject = await prisma.project.findFirst({
+    where: { visitorAnonId: opts.anonId },
+    orderBy: { createdAt: 'desc' },
+    select: { id: true },
+  })
+  const recentProjectId = recentProject?.id ?? null
+
   const features: OpenFeature[] = []
   let photosWithExtractions = 0
   for (const photo of photos) {
@@ -124,6 +141,7 @@ export async function computePreview(opts: ComputePreviewOptions): Promise<Previ
       categories: [],
       dominantCategory: null,
       inferredScope: null,
+      recentProjectId,
     }
   }
 
@@ -156,6 +174,7 @@ export async function computePreview(opts: ComputePreviewOptions): Promise<Previ
         .sort((a, b) => b.featureCount - a.featureCount),
       dominantCategory: null,
       inferredScope: null,
+      recentProjectId,
     }
   }
   const allUnclear = Array.from(byCategory.keys()).every(
@@ -178,6 +197,7 @@ export async function computePreview(opts: ComputePreviewOptions): Promise<Previ
         .sort((a, b) => b.featureCount - a.featureCount),
       dominantCategory: null,
       inferredScope: null,
+      recentProjectId,
     }
   }
 
@@ -227,5 +247,6 @@ export async function computePreview(opts: ComputePreviewOptions): Promise<Previ
     categories: categorySummaries,
     dominantCategory: dominant,
     inferredScope: inferred,
+    recentProjectId,
   }
 }

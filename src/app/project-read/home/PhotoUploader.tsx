@@ -324,26 +324,31 @@ export function PhotoUploader() {
     <div>
       {/* PR3.10 photo+chat: visitor's intent text. Lives ABOVE the
           uploader so it gets attention before they pick photos.
-          Plumbed to Project.userIntent + into synth as LLM context. */}
-      <section className="mb-6 rounded-lg border border-gray-200 bg-gray-50 p-4">
-        <label>
-          <span className="mb-1 block text-sm font-medium text-gray-900">
-            Tell us what you&apos;re looking to do (one sentence helps a lot):
-          </span>
-          <textarea
-            value={userIntent}
-            onChange={(e) => setUserIntent(e.target.value)}
-            rows={2}
-            maxLength={500}
-            placeholder="e.g. We just bought this house — what should we tackle first in the basement?"
-            className="w-full rounded border border-gray-300 px-3 py-2 text-sm"
-          />
-        </label>
-        <p className="mt-2 text-xs text-gray-500">
-          Optional, but the recommendations get a lot sharper when we know
-          what you&apos;re trying to do, not just what&apos;s in the photo.
-        </p>
-      </section>
+          Plumbed to Project.userIntent + into synth as LLM context.
+          PR3.11: hidden on mobile-handoff sessions (?source=handoff)
+          — the phone is just the "ease of uploading" device; intent
+          stays on the desktop session where the journey began. */}
+      {!isHandoffPhone && (
+        <section className="mb-6 rounded-lg border border-gray-200 bg-gray-50 p-4">
+          <label>
+            <span className="mb-1 block text-sm font-medium text-gray-900">
+              Tell us what you&apos;re looking to do (one sentence helps a lot):
+            </span>
+            <textarea
+              value={userIntent}
+              onChange={(e) => setUserIntent(e.target.value)}
+              rows={2}
+              maxLength={500}
+              placeholder="e.g. We just bought this house — what should we tackle first in the basement?"
+              className="w-full rounded border border-gray-300 px-3 py-2 text-sm"
+            />
+          </label>
+          <p className="mt-2 text-xs text-gray-500">
+            Optional, but the recommendations get a lot sharper when we know
+            what you&apos;re trying to do, not just what&apos;s in the photo.
+          </p>
+        </section>
+      )}
 
       {/* Consent block */}
       <section className="mb-6 rounded-lg border border-gray-200 p-4">
@@ -478,10 +483,28 @@ export function PhotoUploader() {
           empty-features early-return and look broken to the user. */}
       {!isMobile && remotePhotoCount > photos.length && stage !== 'synthesizing' && (
         remoteFeatureCount === 0 ? (
-          <div className="mb-3 rounded-lg border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-900">
-            {remotePhotoCount === 1
-              ? '1 photo uploaded from your phone — reading it now…'
-              : `${remotePhotoCount} photos uploaded from your phone — reading them now…`}
+          // PR3.11: pulsing dots + "art of distraction" so the wait
+          // feels like work is happening, not like a hang.
+          <div className="mb-3 flex items-center gap-2 rounded-lg border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-900">
+            <span className="inline-flex shrink-0 items-center gap-1">
+              <span
+                className="h-2 w-2 animate-pulse rounded-full bg-emerald-700"
+                style={{ animationDelay: '0ms', animationDuration: '1.2s' }}
+              />
+              <span
+                className="h-2 w-2 animate-pulse rounded-full bg-emerald-700"
+                style={{ animationDelay: '200ms', animationDuration: '1.2s' }}
+              />
+              <span
+                className="h-2 w-2 animate-pulse rounded-full bg-emerald-700"
+                style={{ animationDelay: '400ms', animationDuration: '1.2s' }}
+              />
+            </span>
+            <span>
+              {remotePhotoCount === 1
+                ? '1 photo uploaded from your phone — reading it now…'
+                : `${remotePhotoCount} photos uploaded from your phone — reading them now…`}
+            </span>
           </div>
         ) : (
           <div className="mb-3 rounded-lg border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-900">

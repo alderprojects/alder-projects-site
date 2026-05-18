@@ -46,12 +46,13 @@ import type {
  * on every LearningStore row generated via this path so the retro
  * can compare quality across versions.
  */
-// v1.2.0 — PR3.7 §1.3: strict allow-list grounding. Recommendations
-// may ONLY reference materials/fixtures/conditions present in the
-// supplied feature. Forbidden-vocabulary list injected to block the
-// model's known fabrications (polyethylene, laminate, mini-split,
-// etc.) when the feature does not mention them.
-export const FEATURE_SYNTH_PROMPT_VERSION = 'feat-synth-v1.2.0'
+// v1.3.0 — PR3.10: optional userIntent context. When the visitor
+// provided a freeform "tell us what you're looking to do" sentence
+// alongside the photo upload, it's plumbed through synthesize-v3 and
+// surfaced to the per-feature LLM as project-level context. Pushes
+// the recommender from "guess from photo alone" toward "ground in
+// stated intent + visible features."
+export const FEATURE_SYNTH_PROMPT_VERSION = 'feat-synth-v1.3.0'
 
 // Bounded so a request synthesizing many cache-miss features can't
 // blow past Vercel's 10s function timeout. Haiku at this cap is
@@ -107,6 +108,8 @@ You are generating cache entries that will be reused for many future homeowners 
 interface PromptInput {
   feature: OpenFeature
   candidates: UniverseProduct[]
+  /** PR3.10: visitor's "tell us what you're looking to do" sentence. */
+  userIntent?: string | null
 }
 
 function buildUserPrompt(input: PromptInput): string {
@@ -120,7 +123,11 @@ function buildUserPrompt(input: PromptInput): string {
     functions: c.tags.functions,
   }))
 
-  return `Observed feature:
+  const intentBlock = input.userIntent
+    ? `\nVisitor said: "${input.userIntent.replace(/\n/g, ' ').slice(0, 500)}"\n\nUse the visitor's stated intent to weight the recommendation. If the feature is incidental to their stated goal, lean SKIP or MONITOR. If it's directly on-path, recommend a buy when the universe supports it.\n`
+    : ''
+
+  return `${intentBlock}Observed feature:
   type: ${input.feature.type}
   category_hint: ${input.feature.category_hint}
   location: ${input.feature.location}
@@ -192,6 +199,8 @@ export interface SynthesizeFeatureResult {
 export async function synthesizeFeatureRecommendation(opts: {
   feature: OpenFeature
   universe: UniverseProduct[]
+  /** PR3.10: optional visitor intent for project-level grounding. */
+  userIntent?: string | null
 }): Promise<SynthesizeFeatureResult> {
   if (!process.env.ANTHROPIC_API_KEY) {
     throw new Error('ANTHROPIC_API_KEY not set')
@@ -200,7 +209,11 @@ export async function synthesizeFeatureRecommendation(opts: {
   const t0 = Date.now()
 
   const candidates = filterUniverseForFeature(opts.feature, opts.universe)
-  const user = buildUserPrompt({ feature: opts.feature, candidates })
+  const user = buildUserPrompt({
+    feature: opts.feature,
+    candidates,
+    userIntent: opts.userIntent ?? null,
+  })
 
   const resp = await client.messages.create({
     model: MODEL_VERSION,

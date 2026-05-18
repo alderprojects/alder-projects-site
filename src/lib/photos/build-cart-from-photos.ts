@@ -73,22 +73,24 @@ export async function buildCartFromPhotos(
     features.push(...(json as OpenExtraction).features)
   }
 
+  // PR3.10: pull the visitor's project FIRST so we can pass its
+  // userIntent into synthesis. The project resolution was already
+  // happening below but only used for its id; reading userIntent
+  // here keeps the synth call intent-aware.
+  const project = await prisma.project.findFirst({
+    where: { visitorAnonId: opts.anonId },
+    orderBy: { createdAt: 'desc' },
+  })
+
   // The webhook should never have arrived if the visitor had no
   // photos extracted — the photo panel gates on photoCount > 0 +
   // confidence threshold before showing the paywall CTA. But
   // defensive code: if features array is empty, synthesizeCartV3
   // returns an empty cart and we still persist it so the visitor
   // gets a refund-eligible "we had no data to work with" row.
-  const result = await synthesizeCartV3({ features })
-
-  // Project resolution: find the most recent Project owned by this
-  // anon (created during the photo upload pipeline). All confirmed
-  // photos in this anon session typically belong to the same Project
-  // because the PR1.2 BasementUploader fix threads runningProjectId
-  // through the upload batch.
-  const project = await prisma.project.findFirst({
-    where: { visitorAnonId: opts.anonId },
-    orderBy: { createdAt: 'desc' },
+  const result = await synthesizeCartV3({
+    features,
+    userIntent: project?.userIntent ?? null,
   })
 
   if (!project) {

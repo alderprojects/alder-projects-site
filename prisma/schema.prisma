@@ -394,6 +394,13 @@ model Project {
   property          Property?  @relation(fields: [propertyId], references: [id])
   topic             String // "kitchen" | "bathroom" | "outdoor" | "mudroom" | "weatherization" | "basement_moisture" | ...
   scopeVariant      String? // matches scope catalog in code
+  // v7.3.4-PR3.10: visitor's freeform "tell us what you're looking
+  // to do" sentence captured alongside photo upload. Plumbed into
+  // the per-feature LLM synthesis prompt as project-level context so
+  // recommendations are intent-grounded, not photo-only. Optional;
+  // when unset, synthesis proceeds with photo features alone.
+  // Capped at 500 chars at the upload route.
+  userIntent        String?
   // Anonymous-visitor owner. Set during anon photo upload; cleared
   // once the visitor session is claimed by a User (which assigns
   // householdId).

@@ -66,6 +66,17 @@ export function PhotoUploader() {
     setIsMobile(/iphone|ipad|ipod|android/i.test(navigator.userAgent))
   }, [])
 
+  // PR3.10: visitor's "tell us what you're looking to do" sentence.
+  // Same plumbing as PhotoPanel — written to Project.userIntent on
+  // upload, surfaced to per-feature LLM synthesis as context.
+  const [userIntent, setUserIntent] = useState('')
+
+  // PR3.10: timestamp captured once at component mount so polling
+  // only sees photos uploaded after THIS page session. Without it,
+  // photos from a previous session in the 24h window auto-light up
+  // the "uploaded from phone" banner.
+  const pageLoadedAtRef = useRef<Date>(new Date())
+
   // PR3.8 Fix A: photos this anon has on the server (set by polling).
   // When remotePhotoCount > local photos.length, photos arrived from
   // another device (the phone, via QR handoff). Drives the
@@ -89,7 +100,11 @@ export function PhotoUploader() {
     let cancelled = false
     async function poll() {
       try {
-        const res = await fetch('/api/photos/preview', { method: 'POST' })
+        // PR3.10: send ?since=<pageLoadedAt> so polling only counts
+        // photos uploaded in THIS page session. Old photos in the
+        // 24h window don't auto-light the banner / CTA.
+        const sinceParam = `?since=${encodeURIComponent(pageLoadedAtRef.current.toISOString())}`
+        const res = await fetch(`/api/photos/preview${sinceParam}`, { method: 'POST' })
         if (!res.ok) return
         const json = (await res.json()) as {
           ok?: boolean
@@ -146,6 +161,12 @@ export function PhotoUploader() {
     formData.append('roomType', 'auto')
     formData.append('scope', 'auto')
     formData.append('consents', JSON.stringify(consents))
+    // PR3.10 photo+chat: visitor's project intent. Upload route
+    // writes it to Project.userIntent on create or backfills if not
+    // yet set. Plumbs through synth as project-level LLM context.
+    if (userIntent.trim().length > 0) {
+      formData.append('userIntent', userIntent.trim())
+    }
 
     const res = await fetch('/api/photos/upload', {
       method: 'POST',
@@ -301,6 +322,29 @@ export function PhotoUploader() {
 
   return (
     <div>
+      {/* PR3.10 photo+chat: visitor's intent text. Lives ABOVE the
+          uploader so it gets attention before they pick photos.
+          Plumbed to Project.userIntent + into synth as LLM context. */}
+      <section className="mb-6 rounded-lg border border-gray-200 bg-gray-50 p-4">
+        <label>
+          <span className="mb-1 block text-sm font-medium text-gray-900">
+            Tell us what you&apos;re looking to do (one sentence helps a lot):
+          </span>
+          <textarea
+            value={userIntent}
+            onChange={(e) => setUserIntent(e.target.value)}
+            rows={2}
+            maxLength={500}
+            placeholder="e.g. We just bought this house — what should we tackle first in the basement?"
+            className="w-full rounded border border-gray-300 px-3 py-2 text-sm"
+          />
+        </label>
+        <p className="mt-2 text-xs text-gray-500">
+          Optional, but the recommendations get a lot sharper when we know
+          what you&apos;re trying to do, not just what&apos;s in the photo.
+        </p>
+      </section>
+
       {/* Consent block */}
       <section className="mb-6 rounded-lg border border-gray-200 p-4">
         <h2 className="mb-3 font-medium text-gray-900">How your photos are used</h2>

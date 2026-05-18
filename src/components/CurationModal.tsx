@@ -26,6 +26,16 @@ import {
   trackCurationModalPrefilled,
 } from '@/lib/analytics'
 import DynamicExampleCard from './intent/DynamicExampleCard'
+import { PhotoPanel, type PreviewMeta } from './smartCart/PhotoPanel'
+
+// v7.3.4-PR2: feature flag for the photo side panel. Off by default
+// until v7.3.4-PR3 lands Stripe webhook routing — without webhook
+// routing a paid visitor coming through the photo path would get a
+// v1 cart synthesized from the inferred topic, not the v3
+// LearningStore cart their photos warrant. Flip to 'true' (or any
+// truthy string) after PR3.
+const PHOTO_PANEL_ENABLED =
+  process.env.NEXT_PUBLIC_PHOTO_PANEL_ENABLED === 'true'
 
 type ProductId = 'smart_cart' | 'worth_it'
 type Step = 0 | 1 | 2 | 3
@@ -71,6 +81,15 @@ export default function CurationModal() {
   // checkout endpoint fills them from SCENARIO_DEFAULTS.
   const [selectedTier, setSelectedTier] = useState<CartTier | undefined>(undefined)
   const [alreadyHave, setAlreadyHave] = useState<string[] | undefined>(undefined)
+  // v7.3.4-PR2: photo side panel state.
+  const [photoPanelOpen, setPhotoPanelOpen] = useState(false)
+  // Set when the visitor arrives at step 3 via the photo panel
+  // (rather than the chat-driven topic picker). Drives a small
+  // banner on step 3 confirming the topic was inferred from photos.
+  const [photoPrefilledFromPanel, setPhotoPrefilledFromPanel] = useState(false)
+  // Captured from the panel for downstream telemetry on submit
+  // (PR3 reads this and stamps Stripe metadata.product_source).
+  const [photoPreviewMeta, setPhotoPreviewMeta] = useState<PreviewMeta | null>(null)
 
   // V7.2.2 — guard for the modal-open race. The "default scope when
   // topic changes" effect runs after each commit and used to stomp
@@ -268,6 +287,15 @@ export default function CurationModal() {
           // Server fills SCENARIO_DEFAULTS when these are undefined.
           selectedTier,
           alreadyHave,
+          // v7.3.4-PR2: include photo-source hint when the visitor
+          // arrived via the side panel. PR3 reads this on the Stripe
+          // checkout payload + bakes into webhook metadata so the
+          // post-payment synthesizer runs v3 against the visitor's
+          // extracted features instead of v1 against topic/scope.
+          // Until PR3 ships, the checkout route ignores these fields
+          // (no schema break) so PR2 is safely deploy-able.
+          productSource: photoPrefilledFromPanel ? 'photo' : 'chat',
+          photoPreviewMeta: photoPreviewMeta ?? undefined,
         }),
       })
       if (!res.ok) {
@@ -305,6 +333,33 @@ export default function CurationModal() {
             ×
           </button>
         </div>
+
+        {/* v7.3.4-PR2: photo side panel entry. Only shown during the
+            early steps (before the visitor has invested in topic/scope
+            selection themselves) and only when the feature flag is on.
+            Hidden in prod by default until PR3 wires Stripe webhook. */}
+        {PHOTO_PANEL_ENABLED && (step === 0 || step === 1) && (
+          <button
+            type="button"
+            onClick={() => {
+              setPhotoPanelOpen(true)
+              // Fire-and-forget telemetry.
+              void fetch('/api/events/funnel', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  eventType: 'PHOTO_PANEL_OPENED',
+                  payload: { source: 'curation_modal_link', stepWhenOpened: step },
+                }),
+                keepalive: true,
+              }).catch(() => {})
+            }}
+            className="mb-3 inline-flex items-center gap-1 text-xs font-medium text-emerald-700 hover:text-emerald-800"
+          >
+            Have a photo? Show us your project →
+          </button>
+        )}
+
         <StepIndicator step={step} />
 
         {step === 0 && (
@@ -452,8 +507,43 @@ export default function CurationModal() {
           </div>
         )}
 
+        {/* PhotoPanel mount — only renders content when photoPanelOpen
+            is true. Defined here (vs the very bottom of the JSX)
+            because it lives inside the modal's z-stack and shares the
+            backdrop click-outside-to-close semantic. */}
+        {PHOTO_PANEL_ENABLED && (
+          <PhotoPanel
+            open={photoPanelOpen}
+            onClose={() => setPhotoPanelOpen(false)}
+            onRejectRead={() => {
+              setPhotoPanelOpen(false)
+              // Visitor stays on whatever step they were on; the
+              // chat picker is right there for them to use instead.
+            }}
+            onPaywallProceed={(scope, meta) => {
+              setTopic(scope.topic)
+              setScopeVariantId(scope.scopeVariantId)
+              explicitlySetScopeRef.current = true
+              setScenario(scope.scenario)
+              setPhotoPrefilledFromPanel(true)
+              setPhotoPreviewMeta(meta)
+              setPhotoPanelOpen(false)
+              setStep(3)
+            }}
+          />
+        )}
+
         {step === 3 && (
           <div className="space-y-5">
+            {/* v7.3.4-PR2 banner: when the visitor arrived at step 3
+                via the photo panel, surface a tiny inline note so they
+                know their topic was pre-filled from their photos and
+                not silently guessed. */}
+            {photoPrefilledFromPanel && (
+              <p className="text-xs text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-md p-2">
+                Pre-filled from your photos. You can change topic/scope above if needed.
+              </p>
+            )}
             <div className="bg-white border border-[#e8e3d4] rounded-md p-4 text-sm">
               <div className="flex items-baseline justify-between mb-1">
                 <span className="text-[#1a1f1a]/70">{cfg.productName}</span>

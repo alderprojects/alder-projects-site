@@ -55,15 +55,21 @@ const SEEDS: SeedEntry[] = [
     },
   },
   {
+    // v7.3.4-PR3.6 amendment: PRO_LINE removed. Active-water findings
+    // now route to WAIT with a prerequisite-assessment frame. Commerce-
+    // moment voice — the customer is shopping, and we tell them WHY
+    // they should wait on related purchases until the underlying
+    // condition is professionally assessed. We do NOT recommend a
+    // specific pro (Alder has no contractor network to route to).
     featureSignature: 'active_water:basement:severe',
     payload: {
-      lane: 'PRO_LINE',
+      lane: 'WAIT',
       category: 'basement',
-      headline: 'Call a basement water-management pro',
+      headline: 'Wait on basement product purchases until water is assessed',
       reasoning:
-        "Active water in a basement isn't a product purchase — it's a sizing and inspection problem. A pro can determine whether you need a sump pump, French drain, grading work, or a larger dehumidifier sized for your moisture load.",
+        "Active water in a basement is a sizing-and-source problem that needs professional assessment before related product purchases (sump pumps, vapor barriers, larger dehumidifiers) make sense. The right scope depends on where the water is coming from and how much capacity is needed — neither answer should be guessed from a product page.",
       caution:
-        'Take photos and notes about when the water appears (after rain? always?) so the pro can diagnose source vs symptom.',
+        'Note when the water appears (after rain? always?) and take photos — that context speeds any professional evaluation.',
     },
   },
   {

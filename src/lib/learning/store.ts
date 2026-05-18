@@ -37,7 +37,21 @@ import type { LearningStore } from '@prisma/client'
  * explains why (rendered as the cart row body). Both come from
  * curation or from the per-feature LLM synthesis prompt.
  */
-export type CartLane = 'BUY' | 'SKIP' | 'WAIT' | 'PRO_LINE'
+/**
+ * v7.3.4 commerce-moment amendment: lane vocab is now 4 lanes.
+ * - BUY: this product, at this tier, for the project the customer is shopping for
+ * - SKIP: common recommendation that does NOT apply to this customer (saves money)
+ * - WAIT: buy this later — here's the trigger (which may include "after a pro
+ *   assesses X"). WAIT is also the routing for items that previously would
+ *   have been PRO_LINE; the prose names the prerequisite explicitly.
+ * - MONITOR: track this condition before spending on related products
+ *
+ * PRO_LINE / 'CALL A PRO' was removed in v7.3.4-PR3.6 because Alder has no
+ * contractor network to route to; the lane was a false promise. Existing
+ * LearningStore rows with lane='PRO_LINE' are migrated in-place to lane='WAIT'
+ * with reframed prose by scripts/migrate-pro-line-to-wait.ts.
+ */
+export type CartLane = 'BUY' | 'SKIP' | 'WAIT' | 'MONITOR'
 
 export type CartTier = 'budget' | 'sweet_spot' | 'premium'
 

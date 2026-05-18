@@ -1,35 +1,33 @@
 'use client'
 
 /**
- * v7.3.4-PR1 — V3 Cart View (shared client component).
+ * v7.3.4-PR3.6 — V3 Cart View (shared client component).
  *
- * Lifted from the v7.3.3-C `/project-read/basement/result/[cartId]/ResultView.tsx`.
- * Renders a v3 LearningStore-synthesized cart (mixed-category, source-aware)
- * in both result locations:
+ * Commerce-moment retrofit per the v7.3.4 amendment:
+ *   - 4-lane vocab: BUY, SKIP, WAIT, MONITOR (PRO_LINE / CALL A PRO removed)
+ *   - Brief intro section above the lanes (max 2-3 sentences, set by
+ *     synthesizeCartV3's deterministic composer)
+ *   - "Want the full diagnostic?" v75_signup footer (email capture for
+ *     the future Project Read product launch)
+ *   - Per-section instrumentation: RESULT_SECTION_ENGAGEMENT fires
+ *     on scroll-into-view, reaction-click, affiliate-click, signup-click
+ *   - Page-level instrumentation: RESULT_VIEW_SECONDS via beacon on
+ *     page unload
  *
- *   1. `/project-read/basement/result/[cartId]` — free photo-beta cart
- *      (anon-owned, no payment).
- *   2. `/smart-cart/result/[cartId]` — paid cart whose synthesisVersion
- *      is `v3_learning_store` (chat-fallback-to-v3 carts from PR4, and
- *      photo-originated paid carts from PR3 once Stripe is wired).
+ * Renders at both result URLs:
+ *   - /project-read/basement/result/[cartId] (free beta)
+ *   - /smart-cart/result/[cartId] (paid v3 carts, dispatched in PR1)
  *
- * Adds the v7.3.4-PR1 reaction substrate:
- *   - 👍 / dismiss / "doesn't apply" buttons on every cart item
- *   - "doesn't apply" opens an inline freeform text field so the
- *     visitor can explain what was wrong; submission writes a
- *     LearningStoreFeedback row.
- *   - Reactions POST to /api/cart/reaction which updates
- *     LearningStore counts + writes EventLog.
- *
- * Idempotency: buttons disable after click in this session (per
- * cartId + signature + reactionType). A determined user can dual-tab
- * to double-vote — accepted tradeoff for v0; revisit in v7.5.
+ * The reaction substrate (👍/dismiss/doesn't apply + inline freeform
+ * text on doesn't-apply) shipped in PR1 stays unchanged.
  */
 
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
-// Local type duplicates SynthCartItemV3 from synthesize-v3 so this
-// client component doesn't import server-only code.
+// =============================================================================
+// PUBLIC TYPES
+// =============================================================================
+
 export interface CartItemV3 {
   slot: string
   productId: string
@@ -38,7 +36,7 @@ export interface CartItemV3 {
   tier: 'budget' | 'sweet_spot' | 'premium'
   priceBand: string
   selectionReason: string
-  lane: 'BUY' | 'SKIP' | 'WAIT' | 'PRO_LINE'
+  lane: 'BUY' | 'SKIP' | 'WAIT' | 'MONITOR'
   source: 'curated' | 'ai_generated'
   category: string
   confidence: 'high' | 'low'
@@ -48,47 +46,103 @@ export interface CartItemV3 {
   headline: string
 }
 
+interface SmartCartRow {
+  id: string
+  photoChangedRecommendation: boolean | null
+  cartJson: unknown
+  cartItemsJsonWithPhotos: unknown
+  /** changeSummaryJson now carries introText per PR3.6 amendment. */
+  changeSummaryJson: unknown
+}
+
 export interface V3CartViewProps {
   cartId: string
   items: CartItemV3[]
+  /** Set by SmartCart.changeSummaryJson.introText if present. */
+  introText?: string | null
   /** Show the email-save block under the cart (free beta only). */
   showEmailSave?: boolean
-  /** Free-photo-beta vs paid context drives header copy. */
+  /** Cart heading copy. */
   heading?: string
-  subhead?: string
+  /** Show the v7.5 diagnostic-product waitlist footer (paid carts only). */
+  showV75Footer?: boolean
 }
+
+// =============================================================================
+// LANE STYLING (4-lane vocab post-amendment)
+// =============================================================================
 
 const LANE_STYLE: Record<CartItemV3['lane'], string> = {
   BUY: 'bg-emerald-100 text-emerald-800',
   SKIP: 'bg-gray-200 text-gray-700',
   WAIT: 'bg-amber-100 text-amber-800',
-  PRO_LINE: 'bg-blue-100 text-blue-800',
+  MONITOR: 'bg-blue-100 text-blue-800',
 }
 
 const LANE_LABEL: Record<CartItemV3['lane'], string> = {
   BUY: 'BUY',
   SKIP: 'SKIP',
   WAIT: 'WAIT',
-  PRO_LINE: 'CALL A PRO',
+  MONITOR: 'MONITOR',
 }
 
+const LANE_DESCRIPTION: Record<CartItemV3['lane'], string> = {
+  BUY: 'Buy this — what to get for your project.',
+  SKIP: 'Skip this — common recommendations that don’t apply.',
+  WAIT: 'Buy this later — here’s the trigger.',
+  MONITOR: 'Track these conditions before related buys.',
+}
+
+const LANE_ORDER: Array<CartItemV3['lane']> = ['BUY', 'SKIP', 'WAIT', 'MONITOR']
+
 type ReactionType = 'thumbs_up' | 'dismiss' | 'doesnt_apply'
+
+// =============================================================================
+// MAIN COMPONENT
+// =============================================================================
 
 export function V3CartView({
   cartId,
   items,
+  introText,
   showEmailSave = false,
-  heading = 'Your home photo read',
-  subhead,
+  heading = 'Your Smart Cart',
+  showV75Footer = true,
 }: V3CartViewProps) {
-  // Tracks per-item reaction state so buttons disable after click.
-  // Key is `${signature}:${reactionType}`. Value is 'pending' during
-  // POST or 'done' after success.
   const [reactionState, setReactionState] = useState<
     Record<string, 'pending' | 'done'>
   >({})
 
-  const grouped = groupByCategory(items)
+  // ---- Instrumentation: RESULT_VIEW_SECONDS on unload ----
+  const mountedAtRef = useRef<number>(Date.now())
+  useEffect(() => {
+    function fireBeacon() {
+      const secondsOnPage = Math.round((Date.now() - mountedAtRef.current) / 1000)
+      if (secondsOnPage <= 0) return
+      const body = JSON.stringify({
+        eventType: 'RESULT_VIEW_SECONDS',
+        payload: { cartId, secondsOnPage },
+      })
+      if (navigator.sendBeacon) {
+        const blob = new Blob([body], { type: 'application/json' })
+        navigator.sendBeacon('/api/events/funnel', blob)
+      } else {
+        // Fallback for environments without sendBeacon
+        fetch('/api/events/funnel', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body,
+          keepalive: true,
+        }).catch(() => {})
+      }
+    }
+    // Use pagehide (more reliable than unload on mobile) + visibilitychange.
+    const onHide = () => fireBeacon()
+    window.addEventListener('pagehide', onHide)
+    return () => {
+      window.removeEventListener('pagehide', onHide)
+    }
+  }, [cartId])
 
   async function postReaction(
     signature: string,
@@ -96,21 +150,15 @@ export function V3CartView({
     feedbackText?: string
   ) {
     const key = `${signature}:${reactionType}`
-    if (reactionState[key]) return // already pending or done
+    if (reactionState[key]) return
     setReactionState((prev) => ({ ...prev, [key]: 'pending' }))
     try {
       const res = await fetch('/api/cart/reaction', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          cartId,
-          signature,
-          reactionType,
-          feedbackText,
-        }),
+        body: JSON.stringify({ cartId, signature, reactionType, feedbackText }),
       })
       if (!res.ok) {
-        // Roll back so the user can retry.
         setReactionState((prev) => {
           const next = { ...prev }
           delete next[key]
@@ -119,6 +167,13 @@ export function V3CartView({
         return
       }
       setReactionState((prev) => ({ ...prev, [key]: 'done' }))
+      // Section engagement event
+      fireFunnelEvent('RESULT_SECTION_ENGAGEMENT', {
+        cartId,
+        section: laneToSection(items.find((i) => i.signature === signature)?.lane),
+        engagementType: 'clicked_reaction',
+        reactionType,
+      })
     } catch {
       setReactionState((prev) => {
         const next = { ...prev }
@@ -128,46 +183,90 @@ export function V3CartView({
     }
   }
 
-  const fallbackSubhead =
-    items.length > 0
-      ? `We turned your photos into ${items.length} ${
-          items.length === 1 ? 'recommendation' : 'recommendations'
-        }${grouped.length > 1 ? ` across ${grouped.length} categories` : ''}. Each one is tied to something we actually saw.`
-      : "We couldn't turn your photos into specific recommendations this time. Try uploading clearer wide-angle photos."
+  // Group items into the 4 lane buckets in fixed lane order.
+  const itemsByLane: Record<CartItemV3['lane'], CartItemV3[]> = {
+    BUY: [],
+    SKIP: [],
+    WAIT: [],
+    MONITOR: [],
+  }
+  for (const item of items) {
+    itemsByLane[item.lane].push(item)
+  }
 
   return (
     <div>
       <header className="mb-6">
         <h1 className="text-2xl font-semibold text-gray-900">{heading}</h1>
-        <p className="mt-2 text-sm text-gray-600">{subhead ?? fallbackSubhead}</p>
       </header>
 
-      {grouped.length === 0 ? (
+      {/* PR3.6 commerce-moment intro section. Brief — 1-3 sentences.
+          Surfaces the most important condition the customer should
+          know BEFORE shopping (e.g. "before you start, X needs a
+          pro's review"). Empty state if introText is null. */}
+      {introText && (
+        <SectionTracker
+          cartId={cartId}
+          section="intro"
+          className="mb-6 rounded-lg border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-900"
+        >
+          {introText}
+        </SectionTracker>
+      )}
+
+      {items.length === 0 ? (
         <div className="mb-8 rounded-lg border border-gray-200 p-4 text-sm text-gray-600">
           We don&apos;t have anything to surface for these photos yet. As more
-          homeowners use the Read, this gets smarter — recommendations for the
-          situations you uploaded will accumulate in our curated cache.
+          homeowners use the Read, this gets smarter — recommendations for
+          the situations you uploaded will accumulate in our curated cache.
         </div>
       ) : (
         <section className="mb-8 space-y-6">
-          {grouped.map((group) => (
-            <div key={group.category}>
-              <h2 className="mb-2 text-xs uppercase tracking-wider text-gray-500">
-                {prettyCategory(group.category)}
-              </h2>
-              <div className="space-y-3">
-                {group.items.map((item) => (
-                  <CartItemCard
-                    key={item.signature}
-                    item={item}
-                    reactionState={reactionState}
-                    onReact={postReaction}
-                  />
-                ))}
-              </div>
-            </div>
-          ))}
+          {LANE_ORDER.map((lane) => {
+            const laneItems = itemsByLane[lane]
+            if (laneItems.length === 0) return null
+            return (
+              <SectionTracker
+                key={lane}
+                cartId={cartId}
+                section={laneToSection(lane)}
+              >
+                <div className="mb-2 flex items-baseline gap-2">
+                  <span
+                    className={`inline-block rounded px-2 py-1 text-xs uppercase tracking-wide ${LANE_STYLE[lane]}`}
+                  >
+                    {LANE_LABEL[lane]} · {laneItems.length}
+                  </span>
+                  <span className="text-xs text-gray-500">
+                    {LANE_DESCRIPTION[lane]}
+                  </span>
+                </div>
+                <div className="space-y-3">
+                  {laneItems.map((item) => (
+                    <CartItemCard
+                      key={item.signature}
+                      item={item}
+                      reactionState={reactionState}
+                      onReact={postReaction}
+                      onAffiliateClick={() => {
+                        fireFunnelEvent('RESULT_SECTION_ENGAGEMENT', {
+                          cartId,
+                          section: laneToSection(item.lane),
+                          engagementType: 'clicked_affiliate',
+                          signature: item.signature,
+                        })
+                      }}
+                    />
+                  ))}
+                </div>
+              </SectionTracker>
+            )
+          })}
         </section>
+      )}
+
+      {showV75Footer && (
+        <V75WaitlistFooter cartId={cartId} />
       )}
 
       {showEmailSave && <EmailSaveBlock cartId={cartId} />}
@@ -175,10 +274,15 @@ export function V3CartView({
   )
 }
 
+// =============================================================================
+// SUB-COMPONENTS
+// =============================================================================
+
 function CartItemCard({
   item,
   reactionState,
   onReact,
+  onAffiliateClick,
 }: {
   item: CartItemV3
   reactionState: Record<string, 'pending' | 'done'>
@@ -187,6 +291,7 @@ function CartItemCard({
     reactionType: ReactionType,
     feedbackText?: string
   ) => void | Promise<void>
+  onAffiliateClick: () => void
 }) {
   const isProduct = item.lane === 'BUY' && item.affiliateUrl
   const [feedbackOpen, setFeedbackOpen] = useState(false)
@@ -197,11 +302,6 @@ function CartItemCard({
   return (
     <article className="rounded-lg border border-gray-200 p-4">
       <div className="mb-2 flex flex-wrap items-center gap-2">
-        <span
-          className={`inline-block rounded px-2 py-1 text-xs uppercase tracking-wide ${LANE_STYLE[item.lane]}`}
-        >
-          {LANE_LABEL[item.lane]}
-        </span>
         <SourceBadge source={item.source} confidence={item.confidence} />
         {item.occurrenceCount > 1 && (
           <span className="text-xs text-gray-500">
@@ -224,6 +324,7 @@ function CartItemCard({
             href={item.affiliateUrl}
             target="_blank"
             rel="nofollow sponsored noopener"
+            onClick={onAffiliateClick}
             className="shrink-0 rounded-md bg-gray-900 px-3 py-2 text-sm text-white hover:bg-black"
           >
             View
@@ -239,7 +340,7 @@ function CartItemCard({
         </p>
       )}
 
-      {/* PR1 reaction row */}
+      {/* Reaction row */}
       <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-gray-100 pt-3">
         <span className="text-xs text-gray-500">Did this help?</span>
         <ReactionButton
@@ -363,33 +464,118 @@ function SourceBadge({
   )
 }
 
-interface CategoryGroup {
-  category: string
-  items: CartItemV3[]
-}
+// ---- v7.5 product-tier waitlist footer (PR3.6 amendment Change 3) ----
 
-function groupByCategory(items: CartItemV3[]): CategoryGroup[] {
-  const map = new Map<string, CartItemV3[]>()
-  for (const item of items) {
-    const existing = map.get(item.category)
-    if (existing) existing.push(item)
-    else map.set(item.category, [item])
-  }
-  return Array.from(map.entries())
-    .map(([category, items]) => ({ category, items }))
-    .sort((a, b) => {
-      const aBuy = a.items.some((i) => i.lane === 'BUY') ? 0 : 1
-      const bBuy = b.items.some((i) => i.lane === 'BUY') ? 0 : 1
-      return aBuy - bBuy
+function V75WaitlistFooter({ cartId }: { cartId: string }) {
+  const [email, setEmail] = useState('')
+  const [stage, setStage] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle')
+
+  async function submit() {
+    if (!email) return
+    setStage('sending')
+    fireFunnelEvent('RESULT_SECTION_ENGAGEMENT', {
+      cartId,
+      section: 'v75_signup',
+      engagementType: 'clicked_signup',
     })
+    try {
+      const res = await fetch('/api/v75-signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, cartId }),
+      })
+      if (res.ok) setStage('sent')
+      else setStage('error')
+    } catch {
+      setStage('error')
+    }
+  }
+
+  return (
+    <SectionTracker
+      cartId={cartId}
+      section="v75_signup"
+      className="mb-6 rounded-lg border border-gray-200 bg-gray-50 p-4"
+    >
+      <h3 className="text-sm font-medium text-gray-900">
+        Want the full diagnostic on whether to do this project at all?
+      </h3>
+      <p className="mt-1 text-xs text-gray-600">
+        Smart Cart answers <em>what to buy</em>. We&apos;re building a separate
+        product (Project Read) that answers <em>whether and when</em> to do the
+        project in the first place. Get notified when it launches.
+      </p>
+      {stage === 'sent' ? (
+        <p className="mt-3 text-sm text-emerald-700">
+          Thanks. We&apos;ll email you when Project Read launches.
+        </p>
+      ) : (
+        <div className="mt-3 flex gap-2">
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="you@example.com"
+            className="flex-1 rounded border border-gray-300 px-3 py-2 text-sm"
+          />
+          <button
+            type="button"
+            onClick={submit}
+            disabled={!email || stage === 'sending'}
+            className="rounded bg-gray-900 px-4 py-2 text-sm text-white hover:bg-black disabled:opacity-60"
+          >
+            {stage === 'sending' ? 'Sending…' : 'Notify me'}
+          </button>
+        </div>
+      )}
+      {stage === 'error' && (
+        <p className="mt-2 text-xs text-red-700">Couldn&apos;t send. Try again.</p>
+      )}
+    </SectionTracker>
+  )
 }
 
-function prettyCategory(category: string): string {
-  return category
-    .split('_')
-    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
-    .join(' ')
+// ---- IntersectionObserver wrapper for section-engagement tracking ----
+
+function SectionTracker({
+  cartId,
+  section,
+  className,
+  children,
+}: {
+  cartId: string
+  section: string
+  className?: string
+  children: React.ReactNode
+}) {
+  const ref = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    const el = ref.current
+    if (!el) return
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          fireFunnelEvent('RESULT_SECTION_ENGAGEMENT', {
+            cartId,
+            section,
+            engagementType: 'scrolled_into_view',
+          })
+          observer.disconnect()
+        }
+      },
+      { threshold: 0.5 }
+    )
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [cartId, section])
+  return (
+    <div ref={ref} className={className}>
+      {children}
+    </div>
+  )
 }
+
+// ---- Legacy free-beta email-save block ----
 
 function EmailSaveBlock({ cartId }: { cartId: string }) {
   const [email, setEmail] = useState('')
@@ -444,3 +630,24 @@ function EmailSaveBlock({ cartId }: { cartId: string }) {
     </aside>
   )
 }
+
+// =============================================================================
+// HELPERS
+// =============================================================================
+
+function laneToSection(lane: CartItemV3['lane'] | undefined): string {
+  if (!lane) return 'unknown'
+  return lane.toLowerCase()
+}
+
+function fireFunnelEvent(eventType: string, payload: Record<string, unknown> = {}): void {
+  fetch('/api/events/funnel', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ eventType, payload }),
+    keepalive: true,
+  }).catch(() => {})
+}
+
+// Re-export for the SmartCartRow consumer in result/page.tsx
+export type { SmartCartRow }

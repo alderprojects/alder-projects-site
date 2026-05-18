@@ -124,6 +124,21 @@ export interface SynthesizeV3Result {
   photoChangedRecommendation: boolean
   /** Structured diff between the two. */
   changeSummary: SynthesizeV3Diff
+  /**
+   * v7.3.4-PR3.6 commerce-moment amendment.
+   *
+   * Brief 2-3 sentence intro for the result page. Surfaces the most
+   * important condition the customer should know BEFORE shopping —
+   * e.g. "we saw active water in your basement; the vapor barrier
+   * recommendation below assumes you address that first." Capped at
+   * one sentence of diagnostic content so the cart stays a shopping
+   * deliverable, not a diagnostic assessment.
+   *
+   * v0 is deterministic (highest-confidence MONITOR-eligible signal,
+   * formatted as a single sentence). v7.3.5+ may switch to a small
+   * LLM call if the deterministic version proves too rigid.
+   */
+  introText: string | null
   /** Telemetry. */
   meta: {
     featureCountIn: number
@@ -157,6 +172,7 @@ export async function synthesizeCartV3(opts: {
       withoutPhotos,
       photoChangedRecommendation: false,
       changeSummary: { itemsAdded: [], itemsRemoved: [], laneShifts: [] },
+      introText: null,
       meta: {
         featureCountIn: 0,
         uniqueSignatures: 0,
@@ -281,11 +297,17 @@ export async function synthesizeCartV3(opts: {
   }
   const photoChangedRecommendation = withPhotos.length > 0
 
+  // 9. PR3.6 commerce-moment intro. Deterministic v0 — picks the
+  //    highest-confidence MONITOR or PRO-flagged finding and formats
+  //    it as one sentence. v7.3.5+ may swap to a small LLM call.
+  const introText = composeIntro(withPhotos, dedupedAll)
+
   return {
     withPhotos,
     withoutPhotos,
     photoChangedRecommendation,
     changeSummary,
+    introText,
     meta: {
       featureCountIn: opts.features.length,
       uniqueSignatures: dedupedAll.length,
@@ -297,6 +319,92 @@ export async function synthesizeCartV3(opts: {
       llmTotalLatencyMs,
     },
   }
+}
+
+// =============================================================================
+// INTRO COMPOSER (v7.3.4-PR3.6 commerce-moment amendment)
+// =============================================================================
+
+/**
+ * Compose a brief intro sentence for the cart header.
+ *
+ * Rules per the amendment:
+ *   - Maximum 2-3 sentences.
+ *   - Surfaces the SINGLE most important condition that should be
+ *     addressed before shopping (e.g. active water, structural cracks,
+ *     panel age).
+ *   - Commerce-moment framing — "before you start shopping, X."
+ *     Never "you should reconsider whether to do this project."
+ *   - Returns null if nothing rises above the bar — better no intro
+ *     than a generic one.
+ *
+ * v0 priority order (deterministic — no LLM call):
+ *   1. Any item in the WAIT lane whose reasoning mentions a pro
+ *      prerequisite — "before you start, X needs a pro's review."
+ *   2. Any item in the MONITOR lane — "track X before related buys."
+ *   3. Otherwise null (no intro).
+ *
+ * The dominant category surfaces in the headline regardless ("Based
+ * on your photos, this looks like a [category] project."), but only
+ * when the cart actually has items — empty carts get no intro.
+ */
+function composeIntro(
+  items: SynthCartItemV3[],
+  _deduped: DedupedFeature[]
+): string | null {
+  if (items.length === 0) return null
+
+  // Pick the most prominent category (max count) for the framing.
+  const categoryCounts = new Map<string, number>()
+  for (const item of items) {
+    categoryCounts.set(item.category, (categoryCounts.get(item.category) ?? 0) + 1)
+  }
+  let dominantCategory: string | null = null
+  let dominantCount = 0
+  for (const [cat, count] of Array.from(categoryCounts.entries())) {
+    if (count > dominantCount) {
+      dominantCategory = cat
+      dominantCount = count
+    }
+  }
+
+  // Look for a WAIT item that names a pro prerequisite.
+  const waitWithPro = items.find((i) => {
+    if (i.lane !== 'WAIT') return false
+    const text = `${i.headline} ${i.selectionReason}`.toLowerCase()
+    return (
+      text.includes("pro's") ||
+      text.includes('professional') ||
+      text.includes('contractor') ||
+      text.includes('electrician') ||
+      text.includes('hvac pro')
+    )
+  })
+
+  // Or any MONITOR item.
+  const monitorItem = items.find((i) => i.lane === 'MONITOR')
+
+  const flag = waitWithPro ?? monitorItem
+  const categoryFrame = dominantCategory
+    ? `Based on your photos, this looks like a ${prettyCategoryLocal(dominantCategory)} project.`
+    : 'Based on your photos, here is your Smart Cart.'
+
+  if (!flag) {
+    return categoryFrame
+  }
+  // Trim the flag headline if longer than ~80 chars; keep prose
+  // tight per amendment.
+  const flagSentence = flag.headline.endsWith('.')
+    ? flag.headline
+    : `${flag.headline}.`
+  return `${categoryFrame} Before you start: ${flagSentence}`
+}
+
+function prettyCategoryLocal(category: string): string {
+  return category
+    .split('_')
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(' ')
 }
 
 // =============================================================================

@@ -1,0 +1,69 @@
+/**
+ * v7.3.4-PR2 — Generic client-fired funnel event logger.
+ *
+ * POST /api/events/funnel
+ * Body: { eventType: <allowlisted>, payload?: Record<string, unknown> }
+ *
+ * Lets client components emit EventLog rows without exposing the full
+ * logEvent contract (which can write arbitrary subjectType/subjectId
+ * pairs and would be abuse-prone if exposed directly).
+ *
+ * Allowlisted events are the v7.3.4 photo funnel transitions per the
+ * strategy doc section 7. Server-side events (CART_REACTION,
+ * VISION_EXTRACTION_*, PHOTO_PREVIEW_RENDERED, etc.) continue to be
+ * written directly by their owning route — they don't need this
+ * endpoint.
+ *
+ * Auth: anonymous (anon cookie). No auth check beyond cookie presence
+ * so visitors who don't have a session yet don't break the funnel
+ * (we just attribute the event with anonId: null).
+ */
+
+import { NextRequest, NextResponse } from 'next/server'
+import { z } from 'zod'
+import { getAnonId } from '@/lib/visitor/session'
+import { logEvent } from '@/lib/events/log'
+
+export const runtime = 'nodejs'
+export const dynamic = 'force-dynamic'
+export const maxDuration = 5
+
+const FUNNEL_EVENT_ALLOWLIST = [
+  'PHOTO_PANEL_OPENED',
+  'PHOTO_UPLOAD_STARTED',
+  'PHOTO_PREVIEW_CONFIRMED_READ',
+  'PHOTO_PREVIEW_REJECTED_READ',
+  'PHOTO_PAYWALL_CLICKED',
+] as const
+
+const FunnelEventEnum = z.enum(FUNNEL_EVENT_ALLOWLIST)
+
+const BodySchema = z.object({
+  eventType: FunnelEventEnum,
+  payload: z.record(z.string(), z.unknown()).optional(),
+})
+
+export async function POST(req: NextRequest): Promise<NextResponse> {
+  let body: z.infer<typeof BodySchema>
+  try {
+    body = BodySchema.parse(await req.json())
+  } catch (e) {
+    return NextResponse.json(
+      { ok: false, error: 'invalid_body', detail: (e as Error).message.slice(0, 200) },
+      { status: 400 }
+    )
+  }
+
+  const anonId = await getAnonId()
+
+  await logEvent({
+    eventType: body.eventType,
+    subjectType: 'VisitorSession',
+    subjectId: anonId ?? 'unknown',
+    anonId: anonId ?? undefined,
+    source: 'web',
+    payload: body.payload ?? {},
+  })
+
+  return NextResponse.json({ ok: true })
+}

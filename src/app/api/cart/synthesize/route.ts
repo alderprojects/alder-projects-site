@@ -109,7 +109,12 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     return (json as OpenExtraction).features
   })
 
-  const result = await synthesizeCartV3({ features })
+  // PR3.10: pull userIntent off the project so synth grounds in the
+  // visitor's stated goal, not just the photo features.
+  const result = await synthesizeCartV3({
+    features,
+    userIntent: project.userIntent,
+  })
 
   const cart = await prisma.smartCart.create({
     data: {

@@ -65,6 +65,13 @@ export interface PreviewMeta {
   inferredScope: InferredScope | null
 }
 
+interface PreviewTeaser {
+  laneCounts: { BUY: number; SKIP: number; WAIT: number; MONITOR: number }
+  totalItems: number
+  sampleBuy: { headline: string; category: string } | null
+  sampleSkip: { headline: string; reasoning: string } | null
+}
+
 interface PreviewResponse {
   ok: boolean
   paywallAllowed: boolean
@@ -75,6 +82,8 @@ interface PreviewResponse {
   categories: PreviewCategorySummary[]
   dominantCategory: string | null
   inferredScope: InferredScope | null
+  userIntent?: string | null
+  teaser?: PreviewTeaser | null
 }
 
 interface UploadedPhoto {
@@ -143,6 +152,24 @@ export function PhotoPanel({
     setIsMobile(/iphone|ipad|ipod|android/i.test(navigator.userAgent))
   }, [])
 
+  // PR3.10: visitor's "tell us what you're looking to do" sentence.
+  // Plumbed into every upload + into synthesize-time LLM prompt as
+  // project-level context. Resets when the panel closes (next session
+  // starts fresh).
+  const [userIntent, setUserIntent] = useState('')
+
+  // PR3.10: timestamp of when the panel opened (reset on each open).
+  // Passed to /api/photos/preview as ?since= so the polling only
+  // counts photos uploaded AFTER the panel opened. Without this,
+  // photos from a previous session in the 24h window auto-advance
+  // the modal and the visitor can't start fresh.
+  const panelOpenedAtRef = useRef<Date | null>(null)
+  useEffect(() => {
+    if (open) {
+      panelOpenedAtRef.current = new Date()
+    }
+  }, [open])
+
   // PR3.8 Fix A: poll /api/photos/preview every 5s while the panel is
   // in upload stage so that photos uploaded from the desktop user's
   // phone (via QR handoff) auto-advance the desktop session to the
@@ -171,7 +198,14 @@ export function PhotoPanel({
 
     async function checkForRemoteUploads() {
       try {
-        const res = await fetch('/api/photos/preview', { method: 'POST' })
+        // PR3.10: send ?since=<panelOpenedAt> so polling only sees
+        // photos uploaded after this panel session started. Without
+        // it, old photos from prior sessions in the 24h window
+        // auto-advance the modal — the visitor can't start fresh.
+        const sinceParam = panelOpenedAtRef.current
+          ? `?since=${encodeURIComponent(panelOpenedAtRef.current.toISOString())}`
+          : ''
+        const res = await fetch(`/api/photos/preview${sinceParam}`, { method: 'POST' })
         if (!res.ok) return
         const json = (await res.json()) as PreviewResponse
         if (cancelled) return
@@ -181,10 +215,14 @@ export function PhotoPanel({
         if (json.photoCount > 0 && json.featureCount === 0) {
           setRemoteSeenPhoto(true)
         }
-        // Advance only when extraction is also complete.
+        // Advance only when extraction is also complete. Trigger a
+        // one-shot teaser preview load on advance — that call runs
+        // synthesis (~3-5c) and replaces the polling-cheap json with
+        // a richer teaser including lane counts + sample BUY/SKIP.
         if (json.featureCount > 0) {
           setPreview(json)
-          setStage('preview')
+          setStage('preview_loading')
+          void loadTeaserPreview()
         }
       } catch {
         /* swallow — poll continues */
@@ -223,6 +261,11 @@ export function PhotoPanel({
         public_content_use: false,
       })
     )
+    // PR3.10: visitor's project intent. Upload route persists to
+    // Project.userIntent on create OR backfills if not yet set.
+    if (userIntent.trim().length > 0) {
+      formData.append('userIntent', userIntent.trim())
+    }
 
     const res = await fetch('/api/photos/upload', {
       method: 'POST',
@@ -305,12 +348,21 @@ export function PhotoPanel({
     setStage('upload')
   }
 
-  async function loadPreview() {
-    if (photos.length === 0) return
+  // PR3.10: real-preview load — runs synthesizeCartV3 server-side and
+  // returns a teaser (lane counts + sample BUY + sample SKIP) on top
+  // of the basic feature summary. This is the "so what" persuasion
+  // bait the visitor sees before the paywall.
+  async function loadTeaserPreview() {
+    if (photos.length === 0 && !remoteSeenPhoto) return
     setStage('preview_loading')
     setErrorMsg('')
     try {
-      const res = await fetch('/api/photos/preview', { method: 'POST' })
+      const sinceParam = panelOpenedAtRef.current
+        ? `&since=${encodeURIComponent(panelOpenedAtRef.current.toISOString())}`
+        : ''
+      const res = await fetch(`/api/photos/preview?teaser=1${sinceParam}`, {
+        method: 'POST',
+      })
       if (!res.ok) throw new Error(`Preview failed (HTTP ${res.status})`)
       const json = (await res.json()) as PreviewResponse
       setPreview(json)
@@ -380,8 +432,10 @@ export function PhotoPanel({
             cameraInputRef={cameraInputRef}
             isMobile={isMobile}
             remoteSeenPhoto={remoteSeenPhoto}
+            userIntent={userIntent}
+            onUserIntentChange={setUserIntent}
             onFilesSelected={onFilesSelected}
-            onPreview={loadPreview}
+            onPreview={loadTeaserPreview}
           />
         )}
 
@@ -398,7 +452,7 @@ export function PhotoPanel({
             {errorMsg || 'Something went wrong loading the preview.'}
             <button
               type="button"
-              onClick={loadPreview}
+              onClick={loadTeaserPreview}
               className="ml-2 underline"
             >
               Try again
@@ -433,6 +487,8 @@ function UploadStageView({
   cameraInputRef,
   isMobile,
   remoteSeenPhoto,
+  userIntent,
+  onUserIntentChange,
   onFilesSelected,
   onPreview,
 }: {
@@ -443,6 +499,8 @@ function UploadStageView({
   cameraInputRef: React.RefObject<HTMLInputElement>
   isMobile: boolean
   remoteSeenPhoto: boolean
+  userIntent: string
+  onUserIntentChange: (value: string) => void
   onFilesSelected: (files: FileList | null) => void
   onPreview: () => void
 }) {
@@ -453,6 +511,27 @@ function UploadStageView({
         kitchen, deck, roof, electrical panel. We&apos;ll read what&apos;s
         visible and show a free preview before asking for payment.
       </p>
+
+      {/* PR3.10 photo+chat: visitor's freeform "tell us what you're
+          looking to do" sentence. Plumbed to Project.userIntent on
+          upload + into per-feature LLM synthesis prompt as
+          project-level context. Optional but heavily encouraged —
+          intent + photo dramatically out-performs photo alone for
+          recommendation quality. */}
+      <label className="mb-3 block">
+        <span className="mb-1 block text-xs font-medium text-gray-900">
+          Tell us what you&apos;re looking to do (one sentence is enough):
+        </span>
+        <textarea
+          value={userIntent}
+          onChange={(e) => onUserIntentChange(e.target.value)}
+          rows={2}
+          maxLength={500}
+          placeholder="e.g. We just bought this house — what should we tackle first in the basement?"
+          className="w-full rounded border border-gray-300 px-3 py-2 text-sm"
+        />
+      </label>
+
       <p className="mb-4 text-xs text-gray-500">{CONSENT_VERSION_NOTE}</p>
 
       {/* PR3.8 Fix A: QR for desktop -> mobile handoff inside the
@@ -615,14 +694,29 @@ function PreviewView({
           : '.'}
       </div>
 
-      <h3 className="mb-2 text-xs uppercase tracking-wider text-gray-500">
-        Sample of what we&apos;ll recommend
-      </h3>
-      <div className="space-y-2">
-        {preview.categories.map((cat) => (
-          <CategoryPreviewCard key={cat.category} cat={cat} />
-        ))}
-      </div>
+      {/* PR3.10: cart teaser. When server-side synthesis ran, render
+          lane counts + sample BUY/SKIP — the "so what" preview that
+          tells the visitor what the $19.99 unlocks. Falls back to the
+          old per-category sample-rec layout if teaser is missing
+          (e.g. synthesis failed or polling-cheap call didn't include
+          teaser=1). */}
+      {preview.teaser ? (
+        <PreviewTeaserBlock
+          teaser={preview.teaser}
+          userIntent={preview.userIntent ?? null}
+        />
+      ) : (
+        <>
+          <h3 className="mb-2 text-xs uppercase tracking-wider text-gray-500">
+            Sample of what we&apos;ll recommend
+          </h3>
+          <div className="space-y-2">
+            {preview.categories.map((cat) => (
+              <CategoryPreviewCard key={cat.category} cat={cat} />
+            ))}
+          </div>
+        </>
+      )}
 
       {!confirmAsked ? (
         <div className="mt-5 rounded-lg border border-gray-200 bg-gray-50 p-4">
@@ -667,6 +761,81 @@ function PreviewView({
         <div className="mt-5 rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
           We couldn&apos;t map your read to a known project scope. Use the
           topic picker to continue.
+        </div>
+      )}
+    </div>
+  )
+}
+
+// PR3.10 cart teaser: lane counts + sample BUY headline + sample SKIP
+// reasoning. The "so what" preview that motivates the visitor to pay.
+// Per the PR3.6 amendment's free-preview discipline: enough to
+// persuade, not enough to bypass the paywall (no product names on
+// BUY, no affiliate URLs).
+function PreviewTeaserBlock({
+  teaser,
+  userIntent,
+}: {
+  teaser: PreviewTeaser
+  userIntent: string | null
+}) {
+  const LANE_PILLS: Array<[keyof PreviewTeaser['laneCounts'], string, string]> = [
+    ['BUY', 'BUY', 'bg-emerald-100 text-emerald-800'],
+    ['SKIP', 'SKIP', 'bg-gray-200 text-gray-700'],
+    ['WAIT', 'WAIT', 'bg-amber-100 text-amber-800'],
+    ['MONITOR', 'MONITOR', 'bg-blue-100 text-blue-800'],
+  ]
+  return (
+    <div>
+      {userIntent && (
+        <div className="mb-4 rounded-md bg-gray-50 p-3 text-xs text-gray-600">
+          You said: <em>&ldquo;{userIntent}&rdquo;</em>
+        </div>
+      )}
+      <h3 className="mb-2 text-xs uppercase tracking-wider text-gray-500">
+        What your full Smart Cart will contain
+      </h3>
+      <div className="mb-4 grid grid-cols-4 gap-2">
+        {LANE_PILLS.map(([lane, label, style]) => (
+          <div
+            key={lane}
+            className={`rounded p-2 text-center ${style}`}
+          >
+            <div className="text-lg font-semibold">{teaser.laneCounts[lane]}</div>
+            <div className="text-[10px] uppercase tracking-wide">{label}</div>
+          </div>
+        ))}
+      </div>
+      {teaser.sampleBuy && (
+        <div className="mb-3 rounded-md border border-emerald-200 bg-emerald-50 p-3">
+          <div className="mb-1 text-[10px] uppercase tracking-wider text-emerald-700">
+            Sample BUY recommendation
+          </div>
+          <div className="text-sm font-medium text-emerald-900">
+            {teaser.sampleBuy.headline}
+          </div>
+          <div className="mt-1 text-xs text-emerald-800">
+            Specific product + affiliate link unlocked after payment.
+          </div>
+        </div>
+      )}
+      {teaser.sampleSkip && (
+        <div className="rounded-md border border-gray-200 bg-gray-50 p-3">
+          <div className="mb-1 text-[10px] uppercase tracking-wider text-gray-600">
+            Sample SKIP — saves you money
+          </div>
+          <div className="text-sm font-medium text-gray-900">
+            {teaser.sampleSkip.headline}
+          </div>
+          <div className="mt-1 text-xs text-gray-700">
+            {teaser.sampleSkip.reasoning}
+          </div>
+        </div>
+      )}
+      {!teaser.sampleBuy && !teaser.sampleSkip && (
+        <div className="rounded-md bg-amber-50 p-3 text-sm text-amber-900">
+          Your full cart has {teaser.totalItems} items across the lanes above.
+          Unlock to see them all.
         </div>
       )}
     </div>

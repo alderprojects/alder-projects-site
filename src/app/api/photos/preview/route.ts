@@ -37,7 +37,25 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     )
   }
 
-  const result = await computePreview({ anonId })
+  // PR3.10: read since + teaser params from URL.
+  //   ?since=<ISO timestamp> — filter Photo.uploadedAt > since so old
+  //                            photos don't auto-advance the modal.
+  //   ?teaser=1               — run real synthesis and return lane
+  //                            counts + sample BUY/SKIP for persuasion.
+  //                            Polling leaves this off (cheap).
+  const url = new URL(req.url)
+  const sinceParam = url.searchParams.get('since')
+  const teaserParam = url.searchParams.get('teaser')
+  let since: Date | undefined
+  if (sinceParam) {
+    const parsed = new Date(sinceParam)
+    if (!Number.isNaN(parsed.getTime())) {
+      since = parsed
+    }
+  }
+  const includeTeaser = teaserParam === '1' || teaserParam === 'true'
+
+  const result = await computePreview({ anonId, since, includeTeaser })
 
   // Server-side telemetry — counts every preview render so the
   // v7.3.4 retro can compute upload->preview->paywall->paid funnel.

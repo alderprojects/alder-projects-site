@@ -89,6 +89,15 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
   const roomType = optionalString(formData.get('roomType'))
   const scope = optionalString(formData.get('scope'))
   const consentsRaw = formData.get('consents')
+  // PR3.10: visitor's freeform "tell us what you're looking to do"
+  // text. Capped at 500 chars. Plumbed to Project.userIntent on
+  // create; on existing-project upload, fills the field if it's not
+  // already set (don't overwrite — first intent wins).
+  const userIntentRaw = optionalString(formData.get('userIntent'))
+  const userIntent =
+    userIntentRaw && userIntentRaw.length > 500
+      ? userIntentRaw.slice(0, 500)
+      : userIntentRaw
 
   if (!(imageEntry instanceof File)) {
     return NextResponse.json(
@@ -217,7 +226,16 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
         topic: 'home_photo_read',
         scopeVariant: 'open_photo_intake',
         visitorAnonId: anonId,
+        userIntent: userIntent ?? null,
       },
+    })
+  } else if (userIntent && !project.userIntent) {
+    // PR3.10: existing project, no intent yet — backfill on first
+    // upload that includes intent. Don't overwrite a prior intent
+    // (the visitor's earlier framing of the project wins).
+    project = await prisma.project.update({
+      where: { id: project.id },
+      data: { userIntent },
     })
   }
 

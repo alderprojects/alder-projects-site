@@ -27,6 +27,7 @@ import { isOpenExtractionShape, type OpenExtraction, type OpenFeature } from '@/
 import { computeSignature } from '@/lib/learning/signature'
 import { lookupManyBySignature, isHighConfidence, type RecommendationPayload } from '@/lib/learning/store'
 import { inferScopeFromCategory, dominantCategory, type InferredScope } from './category-to-topic'
+import { synthesizeCartV3 } from '@/lib/smart-cart/synthesize-v3'
 
 // Strategy section 6: "If confidence is below a threshold (start at
 // 0.6, calibrate post-launch)". Calibrate via the v7.3.4 retro.
@@ -76,12 +77,66 @@ export interface PreviewResult {
    *  uploads (photos all came from phone via QR handoff). Null when
    *  the visitor has no projects yet. */
   recentProjectId: string | null
+  /** PR3.10: visitor's "tell us what you're looking to do" text from
+   *  the project, so the UI can confirm what we heard before the
+   *  paywall. Null when unset. */
+  userIntent: string | null
+  /** PR3.10: when teaser=true and synthesis ran, this carries the
+   *  one-shot cart summary used as persuasion bait on the preview.
+   *  Null when teaser flag wasn't set, when features=0, or when the
+   *  synthesis errored. */
+  teaser: PreviewTeaser | null
+}
+
+/**
+ * PR3.10 cart teaser preview — the "so what" the visitor sees before
+ * the paywall. Per the PR3.6 amendment's free-preview discipline:
+ * lane counts (concrete: "4 BUY, 3 SKIP, 2 WAIT") + ONE sample BUY
+ * (headline only — no product name/URL, just the action verb) + ONE
+ * sample SKIP reasoning. Enough to persuade, not enough to bypass
+ * the paywall.
+ */
+export interface PreviewTeaser {
+  /** Lane counts from a full synthesizeCartV3 run. */
+  laneCounts: {
+    BUY: number
+    SKIP: number
+    WAIT: number
+    MONITOR: number
+  }
+  /** Total item count across all lanes. */
+  totalItems: number
+  /** A single sample BUY-lane item — headline + category only.
+   *  Product name + affiliate URL are paywalled. Null when the
+   *  synthesis produced zero BUY items (the teaser still renders
+   *  the lane counts; the visitor sees the non-BUY summary). */
+  sampleBuy: {
+    headline: string
+    category: string
+  } | null
+  /** A single sample SKIP-lane item — headline + reasoning. SKIP
+   *  reasoning is safe to surface in full because it's not directing
+   *  the visitor to buy anything; if anything it saves them money. */
+  sampleSkip: {
+    headline: string
+    reasoning: string
+  } | null
 }
 
 export interface ComputePreviewOptions {
   anonId: string
   /** Override the default 24h window for diagnostics. */
   windowMs?: number
+  /** PR3.10: when set, filters Photo.uploadedAt > since. Used by the
+   *  panel polling to avoid auto-advancing on photos from a previous
+   *  session. The panel records its open time and passes it here so
+   *  only photos uploaded AFTER the panel opened count. */
+  since?: Date
+  /** PR3.10: when true and features were extracted, run the real
+   *  synthesizeCartV3 and return the teaser (lane counts + sample
+   *  BUY/SKIP). Cheap polling calls leave this false. The one-shot
+   *  call after the modal advances to preview stage sets it true. */
+  includeTeaser?: boolean
 }
 
 // =============================================================================
@@ -89,7 +144,11 @@ export interface ComputePreviewOptions {
 // =============================================================================
 
 export async function computePreview(opts: ComputePreviewOptions): Promise<PreviewResult> {
-  const since = new Date(Date.now() - (opts.windowMs ?? RECENT_PHOTO_WINDOW_MS))
+  // PR3.10: `since` from the caller wins over the default 24h window.
+  // PhotoPanel + PhotoUploader pass their open/load time so old
+  // photos from previous sessions don't auto-advance the modal.
+  const defaultSince = new Date(Date.now() - (opts.windowMs ?? RECENT_PHOTO_WINDOW_MS))
+  const since = opts.since && opts.since > defaultSince ? opts.since : defaultSince
 
   // Same query the synthesize route uses — by anonId, confirmed
   // blob, recent window. Latest extraction per photo.
@@ -105,16 +164,16 @@ export async function computePreview(opts: ComputePreviewOptions): Promise<Previ
     orderBy: { uploadedAt: 'desc' },
   })
 
-  // PR3.8 — recent project id for the polling-driven synthesis path
-  // (PhotoUploader on desktop, after photos arrive from mobile via
-  // QR handoff). The synthesize route requires a projectId for
-  // ownership check even though it queries photos by anonId.
+  // PR3.8 — recent project id for the polling-driven synthesis path.
+  // PR3.10: also reads userIntent off the same project so the teaser
+  // synthesis (when triggered) is intent-aware.
   const recentProject = await prisma.project.findFirst({
     where: { visitorAnonId: opts.anonId },
     orderBy: { createdAt: 'desc' },
-    select: { id: true },
+    select: { id: true, userIntent: true },
   })
   const recentProjectId = recentProject?.id ?? null
+  const userIntent = recentProject?.userIntent ?? null
 
   const features: OpenFeature[] = []
   let photosWithExtractions = 0
@@ -142,6 +201,8 @@ export async function computePreview(opts: ComputePreviewOptions): Promise<Previ
       dominantCategory: null,
       inferredScope: null,
       recentProjectId,
+      userIntent,
+      teaser: null,
     }
   }
 
@@ -175,6 +236,8 @@ export async function computePreview(opts: ComputePreviewOptions): Promise<Previ
       dominantCategory: null,
       inferredScope: null,
       recentProjectId,
+      userIntent,
+      teaser: null,
     }
   }
   const allUnclear = Array.from(byCategory.keys()).every(
@@ -198,6 +261,8 @@ export async function computePreview(opts: ComputePreviewOptions): Promise<Previ
       dominantCategory: null,
       inferredScope: null,
       recentProjectId,
+      userIntent,
+      teaser: null,
     }
   }
 
@@ -239,6 +304,37 @@ export async function computePreview(opts: ComputePreviewOptions): Promise<Previ
   const dominant = dominantCategory(features.map((f) => f.category_hint))
   const inferred = dominant ? inferScopeFromCategory(dominant) : null
 
+  // PR3.10: cart teaser. Only run when caller explicitly asks for it
+  // (cheap polling sets includeTeaser=false; one-shot post-extraction
+  // call sets it true). Synthesis is the expensive part (~3-5c per
+  // call); we don't want every poll triggering it.
+  let teaser: PreviewTeaser | null = null
+  if (opts.includeTeaser) {
+    try {
+      const synth = await synthesizeCartV3({ features, userIntent })
+      const buyItems = synth.withPhotos.filter((i) => i.lane === 'BUY')
+      const skipItems = synth.withPhotos.filter((i) => i.lane === 'SKIP')
+      teaser = {
+        laneCounts: {
+          BUY: synth.withPhotos.filter((i) => i.lane === 'BUY').length,
+          SKIP: synth.withPhotos.filter((i) => i.lane === 'SKIP').length,
+          WAIT: synth.withPhotos.filter((i) => i.lane === 'WAIT').length,
+          MONITOR: synth.withPhotos.filter((i) => i.lane === 'MONITOR').length,
+        },
+        totalItems: synth.withPhotos.length,
+        sampleBuy: buyItems.length > 0
+          ? { headline: buyItems[0]!.headline, category: buyItems[0]!.category }
+          : null,
+        sampleSkip: skipItems.length > 0
+          ? { headline: skipItems[0]!.headline, reasoning: skipItems[0]!.selectionReason }
+          : null,
+      }
+    } catch (e) {
+      console.error('[preview] teaser synthesis failed:', (e as Error).message)
+      // Leave teaser=null; the rest of the preview still renders.
+    }
+  }
+
   return {
     paywallAllowed: true,
     photoCount: photos.length,
@@ -248,5 +344,7 @@ export async function computePreview(opts: ComputePreviewOptions): Promise<Previ
     dominantCategory: dominant,
     inferredScope: inferred,
     recentProjectId,
+    userIntent,
+    teaser,
   }
 }

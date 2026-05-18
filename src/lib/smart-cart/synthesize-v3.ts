@@ -179,6 +179,12 @@ export interface SynthesizeV3Result {
 
 export async function synthesizeCartV3(opts: {
   features: OpenFeature[]
+  /** PR3.10: project-level intent from the visitor's freeform sentence
+   *  alongside photo upload ("tell us what you're looking to do").
+   *  Pushed through to every per-feature LLM call as additional
+   *  context so the LLM weights recommendations against the visitor's
+   *  stated goal, not just the photo content. */
+  userIntent?: string | null
 }): Promise<SynthesizeV3Result> {
   // V1 baseline: no photo features = empty cart. The basement-scope
   // catalog walk that v7.3.3-B used as a baseline is intentionally
@@ -242,6 +248,7 @@ export async function synthesizeCartV3(opts: {
       synthesizeFeatureRecommendation({
         feature: d.feature,
         universe,
+        userIntent: opts.userIntent ?? null,
       }).then(async (synthResult) => {
         // Persist to LearningStore. Failures here don't block the cart
         // render — log + continue.

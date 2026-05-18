@@ -18,6 +18,20 @@ const nextConfig = {
       { source: '/seasonal-home-report', destination: '/', permanent: true },
       { source: '/owners', destination: '/', permanent: true },
       { source: '/buyers', destination: '/', permanent: true },
+      // v7.3.4-PR3.7 §1.1: /project-read/basement renamed to
+      // /project-read/home. 301 keeps Reddit beta cohort bookmarks
+      // live. Also catches the nested result URL so existing free-beta
+      // result links still resolve.
+      {
+        source: '/project-read/basement',
+        destination: '/project-read/home',
+        permanent: true,
+      },
+      {
+        source: '/project-read/basement/result/:cartId',
+        destination: '/project-read/home/result/:cartId',
+        permanent: true,
+      },
     ]
   },
 }

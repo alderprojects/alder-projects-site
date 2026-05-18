@@ -128,17 +128,38 @@ export interface SynthesizeV3Result {
    * v7.3.4-PR3.6 commerce-moment amendment.
    *
    * Brief 2-3 sentence intro for the result page. Surfaces the most
-   * important condition the customer should know BEFORE shopping —
-   * e.g. "we saw active water in your basement; the vapor barrier
-   * recommendation below assumes you address that first." Capped at
-   * one sentence of diagnostic content so the cart stays a shopping
-   * deliverable, not a diagnostic assessment.
-   *
-   * v0 is deterministic (highest-confidence MONITOR-eligible signal,
-   * formatted as a single sentence). v7.3.5+ may switch to a small
-   * LLM call if the deterministic version proves too rigid.
+   * important condition the customer should know BEFORE shopping.
+   * Capped at one sentence of diagnostic content so the cart stays a
+   * shopping deliverable, not a diagnostic assessment.
    */
   introText: string | null
+  /**
+   * v7.3.4-PR3.7 §1.2 + §1.6: routing signals for the result page.
+   *
+   * When needsCategoryClarification is true, the result page renders
+   * the "we see X but aren't sure what project this is for" surface
+   * instead of the cart lanes. clarificationFeatures gives the user
+   * something concrete to confirm (the features we DID see clearly).
+   *
+   * When needsMorePhotos is true, the result page renders the "need a
+   * different angle for a confident shopping list" state. This fires
+   * when extraction succeeded but the synthesized cart has zero BUY
+   * lane items — the customer paid (or showed up free-beta) and
+   * we have nothing concrete to recommend yet.
+   *
+   * Both signals are mutually exclusive with renderable cart items.
+   */
+  needsCategoryClarification: boolean
+  needsMorePhotos: boolean
+  clarificationFeatures: Array<{
+    type: string
+    condition: string
+    confidence: number
+    category_hint: string
+  }>
+  /** Highest-vote category across extractions + confidence in that vote. */
+  dominantCategory: string | null
+  dominantCategoryConfidence: number
   /** Telemetry. */
   meta: {
     featureCountIn: number
@@ -173,6 +194,11 @@ export async function synthesizeCartV3(opts: {
       photoChangedRecommendation: false,
       changeSummary: { itemsAdded: [], itemsRemoved: [], laneShifts: [] },
       introText: null,
+      needsCategoryClarification: false,
+      needsMorePhotos: true,
+      clarificationFeatures: [],
+      dominantCategory: null,
+      dominantCategoryConfidence: 0,
       meta: {
         featureCountIn: 0,
         uniqueSignatures: 0,
@@ -272,18 +298,24 @@ export async function synthesizeCartV3(opts: {
       }))
     } else {
       console.error('[synthesize-v3] LLM call failed:', result.reason)
-      // Fall back to a stub so the user knows we noticed the feature.
-      const failedIdx = llmResults.indexOf(result)
-      const deduped = toSynthesize[failedIdx]
-      if (deduped) {
-        withPhotos.push(makeAcknowledgmentStub(deduped))
-      }
+      // PR3.7 §1.5: don't surface "we noticed but couldn't recommend"
+      // stubs to customers. If a feature's LLM call fails, it's silently
+      // dropped from this synthesis. The needsMorePhotos gate below
+      // catches the case where every recommendation failed.
     }
   }
 
-  // 6c. Stubs for features we deliberately skipped (cap)
-  for (const d of skipped) {
-    withPhotos.push(makeAcknowledgmentStub(d, /*skipReason=*/ 'queue_overflow'))
+  // 6c. PR3.7 §1.5: NO customer-facing stubs for queue-overflow.
+  // Previously surfaced as "Saved for the next read — ran out of
+  // synthesis budget" — that's an internal mechanic, not a thing
+  // customers should see. Cap-exceeded features are silently
+  // dropped from this synthesis run. If the resulting cart has zero
+  // BUY items, the needsMorePhotos signal below routes the customer
+  // to the "different angle" state.
+  if (skipped.length > 0) {
+    console.log(
+      `[synthesize-v3] ${skipped.length} signatures over cap, deferred to next synthesis`
+    )
   }
 
   // 7. Record impressions for everything we surfaced
@@ -297,10 +329,34 @@ export async function synthesizeCartV3(opts: {
   }
   const photoChangedRecommendation = withPhotos.length > 0
 
-  // 9. PR3.6 commerce-moment intro. Deterministic v0 — picks the
-  //    highest-confidence MONITOR or PRO-flagged finding and formats
-  //    it as one sentence. v7.3.5+ may swap to a small LLM call.
+  // 9. PR3.6 commerce-moment intro. Deterministic — see composeIntro.
   const introText = composeIntro(withPhotos, dedupedAll)
+
+  // 10. PR3.7 §1.2 + §1.4 + §1.6: routing signals for the result page.
+  //
+  //   - dominantCategory: which category got the most feature votes
+  //   - dominantCategoryConfidence: that category's share of total features
+  //   - needsCategoryClarification: dominant share < 0.5 OR dominant is
+  //     'unclear'/'mixed' OR all features are unclear/mixed
+  //   - needsMorePhotos: zero items landed in BUY lane (the customer
+  //     paid for a shopping list and we have none to give)
+  //   - clarificationFeatures: top-5 high-confidence features for the
+  //     clarification surface to show
+  const categoryStats = computeCategoryStats(opts.features)
+  const needsCategoryClarification = decideCategoryClarification(categoryStats)
+  const buyCount = withPhotos.filter((i) => i.lane === 'BUY').length
+  const needsMorePhotos = !needsCategoryClarification && buyCount === 0
+  const clarificationFeatures = opts.features
+    .filter((f) => f.confidence >= 0.7)
+    .slice()
+    .sort((a, b) => b.confidence - a.confidence)
+    .slice(0, 5)
+    .map((f) => ({
+      type: f.type,
+      condition: f.condition,
+      confidence: f.confidence,
+      category_hint: f.category_hint,
+    }))
 
   return {
     withPhotos,
@@ -308,6 +364,11 @@ export async function synthesizeCartV3(opts: {
     photoChangedRecommendation,
     changeSummary,
     introText,
+    needsCategoryClarification,
+    needsMorePhotos,
+    clarificationFeatures,
+    dominantCategory: categoryStats.dominantCategory,
+    dominantCategoryConfidence: categoryStats.dominantConfidence,
     meta: {
       featureCountIn: opts.features.length,
       uniqueSignatures: dedupedAll.length,
@@ -319,6 +380,57 @@ export async function synthesizeCartV3(opts: {
       llmTotalLatencyMs,
     },
   }
+}
+
+// =============================================================================
+// CATEGORY STATS (PR3.7 §1.2)
+// =============================================================================
+
+interface CategoryStats {
+  dominantCategory: string | null
+  dominantConfidence: number // share of total features (0-1)
+  allUnclearOrMixed: boolean
+}
+
+function computeCategoryStats(features: OpenFeature[]): CategoryStats {
+  if (features.length === 0) {
+    return { dominantCategory: null, dominantConfidence: 0, allUnclearOrMixed: true }
+  }
+  const counts = new Map<string, number>()
+  for (const f of features) {
+    counts.set(f.category_hint, (counts.get(f.category_hint) ?? 0) + 1)
+  }
+  let dominant: string | null = null
+  let dominantCount = 0
+  for (const [cat, count] of Array.from(counts.entries())) {
+    if (count > dominantCount) {
+      dominant = cat
+      dominantCount = count
+    }
+  }
+  const allUnclearOrMixed = Array.from(counts.keys()).every(
+    (c) => c === 'unclear' || c === 'mixed'
+  )
+  return {
+    dominantCategory: dominant,
+    dominantConfidence: dominantCount / features.length,
+    allUnclearOrMixed,
+  }
+}
+
+function decideCategoryClarification(stats: CategoryStats): boolean {
+  // No features = different signal (needsMorePhotos, not clarification)
+  if (stats.dominantCategory === null) return false
+  // All extractions returned unclear/mixed — definitely needs clarification
+  if (stats.allUnclearOrMixed) return true
+  // Dominant category is itself uncertain
+  if (stats.dominantCategory === 'unclear' || stats.dominantCategory === 'mixed') {
+    return true
+  }
+  // Dominant category didn't get a majority of feature votes
+  // (threshold per PR3.7 §1.2: suggest 0.7, tune from data later)
+  if (stats.dominantConfidence < 0.5) return true
+  return false
 }
 
 // =============================================================================
@@ -442,39 +554,10 @@ function payloadToCartItem(args: PayloadToCartItemArgs): SynthCartItemV3 {
   }
 }
 
-/**
- * Build a stub cart item for features we couldn't synthesize this
- * request (LLM error or queue overflow). User sees "we noticed X but
- * don't have a recommendation yet" — better than silently dropping.
- */
-function makeAcknowledgmentStub(
-  deduped: DedupedFeature,
-  skipReason: 'llm_error' | 'queue_overflow' = 'llm_error'
-): SynthCartItemV3 {
-  const { feature, signature, occurrenceCount } = deduped
-  const reason =
-    skipReason === 'queue_overflow'
-      ? 'Saved for the next read — we noticed this but ran out of synthesis budget this round.'
-      : 'We noticed this but our recommender hit an error. Try refreshing the cart.'
-
-  return {
-    slot: signature,
-    productId: signature,
-    productName: `We saw: ${feature.type.replace(/_/g, ' ')}`,
-    asin: null,
-    affiliateUrl: '',
-    tier: 'sweet_spot',
-    priceBand: '',
-    selectionReason: reason,
-    lane: 'WAIT',
-    source: 'ai_generated',
-    category: feature.category_hint,
-    confidence: 'low',
-    signature,
-    occurrenceCount,
-    headline: `We saw: ${feature.type.replace(/_/g, ' ')}`,
-  }
-}
+// PR3.7 §1.5: makeAcknowledgmentStub deleted. Customer-facing
+// "Saved for the next read" / "We noticed but couldn't recommend"
+// strings were the wrong UX — they advertise internal mechanics. The
+// needsMorePhotos result-page state replaces them.
 
 // Helpful re-exports for downstream callers / scripts.
 export { computeSignature, FEATURE_SYNTH_PROMPT_VERSION, MODEL_VERSION }

@@ -1,48 +1,44 @@
 /**
- * v7.3.3-C PR1 Photo Upload Route — anonymous-first OPEN photo reader.
+ * v7.3.4-PR3.7 Photo Upload Route — multipart/form-data ingest.
  *
  * POST /api/photos/upload
  *
- * Single photo per request. Inline vision extraction via the open
- * extraction path (extractOpenFeatures). No category gating at upload
- * time — the model decides what's in the photo. Vercel Hobby
- * 10-second function timeout is the binding constraint:
- *   - sharp decode + EXIF strip + re-encode + dhash: 0.5-1s
- *   - Vercel Blob put: 0.5-1s
- *   - Prisma writes (4-5 rows): 0.3-0.6s
- *   - Claude vision call (open extraction): 3-8s
- *   - response serialization: <0.1s
- *   ----------------------------------------------------------------
- *   total worst case: ~10.5s. Tight enough that we keep OPEN_MAX_TOKENS
- *   at 4096 (not higher) to bound the vision call.
+ * Accepts multipart/form-data with the raw image file as the 'image'
+ * field. Switched from base64-in-JSON (PR1) to multipart in PR3.7
+ * because base64 inflates payload size by 33%, pushing real iPhone
+ * photos (1.7MB+) past Vercel Hobby's 4.5MB request body cap and
+ * causing sharp to throw "image_decode_failed: bad seek to N" on
+ * truncated buffers. Multipart uses the raw bytes, no inflation.
  *
- * If vision extraction fails or times out, the route still returns 200
- * with `extractionError` populated — the Photo + RoomSnapshot rows are
- * saved, and the synthesizer treats the photo as having no signal.
- * Downstream UI shows "we couldn't read this photo, but kept it."
+ * Single photo per request. Inline vision extraction via
+ * extractOpenFeatures. No category gating at upload time — the
+ * model decides what's in the photo.
  *
- * Body shape (zod-validated):
- *   { projectId?: string,
- *     roomType?: string,        // optional hint, telemetry only — not enforced
- *     scope?: string,           // optional hint, telemetry only — not enforced
- *     imageBase64: string,
- *     consents: { product_improvement, valuation_research, public_content_use } }
+ * Form fields:
+ *   - image           File (image/jpeg | image/png | image/webp), required
+ *   - projectId       string, optional
+ *   - roomType        string, optional (telemetry hint only)
+ *   - scope           string, optional (telemetry hint only)
+ *   - consents        JSON string of { product_improvement, valuation_research, public_content_use }, required
  *
  * Response on success: { ok: true, photoId, projectId, snapshotId,
- *   extraction: { featureCount, overallCategory, features } | null,
- *   extractionError }
+ *   extraction: { overallConfidence, featureCount, overallCategory, features } | null,
+ *   extractionError, durationMs }
  *
- * v7.3.3-C-PR1 changes from v7.3.3-B:
- *   - Calls extractOpenFeatures (open vocab) instead of extractFromImage
- *   - roomType + scope drop from literal('basement') / literal('basement_moisture')
- *     to optional free string (telemetry only). No category gating.
- *   - Hardcoded model string replaced with MODEL_VERSION constant
- *   - Stored VisionExtraction.extractionJson is now the open shape
- *     (features[], overall_photo_category, notes)
+ * If vision extraction fails or times out, the route still returns 200
+ * with extractionError populated — the Photo + RoomSnapshot rows are
+ * saved.
+ *
+ * v7.3.4-PR3.7 changes from PR3:
+ *   - Body is multipart/form-data, not JSON (uploads 4-8MB photos cleanly)
+ *   - On failure, writes UPLOAD_FAILED EventLog (was silent before)
+ *   - Project + RoomSnapshot creation no longer hardcoded to basement
+ *     (was 'basement_moisture' / 'basement_moisture_prep' / roomType='basement';
+ *     now defaults to 'home_photo_read' / null / 'home' so synthesis
+ *     downstream isn't biased toward a category the photo may not be)
  */
 
 import { NextRequest, NextResponse } from 'next/server'
-import { z } from 'zod'
 import sharp from 'sharp'
 import { put } from '@vercel/blob'
 import { createHash } from 'crypto'
@@ -56,34 +52,88 @@ export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 export const maxDuration = 10
 
-const BodySchema = z.object({
-  projectId: z.string().optional(),
-  // roomType + scope are now optional telemetry hints. The extraction
-  // call ignores them — open extraction looks at what's actually in
-  // the photo. Kept in the body so existing /project-read/basement
-  // client code doesn't need to change in PR1.
-  roomType: z.string().optional(),
-  scope: z.string().optional(),
-  // ~10MB upper guard on base64 (raw bytes after decode capped at ~7.5MB)
-  imageBase64: z.string().min(100).max(15_000_000),
-  consents: z.object({
-    product_improvement: z.boolean(),
-    valuation_research: z.boolean(),
-    public_content_use: z.boolean(),
-  }),
-})
+// Vercel Hobby caps function request bodies at ~4.5MB. Multipart
+// avoids base64's 33% overhead, so a 4.5MB JPEG fits cleanly.
+const MAX_IMAGE_BYTES = 4_500_000
+const ACCEPTED_MIME = new Set(['image/jpeg', 'image/jpg', 'image/png', 'image/webp'])
+
+interface UploadConsents {
+  product_improvement: boolean
+  valuation_research: boolean
+  public_content_use: boolean
+}
 
 const CONSENT_VERSION = 'v1.0.0' // privacy policy version snapshot
 
 export async function POST(req: NextRequest): Promise<NextResponse> {
   const t0 = Date.now()
 
-  let body: z.infer<typeof BodySchema>
+  // PR3.7: multipart/form-data parse. Handles real iPhone JPEGs
+  // (1-4MB) that previously failed under base64-in-JSON ingest.
+  let formData: FormData
   try {
-    body = BodySchema.parse(await req.json())
+    formData = await req.formData()
   } catch (e) {
     return NextResponse.json(
-      { ok: false, error: 'invalid_body', detail: (e as Error).message.slice(0, 200) },
+      {
+        ok: false,
+        error: 'invalid_body',
+        detail: `Could not parse multipart body: ${(e as Error).message.slice(0, 160)}`,
+      },
+      { status: 400 }
+    )
+  }
+
+  const imageEntry = formData.get('image')
+  const projectId = optionalString(formData.get('projectId'))
+  const roomType = optionalString(formData.get('roomType'))
+  const scope = optionalString(formData.get('scope'))
+  const consentsRaw = formData.get('consents')
+
+  if (!(imageEntry instanceof File)) {
+    return NextResponse.json(
+      { ok: false, error: 'missing_image', detail: 'Form must include an "image" file field.' },
+      { status: 400 }
+    )
+  }
+  if (imageEntry.size === 0) {
+    return NextResponse.json({ ok: false, error: 'empty_image' }, { status: 400 })
+  }
+  if (imageEntry.size > MAX_IMAGE_BYTES) {
+    return NextResponse.json(
+      {
+        ok: false,
+        error: 'image_too_large',
+        detail: `Max ${(MAX_IMAGE_BYTES / 1_000_000).toFixed(1)}MB — yours is ${(imageEntry.size / 1_000_000).toFixed(1)}MB.`,
+      },
+      { status: 413 }
+    )
+  }
+  if (imageEntry.type && !ACCEPTED_MIME.has(imageEntry.type.toLowerCase())) {
+    return NextResponse.json(
+      {
+        ok: false,
+        error: 'unsupported_image_type',
+        detail: `Got ${imageEntry.type}. Supported: JPEG, PNG, WebP. iPhone HEIC photos need to be exported as JPEG first.`,
+      },
+      { status: 415 }
+    )
+  }
+
+  let consents: UploadConsents
+  try {
+    if (typeof consentsRaw !== 'string') throw new Error('consents must be a JSON string')
+    const parsed = JSON.parse(consentsRaw) as unknown
+    if (typeof parsed !== 'object' || parsed === null) throw new Error('consents must be an object')
+    const p = parsed as Record<string, unknown>
+    consents = {
+      product_improvement: !!p.product_improvement,
+      valuation_research: !!p.valuation_research,
+      public_content_use: !!p.public_content_use,
+    }
+  } catch (e) {
+    return NextResponse.json(
+      { ok: false, error: 'invalid_consents', detail: (e as Error).message.slice(0, 160) },
       { status: 400 }
     )
   }
@@ -98,9 +148,9 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     )
   }
 
-  // 1. Decode base64 (strip data: URI prefix if present)
-  const base64 = body.imageBase64.replace(/^data:image\/\w+;base64,/, '')
-  const raw = Buffer.from(base64, 'base64')
+  // 1. Read the image bytes (no base64 inflation; sharp gets the
+  //    full buffer in one read).
+  const raw = Buffer.from(await imageEntry.arrayBuffer())
   if (raw.length === 0) {
     return NextResponse.json({ ok: false, error: 'empty_image' }, { status: 400 })
   }
@@ -119,8 +169,27 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     widthPx = result.info.width
     heightPx = result.info.height
   } catch (e) {
+    const detail = (e as Error).message.slice(0, 200)
+    // PR3.7 §1.12: UPLOAD_FAILED EventLog for the v7.3.4 retro.
+    try {
+      await logEvent({
+        eventType: 'UPLOAD_FAILED',
+        subjectType: 'VisitorSession',
+        subjectId: anonId,
+        anonId,
+        source: 'web',
+        payload: {
+          stage: 'image_decode',
+          fileBytes: imageEntry.size,
+          mimeType: imageEntry.type,
+          detail,
+        },
+      })
+    } catch {
+      /* event log failure must never block the response */
+    }
     return NextResponse.json(
-      { ok: false, error: 'image_decode_failed', detail: (e as Error).message.slice(0, 200) },
+      { ok: false, error: 'image_decode_failed', detail },
       { status: 400 }
     )
   }
@@ -130,41 +199,52 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
   const dhash = await dhashFromBuffer(processed)
   const blobKey = `photos/${sha.substring(0, 2)}/${sha}.jpg`
 
-  // 4. Find-or-create Project (anon-owned for this beta)
-  let project = body.projectId
-    ? await prisma.project.findUnique({ where: { id: body.projectId } })
+  // 4. Find-or-create Project (anon-owned for this beta).
+  //
+  // PR3.7 §1.1: dropped the 'basement_moisture' / 'basement_moisture_prep'
+  // hardcoded defaults. Project now records the OPEN-extraction context
+  // ('home_photo_read'), and downstream synthesis infers the actual
+  // project category from the extracted features, not from this row.
+  let project = projectId
+    ? await prisma.project.findUnique({ where: { id: projectId } })
     : null
   if (project && project.visitorAnonId !== anonId) {
-    // The provided projectId doesn't belong to this visitor. Don't leak
-    // existence — treat as "not your project."
     return NextResponse.json({ ok: false, error: 'not_your_project' }, { status: 403 })
   }
   if (!project) {
     project = await prisma.project.create({
       data: {
-        topic: 'basement_moisture',
-        scopeVariant: 'basement_moisture_prep',
+        topic: 'home_photo_read',
+        scopeVariant: 'open_photo_intake',
         visitorAnonId: anonId,
       },
     })
   }
 
-  // 5. Find-or-create RoomSnapshot for this Project + room type
+  // 5. Find-or-create RoomSnapshot for this Project.
+  //
+  // PR3.7 §1.1: roomType defaults to 'home' (was hardcoded 'basement').
+  // The room type the visitor uploaded isn't known until extraction
+  // runs; for the snapshot row we use a generic placeholder.
+  const snapshotRoomType = roomType || 'home'
   let snap = await prisma.roomSnapshot.findFirst({
-    where: { projectId: project.id, roomType: 'basement' },
+    where: { projectId: project.id, roomType: snapshotRoomType },
     orderBy: { snapshotAt: 'desc' },
   })
   if (!snap) {
     snap = await prisma.roomSnapshot.create({
       data: {
         projectId: project.id,
-        roomType: 'basement',
+        roomType: snapshotRoomType,
         snapshotAt: new Date(),
         captureContext: 'anon_photo_upload',
         visitorAnonId: anonId,
       },
     })
   }
+  // scope is currently a no-op telemetry hint; logEvent already
+  // captures it. Mark as intentionally unused.
+  void scope
 
   // 6. Find-or-create Photo on (visitorAnonId, blobKey).
   //
@@ -180,9 +260,9 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
   // re-add the same photo.
   const consentFlags = {
     personal_recommendations: true, // implicit — can't use the service without it
-    product_improvement: body.consents.product_improvement,
-    valuation_research: body.consents.valuation_research,
-    public_content_use: body.consents.public_content_use,
+    product_improvement: consents.product_improvement,
+    valuation_research: consents.valuation_research,
+    public_content_use: consents.public_content_use,
   }
 
   let photo
@@ -214,8 +294,21 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       })
     }
   } catch (e) {
+    const detail = (e as Error).message.slice(0, 200)
+    try {
+      await logEvent({
+        eventType: 'UPLOAD_FAILED',
+        subjectType: 'VisitorSession',
+        subjectId: anonId,
+        anonId,
+        source: 'web',
+        payload: { stage: 'photo_create', fileBytes: imageEntry.size, detail },
+      })
+    } catch {
+      /* swallow */
+    }
     return NextResponse.json(
-      { ok: false, error: 'photo_create_failed', detail: (e as Error).message.slice(0, 200) },
+      { ok: false, error: 'photo_create_failed', detail },
       { status: 500 }
     )
   }
@@ -227,9 +320,9 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
   await prisma.consent.createMany({
     data: [
       { anonId, purpose: 'personal_recommendations', dataType: 'photo', granted: true, version: CONSENT_VERSION, source: 'anon_upload' },
-      { anonId, purpose: 'product_improvement', dataType: 'photo', granted: body.consents.product_improvement, version: CONSENT_VERSION, source: 'anon_upload' },
-      { anonId, purpose: 'valuation_research', dataType: 'photo', granted: body.consents.valuation_research, version: CONSENT_VERSION, source: 'anon_upload' },
-      { anonId, purpose: 'public_content_use', dataType: 'photo', granted: body.consents.public_content_use, version: CONSENT_VERSION, source: 'anon_upload' },
+      { anonId, purpose: 'product_improvement', dataType: 'photo', granted: consents.product_improvement, version: CONSENT_VERSION, source: 'anon_upload' },
+      { anonId, purpose: 'valuation_research', dataType: 'photo', granted: consents.valuation_research, version: CONSENT_VERSION, source: 'anon_upload' },
+      { anonId, purpose: 'public_content_use', dataType: 'photo', granted: consents.public_content_use, version: CONSENT_VERSION, source: 'anon_upload' },
     ],
     skipDuplicates: true,
   })
@@ -246,13 +339,31 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       })
       blobUrl = blob.url
     } catch (e) {
+      const detail = (e as Error).message.slice(0, 200)
+      try {
+        await logEvent({
+          eventType: 'UPLOAD_FAILED',
+          subjectType: 'VisitorSession',
+          subjectId: anonId,
+          anonId,
+          source: 'web',
+          payload: {
+            stage: 'blob_write',
+            fileBytes: imageEntry.size,
+            photoId: photo.id,
+            detail,
+          },
+        })
+      } catch {
+        /* swallow */
+      }
       // Blob write failed — Photo row exists but is orphaned. Cleanup
       // cron will sweep it (Photo.blobConfirmedAt is null).
       return NextResponse.json(
         {
           ok: false,
           error: 'blob_write_failed',
-          detail: (e as Error).message.slice(0, 200),
+          detail,
           photoId: photo.id,
         },
         { status: 502 }
@@ -273,7 +384,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     source: 'web',
     payload: {
       projectId: project.id,
-      scope: body.scope,
+      scope: scope ?? null,
       bytes: processed.length,
       reusedExistingPhoto,
     },
@@ -417,4 +528,15 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     extractionError,
     durationMs: Date.now() - t0,
   })
+}
+
+// =============================================================================
+// HELPERS
+// =============================================================================
+
+/** Extract a string-valued field from a FormData entry, or null. */
+function optionalString(v: FormDataEntryValue | null): string | null {
+  if (typeof v !== 'string') return null
+  const trimmed = v.trim()
+  return trimmed.length > 0 ? trimmed : null
 }

@@ -21,7 +21,7 @@
  * architecture decision.
  */
 
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 
 type Stage = 'idle' | 'uploading' | 'synthesizing' | 'error'
@@ -48,6 +48,14 @@ export function PhotoUploader() {
     public_content_use: false,
   })
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const cameraInputRef = useRef<HTMLInputElement>(null)
+  // PR3.7 §1.8: show the explicit "Use camera" button on mobile only,
+  // so desktop users don't see an irrelevant CTA.
+  const [isMobile, setIsMobile] = useState(false)
+  useEffect(() => {
+    if (typeof navigator === 'undefined') return
+    setIsMobile(/iphone|ipad|ipod|android/i.test(navigator.userAgent))
+  }, [])
 
   async function uploadOne(
     file: File,
@@ -58,25 +66,24 @@ export function PhotoUploader() {
     // photo (EventLog confirmed 4 photos -> 4 separate projects).
     runningProjectId: string | null
   ): Promise<UploadedPhoto> {
-    const reader = new FileReader()
-    const base64 = await new Promise<string>((resolve, reject) => {
-      reader.onload = () => resolve(reader.result as string)
-      reader.onerror = () => reject(new Error('Could not read photo file'))
-      reader.readAsDataURL(file)
-    })
+    // PR3.7 §1.11: multipart/form-data instead of base64-in-JSON.
+    // base64 inflates payload by 33% and pushed real iPhone photos
+    // (1.7MB+) past Vercel Hobby's 4.5MB request body cap, causing
+    // sharp to throw "image_decode_failed: bad seek to N" on
+    // truncated buffers. Multipart sends raw bytes — no inflation,
+    // server reads with req.formData().
+    const formData = new FormData()
+    formData.append('image', file)
+    if (runningProjectId) formData.append('projectId', runningProjectId)
+    formData.append('roomType', 'auto')
+    formData.append('scope', 'auto')
+    formData.append('consents', JSON.stringify(consents))
 
     const res = await fetch('/api/photos/upload', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        projectId: runningProjectId ?? undefined,
-        // PR1: roomType/scope are telemetry hints only — open extraction
-        // ignores them. 'auto' = client did not pre-classify.
-        roomType: 'auto',
-        scope: 'auto',
-        imageBase64: base64,
-        consents,
-      }),
+      // No Content-Type header: browser auto-sets multipart/form-data
+      // with the correct boundary.
+      body: formData,
     })
 
     // PR1.2: check res.ok BEFORE attempting res.json(). On a Vercel
@@ -212,7 +219,8 @@ export function PhotoUploader() {
       if (!res.ok || !json.ok || !json.cartId) {
         throw new Error(json.error ?? 'synth_failed')
       }
-      router.push(`/project-read/basement/result/${json.cartId}`)
+      // PR3.7 §1.1: canonical URL is now /project-read/home.
+      router.push(`/project-read/home/result/${json.cartId}`)
     } catch (e) {
       setStage('error')
       setErrorMsg((e as Error).message)
@@ -264,16 +272,28 @@ export function PhotoUploader() {
 
       {/* Uploader */}
       <section className="mb-6">
+        {/* Primary input: NO `capture` attribute. The system picker
+            on iOS Safari + Android Chrome already offers BOTH
+            library + camera; adding capture="environment" was tried
+            in early v7.3.3 and reverted because older iOS forced
+            single-shot, blocking multi-select. */}
         <input
           ref={fileInputRef}
           type="file"
           accept="image/*"
           multiple
-          // No `capture` attribute. On iOS Safari, capture="environment"
-          // forces the camera (single shot only) — blocks multi-select.
-          // Without it, mobile users get the system picker showing
-          // photo library (multi-select works) PLUS "Take Photo" as a
-          // submenu, so both paths are preserved.
+          className="hidden"
+          onChange={(e) => onFilesSelected(e.target.files)}
+        />
+        {/* PR3.7 §1.8: dedicated camera input for mobile, in addition
+            to the library picker above. Two-button pattern keeps
+            multi-select working AND gives mobile users a one-tap
+            camera CTA. */}
+        <input
+          ref={cameraInputRef}
+          type="file"
+          accept="image/*"
+          capture="environment"
           className="hidden"
           onChange={(e) => onFilesSelected(e.target.files)}
         />
@@ -286,11 +306,24 @@ export function PhotoUploader() {
           {stage === 'uploading'
             ? 'Uploading…'
             : photos.length === 0
-              ? 'Send 1-5 photos'
+              ? isMobile
+                ? 'Choose photos from library'
+                : 'Send 1-5 photos'
               : photos.length >= MAX_PHOTOS
                 ? `${MAX_PHOTOS}-photo limit reached`
-                : 'Add more photos'}
+                : 'Add more from library'}
         </button>
+        {/* PR3.7 §1.8: mobile-only dedicated camera CTA. Desktop users
+            don't see it; mobile users get one tap to the back camera. */}
+        {isMobile && photos.length < MAX_PHOTOS && stage !== 'uploading' && stage !== 'synthesizing' && (
+          <button
+            type="button"
+            onClick={() => cameraInputRef.current?.click()}
+            className="mt-2 w-full rounded-lg border border-emerald-700 bg-white px-6 py-3 text-sm font-medium text-emerald-700 hover:bg-emerald-50"
+          >
+            Or take a photo with your camera
+          </button>
+        )}
         <p className="mt-2 text-xs text-gray-500">
           Up to {MAX_PHOTOS} photos. Wide shots help more than close-ups. Anything
           you want a read on — basement walls, kitchen counters, deck boards,

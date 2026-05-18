@@ -1,20 +1,21 @@
 /**
- * v7.3.3-C-PR1 Photo Reader landing page.
+ * v7.3.4-PR3.7 Home Photo Reader landing page.
  *
- * Originally basement-only (v7.3.3-B). PR1 opens the funnel — the same
- * upload pipeline now accepts photos of anything around the home and
- * extracts an open feature array. The URL stays /project-read/basement
- * because the Reddit beta cohort already has the link; v7.3.4+ will
- * fork a /project-read/photo route as a cleaner entry.
+ * Canonical URL: /project-read/home (renamed from /project-read/basement
+ * in PR3.7). The basement URL still works via a 301 redirect set in
+ * next.config.js — Reddit cohort bookmarks stay live.
  *
- * Anonymous-friendly entry — middleware mints alder_anon_id on this
- * page load, then the embedded uploader posts photos under that anon
- * id.
+ * The page accepts photos of any part of the home (basement, kitchen,
+ * deck, roof, electrical panel, exterior, attic, garage). Server-side
+ * open extraction decides what's in each photo; downstream synthesis
+ * grounds recommendations only in the features the extraction
+ * surfaced (PR3.7 §1.3 allow-list discipline).
  *
  * v7.3.3-B1/B2: desktop -> mobile QR handoff via the HandoffQR client
  * component. The QR is fetched client-side from /api/visitor/handoff
  * because the middleware-set cookie isn't visible to a server component
- * in the same request.
+ * in the same request. PR3.7 §1.9 extended the handoff to bidirectional
+ * so the result renders on whichever device the user returns to.
  *
  * Free during beta. Normally $19.99 (pricing copy lives ONLY here per
  * v7.3.3 architecture decision — no other page repeats the price).
@@ -27,7 +28,7 @@ import { HandoffQR } from './HandoffQR'
 export const metadata: Metadata = {
   title: 'Home Photo Read — Alder',
   description:
-    'Send 1-5 photos of any part of your home. Alder reads them and tells you what to buy, what to skip, what to wait on, and when to call a pro.',
+    'Send photos of anything around your home. Alder reads them and tells you what to buy, what to skip, and what to wait on.',
 }
 
 export default function PhotoReadPage() {
@@ -41,9 +42,8 @@ export default function PhotoReadPage() {
           Home photo read
         </h1>
         <p className="mt-3 text-lg text-gray-700">
-          Send photos of anything around your home — basement, kitchen, deck,
-          roof, electrical panel. Alder reads them and tells you what to buy,
-          what to skip, what to wait on, and when to call a pro.
+          Send photos of anything around your home. Alder reads them and tells
+          you what to buy, what to skip, and what to wait on.
         </p>
         <p className="mt-2 text-sm text-gray-500">
           Free during beta · normally $19.99

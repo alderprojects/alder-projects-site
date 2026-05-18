@@ -42,6 +42,10 @@ const FUNNEL_EVENT_ALLOWLIST = [
   // signup clicks.
   'RESULT_VIEW_SECONDS',
   'RESULT_SECTION_ENGAGEMENT',
+  // PR3.7 §1.12 — captures the user's category pick when the result
+  // page renders the §1.2 clarification surface. Lets the retro
+  // distinguish "we guessed right" from "user told us the answer."
+  'CATEGORY_CLARIFICATION_SUBMITTED',
 ] as const
 
 const FunnelEventEnum = z.enum(FUNNEL_EVENT_ALLOWLIST)

@@ -334,29 +334,33 @@ export default function CurationModal() {
           </button>
         </div>
 
-        {/* v7.3.4-PR2: photo side panel entry. Only shown during the
-            early steps (before the visitor has invested in topic/scope
-            selection themselves) and only when the feature flag is on.
-            Hidden in prod by default until PR3 wires Stripe webhook. */}
+        {/* v7.3.4-PR2: photo side panel entry. v7.3.4-PR3.7 §1.10
+            promoted from a small text link to a noticeable secondary
+            CTA — visible weight, full-width button with emerald
+            border, sits between the modal header and the step
+            indicator so it's hard to miss on first scan. Shown on
+            steps 0-1 (before the visitor has committed to a topic);
+            disappears once the visitor has invested in scope picking
+            so it doesn't compete with the primary path. Flag-gated
+            until v7.3.4-PR3 webhook routing lands. */}
         {PHOTO_PANEL_ENABLED && (step === 0 || step === 1) && (
           <button
             type="button"
             onClick={() => {
               setPhotoPanelOpen(true)
-              // Fire-and-forget telemetry.
               void fetch('/api/events/funnel', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                   eventType: 'PHOTO_PANEL_OPENED',
-                  payload: { source: 'curation_modal_link', stepWhenOpened: step },
+                  payload: { source: 'curation_modal_button', stepWhenOpened: step },
                 }),
                 keepalive: true,
               }).catch(() => {})
             }}
-            className="mb-3 inline-flex items-center gap-1 text-xs font-medium text-emerald-700 hover:text-emerald-800"
+            className="mb-4 w-full rounded-lg border-2 border-emerald-700 bg-white px-4 py-3 text-sm font-semibold text-emerald-700 hover:bg-emerald-50 transition-colors"
           >
-            Have a photo? Show us your project →
+            Have photos? Upload them instead →
           </button>
         )}
 

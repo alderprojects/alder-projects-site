@@ -1,20 +1,23 @@
 /**
  * GET /handoff/[token]
  *
- * Mobile-device redemption endpoint for the desktop -> mobile session
- * handoff. The QR code on the desktop /project-read/basement page
- * encodes a URL pointing here.
+ * Mobile-device redemption endpoint for the desktop <-> mobile session
+ * handoff. The QR code on /project-read/home (renamed in PR3.7 from
+ * /project-read/basement) encodes a URL pointing here.
  *
  * Flow:
  *   1. Mobile scans QR -> lands here
  *   2. Verify token (single-use, 5-min TTL)
  *   3. Set alder_anon_id cookie to the desktop's anon id
- *   4. Redirect to /project-read/basement
+ *   4. Redirect to /project-read/home
  *
- * Mobile is now in the same anon session. Photos uploaded from either
- * device land under the same Project / RoomSnapshot / SmartCart owner.
+ * Mobile is now in the same anon session as the originating desktop.
+ * Photos uploaded from either device land under the same Project /
+ * RoomSnapshot / SmartCart owner. PR3.7 §1.9: when the visitor returns
+ * to the desktop after uploading from phone, the result page reads the
+ * shared anon's photos and renders the cart.
  *
- * On failure: HTML error page with link back to /project-read/basement
+ * On failure: HTML error page with link back to /project-read/home
  * (where the mobile user can start their own anon session).
  */
 
@@ -44,7 +47,7 @@ export async function GET(
   }
 
   const res = NextResponse.redirect(
-    new URL('/project-read/basement', request.url),
+    new URL('/project-read/home', request.url),
     303
   )
   res.cookies.set(VISITOR_ANON_COOKIE, result.anonId, {
@@ -81,7 +84,7 @@ function errorHtml(reason: string): Response {
 <body>
   <h1>Handoff link didn't work</h1>
   <p>${message}</p>
-  <a class="btn" href="/project-read/basement">Start a new basement read</a>
+  <a class="btn" href="/project-read/home">Start a new home photo read</a>
 </body>
 </html>`
 

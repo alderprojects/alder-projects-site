@@ -23,7 +23,7 @@
 
 import type { Metadata } from 'next'
 import { PhotoUploader } from './PhotoUploader'
-import { HandoffQR } from './HandoffQR'
+import { HandoffQRCard } from '@/components/smartCart/HandoffQRCard'
 
 export const metadata: Metadata = {
   title: 'Home Photo Read — Alder',
@@ -50,7 +50,7 @@ export default function PhotoReadPage() {
         </p>
       </header>
 
-      <HandoffQR />
+      <HandoffQRCard variant="page" />
 
       <PhotoUploader />
     </main>

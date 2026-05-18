@@ -23,6 +23,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { convertHeicIfNeeded } from '@/lib/photos/heic-client'
 
 type Stage = 'idle' | 'uploading' | 'synthesizing' | 'error'
 
@@ -57,8 +58,52 @@ export function PhotoUploader() {
     setIsMobile(/iphone|ipad|ipod|android/i.test(navigator.userAgent))
   }, [])
 
+  // PR3.8 Fix A: photos this anon has on the server (set by polling).
+  // When remotePhotoCount > local photos.length, photos arrived from
+  // another device (the phone, via QR handoff). Drives the
+  // "uploaded from your phone" banner + lets the "See my read" CTA
+  // fire even with zero local uploads. remoteProjectId is captured
+  // so synthesize() can call the API with a valid projectId for
+  // ownership check.
+  const [remotePhotoCount, setRemotePhotoCount] = useState(0)
+  const [remoteProjectId, setRemoteProjectId] = useState<string | null>(null)
+  useEffect(() => {
+    // Skip on mobile — mobile users aren't waiting for a phone companion.
+    if (isMobile) return
+    // Skip if we're already past upload / have local progress.
+    if (stage === 'synthesizing' || stage === 'error') return
+
+    let cancelled = false
+    async function poll() {
+      try {
+        const res = await fetch('/api/photos/preview', { method: 'POST' })
+        if (!res.ok) return
+        const json = (await res.json()) as {
+          ok?: boolean
+          photoCount?: number
+          recentProjectId?: string | null
+        }
+        if (cancelled) return
+        if (typeof json.photoCount === 'number') {
+          setRemotePhotoCount(json.photoCount)
+        }
+        if (typeof json.recentProjectId === 'string') {
+          setRemoteProjectId(json.recentProjectId)
+        }
+      } catch {
+        /* swallow */
+      }
+    }
+    poll()
+    const id = setInterval(poll, 5000)
+    return () => {
+      cancelled = true
+      clearInterval(id)
+    }
+  }, [isMobile, stage])
+
   async function uploadOne(
-    file: File,
+    rawFile: File,
     // PR1.2: explicit projectId param. The outer for-loop tracks the
     // running projectId in a local variable to work around React's
     // async setState — without this, every photo in a batch read a
@@ -66,6 +111,12 @@ export function PhotoUploader() {
     // photo (EventLog confirmed 4 photos -> 4 separate projects).
     runningProjectId: string | null
   ): Promise<UploadedPhoto> {
+    // PR3.8 Fix B: iPhone HEIC -> JPEG client-side before upload.
+    // sharp on Vercel doesn't decode HEIC and previously bounced
+    // with HTTP 415. heic2any is dynamic-imported so the ~700KB
+    // library only loads when a HEIC is detected.
+    const file = await convertHeicIfNeeded(rawFile)
+
     // PR3.7 §1.11: multipart/form-data instead of base64-in-JSON.
     // base64 inflates payload by 33% and pushed real iPhone photos
     // (1.7MB+) past Vercel Hobby's 4.5MB request body cap, causing
@@ -206,14 +257,18 @@ export function PhotoUploader() {
   }
 
   async function synthesize() {
-    if (!projectId) return
+    // PR3.8 Fix A: accept local projectId OR the remoteProjectId
+    // captured by polling — that's the case where photos came in via
+    // QR handoff from the phone (no local uploads on desktop).
+    const effectiveProjectId = projectId ?? remoteProjectId
+    if (!effectiveProjectId) return
     setStage('synthesizing')
     setErrorMsg('')
     try {
       const res = await fetch('/api/cart/synthesize', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ projectId }),
+        body: JSON.stringify({ projectId: effectiveProjectId }),
       })
       const json = (await res.json()) as { ok: boolean; cartId?: string; error?: string }
       if (!res.ok || !json.ok || !json.cartId) {
@@ -280,7 +335,7 @@ export function PhotoUploader() {
         <input
           ref={fileInputRef}
           type="file"
-          accept="image/*"
+          accept="image/*,.heic,.heif"
           multiple
           className="hidden"
           onChange={(e) => onFilesSelected(e.target.files)}
@@ -292,7 +347,7 @@ export function PhotoUploader() {
         <input
           ref={cameraInputRef}
           type="file"
-          accept="image/*"
+          accept="image/*,.heic,.heif"
           capture="environment"
           className="hidden"
           onChange={(e) => onFilesSelected(e.target.files)}
@@ -354,8 +409,22 @@ export function PhotoUploader() {
         </section>
       )}
 
+      {/* PR3.8 Fix A: "uploaded from your phone" banner when polling
+          detected remote uploads not in the local photos[] state.
+          Surfaces above the synthesize CTA so the user knows what
+          happened. Only on desktop (mobile users have their own
+          local uploads). */}
+      {!isMobile && remotePhotoCount > photos.length && stage !== 'synthesizing' && (
+        <div className="mb-3 rounded-lg border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-900">
+          {remotePhotoCount === 1
+            ? '1 photo uploaded from your phone.'
+            : `${remotePhotoCount} photos uploaded from your phone.`}{' '}
+          Ready to see the read.
+        </div>
+      )}
+
       {/* Synthesize CTA */}
-      {photos.length > 0 && stage !== 'synthesizing' && (
+      {(photos.length > 0 || remotePhotoCount > 0) && stage !== 'synthesizing' && (
         <button
           onClick={synthesize}
           className="w-full rounded-lg bg-gray-900 px-6 py-4 font-medium text-white hover:bg-black"

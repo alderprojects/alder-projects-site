@@ -170,38 +170,43 @@ export function PhotoPanel({
     }
   }, [open])
 
-  // PR3.8 Fix A: poll /api/photos/preview every 5s while the panel is
-  // in upload stage so that photos uploaded from the desktop user's
-  // phone (via QR handoff) auto-advance the desktop session to the
-  // preview stage.
+  // PR3.12 — REMOVED auto-advance. Per user feedback after the PR3.11
+  // retest got stuck in preview_loading: "show progress of photos
+  // coming in and then go back to intent box & how your photos are
+  // used."
   //
-  // PR3.9 Bug #1 fix: previously advanced on `photoCount > 0`, but
-  // extraction takes ~4-6s and the polling can fire 2s after upload.
-  // Result was the modal advanced into the preview stage before
-  // features were extracted, surfacing "We didn't find any photos to
-  // read" — confusing the user about whether their upload worked.
-  // Now we only advance when featureCount > 0 (extraction complete).
-  // Between PHOTO_UPLOADED and VISION_EXTRACTION_COMPLETED, we show a
-  // small "Reading your photo…" notice instead.
+  // Diagnosis (Neon EventLog): 5 photos uploaded from mobile via
+  // QR handoff over a ~20s window. Polling auto-advanced on the
+  // first featureCount > 0, called loadPreview, and the modal got
+  // committed to preview_loading. The useEffect cleanup stopped
+  // polling, so the next 4 photos arrived silently — and loadPreview
+  // hit a state where the preview was already rendered but the
+  // visitor saw an indefinite "Reading your photos…" hang.
   //
-  // Polling only runs:
-  //   - When the panel is open AND in upload stage
-  //   - When no photos have been uploaded from THIS device yet
-  const [remoteSeenPhoto, setRemoteSeenPhoto] = useState(false)
+  // New model:
+  //   - Polling stays in upload stage and updates live counts
+  //     (remotePhotoCount, remoteFeatureCount).
+  //   - The "See free preview" CTA shows whenever there's at least
+  //     one extracted feature (local OR remote). The visitor clicks
+  //     it when they're done adding photos — we don't guess.
+  //   - The intent textarea + "How your photos are used" note stay
+  //     visible while uploads come in, so the visitor can edit
+  //     intent up to the moment they press the CTA.
+  //
+  // Polling runs whenever the panel is open AND in upload stage.
+  // (Removed the `photos.length > 0` guard — local uploads can
+  // co-exist with remote uploads in QR handoff flows.)
+  const [remotePhotoCount, setRemotePhotoCount] = useState(0)
+  const [remoteFeatureCount, setRemoteFeatureCount] = useState(0)
   useEffect(() => {
     if (!open) return
-    if (stage !== 'upload') return
-    if (photos.length > 0) return // user has local uploads, don't auto-advance
+    if (stage !== 'upload' && stage !== 'uploading') return
 
     let cancelled = false
     let intervalId: ReturnType<typeof setInterval> | null = null
 
-    async function checkForRemoteUploads() {
+    async function pollRemoteProgress() {
       try {
-        // PR3.10: send ?since=<panelOpenedAt> so polling only sees
-        // photos uploaded after this panel session started. Without
-        // it, old photos from prior sessions in the 24h window
-        // auto-advance the modal — the visitor can't start fresh.
         const sinceParam = panelOpenedAtRef.current
           ? `?since=${encodeURIComponent(panelOpenedAtRef.current.toISOString())}`
           : ''
@@ -209,32 +214,24 @@ export function PhotoPanel({
         if (!res.ok) return
         const json = (await res.json()) as PreviewResponse
         if (cancelled) return
-        // Interim signal: we see a Photo row but extraction is still
-        // running. Show the "Reading…" notice so the user knows the
-        // upload landed.
-        if (json.photoCount > 0 && json.featureCount === 0) {
-          setRemoteSeenPhoto(true)
+        if (typeof json.photoCount === 'number') {
+          setRemotePhotoCount(json.photoCount)
         }
-        // Advance only when extraction is also complete. Trigger a
-        // one-shot teaser preview load on advance — that call runs
-        // synthesis (~3-5c) and replaces the polling-cheap json with
-        // a richer teaser including lane counts + sample BUY/SKIP.
-        if (json.featureCount > 0) {
-          setPreview(json)
-          setStage('preview_loading')
-          void loadPreview()
+        if (typeof json.featureCount === 'number') {
+          setRemoteFeatureCount(json.featureCount)
         }
       } catch {
         /* swallow — poll continues */
       }
     }
 
-    intervalId = setInterval(checkForRemoteUploads, 5000)
+    void pollRemoteProgress()
+    intervalId = setInterval(pollRemoteProgress, 5000)
     return () => {
       cancelled = true
       if (intervalId) clearInterval(intervalId)
     }
-  }, [open, stage, photos.length])
+  }, [open, stage])
 
   if (!open) return null
 
@@ -360,7 +357,9 @@ export function PhotoPanel({
   // photos" bug — 5+ photos = 6 parallel LLM calls = ~10s = Vercel
   // 504. Reverted.
   async function loadPreview() {
-    if (photos.length === 0 && !remoteSeenPhoto) return
+    // PR3.12: visitor-initiated. Gate on having SOMETHING to show —
+    // local uploads OR a remote feature extracted via QR handoff.
+    if (photos.length === 0 && remoteFeatureCount === 0) return
     setStage('preview_loading')
     setErrorMsg('')
     try {
@@ -379,6 +378,22 @@ export function PhotoPanel({
       setStage('preview_error')
     }
   }
+
+  // PR3.12: bail-out from preview_loading. If the /api/photos/preview
+  // call hangs (LLM slow, Vercel 504), the visitor should be able to
+  // back out to the upload stage rather than stare at the dots
+  // indefinitely. Also auto-bails after 30s as a hard ceiling.
+  function bailOutOfPreviewLoading() {
+    setStage('upload')
+    setErrorMsg('Preview is taking longer than expected. Add or remove photos and try again.')
+  }
+  useEffect(() => {
+    if (stage !== 'preview_loading') return
+    const t = setTimeout(() => {
+      bailOutOfPreviewLoading()
+    }, 30_000)
+    return () => clearTimeout(t)
+  }, [stage])
 
   function handleConfirmRead() {
     if (!preview) return
@@ -438,7 +453,8 @@ export function PhotoPanel({
             fileInputRef={fileInputRef}
             cameraInputRef={cameraInputRef}
             isMobile={isMobile}
-            remoteSeenPhoto={remoteSeenPhoto}
+            remotePhotoCount={remotePhotoCount}
+            remoteFeatureCount={remoteFeatureCount}
             userIntent={userIntent}
             onUserIntentChange={setUserIntent}
             onFilesSelected={onFilesSelected}
@@ -446,8 +462,9 @@ export function PhotoPanel({
           />
         )}
 
-        {/* PREVIEW LOADING — PR3.11 added pulsing dots so the wait
-            feels active rather than hung. */}
+        {/* PREVIEW LOADING — PR3.11 added pulsing dots; PR3.12 added
+            an explicit bail-out button + 30s auto-bail so a slow
+            preview doesn't strand the visitor. */}
         {stage === 'preview_loading' && (
           <div className="flex flex-col items-center gap-3 rounded-lg bg-gray-100 p-6 text-center text-sm text-gray-700">
             <PulsingDots />
@@ -455,6 +472,13 @@ export function PhotoPanel({
             <span className="text-xs text-gray-500">
               Usually 4–8 seconds per photo.
             </span>
+            <button
+              type="button"
+              onClick={bailOutOfPreviewLoading}
+              className="mt-2 text-xs text-gray-600 underline hover:text-gray-900"
+            >
+              Cancel and go back
+            </button>
           </div>
         )}
 
@@ -498,7 +522,8 @@ function UploadStageView({
   fileInputRef,
   cameraInputRef,
   isMobile,
-  remoteSeenPhoto,
+  remotePhotoCount,
+  remoteFeatureCount,
   userIntent,
   onUserIntentChange,
   onFilesSelected,
@@ -510,12 +535,23 @@ function UploadStageView({
   fileInputRef: React.RefObject<HTMLInputElement>
   cameraInputRef: React.RefObject<HTMLInputElement>
   isMobile: boolean
-  remoteSeenPhoto: boolean
+  remotePhotoCount: number
+  remoteFeatureCount: number
   userIntent: string
   onUserIntentChange: (value: string) => void
   onFilesSelected: (files: FileList | null) => void
   onPreview: () => void
 }) {
+  // PR3.12: live count of "have we read it yet" combined across local
+  // and remote sources. Remote counts come from polling; local counts
+  // come from uploadOne's return status. The CTA only enables when at
+  // least one feature has been extracted somewhere.
+  const localReadCount = photos.filter((p) => p.status === 'ok' || p.status === 'low_confidence').length
+  const totalUploaded = Math.max(photos.length, remotePhotoCount)
+  const totalRead = Math.max(localReadCount, remoteFeatureCount > 0 ? remotePhotoCount : 0)
+  const anyReadyToPreview = photos.length > 0 || remoteFeatureCount > 0
+  const stillReading = totalUploaded > 0 && totalRead < totalUploaded
+  const remoteOnly = photos.length === 0 && remotePhotoCount > 0
   return (
     <div>
       <p className="mb-3 text-sm text-gray-700">
@@ -556,16 +592,23 @@ function UploadStageView({
         subtitle="Scan with your phone to upload photos there. The preview will appear here automatically."
       />
 
-      {/* PR3.9 Bug #1 + PR3.11: between PHOTO_UPLOADED and
-          VISION_EXTRACTION_COMPLETED (~4-8s — can be longer on phone
-          uploads if the network was sluggish), polling has seen a
-          Photo row but no features yet. Pulsing dots give the
-          visitor visible feedback that work is happening so the
-          wait doesn't feel like a hang. */}
-      {remoteSeenPhoto && (
-        <div className="mb-4 hidden items-center gap-2 rounded-lg border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-900 md:flex">
-          <PulsingDots />
-          <span>Photo received from your phone — reading it now…</span>
+      {/* PR3.12: live progress banner. Shows the running count of
+          photos uploaded (local + remote via QR handoff) vs. how
+          many have been extracted. Pulsing dots only animate while
+          extraction is still catching up. The visitor stays on the
+          upload stage — they decide when to press "See free
+          preview" — so new mobile uploads can keep streaming in. */}
+      {totalUploaded > 0 && (
+        <div className="mb-4 flex items-center gap-2 rounded-lg border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-900">
+          {stillReading && <PulsingDots />}
+          <span>
+            {remoteOnly
+              ? `${remotePhotoCount} ${remotePhotoCount === 1 ? 'photo' : 'photos'} from your phone`
+              : `${totalUploaded} ${totalUploaded === 1 ? 'photo' : 'photos'} uploaded`}
+            {stillReading
+              ? ` — reading ${totalRead === 0 ? 'now' : `(${totalRead}/${totalUploaded} read)`}…`
+              : ` — ${totalRead === 1 ? 'read' : 'all read'}.`}
+          </span>
         </div>
       )}
 
@@ -613,43 +656,48 @@ function UploadStageView({
       )}
 
       {photos.length > 0 && (
-        <>
-          <div className="mt-4 grid grid-cols-3 gap-2">
-            {photos.map((p, i) => (
-              <div
-                key={p.photoId}
-                className="rounded border border-gray-200 p-1"
-              >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={p.preview}
-                  alt={`Photo ${i + 1}`}
-                  className="h-20 w-full rounded object-cover"
-                />
-                <p className="mt-1 text-[10px]">
-                  {p.status === 'ok' && (
-                    <span className="text-emerald-700">Read</span>
-                  )}
-                  {p.status === 'low_confidence' && (
-                    <span className="text-amber-700">Partial</span>
-                  )}
-                  {p.status === 'failed' && (
-                    <span className="text-red-700">Failed</span>
-                  )}
-                </p>
-              </div>
-            ))}
-          </div>
+        <div className="mt-4 grid grid-cols-3 gap-2">
+          {photos.map((p, i) => (
+            <div
+              key={p.photoId}
+              className="rounded border border-gray-200 p-1"
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={p.preview}
+                alt={`Photo ${i + 1}`}
+                className="h-20 w-full rounded object-cover"
+              />
+              <p className="mt-1 text-[10px]">
+                {p.status === 'ok' && (
+                  <span className="text-emerald-700">Read</span>
+                )}
+                {p.status === 'low_confidence' && (
+                  <span className="text-amber-700">Partial</span>
+                )}
+                {p.status === 'failed' && (
+                  <span className="text-red-700">Failed</span>
+                )}
+              </p>
+            </div>
+          ))}
+        </div>
+      )}
 
-          <button
-            type="button"
-            onClick={onPreview}
-            disabled={stage === 'uploading'}
-            className="mt-4 w-full rounded-lg bg-gray-900 px-4 py-3 text-sm font-medium text-white hover:bg-black disabled:opacity-60"
-          >
-            See free preview
-          </button>
-        </>
+      {/* PR3.12: visitor-controlled CTA. Enables as soon as ONE
+          feature has been extracted (local or remote), so QR-handoff
+          flows with zero local uploads still work. Stays disabled
+          until then so a press during "uploading" or "reading" won't
+          trigger an empty-features early return on the preview API. */}
+      {anyReadyToPreview && (
+        <button
+          type="button"
+          onClick={onPreview}
+          disabled={stage === 'uploading'}
+          className="mt-4 w-full rounded-lg bg-gray-900 px-4 py-3 text-sm font-medium text-white hover:bg-black disabled:opacity-60"
+        >
+          {stillReading ? 'See preview so far' : 'See free preview'}
+        </button>
       )}
 
       {errorMsg && (

@@ -124,7 +124,11 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       cartItemsJsonWithoutPhotos: result.withoutPhotos as never,
       cartItemsJsonWithPhotos: result.withPhotos as never,
       photoChangedRecommendation: result.photoChangedRecommendation,
-      changeSummaryJson: result.changeSummary as never,
+      // v7.3.4-PR3.6 — introText lives in changeSummaryJson.
+      changeSummaryJson: {
+        ...result.changeSummary,
+        introText: result.introText,
+      } as never,
     },
   })
 

@@ -116,7 +116,13 @@ export async function buildCartFromPhotos(
       cartItemsJsonWithoutPhotos: result.withoutPhotos as never,
       cartItemsJsonWithPhotos: result.withPhotos as never,
       photoChangedRecommendation: result.photoChangedRecommendation,
-      changeSummaryJson: result.changeSummary as never,
+      // v7.3.4-PR3.6 — introText lives inside the existing
+      // changeSummaryJson column as an additive field. No schema
+      // change needed; ResultView reads this on render.
+      changeSummaryJson: {
+        ...result.changeSummary,
+        introText: result.introText,
+      } as never,
     },
   })
 

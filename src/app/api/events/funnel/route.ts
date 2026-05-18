@@ -29,11 +29,19 @@ export const dynamic = 'force-dynamic'
 export const maxDuration = 5
 
 const FUNNEL_EVENT_ALLOWLIST = [
+  // PR2 photo-funnel transitions
   'PHOTO_PANEL_OPENED',
   'PHOTO_UPLOAD_STARTED',
   'PHOTO_PREVIEW_CONFIRMED_READ',
   'PHOTO_PREVIEW_REJECTED_READ',
   'PHOTO_PAYWALL_CLICKED',
+  // PR3.6 commerce-moment instrumentation (drives v7.5 product-tier
+  // decision per amendment Change 3). RESULT_VIEW_SECONDS fires via
+  // navigator.sendBeacon on page unload; RESULT_SECTION_ENGAGEMENT
+  // fires on first scroll-into-view per section + reaction/affiliate/
+  // signup clicks.
+  'RESULT_VIEW_SECONDS',
+  'RESULT_SECTION_ENGAGEMENT',
 ] as const
 
 const FunnelEventEnum = z.enum(FUNNEL_EVENT_ALLOWLIST)

@@ -46,7 +46,10 @@ import type {
  * on every LearningStore row generated via this path so the retro
  * can compare quality across versions.
  */
-export const FEATURE_SYNTH_PROMPT_VERSION = 'feat-synth-v1.0.0'
+// v1.1.0 — commerce-moment discipline + 4-lane vocab (v7.3.4-PR3.6).
+// Bumped MAJOR-minor so the LearningStore retro can distinguish
+// pre/post amendment cache entries.
+export const FEATURE_SYNTH_PROMPT_VERSION = 'feat-synth-v1.1.0'
 
 // Bounded so a request synthesizing many cache-miss features can't
 // blow past Vercel's 10s function timeout. Haiku at this cap is
@@ -62,24 +65,28 @@ const UNIVERSE_CANDIDATES_PER_CALL = 12
 // PROMPT
 // =============================================================================
 
-const SYSTEM_PROMPT = `You are a recommendation generator for Alder, a home maintenance shopping platform.
+const SYSTEM_PROMPT = `You are a recommendation generator for Alder, a home maintenance SHOPPING platform.
+
+The customer who will see your output has already decided to do this project and is shopping for it. Your output is a shopping deliverable, not a diagnostic assessment. The customer is asking "what should I buy?", not "should I do this project?"
 
 You receive ONE observed feature from a homeowner's photo (e.g. "moisture_efflorescence on a basement wall") and a short list of available curated products. Your job is to produce a single JSON recommendation that the cart will render.
 
 Rules:
 1. Output a single JSON object matching the schema. No prose, no markdown fences.
-2. Pick the BEST lane for this feature:
+2. Pick the BEST lane for this feature. The lane vocabulary is exactly FOUR values:
    - "BUY": the universe has a product that genuinely addresses this feature. You MUST pick a product from the supplied list — never invent product names. Populate the product object with the supplied universeId / productName / affiliateUrl / priceBand / tier.
-   - "SKIP": the homeowner already has equipment doing this job (e.g. dehumidifier_present means: don't buy another). No product. Headline tells the homeowner what to skip and why.
-   - "WAIT": observation is real but doesn't require immediate action — monitor through a season. No product.
-   - "PRO_LINE": the situation needs professional sizing/inspection (e.g. active water, structural cracks, electrical hazards). No product. Headline tells the homeowner what kind of pro.
-3. NEVER invent product names. If nothing in the universe genuinely fits, use SKIP, WAIT, or PRO_LINE instead of forcing a BUY.
-4. headline: short, action-oriented, ≤60 chars. Examples: "Skip a second dehumidifier", "Call a foundation contractor", "Add a moisture meter".
-5. reasoning: 1-2 sentences explaining why, factual and grounded in the feature condition. No value judgments ("ugly", "dated").
-6. caution: optional, only when BUY needs additional warning (e.g. "Confirm the existing unit's capacity first").
-7. category: copy from the supplied feature.category_hint exactly.
+   - "SKIP": this is a common recommendation that does NOT apply to the customer's situation (e.g. dehumidifier_present means: don't buy another). No product. Headline tells the customer what to skip and why — saves them money.
+   - "WAIT": buy this later, here's the trigger. The trigger may be a season, a condition change, or a prerequisite professional assessment. If the prerequisite is professional assessment (active water, structural cracks, electrical hazards), the reasoning should name that explicitly — e.g. "your panel needs professional evaluation before any electrical product purchase makes sense." Do NOT invent referrals or contractor recommendations.
+   - "MONITOR": track this condition before spending on related products. Use ONLY when the customer should watch a specific condition and adjust their shopping later (e.g. a moisture reading before insulating). Reasoning names what change would trigger action.
+3. There is NO "PRO_LINE" or "CALL A PRO" lane. Alder does not have a contractor network and cannot route customers to professional services. If the photo shows something that needs a pro, use WAIT and name the prerequisite ("X needs a pro's assessment before related products make sense"). The customer gets the same actionable information without a false referral promise.
+4. NEVER invent product names. If nothing in the universe genuinely fits, use SKIP, WAIT, or MONITOR instead of forcing a BUY.
+5. Do NOT include recommendations that ask the customer to assess, evaluate, or reconsider whether to do the project at all. Those belong in our separate diagnostic product (Project Read), not Smart Cart. Smart Cart is for committed shoppers.
+6. headline: short, action-oriented, ≤60 chars. Examples: "Skip a second dehumidifier", "Add a moisture meter", "Wait on vapor barrier until panel is reviewed".
+7. reasoning: 1-2 sentences explaining why, factual and grounded in the feature condition. No value judgments ("ugly", "dated"). No diagnostic framing ("you might not be ready for this project").
+8. caution: optional, only when BUY needs additional warning (e.g. "Confirm the existing unit's capacity first"). For non-BUY lanes, fold the caution into reasoning.
+9. category: copy from the supplied feature.category_hint exactly.
 
-You are generating cache entries that will be reused for many future homeowners seeing similar features. Optimize for "what would a thoughtful home inspector say." Keep it specific and useful, not generic.`
+You are generating cache entries that will be reused for many future homeowners seeing similar features. Optimize for "what would a thoughtful home inspector who is also a thrifty shopper say to a buyer who is committed and shopping today." Keep it specific and useful, not generic.`
 
 interface PromptInput {
   feature: OpenFeature
@@ -109,7 +116,7 @@ ${JSON.stringify(candidatesJson, null, 2)}
 
 Return JSON matching this schema:
 {
-  "lane": "BUY | SKIP | WAIT | PRO_LINE",
+  "lane": "BUY | SKIP | WAIT | MONITOR",
   "headline": "short action-oriented title, ≤60 chars",
   "reasoning": "1-2 sentence factual explanation",
   "category": "${input.feature.category_hint}",
@@ -232,7 +239,7 @@ const VALID_LANES: ReadonlySet<CartLane> = new Set<CartLane>([
   'BUY',
   'SKIP',
   'WAIT',
-  'PRO_LINE',
+  'MONITOR',
 ])
 const VALID_TIERS: ReadonlySet<CartTier> = new Set<CartTier>([
   'budget',

@@ -73,6 +73,11 @@ export interface V3CartViewProps {
   needsMorePhotos?: boolean
   /** Features the extraction was confident about; surfaced in §1.2 and §1.6 states. */
   clarificationFeatures?: ClarificationFeature[]
+  /** PR3.9 — when needsMorePhotos fires for a known-empty-catalog
+   *  category (e.g. living_area, bedroom), the surface adapts to say
+   *  "we recognize this room but don't have products for it yet"
+   *  rather than the generic "we need a different angle." */
+  dominantCategory?: string | null
   /** Show the email-save block under the cart (free beta only). */
   showEmailSave?: boolean
   /** Cart heading copy. */
@@ -126,6 +131,7 @@ export function V3CartView({
   needsCategoryClarification = false,
   needsMorePhotos = false,
   clarificationFeatures = [],
+  dominantCategory = null,
   showEmailSave = false,
   heading = 'Your Smart Cart',
   showV75Footer = true,
@@ -233,11 +239,14 @@ export function V3CartView({
           uploadMoreHref={uploadMoreHref}
         />
       ) : needsMorePhotos ? (
-        /* PR3.7 §1.6: needs-more-photos state when extraction was OK
-           but synthesis produced zero BUY items. */
+        /* PR3.7 §1.6 + PR3.9 catalog-gap UX: needs-more-photos state.
+           Adapts when the dominant category has no ASIN coverage in
+           the current universe (rooms-as-such don't have product
+           catalogs in v7.3.x). */
         <NeedsMorePhotosSurface
           cartId={cartId}
           clarificationFeatures={clarificationFeatures}
+          dominantCategory={dominantCategory}
           uploadMoreHref={uploadMoreHref}
         />
       ) : (
@@ -618,15 +627,90 @@ function CategoryClarificationSurface({
 
 // ---- PR3.7 §1.6 Needs-more-photos surface (BUY lane empty) ----
 
+// PR3.9: categories with no actionable products in the current curated
+// universe (16 ASIN-bearing SKUs are all kitchen + outdoor today).
+// When extraction landed in one of these, "we need a different angle"
+// is misleading — the photo was fine, our catalog is incomplete.
+const CATEGORIES_WITH_SPARSE_CATALOG = new Set<string>([
+  'living_area',
+  'bedroom',
+  'hallway_or_stair',
+  'closet',
+  'garage',
+  'attic',
+])
+
 function NeedsMorePhotosSurface({
   cartId,
   clarificationFeatures,
+  dominantCategory,
   uploadMoreHref,
 }: {
   cartId: string
   clarificationFeatures: ClarificationFeature[]
+  dominantCategory: string | null
   uploadMoreHref: string
 }) {
+  // PR3.9 catalog-gap UX: when we recognized the room but our product
+  // catalog has nothing for that category, say that instead of asking
+  // the user to upload a better photo (which won't help).
+  const isCatalogGap =
+    dominantCategory !== null &&
+    CATEGORIES_WITH_SPARSE_CATALOG.has(dominantCategory)
+
+  if (isCatalogGap) {
+    const prettyCat = dominantCategory!
+      .split('_')
+      .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+      .join(' ')
+    return (
+      <SectionTracker
+        cartId={cartId}
+        section="intro"
+        className="mb-6 rounded-lg border border-amber-200 bg-amber-50 p-4"
+      >
+        <h2 className="text-lg font-medium text-amber-900">
+          We recognized your {prettyCat.toLowerCase()} photo — but we don&apos;t
+          have product picks for that area yet.
+        </h2>
+        {clarificationFeatures.length > 0 && (
+          <>
+            <p className="mt-2 text-sm text-amber-900">
+              We saw:
+            </p>
+            <ul className="mt-2 list-inside list-disc text-sm text-amber-900">
+              {clarificationFeatures.slice(0, 4).map((f) => (
+                <li key={f.type}>{f.condition}</li>
+              ))}
+            </ul>
+          </>
+        )}
+        <p className="mt-3 text-sm text-amber-900">
+          Our shopping catalog today covers <strong>basement moisture,
+          kitchen organization + cosmetic, weatherization, outdoor / deck</strong>,
+          and a few <strong>safety / mechanical</strong> staples. We&apos;re
+          expanding category by category. If you have photos of any of those
+          areas, we can produce a Smart Cart for them now.
+        </p>
+        <div className="mt-4 flex flex-wrap items-center gap-3">
+          <a
+            href={uploadMoreHref}
+            className="rounded-md bg-amber-700 px-4 py-2 text-sm font-medium text-white hover:bg-amber-800"
+          >
+            Try a different photo
+          </a>
+          <a
+            href="/smart-cart"
+            className="text-xs text-amber-800 underline hover:text-amber-900"
+          >
+            Or pick a project topic
+          </a>
+        </div>
+      </SectionTracker>
+    )
+  }
+
+  // Normal needs-more-photos: extraction was OK but BUY lane empty.
   return (
     <SectionTracker
       cartId={cartId}

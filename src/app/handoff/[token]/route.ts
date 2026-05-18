@@ -46,8 +46,14 @@ export async function GET(
     return errorHtml(result.reason)
   }
 
+  // PR3.9 Bug #2: tag the redirect with ?source=handoff so the
+  // mobile PhotoUploader knows it's the phone half of a desktop
+  // handoff pair. PhotoUploader then hides the synthesize CTA + shows
+  // a "photos uploaded — return to your desktop" message rather than
+  // letting the visitor synthesize on mobile (which strands the
+  // desktop session at the QR + duplicates the buyer journey).
   const res = NextResponse.redirect(
-    new URL('/project-read/home', request.url),
+    new URL('/project-read/home?source=handoff', request.url),
     303
   )
   res.cookies.set(VISITOR_ANON_COOKIE, result.anonId, {

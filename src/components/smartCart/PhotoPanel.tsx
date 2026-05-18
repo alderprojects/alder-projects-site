@@ -146,14 +146,21 @@ export function PhotoPanel({
   // PR3.8 Fix A: poll /api/photos/preview every 5s while the panel is
   // in upload stage so that photos uploaded from the desktop user's
   // phone (via QR handoff) auto-advance the desktop session to the
-  // preview stage. Without this poll the desktop user has no way to
-  // know mobile upload succeeded; they're stuck staring at the QR.
+  // preview stage.
+  //
+  // PR3.9 Bug #1 fix: previously advanced on `photoCount > 0`, but
+  // extraction takes ~4-6s and the polling can fire 2s after upload.
+  // Result was the modal advanced into the preview stage before
+  // features were extracted, surfacing "We didn't find any photos to
+  // read" — confusing the user about whether their upload worked.
+  // Now we only advance when featureCount > 0 (extraction complete).
+  // Between PHOTO_UPLOADED and VISION_EXTRACTION_COMPLETED, we show a
+  // small "Reading your photo…" notice instead.
   //
   // Polling only runs:
-  //   - When the panel is open AND in upload stage (not while
-  //     uploading, not while previewing — that'd be wasteful)
+  //   - When the panel is open AND in upload stage
   //   - When no photos have been uploaded from THIS device yet
-  //     (otherwise we'd double-progress past the user's own uploads)
+  const [remoteSeenPhoto, setRemoteSeenPhoto] = useState(false)
   useEffect(() => {
     if (!open) return
     if (stage !== 'upload') return
@@ -168,8 +175,14 @@ export function PhotoPanel({
         if (!res.ok) return
         const json = (await res.json()) as PreviewResponse
         if (cancelled) return
-        if (json.photoCount > 0) {
-          // Remote upload detected — auto-advance to preview stage.
+        // Interim signal: we see a Photo row but extraction is still
+        // running. Show the "Reading…" notice so the user knows the
+        // upload landed.
+        if (json.photoCount > 0 && json.featureCount === 0) {
+          setRemoteSeenPhoto(true)
+        }
+        // Advance only when extraction is also complete.
+        if (json.featureCount > 0) {
           setPreview(json)
           setStage('preview')
         }
@@ -178,8 +191,6 @@ export function PhotoPanel({
       }
     }
 
-    // First poll after 5s (give the user time to set up the phone),
-    // then every 5s thereafter.
     intervalId = setInterval(checkForRemoteUploads, 5000)
     return () => {
       cancelled = true
@@ -368,6 +379,7 @@ export function PhotoPanel({
             fileInputRef={fileInputRef}
             cameraInputRef={cameraInputRef}
             isMobile={isMobile}
+            remoteSeenPhoto={remoteSeenPhoto}
             onFilesSelected={onFilesSelected}
             onPreview={loadPreview}
           />
@@ -420,6 +432,7 @@ function UploadStageView({
   fileInputRef,
   cameraInputRef,
   isMobile,
+  remoteSeenPhoto,
   onFilesSelected,
   onPreview,
 }: {
@@ -429,6 +442,7 @@ function UploadStageView({
   fileInputRef: React.RefObject<HTMLInputElement>
   cameraInputRef: React.RefObject<HTMLInputElement>
   isMobile: boolean
+  remoteSeenPhoto: boolean
   onFilesSelected: (files: FileList | null) => void
   onPreview: () => void
 }) {
@@ -450,6 +464,17 @@ function UploadStageView({
         variant="panel"
         subtitle="Scan with your phone to upload photos there. The preview will appear here automatically."
       />
+
+      {/* PR3.9 Bug #1: between PHOTO_UPLOADED and
+          VISION_EXTRACTION_COMPLETED (~4-6s), polling has seen a
+          Photo row but no features yet. Tell the desktop user that
+          the upload landed and we're reading it — better than
+          appearing to do nothing for ~5s. */}
+      {remoteSeenPhoto && (
+        <div className="mb-4 hidden rounded-lg border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-900 md:block">
+          Photo received from your phone — reading it now…
+        </div>
+      )}
 
       <input
         ref={fileInputRef}

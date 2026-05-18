@@ -70,6 +70,7 @@ export default async function SmartCartResultPage({ params }: Props) {
         confidence: number
         category_hint: string
       }>
+      dominantCategory?: string | null
     }
     return (
       <main className="mx-auto max-w-3xl px-4 py-8">
@@ -80,6 +81,7 @@ export default async function SmartCartResultPage({ params }: Props) {
           needsCategoryClarification={summary.needsCategoryClarification ?? false}
           needsMorePhotos={summary.needsMorePhotos ?? false}
           clarificationFeatures={summary.clarificationFeatures ?? []}
+          dominantCategory={summary.dominantCategory ?? null}
           // No email-save here: paid carts get the upgrade-offer
           // email scheduled via Stripe webhook (PR3); free-beta
           // carts have email-save under their own URL.

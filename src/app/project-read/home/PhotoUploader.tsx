@@ -22,7 +22,7 @@
  */
 
 import { useEffect, useRef, useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { convertHeicIfNeeded } from '@/lib/photos/heic-client'
 
 type Stage = 'idle' | 'uploading' | 'synthesizing' | 'error'
@@ -39,6 +39,14 @@ const MAX_PHOTOS = 5
 
 export function PhotoUploader() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  // PR3.9 Bug #2: when the visitor arrived via desktop->mobile QR
+  // handoff (/handoff/[token] redirects with ?source=handoff), this
+  // mobile session is the phone half of a desktop journey. Hide the
+  // synthesize CTA and show "return to desktop" guidance instead, so
+  // the visitor doesn't accidentally complete the buyer journey on
+  // their phone and strand the desktop session at the QR.
+  const isHandoffPhone = searchParams.get('source') === 'handoff'
   const [stage, setStage] = useState<Stage>('idle')
   const [photos, setPhotos] = useState<UploadedPhoto[]>([])
   const [projectId, setProjectId] = useState<string | null>(null)
@@ -65,7 +73,12 @@ export function PhotoUploader() {
   // fire even with zero local uploads. remoteProjectId is captured
   // so synthesize() can call the API with a valid projectId for
   // ownership check.
+  //
+  // PR3.9 Bug #1: track remoteFeatureCount distinct from
+  // remotePhotoCount so we can show "reading…" between
+  // PHOTO_UPLOADED and VISION_EXTRACTION_COMPLETED (~4-6s gap).
   const [remotePhotoCount, setRemotePhotoCount] = useState(0)
+  const [remoteFeatureCount, setRemoteFeatureCount] = useState(0)
   const [remoteProjectId, setRemoteProjectId] = useState<string | null>(null)
   useEffect(() => {
     // Skip on mobile — mobile users aren't waiting for a phone companion.
@@ -81,11 +94,15 @@ export function PhotoUploader() {
         const json = (await res.json()) as {
           ok?: boolean
           photoCount?: number
+          featureCount?: number
           recentProjectId?: string | null
         }
         if (cancelled) return
         if (typeof json.photoCount === 'number') {
           setRemotePhotoCount(json.photoCount)
+        }
+        if (typeof json.featureCount === 'number') {
+          setRemoteFeatureCount(json.featureCount)
         }
         if (typeof json.recentProjectId === 'string') {
           setRemoteProjectId(json.recentProjectId)
@@ -409,28 +426,56 @@ export function PhotoUploader() {
         </section>
       )}
 
-      {/* PR3.8 Fix A: "uploaded from your phone" banner when polling
-          detected remote uploads not in the local photos[] state.
-          Surfaces above the synthesize CTA so the user knows what
-          happened. Only on desktop (mobile users have their own
-          local uploads). */}
+      {/* PR3.8 Fix A + PR3.9 Bug #1: "uploaded from your phone" banner.
+          PR3.9 distinguishes "reading…" (photo landed but extraction
+          still running, no features yet) from "ready" (extraction
+          complete, features available). Synthesize CTA only enables
+          on "ready" — otherwise the synthesize call would land in the
+          empty-features early-return and look broken to the user. */}
       {!isMobile && remotePhotoCount > photos.length && stage !== 'synthesizing' && (
-        <div className="mb-3 rounded-lg border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-900">
-          {remotePhotoCount === 1
-            ? '1 photo uploaded from your phone.'
-            : `${remotePhotoCount} photos uploaded from your phone.`}{' '}
-          Ready to see the read.
-        </div>
+        remoteFeatureCount === 0 ? (
+          <div className="mb-3 rounded-lg border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-900">
+            {remotePhotoCount === 1
+              ? '1 photo uploaded from your phone — reading it now…'
+              : `${remotePhotoCount} photos uploaded from your phone — reading them now…`}
+          </div>
+        ) : (
+          <div className="mb-3 rounded-lg border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-900">
+            {remotePhotoCount === 1
+              ? '1 photo uploaded from your phone.'
+              : `${remotePhotoCount} photos uploaded from your phone.`}{' '}
+            Ready to see the read.
+          </div>
+        )
       )}
 
-      {/* Synthesize CTA */}
-      {(photos.length > 0 || remotePhotoCount > 0) && stage !== 'synthesizing' && (
-        <button
-          onClick={synthesize}
-          className="w-full rounded-lg bg-gray-900 px-6 py-4 font-medium text-white hover:bg-black"
-        >
-          See my read
-        </button>
+      {/* PR3.9 Bug #2: when this is the mobile half of a desktop->mobile
+          QR handoff, show "return to desktop" guidance instead of the
+          synthesize CTA. Buyer journey completes on desktop. */}
+      {isHandoffPhone && photos.length > 0 ? (
+        <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-4 text-center text-sm text-emerald-900">
+          <p className="font-medium">
+            {photos.length === 1
+              ? 'Photo uploaded.'
+              : `${photos.length} photos uploaded.`}
+          </p>
+          <p className="mt-1 text-xs text-emerald-800">
+            You can close this tab — your read will appear on the desktop
+            window you scanned the QR from.
+          </p>
+        </div>
+      ) : (
+        /* Synthesize CTA — enabled when local uploads exist OR remote
+           uploads have been extracted (featureCount > 0). */
+        (photos.length > 0 || remoteFeatureCount > 0) &&
+        stage !== 'synthesizing' && (
+          <button
+            onClick={synthesize}
+            className="w-full rounded-lg bg-gray-900 px-6 py-4 font-medium text-white hover:bg-black"
+          >
+            See my read
+          </button>
+        )
       )}
 
       {stage === 'synthesizing' && (

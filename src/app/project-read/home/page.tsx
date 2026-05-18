@@ -25,6 +25,12 @@ import type { Metadata } from 'next'
 import { PhotoUploader } from './PhotoUploader'
 import { HandoffQRCard } from '@/components/smartCart/HandoffQRCard'
 
+// PR3.9 Bug #2: PhotoUploader uses useSearchParams() to read
+// ?source=handoff (mobile session arrived via desktop QR). That hook
+// forces the page out of static generation. Mark dynamic so Next
+// doesn't try to prerender.
+export const dynamic = 'force-dynamic'
+
 export const metadata: Metadata = {
   title: 'Home Photo Read — Alder',
   description:

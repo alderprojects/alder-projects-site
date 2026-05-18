@@ -62,8 +62,30 @@ export async function convertHeicIfNeeded(file: File): Promise<File> {
     // multiple frames (live photos, bursts). Take the first frame.
     blob = Array.isArray(result) ? result[0]! : result
   } catch (e) {
+    const msg = (e as Error).message || ''
+    // PR3.9 Bug #3: iOS Safari sometimes decodes HEIC natively before
+    // heic2any sees it; the library then throws "image is already
+    // browser readable" (code ERR_USER). In that case the file is
+    // ALREADY a normal image as far as the upload pipeline is
+    // concerned — fall through to direct upload instead of failing.
+    const isBrowserReadable =
+      msg.toLowerCase().includes('already browser readable') ||
+      msg.toLowerCase().includes('err_user')
+    if (isBrowserReadable) {
+      console.log('[heic-client] heic2any reports file is already browser-readable; uploading as-is')
+      // Re-wrap the file to ensure it has a JPEG-ish filename + MIME
+      // (server's MIME allowlist rejects empty/heic strings).
+      const newName = file.name.replace(/\.(heic|heif)$/i, '.jpg')
+      const fallbackType = file.type && file.type.startsWith('image/') && file.type !== 'image/heic' && file.type !== 'image/heif'
+        ? file.type
+        : 'image/jpeg'
+      return new File([file], newName, {
+        type: fallbackType,
+        lastModified: file.lastModified,
+      })
+    }
     throw new Error(
-      `Couldn't convert your iPhone HEIC photo (${(e as Error).message.slice(0, 80)}). Try a different photo, or iPhone Settings > Camera > Formats > Most Compatible.`
+      `Couldn't convert your iPhone HEIC photo (${msg.slice(0, 80)}). Try a different photo, or iPhone Settings > Camera > Formats > Most Compatible.`
     )
   }
 

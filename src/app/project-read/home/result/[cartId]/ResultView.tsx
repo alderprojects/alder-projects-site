@@ -32,6 +32,7 @@ interface ChangeSummaryWithRouting {
   needsCategoryClarification?: boolean
   needsMorePhotos?: boolean
   clarificationFeatures?: ClarificationFeature[]
+  dominantCategory?: string | null
 }
 
 export function ResultView({ cart }: Props) {
@@ -48,6 +49,7 @@ export function ResultView({ cart }: Props) {
         needsCategoryClarification={summary.needsCategoryClarification ?? false}
         needsMorePhotos={summary.needsMorePhotos ?? false}
         clarificationFeatures={summary.clarificationFeatures ?? []}
+        dominantCategory={summary.dominantCategory ?? null}
         showEmailSave
         heading="Your home photo read"
         showV75Footer

@@ -350,46 +350,53 @@ export function PhotoUploader() {
         </section>
       )}
 
-      {/* Consent block */}
-      <section className="mb-6 rounded-lg border border-gray-200 p-4">
-        <h2 className="mb-3 font-medium text-gray-900">How your photos are used</h2>
-        <p className="mb-3 text-sm text-gray-600">
-          Photos are stripped of location data before saving. You can revoke any of these at any time.
-        </p>
-        <label className="mb-2 flex items-start gap-2 text-sm">
-          <input
-            type="checkbox"
-            checked={consents.product_improvement}
-            onChange={(e) => setConsents({ ...consents, product_improvement: e.target.checked })}
-            className="mt-1"
-          />
-          <span>
-            <strong>Help improve the product.</strong> Aggregated, anonymized use to tune accuracy.
-          </span>
-        </label>
-        <label className="mb-2 flex items-start gap-2 text-sm">
-          <input
-            type="checkbox"
-            checked={consents.valuation_research}
-            onChange={(e) => setConsents({ ...consents, valuation_research: e.target.checked })}
-            className="mt-1"
-          />
-          <span>
-            <strong>Include in property research.</strong> Used in internal home-value analysis.
-          </span>
-        </label>
-        <label className="flex items-start gap-2 text-sm">
-          <input
-            type="checkbox"
-            checked={consents.public_content_use}
-            onChange={(e) => setConsents({ ...consents, public_content_use: e.target.checked })}
-            className="mt-1"
-          />
-          <span>
-            <strong>May appear on public guide pages.</strong> Featured (with credit, if you want) on alderprojects.com guides.
-          </span>
-        </label>
-      </section>
+      {/* Consent block.
+          PR3.12: hidden on mobile-handoff sessions (?source=handoff).
+          The phone half is upload-only — consent already lives on the
+          desktop side of the journey. Per user direction: "we can make
+          even lighter by taking out the 'how your photos are used'
+          section. just the upload." */}
+      {!isHandoffPhone && (
+        <section className="mb-6 rounded-lg border border-gray-200 p-4">
+          <h2 className="mb-3 font-medium text-gray-900">How your photos are used</h2>
+          <p className="mb-3 text-sm text-gray-600">
+            Photos are stripped of location data before saving. You can revoke any of these at any time.
+          </p>
+          <label className="mb-2 flex items-start gap-2 text-sm">
+            <input
+              type="checkbox"
+              checked={consents.product_improvement}
+              onChange={(e) => setConsents({ ...consents, product_improvement: e.target.checked })}
+              className="mt-1"
+            />
+            <span>
+              <strong>Help improve the product.</strong> Aggregated, anonymized use to tune accuracy.
+            </span>
+          </label>
+          <label className="mb-2 flex items-start gap-2 text-sm">
+            <input
+              type="checkbox"
+              checked={consents.valuation_research}
+              onChange={(e) => setConsents({ ...consents, valuation_research: e.target.checked })}
+              className="mt-1"
+            />
+            <span>
+              <strong>Include in property research.</strong> Used in internal home-value analysis.
+            </span>
+          </label>
+          <label className="flex items-start gap-2 text-sm">
+            <input
+              type="checkbox"
+              checked={consents.public_content_use}
+              onChange={(e) => setConsents({ ...consents, public_content_use: e.target.checked })}
+              className="mt-1"
+            />
+            <span>
+              <strong>May appear on public guide pages.</strong> Featured (with credit, if you want) on alderprojects.com guides.
+            </span>
+          </label>
+        </section>
+      )}
 
       {/* Uploader */}
       <section className="mb-6">

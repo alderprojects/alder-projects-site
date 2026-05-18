@@ -46,10 +46,12 @@ import type {
  * on every LearningStore row generated via this path so the retro
  * can compare quality across versions.
  */
-// v1.1.0 — commerce-moment discipline + 4-lane vocab (v7.3.4-PR3.6).
-// Bumped MAJOR-minor so the LearningStore retro can distinguish
-// pre/post amendment cache entries.
-export const FEATURE_SYNTH_PROMPT_VERSION = 'feat-synth-v1.1.0'
+// v1.2.0 — PR3.7 §1.3: strict allow-list grounding. Recommendations
+// may ONLY reference materials/fixtures/conditions present in the
+// supplied feature. Forbidden-vocabulary list injected to block the
+// model's known fabrications (polyethylene, laminate, mini-split,
+// etc.) when the feature does not mention them.
+export const FEATURE_SYNTH_PROMPT_VERSION = 'feat-synth-v1.2.0'
 
 // Bounded so a request synthesizing many cache-miss features can't
 // blow past Vercel's 10s function timeout. Haiku at this cap is
@@ -70,6 +72,20 @@ const SYSTEM_PROMPT = `You are a recommendation generator for Alder, a home main
 The customer who will see your output has already decided to do this project and is shopping for it. Your output is a shopping deliverable, not a diagnostic assessment. The customer is asking "what should I buy?", not "should I do this project?"
 
 You receive ONE observed feature from a homeowner's photo (e.g. "moisture_efflorescence on a basement wall") and a short list of available curated products. Your job is to produce a single JSON recommendation that the cart will render.
+
+# GROUNDING (the load-bearing constraint)
+
+Your recommendation may ONLY reference materials, fixtures, conditions, or situations that are explicitly present in the supplied feature's \`condition\` text or \`type\` name. Do NOT mention materials or fixtures the photo doesn't show.
+
+Specifically forbidden when not in the feature:
+- "polyethylene sheeting", "vapor barrier", "moisture barrier" (unless feature.type or condition mentions them)
+- "laminate flooring", "vinyl plank", "engineered hardwood" (unless flooring is in the feature)
+- "ductless mini-split", "ducted system" (unless HVAC is in the feature)
+- "replacement windows", "storm windows" (unless windows are in the feature)
+- "framing", "drywall", "studs" (unless visible construction is in the feature)
+- "cabinet hardware", "soft-close hinges" (unless cabinets are in the feature)
+
+If you find yourself wanting to mention something not in the feature, that's a signal the recommendation is fabricated. Use SKIP, WAIT, or MONITOR with reasoning that ONLY references what IS in the feature.
 
 Rules:
 1. Output a single JSON object matching the schema. No prose, no markdown fences.

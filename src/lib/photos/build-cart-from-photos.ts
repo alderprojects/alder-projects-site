@@ -117,14 +117,47 @@ export async function buildCartFromPhotos(
       cartItemsJsonWithPhotos: result.withPhotos as never,
       photoChangedRecommendation: result.photoChangedRecommendation,
       // v7.3.4-PR3.6 — introText lives inside the existing
-      // changeSummaryJson column as an additive field. No schema
-      // change needed; ResultView reads this on render.
+      // changeSummaryJson column. PR3.7 §1.2 + §1.4 + §1.6 add
+      // needsCategoryClarification + needsMorePhotos + clarification
+      // features so the result page renders the right state without
+      // needing to recompute.
       changeSummaryJson: {
         ...result.changeSummary,
         introText: result.introText,
+        needsCategoryClarification: result.needsCategoryClarification,
+        needsMorePhotos: result.needsMorePhotos,
+        clarificationFeatures: result.clarificationFeatures,
+        dominantCategory: result.dominantCategory,
+        dominantCategoryConfidence: result.dominantCategoryConfidence,
       } as never,
     },
   })
+
+  // PR3.7 §1.12: log CART_INSUFFICIENT_SIGNAL when the customer paid
+  // and we landed in needsMorePhotos / needsCategoryClarification —
+  // helps the retro decide whether to tighten extraction quality or
+  // add a category-clarification step earlier in the funnel.
+  if (result.needsMorePhotos || result.needsCategoryClarification) {
+    try {
+      await logEvent({
+        eventType: 'CART_INSUFFICIENT_SIGNAL',
+        subjectType: 'SmartCart',
+        subjectId: cart.id,
+        anonId: opts.anonId,
+        source: 'system',
+        payload: {
+          gate: result.needsCategoryClarification
+            ? 'ambiguous_category'
+            : 'empty_buy_lane',
+          dominantCategory: result.dominantCategory,
+          dominantCategoryConfidence: result.dominantCategoryConfidence,
+          featureCount: features.length,
+        },
+      })
+    } catch {
+      /* swallow */
+    }
+  }
 
   await logEvent({
     eventType: 'PHOTO_CART_PAID',

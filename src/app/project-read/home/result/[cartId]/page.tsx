@@ -21,10 +21,10 @@ import { ResultView } from './ResultView'
 export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
-  title: 'Your basement read · Alder',
+  title: 'Your home photo read · Alder',
   robots: { index: false, follow: false },
   alternates: {
-    canonical: 'https://alderprojects.com/project-read/basement',
+    canonical: 'https://alderprojects.com/project-read/home',
   },
 }
 

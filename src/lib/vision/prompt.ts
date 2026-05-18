@@ -38,10 +38,14 @@ import { z } from 'zod'
  * or OpenExtractionSchema. Stored on every VisionExtraction row so we
  * can replay or re-eval across prompt versions.
  */
-// v1.0.2: model class changed from Sonnet 4.5 to Haiku 4.5 in PR1.3.
-// Prompt text unchanged from v1.0.1; version bump exists so we can
-// distinguish per-model extraction quality in the LearningStore retro.
-export const OPEN_EXTRACTION_PROMPT_VERSION = 'open-v1.0.2'
+// v1.1.0 — PR3.7 §1.1: rebalanced example types so the prompt does
+// not over-bias the model toward basement vocabulary. The May 17
+// MCP test found that a living-room photo extracted with basement
+// signatures because the example list was 60% basement. v1.1.0
+// distributes examples across all 20 categories evenly, with an
+// explicit "be category-honest" instruction added to the system
+// prompt rules.
+export const OPEN_EXTRACTION_PROMPT_VERSION = 'open-v1.1.0'
 
 // =============================================================================
 // CONTROLLED CATEGORY VOCABULARY
@@ -183,14 +187,30 @@ Do NOT:
 - Estimate cost or property value.
 - Fabricate features to fill out the array. An empty features array is acceptable if nothing is genuinely observable.
 
+# Be category-honest
+
+Set \`overall_photo_category\` and each feature's \`category_hint\` based on what you actually see in the photo. Do NOT pre-bias toward any category. A living room is a living room; a kitchen is a kitchen; a basement is a basement. If you can't tell what room or area you're looking at, use "unclear" rather than guessing. If the photo shows multiple areas (e.g. a doorway between kitchen and living room), use "mixed" at the photo level and pick the right per-feature category_hint individually.
+
 # Example feature types (starting vocabulary — extend as needed)
 
-Moisture / water: moisture_efflorescence, water_staining, active_water, musty_indicators_visual, rust_on_metal
-Damage / wear: visible_cracks_wall, foundation_crack, rotting_wood_deck, peeling_paint_exterior, settled_walkway, asphalt_shingle_curl, missing_shingle, water_stained_ceiling
-Missing safety: missing_gfci, missing_smoke_detector, missing_handrail, exposed_wiring
-Present equipment: dehumidifier_present, sump_pump_present, vapor_barrier_visible, water_heater_visible, electrical_panel_visible, hvac_unit_outdoor, hvac_unit_indoor, range_hood_visible
-Maintenance: gutter_clogged, gutter_separated, peeling_caulk_window, weathered_deck_finish
-Finish: dated_kitchen_cabinets, dated_carpet, unfinished_basement_walls, finished_basement_walls
+Examples are distributed across categories. Use the right example for the category in the photo, not whichever sounds most common.
+
+KITCHEN: dated_kitchen_cabinets, missing_under_cabinet_lighting, cabinet_hardware_missing, range_hood_visible, leaking_faucet_visible, water_stained_ceiling, missing_gfci, electrical_panel_visible
+BATHROOM: leaking_faucet_visible, missing_gfci, missing_handrail, vanity_lighting_missing, mildew_on_grout, tile_cracked, sink_caulk_failing
+BEDROOM: dated_carpet, ceiling_crack, baseboard_separation, window_air_gap, missing_smoke_detector, closet_organization_missing
+LIVING_AREA: dated_carpet, ceiling_crack, baseboard_separation, missing_smoke_detector, dated_window_treatments, fireplace_visible, hardwood_floor_wear
+BASEMENT: moisture_efflorescence, water_staining, active_water, dehumidifier_present, sump_pump_present, vapor_barrier_visible, unfinished_basement_walls, finished_basement_walls
+LAUNDRY: washer_dryer_visible, water_heater_visible, water_stained_ceiling, exposed_wiring, dryer_vent_visible
+DECK_OR_PATIO: rotting_wood_deck, weathered_deck_finish, missing_handrail, deck_board_lifting, joist_visible
+ROOF_OR_GUTTER: asphalt_shingle_curl, missing_shingle, gutter_clogged, gutter_separated, flashing_failure, moss_on_shingles
+EXTERIOR_SIDING: peeling_paint_exterior, siding_damage, caulk_failing_window, wood_rot_trim
+EXTERIOR_FOUNDATION: foundation_crack, settled_walkway, grade_sloping_toward_house, foundation_efflorescence
+EXTERIOR_LANDSCAPE: overgrown_vegetation, drainage_pooling, walkway_damage
+HVAC: hvac_unit_outdoor, hvac_unit_indoor, ductwork_visible, condensate_line_visible, filter_dirty
+ELECTRICAL_PANEL: electrical_panel_visible, panel_at_capacity_visual, exposed_wiring, knob_and_tube_visible
+PLUMBING: leaking_faucet_visible, leaking_pipe_visible, pipe_corrosion, shutoff_valve_visible
+ATTIC: insulation_thin, knob_and_tube_visible, roof_decking_stain, vent_blocked
+GARAGE: door_seal_failing, exposed_wiring, water_heater_visible
 
 The above is a starting list — invent new \`type\` values whenever the photo shows something not covered.`
 

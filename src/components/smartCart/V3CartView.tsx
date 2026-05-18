@@ -55,17 +55,32 @@ interface SmartCartRow {
   changeSummaryJson: unknown
 }
 
+export interface ClarificationFeature {
+  type: string
+  condition: string
+  confidence: number
+  category_hint: string
+}
+
 export interface V3CartViewProps {
   cartId: string
   items: CartItemV3[]
   /** Set by SmartCart.changeSummaryJson.introText if present. */
   introText?: string | null
+  /** PR3.7 §1.2 — render category-clarification surface instead of lanes. */
+  needsCategoryClarification?: boolean
+  /** PR3.7 §1.6 — render needs-more-photos state instead of lanes. */
+  needsMorePhotos?: boolean
+  /** Features the extraction was confident about; surfaced in §1.2 and §1.6 states. */
+  clarificationFeatures?: ClarificationFeature[]
   /** Show the email-save block under the cart (free beta only). */
   showEmailSave?: boolean
   /** Cart heading copy. */
   heading?: string
   /** Show the v7.5 diagnostic-product waitlist footer (paid carts only). */
   showV75Footer?: boolean
+  /** Optional URL to send the visitor to when they need to upload more photos. */
+  uploadMoreHref?: string
 }
 
 // =============================================================================
@@ -93,7 +108,10 @@ const LANE_DESCRIPTION: Record<CartItemV3['lane'], string> = {
   MONITOR: 'Track these conditions before related buys.',
 }
 
-const LANE_ORDER: Array<CartItemV3['lane']> = ['BUY', 'SKIP', 'WAIT', 'MONITOR']
+// PR3.7 §1.4: commerce-moment order. BUY first (what the customer is
+// paying attention for), then WAIT (what to defer), MONITOR (what to
+// track), SKIP last (saves money but is not the headline).
+const LANE_ORDER: Array<CartItemV3['lane']> = ['BUY', 'WAIT', 'MONITOR', 'SKIP']
 
 type ReactionType = 'thumbs_up' | 'dismiss' | 'doesnt_apply'
 
@@ -105,9 +123,13 @@ export function V3CartView({
   cartId,
   items,
   introText,
+  needsCategoryClarification = false,
+  needsMorePhotos = false,
+  clarificationFeatures = [],
   showEmailSave = false,
   heading = 'Your Smart Cart',
   showV75Footer = true,
+  uploadMoreHref = '/project-read/home',
 }: V3CartViewProps) {
   const [reactionState, setReactionState] = useState<
     Record<string, 'pending' | 'done'>
@@ -200,76 +222,97 @@ export function V3CartView({
         <h1 className="text-2xl font-semibold text-gray-900">{heading}</h1>
       </header>
 
-      {/* PR3.6 commerce-moment intro section. Brief — 1-3 sentences.
-          Surfaces the most important condition the customer should
-          know BEFORE shopping (e.g. "before you start, X needs a
-          pro's review"). Empty state if introText is null. */}
-      {introText && (
-        <SectionTracker
+      {/* PR3.7 §1.2: category-clarification surface comes FIRST when
+          the extraction couldn't confidently pick a project category.
+          Renders before the intro/lanes so the visitor's pick can
+          re-route the experience. */}
+      {needsCategoryClarification ? (
+        <CategoryClarificationSurface
           cartId={cartId}
-          section="intro"
-          className="mb-6 rounded-lg border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-900"
-        >
-          {introText}
-        </SectionTracker>
-      )}
-
-      {items.length === 0 ? (
-        <div className="mb-8 rounded-lg border border-gray-200 p-4 text-sm text-gray-600">
-          We don&apos;t have anything to surface for these photos yet. As more
-          homeowners use the Read, this gets smarter — recommendations for
-          the situations you uploaded will accumulate in our curated cache.
-        </div>
+          clarificationFeatures={clarificationFeatures}
+          uploadMoreHref={uploadMoreHref}
+        />
+      ) : needsMorePhotos ? (
+        /* PR3.7 §1.6: needs-more-photos state when extraction was OK
+           but synthesis produced zero BUY items. */
+        <NeedsMorePhotosSurface
+          cartId={cartId}
+          clarificationFeatures={clarificationFeatures}
+          uploadMoreHref={uploadMoreHref}
+        />
       ) : (
-        <section className="mb-8 space-y-6">
-          {LANE_ORDER.map((lane) => {
-            const laneItems = itemsByLane[lane]
-            if (laneItems.length === 0) return null
-            return (
-              <SectionTracker
-                key={lane}
-                cartId={cartId}
-                section={laneToSection(lane)}
-              >
-                <div className="mb-2 flex items-baseline gap-2">
-                  <span
-                    className={`inline-block rounded px-2 py-1 text-xs uppercase tracking-wide ${LANE_STYLE[lane]}`}
+        <>
+          {/* PR3.6 commerce-moment intro. 1-3 sentences. */}
+          {introText && (
+            <SectionTracker
+              cartId={cartId}
+              section="intro"
+              className="mb-6 rounded-lg border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-900"
+            >
+              {introText}
+            </SectionTracker>
+          )}
+
+          {/* PR3.7 §1.4 lane order: BUY -> WAIT -> MONITOR -> SKIP.
+              Empty lanes collapse to a one-line "no X items for your
+              situation" rather than render an empty header. */}
+          <section className="mb-8 space-y-6">
+            {LANE_ORDER.map((lane) => {
+              const laneItems = itemsByLane[lane]
+              if (laneItems.length === 0) {
+                return (
+                  <p
+                    key={lane}
+                    className="text-xs text-gray-500"
                   >
-                    {LANE_LABEL[lane]} · {laneItems.length}
-                  </span>
-                  <span className="text-xs text-gray-500">
-                    {LANE_DESCRIPTION[lane]}
-                  </span>
-                </div>
-                <div className="space-y-3">
-                  {laneItems.map((item) => (
-                    <CartItemCard
-                      key={item.signature}
-                      item={item}
-                      reactionState={reactionState}
-                      onReact={postReaction}
-                      onAffiliateClick={() => {
-                        fireFunnelEvent('RESULT_SECTION_ENGAGEMENT', {
-                          cartId,
-                          section: laneToSection(item.lane),
-                          engagementType: 'clicked_affiliate',
-                          signature: item.signature,
-                        })
-                      }}
-                    />
-                  ))}
-                </div>
-              </SectionTracker>
-            )
-          })}
-        </section>
-      )}
+                    No {LANE_LABEL[lane]} items for your situation.
+                  </p>
+                )
+              }
+              return (
+                <SectionTracker
+                  key={lane}
+                  cartId={cartId}
+                  section={laneToSection(lane)}
+                >
+                  <div className="mb-2 flex items-baseline gap-2">
+                    <span
+                      className={`inline-block rounded px-2 py-1 text-xs uppercase tracking-wide ${LANE_STYLE[lane]}`}
+                    >
+                      {LANE_LABEL[lane]} · {laneItems.length}
+                    </span>
+                    <span className="text-xs text-gray-500">
+                      {LANE_DESCRIPTION[lane]}
+                    </span>
+                  </div>
+                  <div className="space-y-3">
+                    {laneItems.map((item) => (
+                      <CartItemCard
+                        key={item.signature}
+                        item={item}
+                        reactionState={reactionState}
+                        onReact={postReaction}
+                        onAffiliateClick={() => {
+                          fireFunnelEvent('RESULT_SECTION_ENGAGEMENT', {
+                            cartId,
+                            section: laneToSection(item.lane),
+                            engagementType: 'clicked_affiliate',
+                            signature: item.signature,
+                          })
+                        }}
+                      />
+                    ))}
+                  </div>
+                </SectionTracker>
+              )
+            })}
+          </section>
 
-      {showV75Footer && (
-        <V75WaitlistFooter cartId={cartId} />
-      )}
+          {showV75Footer && <V75WaitlistFooter cartId={cartId} />}
 
-      {showEmailSave && <EmailSaveBlock cartId={cartId} />}
+          {showEmailSave && <EmailSaveBlock cartId={cartId} />}
+        </>
+      )}
     </div>
   )
 }
@@ -302,7 +345,11 @@ function CartItemCard({
   return (
     <article className="rounded-lg border border-gray-200 p-4">
       <div className="mb-2 flex flex-wrap items-center gap-2">
-        <SourceBadge source={item.source} confidence={item.confidence} />
+        <SourceBadge
+          source={item.source}
+          confidence={item.confidence}
+          selectionReason={item.selectionReason}
+        />
         {item.occurrenceCount > 1 && (
           <span className="text-xs text-gray-500">
             seen in {item.occurrenceCount} photos
@@ -442,14 +489,33 @@ function ReactionButton({
   )
 }
 
+/**
+ * PR3.7 §1.5: badge is now SELECTIVE, not universal.
+ * Shown only when both:
+ *   - confidence === 'low' (item is ai_generated without strong reactions), AND
+ *   - the item's reasoning has a photo-specific anchor (mentions "saw",
+ *     "your", or contains a non-generic feature reference)
+ * When there's no photo anchor, no badge — the item stands on its content.
+ */
 function SourceBadge({
   source,
   confidence,
+  selectionReason,
 }: {
   source: CartItemV3['source']
   confidence: CartItemV3['confidence']
+  selectionReason: string
 }) {
   if (confidence === 'high') return null
+  const lower = selectionReason.toLowerCase()
+  const hasPhotoAnchor =
+    lower.includes('we saw') ||
+    lower.includes('we noticed') ||
+    lower.includes('your photo') ||
+    lower.includes('in your') ||
+    lower.includes('based on your') ||
+    lower.includes('the photos show')
+  if (!hasPhotoAnchor) return null
   return (
     <span
       className="inline-block rounded border border-amber-200 bg-amber-50 px-2 py-1 text-[11px] uppercase tracking-wider text-amber-800"
@@ -461,6 +527,154 @@ function SourceBadge({
     >
       new for your situation
     </span>
+  )
+}
+
+// ---- PR3.7 §1.2 Category clarification surface ----
+
+const CATEGORY_CHIPS: Array<{ id: string; label: string }> = [
+  { id: 'basement', label: 'Basement / foundation' },
+  { id: 'kitchen', label: 'Kitchen' },
+  { id: 'bathroom', label: 'Bathroom' },
+  { id: 'deck_or_patio', label: 'Deck or exterior' },
+  { id: 'roof_or_gutter', label: 'Roof / gutters' },
+  { id: 'electrical_panel', label: 'Electrical' },
+  { id: 'hvac', label: 'HVAC / mechanical' },
+  { id: 'unclear', label: 'None of these — something else' },
+]
+
+function CategoryClarificationSurface({
+  cartId,
+  clarificationFeatures,
+  uploadMoreHref,
+}: {
+  cartId: string
+  clarificationFeatures: ClarificationFeature[]
+  uploadMoreHref: string
+}) {
+  function onPick(categoryId: string) {
+    fireFunnelEvent('CATEGORY_CLARIFICATION_SUBMITTED', {
+      cartId,
+      pickedCategory: categoryId,
+      hadExtractedFeatures: clarificationFeatures.length,
+    })
+    // For v0 we route the visitor to the topic picker with the
+    // category pre-selected (chat-funnel entry). Per PR3.7 §1.6
+    // secondary CTA. A future PR may re-run synthesis with the
+    // category as a hint instead.
+    if (categoryId === 'unclear') {
+      window.location.href = '/smart-cart'
+    } else {
+      window.location.href = `/smart-cart?source=photo_clarify&category=${encodeURIComponent(categoryId)}`
+    }
+  }
+
+  return (
+    <SectionTracker
+      cartId={cartId}
+      section="intro"
+      className="mb-6 rounded-lg border border-amber-200 bg-amber-50 p-4"
+    >
+      <h2 className="text-lg font-medium text-amber-900">
+        We see what&apos;s in your photos, but not what project this is for.
+      </h2>
+      {clarificationFeatures.length > 0 && (
+        <>
+          <p className="mt-2 text-sm text-amber-900">
+            From your photos, we can see:
+          </p>
+          <ul className="mt-2 list-inside list-disc text-sm text-amber-900">
+            {clarificationFeatures.slice(0, 4).map((f) => (
+              <li key={f.type}>{f.condition}</li>
+            ))}
+          </ul>
+        </>
+      )}
+      <p className="mt-3 text-sm font-medium text-amber-900">
+        Pick the project this is for, so we can focus the cart:
+      </p>
+      <div className="mt-2 flex flex-wrap gap-2">
+        {CATEGORY_CHIPS.map((chip) => (
+          <button
+            key={chip.id}
+            type="button"
+            onClick={() => onPick(chip.id)}
+            className="rounded-full border border-amber-300 bg-white px-3 py-1.5 text-xs font-medium text-amber-900 hover:bg-amber-100"
+          >
+            {chip.label}
+          </button>
+        ))}
+      </div>
+      <p className="mt-4 text-xs text-amber-800">
+        Or{' '}
+        <a href={uploadMoreHref} className="underline">
+          add a wider photo
+        </a>{' '}
+        to help us read the project.
+      </p>
+    </SectionTracker>
+  )
+}
+
+// ---- PR3.7 §1.6 Needs-more-photos surface (BUY lane empty) ----
+
+function NeedsMorePhotosSurface({
+  cartId,
+  clarificationFeatures,
+  uploadMoreHref,
+}: {
+  cartId: string
+  clarificationFeatures: ClarificationFeature[]
+  uploadMoreHref: string
+}) {
+  return (
+    <SectionTracker
+      cartId={cartId}
+      section="intro"
+      className="mb-6 rounded-lg border border-emerald-200 bg-emerald-50 p-4"
+    >
+      <h2 className="text-lg font-medium text-emerald-900">
+        We need a different angle to give you a confident shopping list.
+      </h2>
+      {clarificationFeatures.length > 0 ? (
+        <>
+          <p className="mt-2 text-sm text-emerald-900">
+            From your photos, we can see:
+          </p>
+          <ul className="mt-2 list-inside list-disc text-sm text-emerald-900">
+            {clarificationFeatures.slice(0, 4).map((f) => (
+              <li key={f.type}>{f.condition}</li>
+            ))}
+          </ul>
+          <p className="mt-3 text-sm text-emerald-900">
+            To give you specific buy recommendations, we need a wider shot of
+            the area, a clearer view of the conditions above, or photos of
+            related parts of the project (fixtures, the wall behind/around,
+            adjacent surfaces).
+          </p>
+        </>
+      ) : (
+        <p className="mt-2 text-sm text-emerald-900">
+          Your photos didn&apos;t give us enough detail to ground specific
+          product picks. Try a wider shot of the area, with more of the room
+          in frame.
+        </p>
+      )}
+      <div className="mt-4 flex flex-wrap items-center gap-3">
+        <a
+          href={uploadMoreHref}
+          className="rounded-md bg-emerald-700 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-800"
+        >
+          Add more photos
+        </a>
+        <a
+          href="/smart-cart"
+          className="text-xs text-emerald-800 underline hover:text-emerald-900"
+        >
+          Or pick a topic to focus on
+        </a>
+      </div>
+    </SectionTracker>
   )
 }
 

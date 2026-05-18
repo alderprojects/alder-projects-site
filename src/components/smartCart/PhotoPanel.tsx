@@ -25,7 +25,7 @@
  * acceptable for staging but not for real revenue.
  */
 
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { TopicId } from '@/lib/property-modules'
 import type { BriefScenarioId } from '@/lib/recommender-config.types'
 
@@ -35,7 +35,10 @@ import type { BriefScenarioId } from '@/lib/recommender-config.types'
 
 interface SampleRecommendation {
   headline: string
-  lane: 'BUY' | 'SKIP' | 'WAIT' | 'PRO_LINE'
+  // PR3.7 §1.7: PRO_LINE removed from the v3 photo-path vocab (Alder
+  // has no contractor network to route to). Lane is now the canonical
+  // 4 values from PR3.6.
+  lane: 'BUY' | 'SKIP' | 'WAIT' | 'MONITOR'
   reasoning: string
   source: 'curated' | 'ai_generated'
 }
@@ -130,33 +133,37 @@ export function PhotoPanel({
   const [preview, setPreview] = useState<PreviewResponse | null>(null)
   const [confirmAsked, setConfirmAsked] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const cameraInputRef = useRef<HTMLInputElement>(null)
+  // PR3.7 §1.8 — surface the mobile camera CTA only on mobile.
+  const [isMobile, setIsMobile] = useState(false)
+  useEffect(() => {
+    if (typeof navigator === 'undefined') return
+    setIsMobile(/iphone|ipad|ipod|android/i.test(navigator.userAgent))
+  }, [])
 
   if (!open) return null
 
   async function uploadOne(file: File): Promise<UploadedPhoto> {
-    const reader = new FileReader()
-    const base64 = await new Promise<string>((resolve, reject) => {
-      reader.onload = () => resolve(reader.result as string)
-      reader.onerror = () => reject(new Error('Could not read photo file'))
-      reader.readAsDataURL(file)
-    })
+    // PR3.7 §1.11: multipart/form-data — see PhotoUploader.tsx for the
+    // full rationale (base64-in-JSON was failing on real iPhone JPEGs).
+    const formData = new FormData()
+    formData.append('image', file)
+    formData.append('roomType', 'auto')
+    formData.append('scope', 'auto')
+    formData.append(
+      'consents',
+      JSON.stringify({
+        // Inside the modal we surface a single inline note rather than
+        // 3 checkboxes — keeps the panel compact.
+        product_improvement: true,
+        valuation_research: false,
+        public_content_use: false,
+      })
+    )
 
     const res = await fetch('/api/photos/upload', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        roomType: 'auto',
-        scope: 'auto',
-        imageBase64: base64,
-        consents: {
-          // Inside the modal we surface a single inline note rather
-          // than 3 checkboxes — keeps the panel compact. Defaults
-          // match the most generous beta-cohort behavior.
-          product_improvement: true,
-          valuation_research: false,
-          public_content_use: false,
-        },
-      }),
+      body: formData,
     })
 
     if (!res.ok) {
@@ -307,6 +314,8 @@ export function PhotoPanel({
             stage={stage}
             errorMsg={errorMsg}
             fileInputRef={fileInputRef}
+            cameraInputRef={cameraInputRef}
+            isMobile={isMobile}
             onFilesSelected={onFilesSelected}
             onPreview={loadPreview}
           />
@@ -357,6 +366,8 @@ function UploadStageView({
   stage,
   errorMsg,
   fileInputRef,
+  cameraInputRef,
+  isMobile,
   onFilesSelected,
   onPreview,
 }: {
@@ -364,6 +375,8 @@ function UploadStageView({
   stage: Stage
   errorMsg: string
   fileInputRef: React.RefObject<HTMLInputElement>
+  cameraInputRef: React.RefObject<HTMLInputElement>
+  isMobile: boolean
   onFilesSelected: (files: FileList | null) => void
   onPreview: () => void
 }) {
@@ -384,6 +397,15 @@ function UploadStageView({
         className="hidden"
         onChange={(e) => onFilesSelected(e.target.files)}
       />
+      {/* PR3.7 §1.8: mobile-only camera input (back camera hinted). */}
+      <input
+        ref={cameraInputRef}
+        type="file"
+        accept="image/*"
+        capture="environment"
+        className="hidden"
+        onChange={(e) => onFilesSelected(e.target.files)}
+      />
       <button
         type="button"
         onClick={() => fileInputRef.current?.click()}
@@ -393,11 +415,22 @@ function UploadStageView({
         {stage === 'uploading'
           ? 'Uploading…'
           : photos.length === 0
-            ? 'Send 1–5 photos'
+            ? isMobile
+              ? 'Choose photos from library'
+              : 'Send 1–5 photos'
             : photos.length >= MAX_PHOTOS
               ? `${MAX_PHOTOS}-photo limit reached`
-              : 'Add more photos'}
+              : 'Add more from library'}
       </button>
+      {isMobile && photos.length < MAX_PHOTOS && stage !== 'uploading' && (
+        <button
+          type="button"
+          onClick={() => cameraInputRef.current?.click()}
+          className="mt-2 w-full rounded-lg border border-emerald-700 bg-white px-4 py-2.5 text-sm font-medium text-emerald-700 hover:bg-emerald-50"
+        >
+          Or take a photo with your camera
+        </button>
+      )}
 
       {photos.length > 0 && (
         <>

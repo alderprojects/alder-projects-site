@@ -158,7 +158,7 @@ export async function sendPhotoCartReceiptEmail(args: {
   const subject = `Your home photo Smart Cart is ready`
   const body = `Thanks for your purchase.
 
-Your home photo Smart Cart is ready. We read ${args.photoCount} ${args.photoCount === 1 ? 'photo' : 'photos'} and turned them into ${args.itemCount} ${args.itemCount === 1 ? 'recommendation' : 'recommendations'} — what to buy, skip, wait on, and when to call a pro.
+Your home photo Smart Cart is ready. We read ${args.photoCount} ${args.photoCount === 1 ? 'photo' : 'photos'} and turned them into ${args.itemCount} ${args.itemCount === 1 ? 'recommendation' : 'recommendations'} — what to buy, what to skip, what to wait on, and what to monitor.
 
 Open your cart:
 ${cartUrl}

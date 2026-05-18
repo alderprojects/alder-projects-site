@@ -125,12 +125,41 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       cartItemsJsonWithPhotos: result.withPhotos as never,
       photoChangedRecommendation: result.photoChangedRecommendation,
       // v7.3.4-PR3.6 — introText lives in changeSummaryJson.
+      // v7.3.4-PR3.7 — clarification + needs-more-photos signals.
       changeSummaryJson: {
         ...result.changeSummary,
         introText: result.introText,
+        needsCategoryClarification: result.needsCategoryClarification,
+        needsMorePhotos: result.needsMorePhotos,
+        clarificationFeatures: result.clarificationFeatures,
+        dominantCategory: result.dominantCategory,
+        dominantCategoryConfidence: result.dominantCategoryConfidence,
       } as never,
     },
   })
+
+  // PR3.7 §1.12: log CART_INSUFFICIENT_SIGNAL when free-beta synthesis
+  // landed in needsMorePhotos / needsCategoryClarification.
+  if (result.needsMorePhotos || result.needsCategoryClarification) {
+    try {
+      await logEvent({
+        eventType: 'CART_INSUFFICIENT_SIGNAL',
+        subjectType: 'SmartCart',
+        subjectId: cart.id,
+        anonId,
+        source: 'web',
+        payload: {
+          gate: result.needsCategoryClarification
+            ? 'ambiguous_category'
+            : 'empty_buy_lane',
+          dominantCategory: result.dominantCategory,
+          dominantCategoryConfidence: result.dominantCategoryConfidence,
+        },
+      })
+    } catch {
+      /* swallow */
+    }
+  }
 
   await logEvent({
     eventType: 'SMART_CART_SYNTHESIZED',

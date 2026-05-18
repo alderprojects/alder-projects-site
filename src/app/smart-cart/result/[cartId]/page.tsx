@@ -58,9 +58,18 @@ export default async function SmartCartResultPage({ params }: Props) {
     const items =
       ((prismaCart.cartItemsJsonWithPhotos ??
         prismaCart.cartJson) as unknown as CartItemV3[]) ?? []
-    // v7.3.4-PR3.6: introText now lives inside changeSummaryJson.
+    // v7.3.4-PR3.6: introText inside changeSummaryJson.
+    // v7.3.4-PR3.7: also routing signals (clarification / needs-more).
     const summary = (prismaCart.changeSummaryJson ?? {}) as {
       introText?: string | null
+      needsCategoryClarification?: boolean
+      needsMorePhotos?: boolean
+      clarificationFeatures?: Array<{
+        type: string
+        condition: string
+        confidence: number
+        category_hint: string
+      }>
     }
     return (
       <main className="mx-auto max-w-3xl px-4 py-8">
@@ -68,6 +77,9 @@ export default async function SmartCartResultPage({ params }: Props) {
           cartId={prismaCart.id}
           items={items}
           introText={summary.introText ?? null}
+          needsCategoryClarification={summary.needsCategoryClarification ?? false}
+          needsMorePhotos={summary.needsMorePhotos ?? false}
+          clarificationFeatures={summary.clarificationFeatures ?? []}
           // No email-save here: paid carts get the upgrade-offer
           // email scheduled via Stripe webhook (PR3); free-beta
           // carts have email-save under their own URL.
@@ -76,6 +88,7 @@ export default async function SmartCartResultPage({ params }: Props) {
           // v75 footer surfaces on paid carts (measurement substrate
           // for the v7.5 product-tier decision per amendment Change 3).
           showV75Footer
+          uploadMoreHref="/project-read/home"
         />
       </main>
     )

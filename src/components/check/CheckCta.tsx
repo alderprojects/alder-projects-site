@@ -32,8 +32,6 @@ const POLL_MAX_MS = 30 * 60 * 1000
 export default function CheckCta() {
   const inputRef = useRef<HTMLInputElement | null>(null)
   const [files, setFiles] = useState<File[] | null>(null)
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [polledReport, setPolledReport] = useState<any | null>(null)
   const [dragOver, setDragOver] = useState(false)
   const [handoff, setHandoff] = useState<HandoffState>({ stage: 'idle' })
   const heroFired = useRef(false)
@@ -86,9 +84,10 @@ export default function CheckCta() {
     return () => clearTimeout(t)
   }, [handoff, loadQr])
 
-  // Poll for a report created by the phone half of the handoff.
+  // Poll for a report created by the phone half of the handoff; when it
+  // lands, navigate straight to the canonical report page.
   useEffect(() => {
-    if (handoff.stage !== 'ready' || files || polledReport) return
+    if (handoff.stage !== 'ready' || files) return
     pollStop.current = false
     const startedAt = Date.now()
     const since = handoff.issuedAt
@@ -100,17 +99,17 @@ export default function CheckCta() {
       try {
         const res = await fetch(`/api/report/latest?after=${encodeURIComponent(since)}`)
         const json = await res.json()
-        if (json.ok && json.found) {
+        if (json.ok && json.found && json.reportId) {
           pollStop.current = true
           clearInterval(timer)
-          setPolledReport(json)
+          window.location.assign(`/report/${json.reportId}`)
         }
       } catch {
         /* transient — keep polling */
       }
     }, POLL_MS)
     return () => clearInterval(timer)
-  }, [handoff, files, polledReport])
+  }, [handoff, files])
 
   const onPick = useCallback(() => {
     fireFunnel('HOME_CTA_TAPPED', { method: 'button' })
@@ -125,27 +124,30 @@ export default function CheckCta() {
     }
   }, [])
 
-  if (files || polledReport) {
+  if (files) {
     return (
       <Suspense
         fallback={
           <div style={{ padding: 32, textAlign: 'center', color: 'rgba(34,48,31,0.68)', fontSize: 15 }}>
-            {files ? 'Getting your photos ready…' : 'Loading your report…'}
+            Getting your photos ready…
           </div>
         }
       >
-        {files ? <CheckFlow initialFiles={files} /> : <CheckFlow initialReport={polledReport} />}
+        <CheckFlow initialFiles={files} />
       </Suspense>
     )
   }
 
   return (
     <div>
+      {/* No `capture` attribute (v7.4.2f): with it, mobile browsers force
+          the camera and BLOCK the photo library. Without it, one tap
+          opens the native chooser — camera or existing photos, and
+          `multiple` lets library users select several at once. */}
       <input
         ref={inputRef}
         type="file"
         accept="image/*"
-        capture="environment"
         multiple
         style={{ display: 'none' }}
         onChange={(e) => {
@@ -228,7 +230,7 @@ export default function CheckCta() {
 
       {/* Mobile hint line (desktop shows the drop zone instead) */}
       <p className="md:hidden" style={{ marginTop: 12, fontSize: 13.5, color: 'rgba(34,48,31,0.6)' }}>
-        One tap opens your camera. 1–5 photos of any room. Free, no account required.
+        One tap — take photos or pick from your library. 1–5 of any room. Free, no account required.
       </p>
     </div>
   )

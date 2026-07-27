@@ -47,7 +47,8 @@ export interface RefineResult {
 
 export async function refineReport(opts: {
   reportId: string
-  anonId: string
+  anonId: string | null
+  key?: string | null
   questionKey: string
   answerText: string
   recommendationId?: string
@@ -57,7 +58,9 @@ export async function refineReport(opts: {
     include: { recommendations: { include: { cartCandidates: true } } },
   })
   if (!report || report.deletedAt) throw new RefineError('report_not_found', 'Report not found.')
-  if (report.visitorAnonId !== opts.anonId) throw new RefineError('not_your_report', 'Not your report.')
+  const byCookie = opts.anonId != null && report.visitorAnonId === opts.anonId
+  const byKey = opts.key != null && report.accessKey != null && opts.key === report.accessKey
+  if (!byCookie && !byKey) throw new RefineError('not_your_report', 'Not your report.')
 
   // 1. Persist the answer (re-answering replaces). Not an upsert because
   //    recommendationId is nullable and Postgres compound uniques treat

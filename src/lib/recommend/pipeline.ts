@@ -68,8 +68,10 @@ export async function runPipeline(input: PipelineInput): Promise<PipelineOutput>
   const validated = validateReport(enriched)
 
   // 6. Persist.
+  const { newAccessKey } = await import('./access')
   const report = await prisma.report.create({
     data: {
+      accessKey: newAccessKey(),
       visitorAnonId: input.anonId,
       snapshotIds: input.snapshotIds,
       status: 'CHECK_ISSUED',

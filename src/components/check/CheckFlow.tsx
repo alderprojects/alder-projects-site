@@ -1,25 +1,22 @@
 'use client'
 
 /**
- * v7.4.1 — The Alder Check flow. Renders in place on `/` after the
- * visitor picks photos (no interstitial, no second page before value).
+ * v7.4.2f — The Alder Check capture flow: collect photos → explicit
+ * submit → full processing screen → redirect to /report/[id] (the
+ * canonical report page).
  *
- * Stages: uploading → analyzing → report | error.
- *
- * - Uploads 1–5 photos through the existing multipart endpoint
- *   (auto-upload on select, "Add another photo", auto-continue after a
- *   short delay), then runs the full-depth report pipeline.
- * - Renders: exclusion notice, recency question, tenure fork (always
- *   first when unknown), 2 free verdict cards + locked stubs, email
- *   unlock, Smart Cart upsell (only when the report has ≥1 BUY —
- *   zero-BUY reports get save-this-report copy instead), lightweight
- *   feedback, and the delete-my-report control.
- * - "Improve this recommendation" answers re-run enrichment server-side
- *   and surface what changed.
+ * Design decisions from live testing (2026-07-27):
+ *  - NO auto-continue: users add 1-5 photos at their pace and hit one
+ *    clear submit ("Get my Alder Check"). The one-tap promise is about
+ *    reaching the camera/picker, not about racing the user.
+ *  - Uploads run eagerly in the background as photos are added, so
+ *    submit usually only pays for the analysis, not the uploads.
+ *  - Processing is a full-panel branded screen (staged copy + animated
+ *    verdict chips), then a hard navigation to the report page.
  */
 
 import { useCallback, useEffect, useRef, useState } from 'react'
-import VerdictCard, { PALETTE, type VerdictCardData } from './VerdictCard'
+import { PALETTE } from './VerdictCard'
 import { fireFunnel } from '@/lib/check/funnel'
 
 const CONSENTS = JSON.stringify({
@@ -29,531 +26,296 @@ const CONSENTS = JSON.stringify({
 })
 
 const MAX_PHOTOS = 5
-const AUTO_CONTINUE_MS = 2500
 
-interface WireRec extends VerdictCardData {
-  id?: string
-  key: string
-  clarifyingQuestions: Array<{ key: string; question: string }>
-  smartCartEligible: boolean
-  assumptions?: string[]
-  limitations?: string[]
+type Stage = 'collect' | 'processing' | 'error'
+
+interface Slot {
+  id: number
+  thumb: string
+  status: 'uploading' | 'done' | 'failed'
+  snapshotId?: string
 }
 
-interface ReportState {
-  reportId: string
-  tier: string
-  recommendations: WireRec[]
-  lockedRecommendations: Array<{ verdict: string; title: string }>
-  upsell: { eligible: boolean; buyCount: number }
-  exclusionNotice: string | null
-  recency: { flagged: boolean; detail?: string | null; question?: string }
-  tenureQuestion: { key: string; question: string } | null
-  changes?: Array<{ key: string; title: string; from: string; to: string }>
-}
+const PROCESSING_STEPS = [
+  'Reading your photos…',
+  'Looking at what’s actually there…',
+  'Comparing cost and likely benefit…',
+  'Checking verified costs and rebates…',
+  'Writing your Buy / Skip / Wait plan…',
+]
 
-type Stage = 'uploading' | 'analyzing' | 'report' | 'error'
-
-const ANALYZE_COPY = ['Looking at the room…', 'Comparing cost and likely benefit…', 'Checking local costs and rebates…']
-
-export default function CheckFlow({
-  initialFiles,
-  initialReport,
-}: {
-  initialFiles?: File[]
-  /** v7.4.2b — QR handoff: desktop polls up a report the phone created
-   * and renders it directly, skipping the upload stages. */
-  initialReport?: ReportState
-}) {
-  const [stage, setStage] = useState<Stage>(initialReport ? 'report' : 'uploading')
-  const [thumbs, setThumbs] = useState<string[]>([])
-  const [uploadedCount, setUploadedCount] = useState(0)
-  const [statusCopy, setStatusCopy] = useState('Uploading photo…')
-  const [error, setError] = useState<string | null>(null)
-  const [report, setReport] = useState<ReportState | null>(initialReport ?? null)
+export default function CheckFlow({ initialFiles }: { initialFiles?: File[] }) {
+  const [stage, setStage] = useState<Stage>('collect')
+  const [slots, setSlots] = useState<Slot[]>([])
   const [context, setContext] = useState('')
-  const [busy, setBusy] = useState(false)
-  const [feedbackDone, setFeedbackDone] = useState(false)
-  const [emailValue, setEmailValue] = useState('')
-  const [emailState, setEmailState] = useState<'idle' | 'sending' | 'done' | 'error'>('idle')
-  const [deleted, setDeleted] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [stepIdx, setStepIdx] = useState(0)
 
-  const snapshotIdsRef = useRef<Set<string>>(new Set())
   const projectIdRef = useRef<string | null>(null)
-  const pendingFilesRef = useRef<File[]>([])
-  const autoTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const nextId = useRef(0)
   const startedRef = useRef(false)
   const contextRef = useRef('')
   const addInputRef = useRef<HTMLInputElement | null>(null)
-
   contextRef.current = context
 
-  const uploadOne = useCallback(async (file: File): Promise<void> => {
-    const form = new FormData()
-    form.append('image', file)
-    form.append('consents', CONSENTS)
-    if (projectIdRef.current) form.append('projectId', projectIdRef.current)
-    if (contextRef.current.trim()) form.append('userIntent', contextRef.current.trim().slice(0, 500))
-    const res = await fetch('/api/photos/upload', { method: 'POST', body: form })
-    const json = (await res.json()) as { ok: boolean; projectId?: string; snapshotId?: string; error?: string; detail?: string }
-    if (!json.ok || !json.snapshotId) {
-      throw new Error(json.detail || json.error || 'upload_failed')
-    }
-    projectIdRef.current = json.projectId ?? projectIdRef.current
-    snapshotIdsRef.current.add(json.snapshotId)
-    setUploadedCount((n) => n + 1)
-  }, [])
-
-  const runReport = useCallback(async () => {
-    setStage('analyzing')
-    let i = 0
-    setStatusCopy(ANALYZE_COPY[0])
-    const ticker = setInterval(() => {
-      i = Math.min(i + 1, ANALYZE_COPY.length - 1)
-      setStatusCopy(ANALYZE_COPY[i])
-    }, 6000)
+  const uploadOne = useCallback(async (file: File, slotId: number) => {
     try {
-      const res = await fetch('/api/photos/recommend', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          snapshotIds: Array.from(snapshotIdsRef.current),
-          userPrompt: contextRef.current.trim() || undefined,
-        }),
-      })
-      const json = await res.json()
-      if (!json.ok) throw new Error(json.detail || json.error || 'report_failed')
-      setReport(json as ReportState)
-      setStage('report')
-      fireFunnel('RECS_VIEWED', { reportId: json.reportId, buyCount: json.upsell?.buyCount ?? 0 })
-    } catch (e) {
-      setError((e as Error).message)
-      setStage('error')
-    } finally {
-      clearInterval(ticker)
+      const form = new FormData()
+      form.append('image', file)
+      form.append('consents', CONSENTS)
+      if (projectIdRef.current) form.append('projectId', projectIdRef.current)
+      if (contextRef.current.trim()) form.append('userIntent', contextRef.current.trim().slice(0, 500))
+      const res = await fetch('/api/photos/upload', { method: 'POST', body: form })
+      const json = (await res.json()) as { ok: boolean; projectId?: string; snapshotId?: string }
+      if (json.ok && json.snapshotId) {
+        projectIdRef.current = json.projectId ?? projectIdRef.current
+        setSlots((s) => s.map((x) => (x.id === slotId ? { ...x, status: 'done', snapshotId: json.snapshotId } : x)))
+      } else {
+        setSlots((s) => s.map((x) => (x.id === slotId ? { ...x, status: 'failed' } : x)))
+      }
+    } catch {
+      setSlots((s) => s.map((x) => (x.id === slotId ? { ...x, status: 'failed' } : x)))
     }
   }, [])
 
-  const drainQueue = useCallback(async () => {
-    while (pendingFilesRef.current.length > 0 && snapshotIdsRef.current.size + 1 <= MAX_PHOTOS) {
-      const file = pendingFilesRef.current.shift() as File
-      setStatusCopy('Uploading photo…')
-      try {
-        await uploadOne(file)
-      } catch (e) {
-        setError((e as Error).message)
-        setStage('error')
-        return
-      }
-    }
-    // Auto-continue after a short pause unless more photos get added.
-    if (autoTimerRef.current) clearTimeout(autoTimerRef.current)
-    setStatusCopy('Photo received. Add another, or we’ll start your Check in a moment…')
-    autoTimerRef.current = setTimeout(() => {
-      void runReport()
-    }, AUTO_CONTINUE_MS)
-  }, [uploadOne, runReport])
-
-  const enqueueFiles = useCallback(
+  const addFiles = useCallback(
     (files: File[]) => {
-      if (autoTimerRef.current) clearTimeout(autoTimerRef.current)
-      const room = MAX_PHOTOS - snapshotIdsRef.current.size - pendingFilesRef.current.length
-      const accepted = files.slice(0, Math.max(0, room))
-      for (const f of accepted) {
-        setThumbs((t) => [...t, URL.createObjectURL(f)])
-      }
-      pendingFilesRef.current.push(...accepted)
-      void drainQueue()
+      setSlots((current) => {
+        const room = MAX_PHOTOS - current.length
+        const accepted = files.filter((f) => f.type.startsWith('image/')).slice(0, Math.max(0, room))
+        const newSlots = accepted.map((f) => {
+          const id = nextId.current++
+          // fire the eager upload
+          void uploadOne(f, id)
+          return { id, thumb: URL.createObjectURL(f), status: 'uploading' as const }
+        })
+        return [...current, ...newSlots]
+      })
     },
-    [drainQueue]
+    [uploadOne]
   )
 
   useEffect(() => {
     if (startedRef.current) return
     startedRef.current = true
-    if (initialReport) {
-      fireFunnel('RECS_VIEWED', { reportId: initialReport.reportId, source: 'handoff_poll' })
-      return
-    }
     const files = initialFiles ?? []
-    fireFunnel('PHOTO_UPLOAD_STARTED', { source: 'homepage_hero', count: files.length })
-    enqueueFiles(files)
+    fireFunnel('PHOTO_UPLOAD_STARTED', { source: 'check_flow', count: files.length })
+    addFiles(files)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  const answerQuestion = useCallback(
-    async (questionKey: string, answerText: string, recommendationId?: string) => {
-      if (!report) return
-      setBusy(true)
-      try {
-        const res = await fetch('/api/photos/recommend/answer', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ reportId: report.reportId, questionKey, answerText, recommendationId }),
-        })
-        const json = await res.json()
-        if (json.ok) {
-          setReport((prev) =>
-            prev
-              ? {
-                  ...prev,
-                  recommendations: json.recommendations,
-                  lockedRecommendations: json.lockedRecommendations,
-                  upsell: json.upsell,
-                  changes: json.changes,
-                  tenureQuestion: questionKey === 'tenure' ? null : prev.tenureQuestion,
-                  recency: questionKey === 'photos_current' ? { flagged: false } : prev.recency,
-                }
-              : prev
-          )
-        }
-      } finally {
-        setBusy(false)
-      }
-    },
-    [report]
-  )
+  const readyCount = slots.filter((s) => s.status === 'done').length
+  const uploadingCount = slots.filter((s) => s.status === 'uploading').length
 
-  const submitEmail = useCallback(async () => {
-    if (!report || !emailValue.trim()) return
-    setEmailState('sending')
+  const submit = useCallback(async () => {
+    setStage('processing')
+    setStepIdx(0)
+    const ticker = setInterval(() => setStepIdx((i) => Math.min(i + 1, PROCESSING_STEPS.length - 1)), 7000)
     try {
-      const res = await fetch('/api/report/unlock', {
+      // Wait briefly for any in-flight uploads (they started eagerly).
+      for (let i = 0; i < 60; i++) {
+        const stillUploading = await new Promise<number>((r) =>
+          setSlots((s) => {
+            r(s.filter((x) => x.status === 'uploading').length)
+            return s
+          })
+        )
+        if (stillUploading === 0) break
+        await new Promise((r) => setTimeout(r, 500))
+      }
+      const snapshotIds = await new Promise<string[]>((r) =>
+        setSlots((s) => {
+          r(s.filter((x) => x.snapshotId).map((x) => x.snapshotId as string))
+          return s
+        })
+      )
+      if (snapshotIds.length === 0) throw new Error('No photos uploaded successfully — try again.')
+
+      const res = await fetch('/api/photos/recommend', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ reportId: report.reportId, email: emailValue.trim() }),
+        body: JSON.stringify({ snapshotIds: Array.from(new Set(snapshotIds)), userPrompt: contextRef.current.trim() || undefined }),
       })
       const json = await res.json()
-      if (json.ok) {
-        setEmailState('done')
-        if (json.recommendations) {
-          setReport((prev) =>
-            prev
-              ? { ...prev, tier: 'email', recommendations: json.recommendations, lockedRecommendations: [] }
-              : prev
-          )
-        }
-      } else {
-        setEmailState('error')
-      }
-    } catch {
-      setEmailState('error')
+      if (!json.ok) throw new Error(json.detail || json.error || 'report_failed')
+      fireFunnel('RECS_VIEWED', { reportId: json.reportId, buyCount: json.upsell?.buyCount ?? 0 })
+      // Canonical page — refreshable, bookmarkable, emailable.
+      window.location.assign(`/report/${json.reportId}`)
+    } catch (e) {
+      clearInterval(ticker)
+      setError((e as Error).message)
+      setStage('error')
     }
-  }, [report, emailValue])
-
-  const sendFeedback = useCallback(
-    async (useful: boolean, reason?: string) => {
-      if (!report) return
-      setFeedbackDone(true)
-      fireFunnel('FEEDBACK_SUBMITTED', { reportId: report.reportId, useful })
-      fetch('/api/report/feedback', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ reportId: report.reportId, useful, reason }),
-      }).catch(() => {})
-    },
-    [report]
-  )
-
-  const deleteReport = useCallback(async () => {
-    if (!report) return
-    if (!window.confirm('Delete this report and its photos? This cannot be undone.')) return
-    await fetch('/api/photos/recommend/delete', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ reportId: report.reportId }),
-    }).catch(() => {})
-    setDeleted(true)
-  }, [report])
-
-  // ── Render ──────────────────────────────────────────────────────────
-
-  if (deleted) {
-    return (
-      <div style={boxStyle}>
-        <p style={{ color: PALETTE.ink, fontSize: 16 }}>Your report and photos have been deleted.</p>
-      </div>
-    )
-  }
+  }, [])
 
   if (stage === 'error') {
     return (
       <div style={boxStyle}>
         <p style={{ color: '#8a3d2e', fontSize: 15 }}>
-          Something went wrong reading your photos: {error}. Refresh and try again — nothing was charged, nothing is
-          stored without a report.
+          Something went wrong reading your photos: {error}. Your photos weren’t lost — try submitting again.
         </p>
+        <button onClick={() => setStage('collect')} style={secondaryBtn}>
+          Back to my photos
+        </button>
       </div>
     )
   }
 
-  if (stage === 'uploading' || stage === 'analyzing') {
+  if (stage === 'processing') {
     return (
-      <div style={boxStyle}>
-        <div style={{ display: 'flex', gap: 8, justifyContent: 'center', flexWrap: 'wrap', marginBottom: 14 }}>
-          {thumbs.map((src, i) => (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
+      <div style={{ ...boxStyle, padding: '36px 24px' }}>
+        <ProcessingArt />
+        <p style={{ color: PALETTE.green, fontSize: 18, fontWeight: 700, margin: '18px 0 6px' }}>
+          {PROCESSING_STEPS[stepIdx]}
+        </p>
+        <p style={{ color: PALETTE.inkSoft, fontSize: 13.5, margin: '0 0 14px' }}>
+          Usually 30–60 seconds. Your report opens on its own page when it’s ready.
+        </p>
+        <div style={{ display: 'flex', gap: 6, justifyContent: 'center' }}>
+          {PROCESSING_STEPS.map((_, i) => (
+            <span
               key={i}
-              src={src}
-              alt={`Photo ${i + 1}`}
-              style={{ width: 72, height: 72, objectFit: 'cover', borderRadius: 8, border: `1px solid ${PALETTE.line}` }}
+              style={{
+                width: 26,
+                height: 5,
+                borderRadius: 3,
+                background: i <= stepIdx ? PALETTE.gold : 'rgba(31,61,43,0.15)',
+                transition: 'background 0.4s',
+              }}
             />
           ))}
         </div>
-        <p style={{ color: PALETTE.ink, fontSize: 16, fontWeight: 600, marginBottom: 6 }}>{statusCopy}</p>
-        <p style={{ color: PALETTE.inkSoft, fontSize: 13, marginBottom: 14 }}>
-          {uploadedCount} of {Math.min(thumbs.length, MAX_PHOTOS)} photo{thumbs.length === 1 ? '' : 's'} received
-        </p>
-        {stage === 'uploading' && (
-          <div style={{ display: 'flex', gap: 12, justifyContent: 'center', alignItems: 'center', flexWrap: 'wrap' }}>
-            {thumbs.length < MAX_PHOTOS && (
-              <>
-                <input
-                  ref={addInputRef}
-                  type="file"
-                  accept="image/*"
-                  multiple
-                  style={{ display: 'none' }}
-                  onChange={(e) => {
-                    const files = Array.from(e.target.files ?? [])
-                    if (files.length > 0) enqueueFiles(files)
-                    e.target.value = ''
-                  }}
-                />
-                <button onClick={() => addInputRef.current?.click()} style={secondaryBtn}>
-                  Add another photo
-                </button>
-              </>
-            )}
-            <input
-              type="text"
-              value={context}
-              onChange={(e) => setContext(e.target.value)}
-              placeholder="Optional: any context? (“just moved in, propane boiler”)"
-              style={{
-                flex: '1 1 260px',
-                maxWidth: 380,
-                padding: '10px 12px',
-                borderRadius: 8,
-                border: `1px solid ${PALETTE.line}`,
-                fontSize: 14,
-              }}
-            />
-          </div>
-        )}
+        <style>{`@keyframes alderPulse { 0%,100% { opacity: 0.35; transform: translateY(0); } 50% { opacity: 1; transform: translateY(-3px); } }`}</style>
       </div>
     )
   }
 
-  if (!report) return null
-
-  const buyCount = report.upsell.buyCount
-
+  // ── collect stage ──────────────────────────────────────────────────
   return (
-    <div style={{ ...boxStyle, textAlign: 'left' }}>
-      <h2 style={{ fontSize: 22, color: PALETTE.green, margin: '0 0 4px', fontWeight: 700 }}>Your Alder Check</h2>
-      <p style={{ color: PALETTE.inkSoft, fontSize: 14, margin: '0 0 16px' }}>
-        {report.recommendations.length + report.lockedRecommendations.length} findings ·{' '}
-        {buyCount} worth buying · honest about the rest
-      </p>
-
-      {report.exclusionNotice && (
-        <p style={noticeStyle}>{report.exclusionNotice} Not stored, not analyzed.</p>
-      )}
-
-      {report.changes && report.changes.length > 0 && (
-        <div style={{ ...noticeStyle, background: '#eef4ec', borderColor: '#c7dcc0' }}>
-          <strong>What changed:</strong>{' '}
-          {report.changes.map((c) => `${c.title}: ${c.from} → ${c.to}`).join(' · ')}
-        </div>
-      )}
-
-      {report.recency.flagged && (
-        <QuestionRow
-          question={report.recency.question ?? 'Are these photos current?'}
-          options={[
-            { label: 'Yes, current', value: 'yes_current' },
-            { label: 'No, older photos', value: 'not_current' },
-          ]}
-          disabled={busy}
-          onAnswer={(v) => void answerQuestion('photos_current', v)}
-        />
-      )}
-
-      {report.tenureQuestion && (
-        <QuestionRow
-          question={report.tenureQuestion.question}
-          options={[
-            { label: 'Own', value: 'own' },
-            { label: 'Rent', value: 'rent' },
-          ]}
-          disabled={busy}
-          onAnswer={(v) => void answerQuestion('tenure', v)}
-        />
-      )}
-
-      <div style={{ display: 'grid', gap: 14, margin: '16px 0' }}>
-        {report.recommendations.map((rec) => (
-          <div key={rec.key}>
-            <VerdictCard
-              data={rec}
-              onAffiliateClick={() => fireFunnel('AFFILIATE_CLICKED', { reportId: report.reportId, recKey: rec.key })}
+    <div style={boxStyle}>
+      <div style={{ display: 'flex', gap: 8, justifyContent: 'center', flexWrap: 'wrap', marginBottom: 14 }}>
+        {slots.map((s) => (
+          <div key={s.id} style={{ position: 'relative' }}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={s.thumb}
+              alt="Your photo"
+              style={{
+                width: 76,
+                height: 76,
+                objectFit: 'cover',
+                borderRadius: 8,
+                border: `2px solid ${s.status === 'done' ? '#7a9b6f' : s.status === 'failed' ? '#9b3f3f' : 'rgba(31,61,43,0.2)'}`,
+                opacity: s.status === 'uploading' ? 0.6 : 1,
+              }}
             />
-            {rec.clarifyingQuestions.length > 0 && (
-              <details style={{ marginTop: 6 }}>
-                <summary style={{ fontSize: 13.5, color: PALETTE.green, cursor: 'pointer', fontWeight: 600 }}>
-                  Improve this recommendation
-                </summary>
-                <div style={{ padding: '8px 0 0' }}>
-                  {rec.clarifyingQuestions.map((q) => (
-                    <ImproveQuestion
-                      key={q.key}
-                      question={q.question}
-                      disabled={busy}
-                      onSubmit={(answer) => void answerQuestion(q.key, answer, rec.id)}
-                    />
-                  ))}
-                </div>
-              </details>
-            )}
+            <span style={{ position: 'absolute', right: -4, top: -4, fontSize: 14 }}>
+              {s.status === 'done' ? '✅' : s.status === 'failed' ? '⚠️' : '⏳'}
+            </span>
           </div>
         ))}
+        {slots.length < MAX_PHOTOS && (
+          <button
+            onClick={() => addInputRef.current?.click()}
+            style={{
+              width: 76,
+              height: 76,
+              borderRadius: 8,
+              border: '2px dashed rgba(31,61,43,0.3)',
+              background: 'transparent',
+              color: PALETTE.green,
+              fontSize: 26,
+              cursor: 'pointer',
+            }}
+            aria-label="Add another photo"
+          >
+            +
+          </button>
+        )}
       </div>
 
-      {report.lockedRecommendations.length > 0 && (
-        <div style={{ border: `1px dashed ${PALETTE.gold}`, borderRadius: 12, padding: '16px 18px', marginBottom: 16 }}>
-          <p style={{ margin: '0 0 8px', color: PALETTE.ink, fontSize: 15, fontWeight: 600 }}>
-            {report.lockedRecommendations.length} more finding
-            {report.lockedRecommendations.length === 1 ? '' : 's'} in your Check:
-          </p>
-          <ul style={{ margin: '0 0 12px', paddingLeft: 18, color: PALETTE.inkSoft, fontSize: 14 }}>
-            {report.lockedRecommendations.map((l, i) => (
-              <li key={i}>
-                <strong>{l.verdict}</strong> — {l.title}
-              </li>
-            ))}
-          </ul>
-          {emailState === 'done' ? (
-            <p style={{ margin: 0, fontSize: 14, color: '#2d5a3d' }}>Unlocked — full report above. We also emailed you a link to it.</p>
-          ) : (
-            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-              <input
-                type="email"
-                value={emailValue}
-                onChange={(e) => setEmailValue(e.target.value)}
-                placeholder="you@email.com"
-                style={{ flex: '1 1 200px', maxWidth: 300, padding: '10px 12px', borderRadius: 8, border: `1px solid ${PALETTE.line}`, fontSize: 14 }}
-              />
-              <button onClick={() => void submitEmail()} disabled={emailState === 'sending'} style={primaryBtn}>
-                {emailState === 'sending' ? 'Unlocking…' : 'Unlock the full report — free'}
-              </button>
-              {emailState === 'error' && <span style={{ fontSize: 13, color: '#8a3d2e' }}>That didn’t work — check the email address.</span>}
-            </div>
-          )}
-        </div>
-      )}
+      <input
+        ref={addInputRef}
+        type="file"
+        accept="image/*"
+        multiple
+        style={{ display: 'none' }}
+        onChange={(e) => {
+          addFiles(Array.from(e.target.files ?? []))
+          e.target.value = ''
+        }}
+      />
 
-      {buyCount > 0 ? (
-        <div style={{ background: PALETTE.green, borderRadius: 12, padding: '18px 20px', marginBottom: 16 }}>
-          <p style={{ color: PALETTE.cream, fontSize: 15.5, margin: '0 0 10px', lineHeight: 1.5 }}>
-            Your Check found <strong>{buyCount}</strong> thing{buyCount === 1 ? '' : 's'} worth buying. Smart Cart turns{' '}
-            {buyCount === 1 ? 'it' : 'them'} into the exact products and specs — $19.99.
-          </p>
-          <a
-            href={`/report/${report.reportId}/cart`}
-            onClick={() => fireFunnel('SMARTCART_UPSELL_CLICKED', { reportId: report.reportId, buyCount })}
-            style={{ ...primaryBtn, background: PALETTE.gold, color: '#fff', textDecoration: 'none', display: 'inline-block' }}
-          >
-            Build My Smart Cart
-          </a>
-        </div>
-      ) : (
-        <div style={{ ...noticeStyle, marginBottom: 16 }}>
-          Nothing worth buying right now — that’s the honest answer. Unlock the full report above and we’ll save it so
-          you can re-check when something changes.
-        </div>
-      )}
+      <p style={{ fontSize: 13.5, color: PALETTE.inkSoft, margin: '0 0 12px' }}>
+        {readyCount} of {slots.length} photo{slots.length === 1 ? '' : 's'} ready
+        {uploadingCount > 0 ? ` · ${uploadingCount} uploading…` : ''} · up to {MAX_PHOTOS} total — more rooms, better
+        Check
+      </p>
 
-      {!feedbackDone ? (
-        <div style={{ display: 'flex', gap: 10, alignItems: 'center', fontSize: 14, color: PALETTE.inkSoft }}>
-          Was this useful?
-          <button onClick={() => void sendFeedback(true)} style={secondaryBtn}>
-            Yes
-          </button>
-          <button onClick={() => void sendFeedback(false, 'not_really')} style={secondaryBtn}>
-            Not really
-          </button>
-        </div>
-      ) : (
-        <p style={{ fontSize: 14, color: PALETTE.inkSoft }}>Thanks — that feedback tunes the engine.</p>
-      )}
+      <input
+        type="text"
+        value={context}
+        onChange={(e) => setContext(e.target.value)}
+        placeholder="Optional context — “just moved in, propane boiler”"
+        style={{
+          width: '100%',
+          maxWidth: 420,
+          padding: '10px 12px',
+          borderRadius: 8,
+          border: '1px solid rgba(31,61,43,0.2)',
+          fontSize: 14,
+          marginBottom: 14,
+        }}
+      />
 
-      <p style={{ marginTop: 18, fontSize: 12.5, color: PALETTE.inkSoft }}>
-        Photos are analyzed only to create your report.{' '}
-        <button onClick={() => void deleteReport()} style={{ background: 'none', border: 'none', padding: 0, color: '#8a3d2e', textDecoration: 'underline', cursor: 'pointer', fontSize: 12.5 }}>
-          Delete my report and photos
+      <div>
+        <button onClick={() => void submit()} disabled={readyCount === 0} style={{ ...primaryBtn, opacity: readyCount === 0 ? 0.5 : 1 }}>
+          Get my Alder Check{readyCount > 0 ? ` (${readyCount} photo${readyCount === 1 ? '' : 's'})` : ''}
         </button>
+      </div>
+      <p style={{ fontSize: 12, color: PALETTE.inkSoft, marginTop: 10 }}>
+        Free · no account · photos with people are excluded automatically
       </p>
     </div>
   )
 }
 
-function QuestionRow({
-  question,
-  options,
-  onAnswer,
-  disabled,
-}: {
-  question: string
-  options: Array<{ label: string; value: string }>
-  onAnswer: (value: string) => void
-  disabled: boolean
-}) {
-  return (
-    <div style={{ ...noticeStyle, display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
-      <span style={{ fontWeight: 600 }}>{question}</span>
-      {options.map((o) => (
-        <button key={o.value} onClick={() => onAnswer(o.value)} disabled={disabled} style={secondaryBtn}>
-          {o.label}
-        </button>
-      ))}
-    </div>
+/** Animated processing creative: room frame + verdict chips pulsing in sequence. */
+function ProcessingArt() {
+  const chip = (label: string, bg: string, fg: string, delay: string) => (
+    <span
+      style={{
+        display: 'inline-block',
+        background: bg,
+        color: fg,
+        fontWeight: 700,
+        fontSize: 13,
+        letterSpacing: '0.06em',
+        borderRadius: 8,
+        padding: '6px 14px',
+        margin: '0 5px',
+        animation: `alderPulse 1.8s ease-in-out ${delay} infinite`,
+      }}
+    >
+      {label}
+    </span>
   )
-}
-
-function ImproveQuestion({
-  question,
-  onSubmit,
-  disabled,
-}: {
-  question: string
-  onSubmit: (answer: string) => void
-  disabled: boolean
-}) {
-  const [value, setValue] = useState('')
-  const [sent, setSent] = useState(false)
-  if (sent) return <p style={{ fontSize: 13, color: '#2d5a3d', margin: '4px 0' }}>Answered — updating your Check…</p>
   return (
-    <div style={{ display: 'flex', gap: 8, alignItems: 'center', margin: '4px 0', flexWrap: 'wrap' }}>
-      <label style={{ fontSize: 13.5, color: PALETTE.ink }}>{question}</label>
-      <input
-        value={value}
-        onChange={(e) => setValue(e.target.value)}
-        style={{ padding: '6px 10px', borderRadius: 6, border: `1px solid ${PALETTE.line}`, fontSize: 13.5, flex: '1 1 160px', maxWidth: 240 }}
-      />
-      <button
-        onClick={() => {
-          if (value.trim()) {
-            setSent(true)
-            onSubmit(value.trim())
-          }
-        }}
-        disabled={disabled}
-        style={secondaryBtn}
-      >
-        Answer
-      </button>
+    <div>
+      <svg viewBox="0 0 120 90" width="110" height="82" fill="none" aria-hidden="true" style={{ display: 'block', margin: '0 auto' }}>
+        <rect x="8" y="8" width="104" height="70" rx="8" fill="#fff" stroke="rgba(31,61,43,0.3)" strokeWidth="2.5" />
+        <rect x="18" y="18" width="30" height="24" rx="3" fill="#fff" stroke="rgba(31,61,43,0.3)" strokeWidth="2" />
+        <path d="M20 38l7-8 5 5 6-7 8 10H20z" fill="#7a9b6f" opacity="0.5" />
+        <rect x="58" y="52" width="44" height="10" rx="3" fill="#fff" stroke="rgba(31,61,43,0.3)" strokeWidth="2" />
+        <circle cx="60" cy="70" r="4" fill="#b08d2f">
+          <animate attributeName="opacity" values="0.3;1;0.3" dur="1.6s" repeatCount="indefinite" />
+        </circle>
+      </svg>
+      <div style={{ marginTop: 14 }}>
+        {chip('BUY', '#e5efe2', '#2d5a3d', '0s')}
+        {chip('WAIT', '#f3ecd9', '#8a6d1f', '0.3s')}
+        {chip('SKIP', '#f0e4e0', '#8a3d2e', '0.6s')}
+      </div>
     </div>
   )
 }
@@ -568,23 +330,13 @@ const boxStyle: React.CSSProperties = {
   margin: '0 auto',
 }
 
-const noticeStyle: React.CSSProperties = {
-  background: '#f3ecd9',
-  border: '1px solid rgba(176,141,47,0.35)',
-  borderRadius: 10,
-  padding: '10px 14px',
-  fontSize: 14,
-  color: PALETTE.ink,
-  marginBottom: 12,
-}
-
 const primaryBtn: React.CSSProperties = {
   background: PALETTE.green,
   color: PALETTE.cream,
   border: 'none',
-  borderRadius: 8,
-  padding: '10px 18px',
-  fontSize: 14.5,
+  borderRadius: 10,
+  padding: '14px 28px',
+  fontSize: 16,
   fontWeight: 700,
   cursor: 'pointer',
 }
@@ -598,4 +350,5 @@ const secondaryBtn: React.CSSProperties = {
   fontSize: 13.5,
   fontWeight: 600,
   cursor: 'pointer',
+  marginTop: 10,
 }

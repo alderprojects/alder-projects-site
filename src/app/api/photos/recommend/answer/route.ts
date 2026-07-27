@@ -29,6 +29,8 @@ const BodySchema = z.object({
   questionKey: z.string().min(1).max(60),
   answerText: z.string().min(1).max(500),
   recommendationId: z.string().optional(),
+  // v7.4.2f — capability key (email-link sessions on other devices)
+  key: z.string().max(64).optional(),
 })
 
 export async function POST(req: NextRequest): Promise<NextResponse> {
@@ -42,20 +44,25 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     )
   }
 
-  let anonId: string
+  let anonId: string | null = null
   try {
     anonId = await ensureVisitorSession({ firstSource: 'photo_report' })
-  } catch (e) {
-    return NextResponse.json({ ok: false, error: 'no_anon_cookie', detail: (e as Error).message }, { status: 400 })
+  } catch {
+    // Key-holders (email links on another device) have no cookie — the
+    // refine call authorizes on the key instead.
+    if (!body.key) {
+      return NextResponse.json({ ok: false, error: 'no_anon_cookie' }, { status: 400 })
+    }
   }
 
-  const visitor = await prisma.visitorSession.findUnique({ where: { anonId } })
-  const callerTier: DisclosureTier = visitor?.claimedByUserId ? 'email' : 'free'
+  const visitor = anonId ? await prisma.visitorSession.findUnique({ where: { anonId } }) : null
+  const callerTier: DisclosureTier = body.key || visitor?.claimedByUserId ? 'email' : 'free'
 
   try {
     const result = await refineReport({
       reportId: body.reportId,
       anonId,
+      key: body.key ?? null,
       questionKey: body.questionKey,
       answerText: body.answerText,
       recommendationId: body.recommendationId,

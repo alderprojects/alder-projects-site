@@ -21,10 +21,13 @@ export default function ReportCartCheckout({
   reportId,
   questions,
   defaultEmail,
+  accessKey,
 }: {
   reportId: string
   questions: CompatQuestion[]
   defaultEmail: string
+  /** v7.4.2f — capability key for email-link sessions (no cookie). */
+  accessKey?: string
 }) {
   const [answers, setAnswers] = useState<Record<string, string>>(
     Object.fromEntries(questions.map((q) => [`${q.recommendationId}:${q.key}`, q.prefilledAnswer ?? '']))
@@ -54,6 +57,7 @@ export default function ReportCartCheckout({
               questionKey: q.key,
               answerText: val,
               recommendationId: q.recommendationId,
+              ...(accessKey ? { key: accessKey } : {}),
             }),
           }).catch(() => {})
         }
@@ -62,7 +66,7 @@ export default function ReportCartCheckout({
       const res = await fetch('/api/report/cart/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ reportId, email: email.trim() }),
+        body: JSON.stringify({ reportId, email: email.trim(), ...(accessKey ? { key: accessKey } : {}) }),
       })
       const json = await res.json()
       if (!json.ok || !json.checkoutUrl) {

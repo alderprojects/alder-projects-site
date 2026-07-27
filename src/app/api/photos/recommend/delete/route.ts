@@ -21,7 +21,7 @@ export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 export const maxDuration = 30
 
-const BodySchema = z.object({ reportId: z.string().min(1) })
+const BodySchema = z.object({ reportId: z.string().min(1), key: z.string().max(64).optional() })
 
 export async function POST(req: NextRequest): Promise<NextResponse> {
   let body: z.infer<typeof BodySchema>
@@ -31,21 +31,23 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     return NextResponse.json({ ok: false, error: 'invalid_body' }, { status: 400 })
   }
 
-  let anonId: string
+  let anonId: string | null = null
   try {
     anonId = await ensureVisitorSession({ firstSource: 'photo_report' })
-  } catch (e) {
-    return NextResponse.json({ ok: false, error: 'no_anon_cookie' }, { status: 400 })
+  } catch {
+    if (!body.key) return NextResponse.json({ ok: false, error: 'no_anon_cookie' }, { status: 400 })
   }
 
   const report = await prisma.report.findUnique({ where: { id: body.reportId } })
   if (!report) return NextResponse.json({ ok: false, error: 'report_not_found' }, { status: 404 })
-  if (report.visitorAnonId !== anonId) {
+  const byCookie = anonId != null && report.visitorAnonId === anonId
+  const byKey = body.key != null && report.accessKey != null && body.key === report.accessKey
+  if (!byCookie && !byKey) {
     return NextResponse.json({ ok: false, error: 'not_your_report' }, { status: 403 })
   }
 
   const request = await prisma.deletionRequest.create({
-    data: { reportId: report.id, anonId, status: 'pending' },
+    data: { reportId: report.id, anonId: report.visitorAnonId ?? anonId, status: 'pending' },
   })
 
   let photosDeleted = 0
@@ -54,7 +56,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 
   // Photos attached to this report's snapshots, not referenced elsewhere.
   const otherReports = await prisma.report.findMany({
-    where: { id: { not: report.id }, deletedAt: null, visitorAnonId: anonId },
+    where: { id: { not: report.id }, deletedAt: null, visitorAnonId: report.visitorAnonId },
     select: { snapshotIds: true },
   })
   const retainedSnapshots = new Set(otherReports.flatMap((r) => r.snapshotIds))
@@ -97,7 +99,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     eventType: 'REPORT_DELETED',
     subjectType: 'Report',
     subjectId: report.id,
-    anonId,
+    anonId: report.visitorAnonId ?? anonId,
     source: 'web',
     payload: { photosDeleted, blobsDeleted, errorCount: errors.length },
   })

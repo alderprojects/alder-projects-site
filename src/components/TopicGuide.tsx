@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import Nav from '@/components/Nav'
 import Footer from '@/components/Footer'
+import GuideVerdictBox, { guideVerdictHub } from '@/components/check/GuideVerdictBox'
 import GuideFooter from '@/components/GuideFooter'
 import PageViewEvent from '@/components/PageViewEvent'
 import SmartCartGuideCTA from '@/components/SmartCartGuideCTA'
@@ -41,6 +42,7 @@ export default function TopicGuide({
   path: string
 }) {
   const url = absUrl(path)
+  const verdictHub = guideVerdictHub(path)
 
   const schemas = [
     buildArticle({
@@ -120,6 +122,14 @@ export default function TopicGuide({
           </p>
         </div>
       </div>
+
+      {/* v7.4.1c — standing verdict box, auto-rendered when this guide
+          backs a verdict hub (matched by path; no per-guide edits) */}
+      {verdictHub && (
+        <div style={{ padding: '0 24px' }}>
+          <GuideVerdictBox hub={verdictHub} />
+        </div>
+      )}
 
       <div style={{ maxWidth: '720px', margin: '0 auto', padding: 'clamp(40px,6vw,64px) 24px 80px' }}>
         {/* v7.2.14 fix-up — CTA #1: top-of-guide */}

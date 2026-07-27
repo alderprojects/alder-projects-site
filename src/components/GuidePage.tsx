@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import Nav from '@/components/Nav'
+import GuideVerdictBox, { guideVerdictHub } from '@/components/check/GuideVerdictBox'
 import {
   buildArticle,
   buildBreadcrumbList,
@@ -95,6 +96,7 @@ export default function GuidePage({
   smartCartCta?: GuidePageSmartCartCta
 }) {
   const schemas = meta ? buildSchemas(content, meta) : []
+  const verdictHub = guideVerdictHub(meta?.path)
 
   return (
     <div style={{ minHeight: '100vh', backgroundColor: '#FAF7F2' }}>
@@ -125,6 +127,13 @@ export default function GuidePage({
           <p style={{ fontSize: '17px', color: 'rgba(245,239,224,0.6)', lineHeight: 1.7, maxWidth: '580px', margin: 0 }}>{content.intro}</p>
         </div>
       </div>
+      {/* v7.4.1c — standing verdict box, auto-rendered when this guide
+          backs a verdict hub (matched by meta.path; no per-guide edits) */}
+      {verdictHub && (
+        <div style={{ padding: '0 24px' }}>
+          <GuideVerdictBox hub={verdictHub} />
+        </div>
+      )}
       <div style={{ maxWidth: '720px', margin: '0 auto', padding: 'clamp(40px,6vw,64px) 24px 80px' }}>
         {content.sections.map((section, i) => (
           <div key={i}>

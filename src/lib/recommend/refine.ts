@@ -121,6 +121,11 @@ export async function refineReport(opts: {
     const answers = await prisma.clarifyingAnswer.findMany({ where: { reportId: report.id } })
     const gate = await runGate(report.snapshotIds)
     if (gate.features.length === 0) throw new RefineError('no_usable_features', 'No usable observations.')
+    // v7.4.7 — a ZIP stored on the report (upload-form or post-result)
+    // regionalizes refinement re-reasoning the same way it does the
+    // initial pass.
+    const { regionProfileForZip } = await import('@/lib/region/profile')
+    const regionContext = report.zip ? regionProfileForZip(report.zip) : null
     const result = await generateCandidates({
       features: gate.features,
       tenure,
@@ -128,7 +133,11 @@ export async function refineReport(opts: {
       photoCount: gate.includedPhotoCount,
       currentDate: new Date().toISOString().slice(0, 10),
       clarifyingAnswers: answers.map((a) => ({ questionKey: a.questionKey, answerText: a.answerText })),
+      regionContext,
     })
+    if (regionContext && !report.regionContextUsed) {
+      await prisma.report.update({ where: { id: report.id }, data: { regionContextUsed: true } })
+    }
     candidates = result.set.candidates
     enriched = decideVerdicts(candidates, tenure)
   }

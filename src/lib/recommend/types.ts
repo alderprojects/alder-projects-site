@@ -203,6 +203,9 @@ export interface PipelineInput {
   anonId: string
   userPrompt?: string
   tenure?: Tenure
+  // v7.4.7 — optional 5-digit ZIP (validated at the route); resolves to
+  // a static region profile for synthesis. Omitting it changes nothing.
+  zip?: string
 }
 
 export interface GateResult {

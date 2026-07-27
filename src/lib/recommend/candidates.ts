@@ -44,6 +44,7 @@ You are the honest advisor whose differentiation is telling people what NOT to b
 6. Set risk_flags for anything structural, electrical-panel, gas, roofing, suspected mold, foundation, major plumbing, or fire-safety. These route to professional verification — never diagnose safety from a photo.
 7. Clarifying questions: at most 3 per candidate, and ONLY questions whose answer can change the verdict or the cart contents. "Do you own or rent?" is handled globally — do not include it.
 8. Emit 3 to 5 candidates for a typical photo set — never more than 6. Do NOT pad with INVESTIGATE candidates: emit needs_verification/risk-flagged candidates only when a genuine safety concern or verdict-blocking uncertainty is visible. Fewer, better-grounded candidates beat coverage. Keep summaries to 2 sentences and evidence entries short — this response renders while a homeowner waits.
+9. REGION CONTEXT, when provided, describes the home's climate region (from the visitor's ZIP — not from the photos). Region facts may inform which candidates matter, their urgency, and their framing ("the frost line in your area runs deep, so exterior caulking timing matters"). They must NEVER be phrased as photo observations: visible_evidence stays exclusively extraction-grounded, and anything claimed as seen must come from the observations list. When no region context is provided, make zero region or climate claims beyond what the photos show.
 
 # Hard prohibitions
 
@@ -75,6 +76,14 @@ export interface CandidateInput {
   photoCount: number
   currentDate: string
   clarifyingAnswers?: Array<{ questionKey: string; answerText: string }>
+  // v7.4.7 — region profile resolved from the visitor's optional ZIP.
+  // Never contains the ZIP itself; climate facts only.
+  regionContext?: {
+    climateZone: string
+    frostDepthClass: string
+    humidityClass: string
+    regionNote: string
+  } | null
 }
 
 export interface CandidateResult {
@@ -173,6 +182,14 @@ function buildUserMessage(input: CandidateInput): string {
   if (input.clarifyingAnswers && input.clarifyingAnswers.length > 0) {
     lines.push('Answers to earlier clarifying questions:')
     for (const a of input.clarifyingAnswers) lines.push(`  - ${a.questionKey}: ${a.answerText.slice(0, 300)}`)
+  }
+  if (input.regionContext) {
+    lines.push('')
+    lines.push('REGION CONTEXT (from the visitor\'s ZIP, NOT from the photos — see reasoning rule 9):')
+    lines.push(`  climate zone: ${input.regionContext.climateZone}`)
+    lines.push(`  frost depth: ${input.regionContext.frostDepthClass}`)
+    lines.push(`  humidity: ${input.regionContext.humidityClass}`)
+    lines.push(`  note: ${input.regionContext.regionNote}`)
   }
   lines.push('')
   lines.push('Observations extracted from the photo set (type | location | condition | confidence | category):')

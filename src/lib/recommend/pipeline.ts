@@ -17,6 +17,7 @@
 
 import { prisma } from '@/lib/db'
 import { logEvent } from '@/lib/events/log'
+import { regionProfileForZip } from '@/lib/region/profile'
 import { runGate, exclusionLine } from './gate'
 import { generateCandidates } from './candidates'
 import { decideVerdicts } from './verdicts'
@@ -50,12 +51,16 @@ export async function runPipeline(input: PipelineInput): Promise<PipelineOutput>
   }
 
   // 2. Candidate generation (the one LLM step — no numbers, no verdicts).
+  // v7.4.7: optional ZIP resolves to a static region profile; region
+  // facts inform candidates but are never photo observations (rule 9).
+  const regionContext = input.zip ? regionProfileForZip(input.zip) : null
   const candidateResult = await generateCandidates({
     features: gate.features,
     tenure: input.tenure ?? null,
     userPrompt: input.userPrompt ?? null,
     photoCount: gate.includedPhotoCount,
     currentDate: new Date().toISOString().slice(0, 10),
+    regionContext,
   })
 
   // 3. Deterministic verdicts + dataset cost/rebate/citation enrichment.
@@ -80,6 +85,9 @@ export async function runPipeline(input: PipelineInput): Promise<PipelineOutput>
       excludedPhotoCount: gate.excludedPhotoCount,
       exclusionSummaryJson: gate.exclusionSummary as never,
       recencyFlagged: candidateResult.set.recency_conflict.detected,
+      zip: input.zip ?? null,
+      zipSource: input.zip ? 'UPLOAD_FORM' : null,
+      regionContextUsed: regionContext != null,
       modelVersion: RECOMMEND_MODEL,
       promptVersion: RECOMMEND_PROMPT_VERSION,
       rulesVersion: RULES_VERSION,

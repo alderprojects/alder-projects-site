@@ -1033,6 +1033,14 @@ model Report {
   // v7.4.5 admin console — QA review stamp
   reviewedAt      DateTime?
   reviewedBy      String? // admin email
+  // v7.4.7 — optional ZIP for regionalized synthesis. Serves the
+  // consumer's own read (regional accuracy); never required, never
+  // blocking. zipSource: "UPLOAD_FORM" | "POST_RESULT".
+  zip             String?
+  zipSource       String?
+  // True when synthesis ran with a regionContext block (i.e. zip was
+  // present and resolvable at candidate-generation time).
+  regionContextUsed Boolean @default(false)
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
   // delete-my-report control (bytes + rows cleanup handled by DeletionRequest)

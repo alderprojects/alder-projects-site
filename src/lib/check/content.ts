@@ -23,7 +23,7 @@ export const CHECK_FAQS = [
   },
   {
     q: 'Do I need an account to use Alder Check?',
-    a: 'No. Your first Alder Check report renders immediately after upload with no account, no ZIP code, and no signup form. An email address is only requested if you want to unlock the full set of recommendations beyond the first two, or to save your report.',
+    a: 'No. Your first Alder Check report renders immediately after upload with no account and no signup form — an optional ZIP sharpens regional accuracy but is never required. An email address is only requested if you want to unlock the full set of recommendations beyond the first two, or to save your report.',
   },
   {
     q: 'How does Alder know real costs and rebates?',

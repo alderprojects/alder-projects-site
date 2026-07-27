@@ -48,6 +48,7 @@ export default function CheckFlow({ initialFiles }: { initialFiles?: File[] }) {
   const [stage, setStage] = useState<Stage>('collect')
   const [slots, setSlots] = useState<Slot[]>([])
   const [context, setContext] = useState('')
+  const [zip, setZip] = useState('') // v7.4.7 — optional, never blocking
   const [error, setError] = useState<string | null>(null)
   const [stepIdx, setStepIdx] = useState(0)
 
@@ -55,8 +56,10 @@ export default function CheckFlow({ initialFiles }: { initialFiles?: File[] }) {
   const nextId = useRef(0)
   const startedRef = useRef(false)
   const contextRef = useRef('')
+  const zipRef = useRef('')
   const addInputRef = useRef<HTMLInputElement | null>(null)
   contextRef.current = context
+  zipRef.current = zip
 
   const uploadOne = useCallback(async (file: File, slotId: number) => {
     try {
@@ -100,6 +103,7 @@ export default function CheckFlow({ initialFiles }: { initialFiles?: File[] }) {
     startedRef.current = true
     const files = initialFiles ?? []
     fireFunnel('PHOTO_UPLOAD_STARTED', { source: 'check_flow', count: files.length })
+    fireFunnel('ZIP_PROMPT_SHOWN', { surface: 'upload_form' })
     addFiles(files)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
@@ -131,10 +135,17 @@ export default function CheckFlow({ initialFiles }: { initialFiles?: File[] }) {
       )
       if (snapshotIds.length === 0) throw new Error('No photos uploaded successfully — try again.')
 
+      // v7.4.7 — ZIP rides along only when it's a valid 5-digit value;
+      // anything else is omitted (optional, never blocking).
+      const zipValue = /^\d{5}$/.test(zipRef.current.trim()) ? zipRef.current.trim() : undefined
       const res = await fetch('/api/photos/recommend', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ snapshotIds: Array.from(new Set(snapshotIds)), userPrompt: contextRef.current.trim() || undefined }),
+        body: JSON.stringify({
+          snapshotIds: Array.from(new Set(snapshotIds)),
+          userPrompt: contextRef.current.trim() || undefined,
+          zip: zipValue,
+        }),
       })
       const json = await res.json()
       if (!json.ok) throw new Error(json.detail || json.error || 'report_failed')
@@ -264,9 +275,32 @@ export default function CheckFlow({ initialFiles }: { initialFiles?: File[] }) {
           borderRadius: 8,
           border: '1px solid rgba(31,61,43,0.2)',
           fontSize: 14,
-          marginBottom: 14,
+          marginBottom: 10,
         }}
       />
+
+      <div style={{ marginBottom: 14 }}>
+        <input
+          type="text"
+          inputMode="numeric"
+          maxLength={5}
+          value={zip}
+          onChange={(e) => setZip(e.target.value.replace(/[^\d]/g, ''))}
+          placeholder="ZIP (optional)"
+          aria-label="ZIP code (optional)"
+          style={{
+            width: 140,
+            padding: '10px 12px',
+            borderRadius: 8,
+            border: `1px solid ${zip && !/^\d{5}$/.test(zip) ? '#c08a7a' : 'rgba(31,61,43,0.2)'}`,
+            fontSize: 14,
+          }}
+        />
+        <p style={{ fontSize: 12, color: PALETTE.inkSoft, margin: '6px 0 0' }}>
+          Better accuracy for your region — frost depth, humidity, local codes and pricing.
+          {zip && !/^\d{5}$/.test(zip) ? ' Needs 5 digits (or leave it blank).' : ''}
+        </p>
+      </div>
 
       <div>
         <button onClick={() => void submit()} disabled={readyCount === 0} style={{ ...primaryBtn, opacity: readyCount === 0 ? 0.5 : 1 }}>

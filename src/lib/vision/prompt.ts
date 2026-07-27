@@ -45,7 +45,13 @@ import { z } from 'zod'
 // distributes examples across all 20 categories evenly, with an
 // explicit "be category-honest" instruction added to the system
 // prompt rules.
-export const OPEN_EXTRACTION_PROMPT_VERSION = 'open-v1.1.0'
+// v1.2.0 — v7.4.0: added the OPTIONAL `privacy` detection object
+// (people/faces/documents/readable screens/visible addresses) that the
+// recommendation pipeline's privacy gate reads to exclude photos before
+// analysis. Additive + optional: v1.1.0-shaped extractions still parse.
+// NOTE (working rule 4): re-run scripts/eval-vision.ts on the fixture
+// set before deploying — v7.4.4 wires this into the deploy gate.
+export const OPEN_EXTRACTION_PROMPT_VERSION = 'open-v1.2.0'
 
 // =============================================================================
 // CONTROLLED CATEGORY VOCABULARY
@@ -113,10 +119,25 @@ export const OpenFeatureSchema = z.object({
 
 export type OpenFeature = z.infer<typeof OpenFeatureSchema>
 
+/**
+ * v1.2.0 — privacy detection object. The engine sees more than it says:
+ * these flags drive the recommendation pipeline's pre-analysis exclusion
+ * gate ("1 photo excluded (person detected)"), and are never surfaced as
+ * observations. Optional so v1.1.0-shaped extractions still parse.
+ */
+export const PrivacySchema = z.object({
+  people_present: z.boolean().default(false),
+  faces_visible: z.boolean().default(false),
+  documents_visible: z.boolean().default(false),
+  readable_screens: z.boolean().default(false),
+  address_visible: z.boolean().default(false),
+})
+
 export const OpenExtractionSchema = z.object({
   features: z.array(OpenFeatureSchema).max(40), // sane upper bound
   overall_photo_category: CategoryEnum,
   notes: z.string().max(600).default(''),
+  privacy: PrivacySchema.optional(),
 })
 
 export type OpenExtraction = z.infer<typeof OpenExtractionSchema>
@@ -176,6 +197,8 @@ Surface the genuinely visible observations that match these categories:
 
 7. \`notes\` is short free text for things that don't fit the feature shape (e.g. "photo is very dark", "appears to be a partial wall section, full context unclear"). Can be empty.
 
+8. \`privacy\` is a detection object, always included: set \`people_present\` if any person or part of a person is visible, \`faces_visible\` if any face is identifiable, \`documents_visible\` if mail/paperwork with readable text is visible, \`readable_screens\` if a TV/monitor/phone shows readable content, \`address_visible\` if a street address or house number is legible. These are privacy gates, not observations — never describe a person, document, or screen content in \`features\` or \`notes\`.
+
 # Prohibitions
 
 Do NOT:
@@ -234,7 +257,14 @@ export const PROMPT_USER = `Analyze this photo and return a single JSON object m
     }
   ],
   "overall_photo_category": "${CATEGORY_VALUES.join(' | ')}",
-  "notes": "short free text or empty string"
+  "notes": "short free text or empty string",
+  "privacy": {
+    "people_present": false,
+    "faces_visible": false,
+    "documents_visible": false,
+    "readable_screens": false,
+    "address_visible": false
+  }
 }
 
 Return JSON only.`

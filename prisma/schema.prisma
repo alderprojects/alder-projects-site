@@ -976,6 +976,198 @@ model LearningStoreFeedback {
 }
 
 // =============================================================================
+// REPORT + RECOMMENDATION LAYER — v7.4.0 (brand: "Alder Check" in UI only;
+// internal naming stays report/recommendation per the naming rule)
+// =============================================================================
+//
+// Single-pass analysis, layered disclosure: the full-depth pipeline runs
+// once at report creation and persists BOTH the Check layer (verdicts)
+// and the Cart layer (CartCandidate rows). Disclosure tiers gate what
+// crosses the wire; nothing is recomputed between free and paid.
+
+model Report {
+  id              String    @id @default(cuid())
+  // Ownership mirrors the anon-first pattern on Project/Photo: anon-owned
+  // at creation, re-keyed to a User on email claim.
+  visitorAnonId   String?
+  userId          String?
+  projectId       String?
+  // Snapshot ids the batch analysis ran over (photo SET reasoning).
+  snapshotIds     String[]
+  // Check → Cart state machine. Every transition emits a funnel event.
+  status          String    @default("CHECK_ISSUED") // CHECK_ISSUED | CHECK_REFINED | CART_OFFERED | CART_BUILT
+  // Tenure fork — "own" | "rent" | null (unknown → first clarifying Q)
+  tenure          String?
+  // Optional one-line context the visitor typed at upload
+  userPrompt      String?
+  // Privacy gate output: how many photos were excluded pre-analysis and why
+  excludedPhotoCount Int    @default(0)
+  exclusionSummaryJson Json?
+  // Recency check: seasonal cues conflicted with upload date
+  recencyFlagged  Boolean   @default(false)
+  // Versioning for replay/eval
+  modelVersion    String
+  promptVersion   String
+  rulesVersion    String
+  // Full pipeline audit trail (prompt/response pairs) — v7.4.4 reads this
+  pipelineLogJson Json?
+  // Email-gate + upsell lifecycle
+  emailCapturedAt DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  // delete-my-report control (bytes + rows cleanup handled by DeletionRequest)
+  deletedAt       DateTime?
+
+  recommendations Recommendation[]
+  clarifyingAnswers ClarifyingAnswer[]
+  feedback        ReportFeedback[]
+
+  @@index([visitorAnonId])
+  @@index([userId])
+  @@index([projectId])
+  @@index([status, createdAt])
+}
+
+model Recommendation {
+  id               String   @id @default(cuid())
+  reportId         String
+  report           Report   @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  // Stable candidate key (snake_case, from the pipeline) — refinement
+  // re-runs match new results to existing rows by this key.
+  key              String?
+  verdict          String // "BUY" | "WAIT" | "SKIP" | "INVESTIGATE"
+  title            String
+  summary          String
+  // Evidence the user can see in their own photos — array of strings
+  visibleEvidenceJson Json
+  // Cost range only when supportable from the dataset; null otherwise
+  costLow          Int?
+  costHigh         Int?
+  benefitType      String // "cost_savings" | "comfort" | "safety" | "prevention" | "resale"
+  confidenceScore  Float
+  confidenceLabel  String // "high" | "medium" | "low"
+  assumptionsJson  Json // every assumption labeled
+  limitationsJson  Json
+  riskLevel        String // "none" | "low" | "pro_required"
+  clarifyingQuestionsJson Json // ≤3, only verdict/cart-changing ones
+  smartCartEligible Boolean @default(false)
+  nextAction       String
+  // Rebate with freshness: {program, amount, verifiedAt}. Render as
+  // "check current program" when verifiedAt > 120 days old.
+  rebateJson       Json?
+  // Provenance: [{guideSlug, guideTitle, verifiedAt}] resolved from the
+  // dataset entries used (v7.4.1c citation layer)
+  citationsJson    Json
+  // Disclosure tier for the rec as a whole: "free" (recs 1-2) | "email"
+  // (recs 3+). Element-level overrides (e.g. assumptions detail = email)
+  // live in disclosureOverridesJson.
+  disclosureTier   String   @default("free")
+  disclosureOverridesJson Json?
+  // Free-tier commerce surface: category-search affiliate link (never a SKU)
+  categorySearchQuery String?
+  sortOrder        Int      @default(0)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  cartCandidates   CartCandidate[]
+  clarifyingAnswers ClarifyingAnswer[]
+
+  @@index([reportId, sortOrder])
+  @@index([verdict])
+}
+
+model CartCandidate {
+  // Paid-tier cart artifact, computed in the SAME pipeline pass as the
+  // verdicts. recommendationId is REQUIRED — a cart line always refines
+  // a specific Check recommendation, never a detached shopping list.
+  id               String   @id @default(cuid())
+  recommendationId String
+  recommendation   Recommendation @relation(fields: [recommendationId], references: [id], onDelete: Cascade)
+  tier             String // "good" | "better" | "best" | "accessory"
+  productName      String
+  asin             String?
+  searchQuery      String // PA-API query used to find candidates
+  priceLow         Float?
+  priceHigh        Float?
+  availability     String   @default("unknown")
+  // "likely_fit" until a compatibility answer confirms; post-payment
+  // refinement flips to "confirmed_fit" or "removed" — never re-analysis.
+  fitStatus        String   @default("likely_fit") // "likely_fit" | "confirmed_fit" | "removed"
+  requiredSpecsJson Json // the specs that matter + why
+  quantity         Int      @default(1)
+  installDifficulty String? // "diy_easy" | "diy_moderate" | "hire_pro"
+  sortOrder        Int      @default(0)
+  // PA-API staleness: prices re-fetched when the cart is opened
+  lastPricedAt     DateTime?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@index([recommendationId, tier])
+}
+
+model ClarifyingAnswer {
+  id               String    @id @default(cuid())
+  reportId         String
+  report           Report    @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  // Null for report-level questions (tenure, recency); set when the
+  // question refines a specific recommendation. Answers persist here and
+  // pre-fill Smart Cart compatibility questions — never re-asked.
+  recommendationId String?
+  recommendation   Recommendation? @relation(fields: [recommendationId], references: [id], onDelete: Cascade)
+  questionKey      String // stable key, e.g. "tenure", "fan_duct_size"
+  questionText     String
+  answerText       String
+  // Bidirectional continuum: did this answer change a verdict?
+  verdictChanged   Boolean   @default(false)
+  changeSummaryJson Json?
+  answeredAt       DateTime  @default(now())
+
+  @@unique([reportId, recommendationId, questionKey])
+  @@index([reportId])
+}
+
+model ReportFeedback {
+  id        String   @id @default(cuid())
+  reportId  String
+  report    Report   @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  anonId    String?
+  useful    Boolean
+  reason    String? // optional picklist value
+  createdAt DateTime @default(now())
+
+  @@index([reportId])
+}
+
+model DeletionRequest {
+  // The working delete-my-report control. Deletes Report rows AND photo
+  // bytes (Blob) for the report's snapshots.
+  id          String    @id @default(cuid())
+  reportId    String?
+  anonId      String?
+  email       String?
+  status      String    @default("pending") // "pending" | "completed" | "failed"
+  requestedAt DateTime  @default(now())
+  completedAt DateTime?
+  detailJson  Json?
+
+  @@index([status, requestedAt])
+}
+
+model CategoryObservation {
+  // v7.4.1c flywheel logging: anonymized per-report category observations.
+  // Nightly cron aggregates counts; published figures change only with
+  // human review. No FK to Report — anonymized by design.
+  id            String   @id @default(cuid())
+  category      String
+  conditionBand String // "good" | "fair" | "poor" | "unknown"
+  region        String   @default("VT")
+  verdict       String
+  createdAt     DateTime @default(now())
+
+  @@index([category, createdAt])
+}
+
+// =============================================================================
 // END OF SCHEMA
 // =============================================================================
 //

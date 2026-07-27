@@ -1,0 +1,54 @@
+{
+  "_readme": "Fixture manifest for scripts/eval-photos.ts (npm run check:eval). Each group runs one full report cycle against a running dev server. Drop the 5 founder fixture photos into the paths below and flip their groups to enabled:true — no code changes needed. Per-photo expectations: expected_category (extraction overall_photo_category), expect_privacy_person. Group expectations: expect_all_excluded, expect_min_recs, expect_verdicts_include, expect_recency_question, expect_tenure_question, answers (posted after the report renders).",
+  "groups": [
+    {
+      "name": "pexels-3room-baseline",
+      "enabled": true,
+      "photos": [
+        { "path": "test-photos/living_room/pexels-living-room.jpg", "_note": "ambiguous: tiled corner w/ radiator + island + corridor — honest reads include hallway/kitchen/mixed (verified by eye 2026-07-27)", "expected_category": ["living_area", "mixed", "unclear", "hallway_or_stair", "kitchen"] },
+        { "path": "test-photos/kitchen/pexels-old-kitchen.jpg" },
+        { "path": "test-photos/basement/pexels-basement.jpg", "expected_category": ["basement", "unclear"] }
+      ],
+      "expect_min_recs": 3,
+      "expect_tenure_question": true,
+      "answers": [{ "questionKey": "tenure", "answerText": "rent" }]
+    },
+    {
+      "name": "pexels-person-exclusion",
+      "enabled": true,
+      "photos": [
+        { "path": "test-photos/kitchen/pexels-person-in-kitchen.jpg", "expect_privacy_person": true }
+      ],
+      "expect_all_excluded": true
+    },
+    {
+      "name": "founder-lake-house",
+      "enabled": false,
+      "_note": "FOUNDER FIXTURES 1-3: VT lake home (fresh reno, move-in signals, hydronic heat, aging fridge). Drop the photos in and enable.",
+      "photos": [
+        { "path": "test-photos/living_room/founder-lake-living.jpg" },
+        { "path": "test-photos/kitchen/founder-lake-kitchen.jpg" },
+        { "path": "test-photos/laundry/founder-lake-utility.jpg" }
+      ],
+      "expect_min_recs": 4,
+      "expect_verdicts_include": ["BUY", "WAIT"],
+      "expect_tenure_question": true
+    },
+    {
+      "name": "founder-nyc-person",
+      "enabled": false,
+      "_note": "FOUNDER FIXTURE 4: NYC photo with person — expect exclusion.",
+      "photos": [{ "path": "test-photos/living_room/founder-nyc-person.jpg", "expect_privacy_person": true }],
+      "expect_all_excluded": true
+    },
+    {
+      "name": "founder-nyc-holiday",
+      "enabled": false,
+      "_note": "FOUNDER FIXTURE 5: NYC living room with holiday decor — expect recency question + tenure question + rent-safe recs.",
+      "photos": [{ "path": "test-photos/living_room/founder-nyc-holiday.jpg" }],
+      "expect_recency_question": true,
+      "expect_tenure_question": true,
+      "answers": [{ "questionKey": "tenure", "answerText": "rent" }]
+    }
+  ]
+}

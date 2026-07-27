@@ -1,0 +1,999 @@
+[
+  {
+    "category": "basement_moisture",
+    "item": "Basement encapsulation system (skip-list \u2014 usually overkill)",
+    "costLow": 8000,
+    "costHigh": 15000,
+    "rebate": null,
+    "paybackNotes": "Skip before knowing the moisture source; often replaces a ~$300 downspout+grading fix. Interior French drain systems $5,000-12,000 also flagged as skip before exterior fixes. Whole-house dehumidifiers $2,500-4,500 installed flagged as skip when a $300 portable handles 90% of VT basements.",
+    "region": "VT",
+    "sourceGuideSlug": "basement-buy-skip-wait",
+    "verifiedAt": "2026-05-13"
+  },
+  {
+    "category": "basement_moisture",
+    "item": "Basement finishing, 800-1,200 sq ft typical project",
+    "costLow": 20000,
+    "costHigh": 50000,
+    "rebate": null,
+    "paybackNotes": "Only works if basement stays dry \u2014 60% humidity is the mold-growth threshold (EPA / VT DoH). Cost-reality guide: $30-80/sq ft, 600 sq ft = $18,000-48,000.",
+    "region": "VT",
+    "sourceGuideSlug": "before-finishing-basement-moisture-checks-vermont",
+    "verifiedAt": "2026-05-10"
+  },
+  {
+    "category": "basement_moisture",
+    "item": "Basement moisture-prep diagnostic kit (hygrometer, moisture meter, water alarms, dehumidifier, mold test)",
+    "costLow": 80,
+    "costHigh": 300,
+    "rebate": null,
+    "paybackNotes": "Run 30+ days including a wet stretch. Components: WiFi hygrometer $30-80; moisture meter $40-80; water alarms $15-50 battery / $40-80 WiFi; mold screening kit $20-50. Humidity-fix kit (dehumidifier + rim joist sealing) $250-600.",
+    "region": "VT",
+    "sourceGuideSlug": "before-finishing-basement-moisture-checks-vermont",
+    "verifiedAt": "2026-05-10"
+  },
+  {
+    "category": "basement_moisture",
+    "item": "Certified mold inspection",
+    "costLow": 250,
+    "costHigh": 500,
+    "rebate": null,
+    "paybackNotes": "Visible mold over ~10 sq ft is professional remediation territory per EPA guidance.",
+    "region": "VT",
+    "sourceGuideSlug": "before-finishing-basement-moisture-checks-vermont",
+    "verifiedAt": "2026-05-10"
+  },
+  {
+    "category": "basement_moisture",
+    "item": "Cheap basement diagnostic (hygrometer + wood moisture meter)",
+    "costLow": 40,
+    "costHigh": 40,
+    "rebate": null,
+    "paybackNotes": "Hygrometer $15-20 + wood moisture meter $15-25. Thresholds: over 60% sustained humidity = active moisture problem; over 18% wood moisture = rot risk. 'Prevents the most common $30,000 mistake in Vermont home renovation.'",
+    "region": "VT",
+    "sourceGuideSlug": "basement-buy-skip-wait",
+    "verifiedAt": "2026-05-13"
+  },
+  {
+    "category": "basement_moisture",
+    "item": "Dehumidifier, 50-pint, continuous drain (permanent infrastructure for finished VT basement)",
+    "costLow": null,
+    "costHigh": null,
+    "rebate": null,
+    "paybackNotes": "Operating cost ~$15-25/month in summer, less in winter. Basement-buy-skip-wait guide prices a 50-70 pint unit at $200-450; fall (October) model-year sales bring 25-40% discounts.",
+    "region": "VT",
+    "sourceGuideSlug": "before-finishing-basement-moisture-checks-vermont",
+    "verifiedAt": "2026-05-10"
+  },
+  {
+    "category": "basement_moisture",
+    "item": "Egress window install (required for basement bedroom use)",
+    "costLow": 2000,
+    "costHigh": 5000,
+    "rebate": null,
+    "paybackNotes": "Basement bathroom rough-in addition: $5,000-12,000. Moisture mitigation before finishing: $1,500-8,000.",
+    "region": "VT",
+    "sourceGuideSlug": "vermont-home-project-cost-reality-2026",
+    "verifiedAt": "2026-05-13"
+  },
+  {
+    "category": "basement_moisture",
+    "item": "Foundation drainage repair (interior/exterior perimeter drain, sump pump, crack repair)",
+    "costLow": 3000,
+    "costHigh": 15000,
+    "rebate": null,
+    "paybackNotes": "Required when basement takes active water during storms or snowmelt; not a DIY-kit problem.",
+    "region": "VT",
+    "sourceGuideSlug": "before-finishing-basement-moisture-checks-vermont",
+    "verifiedAt": "2026-05-10"
+  },
+  {
+    "category": "basement_moisture",
+    "item": "Surface-water fixes: downspout extensions + regrading",
+    "costLow": 10,
+    "costHigh": 200,
+    "rebate": null,
+    "paybackNotes": "Downspout extensions $10-25 each (discharge 6+ feet from foundation); perimeter grading fix often a $200 weekend with a shovel (slope away 6 inches in first 10 feet). Guide: half of wet-basement problems are surface water. Crawlspace 6-mil poly vapor barrier: $1-2/sq ft.",
+    "region": "VT",
+    "sourceGuideSlug": "basement-buy-skip-wait",
+    "verifiedAt": "2026-05-13"
+  },
+  {
+    "category": "deck",
+    "item": "Composite deck, installed",
+    "costLow": 15000,
+    "costHigh": 40000,
+    "rebate": null,
+    "paybackNotes": "Mid-size composite with aluminum railing and stairs: $18,000-28,000; premium with hidden fasteners/lighting/multi-level: $35,000-40,000. Railing adds $80-150 per linear foot; hidden fastener systems add $1,000-2,500. Composite carries 25-30 year warranties. Cost-reality guide: composite $60-85/sq ft, cedar $50-65/sq ft.",
+    "region": "VT",
+    "sourceGuideSlug": "how-much-does-a-deck-cost-vermont",
+    "verifiedAt": "2026-05-03"
+  },
+  {
+    "category": "deck",
+    "item": "Deck build per square foot (200 sq ft deck = $6,000-16,000)",
+    "costLow": 6000,
+    "costHigh": 16000,
+    "rebate": null,
+    "paybackNotes": "$30-80/sq ft. Drivers: material, height over 30 inches (requires more structure/engineering review), freestanding vs attached. Footings must go below frost depth (typically 48-60 inches in VT).",
+    "region": "VT",
+    "sourceGuideSlug": "vermont-home-project-cost-reality-2026",
+    "verifiedAt": "2026-05-13"
+  },
+  {
+    "category": "deck",
+    "item": "Pressure-treated wood deck, installed",
+    "costLow": 8000,
+    "costHigh": 18000,
+    "rebate": null,
+    "paybackNotes": "Basic 10x16 with simple stairs: $8,000-12,000. PT decks last 15-25 years with maintenance. Cost-reality guide: PT at $30-40/sq ft.",
+    "region": "VT",
+    "sourceGuideSlug": "how-much-does-a-deck-cost-vermont",
+    "verifiedAt": "2026-05-03"
+  },
+  {
+    "category": "drafts_weatherization",
+    "item": "Attic cellulose blow-in to R-49 (from typical R-19/R-30)",
+    "costLow": 1500,
+    "costHigh": 3500,
+    "rebate": null,
+    "paybackNotes": "Vermont attic R-value target R-49 to R-60.",
+    "region": "VT",
+    "sourceGuideSlug": "vermont-weatherization-evt-rebate",
+    "verifiedAt": "2026-05-03"
+  },
+  {
+    "category": "drafts_weatherization",
+    "item": "Comprehensive retrofit rebate stack, income-eligible tier (full retrofit, GMP territory)",
+    "costLow": 20000,
+    "costHigh": 25000,
+    "rebate": {
+      "program": "EVT ducted + fuel-switching + electrical + weatherization 90% + GMP $2,000/condenser + EVT heat pump water heater",
+      "amount": "$11,100-14,700 total stack",
+      "verifiedAt": "2026-04-15"
+    },
+    "paybackNotes": "Out-of-pocket: $5,300-13,900. Standard vs income-eligible tiers are mutually exclusive.",
+    "region": "VT",
+    "sourceGuideSlug": "vermont-rebate-stack-2026",
+    "verifiedAt": "2026-05-03"
+  },
+  {
+    "category": "drafts_weatherization",
+    "item": "Comprehensive retrofit rebate stack, standard tier (heat pump + weatherization + electrical, GMP territory)",
+    "costLow": 20000,
+    "costHigh": 22000,
+    "rebate": {
+      "program": "EVT ducted + EVT fuel-switching + EVT electrical service upgrade + EVT weatherization 75%",
+      "amount": "$6,600-8,600 total stack",
+      "verifiedAt": "2026-04-15"
+    },
+    "paybackNotes": "Out-of-pocket on $20,000-22,000 combined project: $11,400-15,400. Verified April 2026 per guide.",
+    "region": "VT",
+    "sourceGuideSlug": "vermont-rebate-stack-2026",
+    "verifiedAt": "2026-05-03"
+  },
+  {
+    "category": "drafts_weatherization",
+    "item": "DIY storm window insert kit (magnetic/friction-fit acrylic), per window",
+    "costLow": 30,
+    "costHigh": 50,
+    "rebate": null,
+    "paybackNotes": "Same-day at hardware stores. Lifespan 3-5 years; magnetic strips can fail. Typically no EVT rebate (not a qualifying product class). Thermal R-value improvement similar across WindowDressers/Indow/DIY.",
+    "region": "VT",
+    "sourceGuideSlug": "windowdressers-vs-indow-vs-diy-window-inserts-vermont",
+    "verifiedAt": "2026-05-13"
+  },
+  {
+    "category": "drafts_weatherization",
+    "item": "DIY weatherization materials (caulk, weatherstripping, foam sealant, attic hatch kits)",
+    "costLow": 200,
+    "costHigh": 300,
+    "rebate": {
+      "program": "EVT DIY weatherization rebate",
+      "amount": "$100 cash back on materials; submit receipts within 90 days of purchase",
+      "verifiedAt": "2026-04-15"
+    },
+    "paybackNotes": "Only rebate in the program not paid through a contractor.",
+    "region": "VT",
+    "sourceGuideSlug": "vermont-weatherization-evt-rebate",
+    "verifiedAt": "2026-05-03"
+  },
+  {
+    "category": "drafts_weatherization",
+    "item": "EVT energy audit (blower-door test)",
+    "costLow": 300,
+    "costHigh": 500,
+    "rebate": {
+      "program": "Efficiency Vermont",
+      "amount": "Often free for income-eligible households",
+      "verifiedAt": "2026-04-15"
+    },
+    "paybackNotes": "Produces scope of work and rebate-eligibility map; informs heat pump sizing.",
+    "region": "VT",
+    "sourceGuideSlug": "vermont-weatherization-evt-rebate",
+    "verifiedAt": "2026-05-03"
+  },
+  {
+    "category": "drafts_weatherization",
+    "item": "Historic wood-sash window restoration with custom storm inserts, per window",
+    "costLow": 400,
+    "costHigh": 800,
+    "rebate": null,
+    "paybackNotes": "vs. $1,200-1,800 for like-for-like custom replacement. Right choice for pre-1900 homes.",
+    "region": "VT",
+    "sourceGuideSlug": "window-film-vs-replacement-vermont",
+    "verifiedAt": "2026-05-10"
+  },
+  {
+    "category": "drafts_weatherization",
+    "item": "Indow custom acrylic window insert, per window installed",
+    "costLow": 300,
+    "costHigh": 500,
+    "rebate": {
+      "program": "Efficiency Vermont",
+      "amount": "Limited EVT rebate support, varies by program year",
+      "verifiedAt": "2026-05-13"
+    },
+    "paybackNotes": "4-8 week lead time. Lifespan 10-15 years; replacement silicone edges available. 8-window farmhouse: $2,400-4,000.",
+    "region": "VT",
+    "sourceGuideSlug": "windowdressers-vs-indow-vs-diy-window-inserts-vermont",
+    "verifiedAt": "2026-05-13"
+  },
+  {
+    "category": "drafts_weatherization",
+    "item": "Pre-replacement weatherization spend (diagnostic-first, per-house)",
+    "costLow": 200,
+    "costHigh": 485,
+    "rebate": null,
+    "paybackNotes": "Cost-reality guide window section: 'Pre-weatherization spend before deciding: $200-485 typical.' If after one season of ~$200 in fixes windows are still cold, replacement is the right call.",
+    "region": "VT",
+    "sourceGuideSlug": "vermont-home-project-cost-reality-2026",
+    "verifiedAt": "2026-05-13"
+  },
+  {
+    "category": "drafts_weatherization",
+    "item": "Wall insulation upgrade, typical 2,000 sq ft home (dense-pack cellulose)",
+    "costLow": 4000,
+    "costHigh": 9000,
+    "rebate": null,
+    "paybackNotes": "Longer payback than attic/rim-joist scope per guide.",
+    "region": "VT",
+    "sourceGuideSlug": "vermont-weatherization-evt-rebate",
+    "verifiedAt": "2026-05-03"
+  },
+  {
+    "category": "drafts_weatherization",
+    "item": "Weatherization payback period (typical scope, energy savings alone)",
+    "costLow": null,
+    "costHigh": null,
+    "rebate": null,
+    "paybackNotes": "3-7 years on energy savings alone for typical scopes \u2014 faster than nearly any other US state due to 7,500-8,500 annual heating degree days. Weatherizing before heat pump makes sizing math 15-25% cheaper.",
+    "region": "VT",
+    "sourceGuideSlug": "vermont-weatherization-evt-rebate",
+    "verifiedAt": "2026-05-03"
+  },
+  {
+    "category": "drafts_weatherization",
+    "item": "Whole-home weatherization (air sealing + insulation), project scope",
+    "costLow": 4000,
+    "costHigh": 18000,
+    "rebate": {
+      "program": "EVT Home Performance with ENERGY STAR \u2014 standard tier",
+      "amount": "75% of project cost; total out-of-pocket after rebate runs $1,000-4,500 standard tier",
+      "verifiedAt": "2026-04-15"
+    },
+    "paybackNotes": "From facts.ts single-source-of-truth ('vt-cost-weatherization-whole-home', verified 2026-04-15), referenced by weatherization and rebate-stack guides via factIds.",
+    "region": "VT",
+    "sourceGuideSlug": "vermont-weatherization-evt-rebate",
+    "verifiedAt": "2026-04-15"
+  },
+  {
+    "category": "drafts_weatherization",
+    "item": "Whole-project weatherization, EVT income-eligible tier (90% of project cost)",
+    "costLow": null,
+    "costHigh": null,
+    "rebate": {
+      "program": "EVT income-eligible weatherization",
+      "amount": "90% of project cost; stacked rebates cap around $16,700; qualifying threshold 80% AMI",
+      "verifiedAt": "2026-04-15"
+    },
+    "paybackNotes": "Example: $6,000 scope \u2192 $600 out-of-pocket. $18,000 deep retrofit \u2192 rebate ~$16,700 capped, out-of-pocket $1,300.",
+    "region": "VT",
+    "sourceGuideSlug": "vermont-weatherization-evt-rebate",
+    "verifiedAt": "2026-05-03"
+  },
+  {
+    "category": "drafts_weatherization",
+    "item": "Whole-project weatherization, EVT standard tier (75% of project cost)",
+    "costLow": null,
+    "costHigh": null,
+    "rebate": {
+      "program": "EVT Home Performance with ENERGY STAR \u2014 standard tier",
+      "amount": "75% of project cost; stacked rebates cap around $7,700",
+      "verifiedAt": "2026-04-15"
+    },
+    "paybackNotes": "Example: $6,000 scope \u2192 $4,500 paid by EVT to contractor, $1,500 out-of-pocket. $12,000 full scope hits ~$7,700 cap, out-of-pocket $4,300. Rebate paid to contractor, not homeowner.",
+    "region": "VT",
+    "sourceGuideSlug": "vermont-weatherization-evt-rebate",
+    "verifiedAt": "2026-05-03"
+  },
+  {
+    "category": "drafts_weatherization",
+    "item": "Window draft-fix core cart (V-strip, film, caulk, door sweep)",
+    "costLow": 70,
+    "costHigh": 115,
+    "rebate": null,
+    "paybackNotes": "Optional add-ons push to $255-485. Components: weatherstripping $15-35/pack (V-strip/silicone lasts 5-10 years; foam crushes in 3 months); shrink film $15/kit covers 3-5 windows; caulk $10-20; door-bottom sweep $8-25; storm insert kit ~$30-50/window. Handles a typical VT farmhouse for 1-2 winters.",
+    "region": "VT",
+    "sourceGuideSlug": "windows-buy-skip-wait",
+    "verifiedAt": "2026-05-13"
+  },
+  {
+    "category": "drafts_weatherization",
+    "item": "Window weatherization kit (film + weatherstripping + sash caulk + draft control)",
+    "costLow": 80,
+    "costHigh": 220,
+    "rebate": null,
+    "paybackNotes": "Closes 70-90% of air leakage on a leaky pre-1990 window; buys 5-10 more years on many windows. Air-leak fixes pay back in one winter on most pre-1990 homes (7,500-8,500 HDD). Per-window materials: $20-60 air-leak fix; film $15-80; interior storm inserts $200-400.",
+    "region": "VT",
+    "sourceGuideSlug": "window-film-vs-replacement-vermont",
+    "verifiedAt": "2026-05-10"
+  },
+  {
+    "category": "drafts_weatherization",
+    "item": "Window weatherization seasonal savings",
+    "costLow": null,
+    "costHigh": null,
+    "rebate": {
+      "program": "Efficiency Vermont / Community Action Partnership (CAP) agencies",
+      "amount": "EVT incentives for ENERGY STAR-qualified window replacement; income-eligible weatherization assistance via CAP; guide claims stacking with federal IRA 25C credits",
+      "verifiedAt": "2026-05-13"
+    },
+    "paybackNotes": "Guide: drafty windows can account for 10-25% of a VT heating bill (attributed to EVT); honest weatherization commonly cuts draft loss 50-70% for a season = $200-800 saved per winter. STALE-DATE CAVEAT: the 25C stacking claim conflicts with topic guides stating 25C expired Dec 31, 2025. Timing: window kits drop 30-40% in March-April clearance.",
+    "region": "VT",
+    "sourceGuideSlug": "windows-buy-skip-wait",
+    "verifiedAt": "2026-05-13"
+  },
+  {
+    "category": "drafts_weatherization",
+    "item": "WindowDressers community-built interior storm window insert, per insert",
+    "costLow": 40,
+    "costHigh": 40,
+    "rebate": {
+      "program": "Efficiency Vermont",
+      "amount": "EVT rebate support \u2014 qualifying installations get incentive (amount not stated)",
+      "verifiedAt": "2026-05-13"
+    },
+    "paybackNotes": "~$40 per insert at the community build. 4-6 month lead time (sign up summer for November build). Lasts 10+ years with seasonal removal and flat storage.",
+    "region": "VT",
+    "sourceGuideSlug": "windowdressers-vs-indow-vs-diy-window-inserts-vermont",
+    "verifiedAt": "2026-05-13"
+  },
+  {
+    "category": "heat_pump_heating",
+    "item": "Cold-climate heat pump (Efficiency Vermont rebate, per heat pump)",
+    "costLow": null,
+    "costHigh": null,
+    "rebate": {
+      "program": "Efficiency Vermont",
+      "amount": "$800 to $2,000 per cold-climate heat pump",
+      "verifiedAt": "2026-05-03"
+    },
+    "paybackNotes": "Must use a participating contractor; application within 90 days. Applies to both primary and secondary homes. NOTE: conflicts with newer topic guides that state a flat $2,200 ducted / $475-per-head ductless structure \u2014 this guide's figure appears to be older program framing.",
+    "region": "VT",
+    "sourceGuideSlug": "heat-pump-rebates-vermont",
+    "verifiedAt": "2026-05-03"
+  },
+  {
+    "category": "heat_pump_heating",
+    "item": "Ducted cold-climate heat pump, single whole-house system, installed",
+    "costLow": 11000,
+    "costHigh": 22000,
+    "rebate": {
+      "program": "EVT ducted heat pump rebate",
+      "amount": "$2,200 per system, paid by EVT to participating contractor at job completion",
+      "verifiedAt": "2026-04-15"
+    },
+    "paybackNotes": "Statewide median; resort-tier towns reach $14,000-28,000. Verified April 2026 per guide.",
+    "region": "VT",
+    "sourceGuideSlug": "vermont-heat-pump-rebate-stack-2026",
+    "verifiedAt": "2026-05-03"
+  },
+  {
+    "category": "heat_pump_heating",
+    "item": "Ductless heat pump indoor head (EVT rebate, per head)",
+    "costLow": null,
+    "costHigh": null,
+    "rebate": {
+      "program": "EVT ductless heat pump rebate",
+      "amount": "$475 per indoor head; a 3-head system = $1,425",
+      "verifiedAt": "2026-04-15"
+    },
+    "paybackNotes": "Multiple heads stack within program rules.",
+    "region": "VT",
+    "sourceGuideSlug": "vermont-heat-pump-rebate-stack-2026",
+    "verifiedAt": "2026-05-03"
+  },
+  {
+    "category": "heat_pump_heating",
+    "item": "Ductwork retrofit in old home (heat pump cost driver)",
+    "costLow": 4000,
+    "costHigh": 8000,
+    "rebate": null,
+    "paybackNotes": "Other drivers: tight installs requiring custom refrigerant line routing $1,000-3,000.",
+    "region": "VT",
+    "sourceGuideSlug": "vermont-heat-pump-rebate-stack-2026",
+    "verifiedAt": "2026-05-03"
+  },
+  {
+    "category": "heat_pump_heating",
+    "item": "Electrical service/panel upgrade tied to electrification",
+    "costLow": 3000,
+    "costHigh": 7500,
+    "rebate": {
+      "program": "EVT electrical service upgrade",
+      "amount": "$500; requires a paired heat pump or EV charger install",
+      "verifiedAt": "2026-04-15"
+    },
+    "paybackNotes": "Cost range is the 'old wiring requiring service upgrade' driver cited in the same guide. Standalone panel upgrades don't get the rebate.",
+    "region": "VT",
+    "sourceGuideSlug": "vermont-heat-pump-rebate-stack-2026",
+    "verifiedAt": "2026-05-03"
+  },
+  {
+    "category": "heat_pump_heating",
+    "item": "Federal Section 25C credit on heat pumps (status)",
+    "costLow": null,
+    "costHigh": null,
+    "rebate": null,
+    "paybackNotes": "2026 stack is EVT + utility-side bonus only. Section 25D (30%, still active) applies to solar PV + battery, not heat pumps. [Federal 25C credit expired Dec 31, 2025 per 2026 rebate-stack guides \u2014 no longer counted as a rebate.]",
+    "region": "VT",
+    "sourceGuideSlug": "vermont-heat-pump-rebate-stack-2026",
+    "verifiedAt": "2026-05-03"
+  },
+  {
+    "category": "heat_pump_heating",
+    "item": "GMP income-eligible heat pump bonus (per condenser)",
+    "costLow": null,
+    "costHigh": null,
+    "rebate": {
+      "program": "Utility-side bonus (GMP only) \u2014 Green Mountain Power",
+      "amount": "$2,000 per condenser for income-eligible customers (household at or below 80% AMI)",
+      "verifiedAt": "2026-04-15"
+    },
+    "paybackNotes": "Chittenden County 3-person 80% AMI around $96,750 (2026); most rural counties run 15-25% lower.",
+    "region": "VT",
+    "sourceGuideSlug": "vermont-heat-pump-rebate-stack-2026",
+    "verifiedAt": "2026-05-03"
+  },
+  {
+    "category": "heat_pump_heating",
+    "item": "Heat pump installation, all configurations, before rebates",
+    "costLow": 4500,
+    "costHigh": 30000,
+    "rebate": null,
+    "paybackNotes": "Single-zone ductless $3,000-6,000; multi-zone whole-home (3-5 zones) $12,000-30,000; ducted central $8,000-18,000. STALE-DATE CAVEAT: 25C claim conflicts with rebate-stack topic guides (25C expired Dec 31, 2025); EVT amount also disagrees with the flat $2,200/$475 structure in the 2026 topic guides. [Federal 25C credit expired Dec 31, 2025 per 2026 rebate-stack guides \u2014 no longer counted as a rebate.]",
+    "region": "VT",
+    "sourceGuideSlug": "vermont-home-project-cost-reality-2026",
+    "verifiedAt": "2026-05-13"
+  },
+  {
+    "category": "heat_pump_heating",
+    "item": "Heat pump water heater, installed",
+    "costLow": 2500,
+    "costHigh": 4500,
+    "rebate": {
+      "program": "EVT heat pump water heater",
+      "amount": "$600; stacks with heat pump install; self-install allowed with electrician permit",
+      "verifiedAt": "2026-04-15"
+    },
+    "paybackNotes": "Net after $600 EVT rebate: $1,900-3,900.",
+    "region": "VT",
+    "sourceGuideSlug": "vermont-heat-pump-rebate-stack-2026",
+    "verifiedAt": "2026-05-03"
+  },
+  {
+    "category": "heat_pump_heating",
+    "item": "Multi-zone ductless heat pump (2-3 rooms), installed",
+    "costLow": 7000,
+    "costHigh": 12000,
+    "rebate": null,
+    "paybackNotes": null,
+    "region": "VT",
+    "sourceGuideSlug": "heat-pump-rebates-vermont",
+    "verifiedAt": "2026-05-03"
+  },
+  {
+    "category": "heat_pump_heating",
+    "item": "Oil-to-electric fuel switch (removing oil furnace/boiler as primary heat)",
+    "costLow": null,
+    "costHigh": null,
+    "rebate": {
+      "program": "EVT fuel-switching bonus",
+      "amount": "$400, on top of the ducted rebate; documentation of fuel switch required",
+      "verifiedAt": "2026-04-15"
+    },
+    "paybackNotes": null,
+    "region": "VT",
+    "sourceGuideSlug": "vermont-heat-pump-rebate-stack-2026",
+    "verifiedAt": "2026-05-03"
+  },
+  {
+    "category": "heat_pump_heating",
+    "item": "Single-zone ductless mini-split, installed",
+    "costLow": 3500,
+    "costHigh": 5500,
+    "rebate": null,
+    "paybackNotes": "Guide: 'For most seasonal homes, one or two single-zone units in the main living area and primary bedroom is the sweet spot. After rebates: $2,000 to $4,000.'",
+    "region": "VT",
+    "sourceGuideSlug": "heat-pump-rebates-vermont",
+    "verifiedAt": "2026-05-03"
+  },
+  {
+    "category": "heat_pump_heating",
+    "item": "Standard-tier heat pump stack, GMP territory, oil-to-electric, single ducted",
+    "costLow": 14000,
+    "costHigh": 16000,
+    "rebate": {
+      "program": "EVT ducted + EVT fuel-switching + EVT electrical service upgrade",
+      "amount": "$3,100 total ($2,200 + $400 + $500)",
+      "verifiedAt": "2026-04-15"
+    },
+    "paybackNotes": "Out-of-pocket: $11,000-13,000. Income-eligible GMP adds $2,000 \u2192 total $5,100, out-of-pocket $9,000-11,000.",
+    "region": "VT",
+    "sourceGuideSlug": "vermont-heat-pump-rebate-stack-2026",
+    "verifiedAt": "2026-05-03"
+  },
+  {
+    "category": "heat_pump_heating",
+    "item": "Typical $4,500 mini-split install, stacked incentives example",
+    "costLow": 4500,
+    "costHigh": 4500,
+    "rebate": null,
+    "paybackNotes": "STALE-DATE CAVEAT: this guide treats the federal 25C credit (30% up to $2,000/yr) as active; the 2026 topic guides state 25C expired December 31, 2025. [Federal 25C credit expired Dec 31, 2025 per 2026 rebate-stack guides \u2014 no longer counted as a rebate.]",
+    "region": "VT",
+    "sourceGuideSlug": "heat-pump-rebates-vermont",
+    "verifiedAt": "2026-05-03"
+  },
+  {
+    "category": "heat_pump_heating",
+    "item": "VPPSA member-utility income-eligible heat pump bonus (per condenser)",
+    "costLow": null,
+    "costHigh": null,
+    "rebate": {
+      "program": "Utility-side bonus (VPPSA member utilities)",
+      "amount": "$1,000 per condenser for income-eligible customers",
+      "verifiedAt": "2026-04-15"
+    },
+    "paybackNotes": "VPPSA towns: Hyde Park, Stowe, Northfield, Ludlow, Lyndonville, Hardwick, Morrisville, Enosburg, Swanton, Barton, Jacksonville, Johnson, Orleans, Readsboro. BED (Burlington) does NOT stack this way.",
+    "region": "VT",
+    "sourceGuideSlug": "vermont-heat-pump-rebate-stack-2026",
+    "verifiedAt": "2026-05-03"
+  },
+  {
+    "category": "kitchen",
+    "item": "Cabinet refinishing supplies (vs door replacement)",
+    "costLow": 150,
+    "costHigh": 250,
+    "rebate": null,
+    "paybackNotes": "New cabinet doors run $80-200 per door installed \u2014 $2,000-5,000 for a 25-door kitchen. Refinishing the same set: $150-300 in materials and a weekend, looks 90% as good.",
+    "region": "VT",
+    "sourceGuideSlug": "kitchen-refresh-buy-skip-wait",
+    "verifiedAt": "2026-05-13"
+  },
+  {
+    "category": "kitchen",
+    "item": "Kitchen cosmetic refresh, DIY materials (no cabinets, no structural)",
+    "costLow": 400,
+    "costHigh": 1500,
+    "rebate": null,
+    "paybackNotes": "Contractor version of same scope: $3,000-8,000.",
+    "region": "VT",
+    "sourceGuideSlug": "vermont-home-project-cost-reality-2026",
+    "verifiedAt": "2026-05-13"
+  },
+  {
+    "category": "kitchen",
+    "item": "Kitchen full gut renovation (custom cabinetry, structural changes)",
+    "costLow": 60000,
+    "costHigh": 120000,
+    "rebate": null,
+    "paybackNotes": "$120,000+ open-ended top. 3-5 months demolition to punch list. Older VT homes often add code-update work (knob-and-tube wiring, galvanized plumbing). Cost-reality guide extends full renovation to $60,000-150,000+.",
+    "region": "VT",
+    "sourceGuideSlug": "how-much-does-kitchen-remodel-cost-vermont",
+    "verifiedAt": "2026-05-03"
+  },
+  {
+    "category": "kitchen",
+    "item": "Kitchen mid-range renovation (semi-custom cabinets, quartz/granite)",
+    "costLow": 25000,
+    "costHigh": 55000,
+    "rebate": null,
+    "paybackNotes": "Most common VT range. 6-10 weeks once materials arrive. Budget a 15-20% contingency on older homes. NOTE: cost-reality guide gives mid-range as $30,000-60,000 and facts.ts as $35,000-65,000 \u2014 ranges disagree across guides.",
+    "region": "VT",
+    "sourceGuideSlug": "how-much-does-kitchen-remodel-cost-vermont",
+    "verifiedAt": "2026-05-03"
+  },
+  {
+    "category": "kitchen",
+    "item": "Kitchen minor refresh (finishes only, no layout change)",
+    "costLow": 8000,
+    "costHigh": 20000,
+    "rebate": null,
+    "paybackNotes": "Cabinet refacing/repainting, laminate or entry-level quartz, new sink/faucet/hardware, lighting, mid-range appliances. Completes in 2-4 weeks.",
+    "region": "VT",
+    "sourceGuideSlug": "how-much-does-kitchen-remodel-cost-vermont",
+    "verifiedAt": "2026-05-03"
+  },
+  {
+    "category": "kitchen",
+    "item": "Kitchen refresh core 3 moves (hardware swap + faucet + under-cabinet lighting)",
+    "costLow": 260,
+    "costHigh": 480,
+    "rebate": null,
+    "paybackNotes": "Cabinet hardware $80-180 full kitchen (20-30 pulls); faucet $140-220 (Moen/Delta mid-range); plug-in LED under-cabinet strips $40-80. Highest-ROI low-spend project per guide.",
+    "region": "VT",
+    "sourceGuideSlug": "kitchen-refresh-buy-skip-wait",
+    "verifiedAt": "2026-05-13"
+  },
+  {
+    "category": "leak_sensors",
+    "item": "Water alarms for leak-prone basement zones",
+    "costLow": 15,
+    "costHigh": 80,
+    "rebate": null,
+    "paybackNotes": "$15-50 battery alarms or $40-80 WiFi sensors. Place under water heater, washer, near sump, and at basement low point; run a full season including a rainstorm and a snowmelt.",
+    "region": "VT",
+    "sourceGuideSlug": "before-finishing-basement-moisture-checks-vermont",
+    "verifiedAt": "2026-05-10"
+  },
+  {
+    "category": "lighting_efficiency",
+    "item": "Under-cabinet LED strip lighting, plug-in (no electrical work)",
+    "costLow": 40,
+    "costHigh": 80,
+    "rebate": null,
+    "paybackNotes": "Timing: LED strip pricing drops 25-40% in November (holiday cycle).",
+    "region": "VT",
+    "sourceGuideSlug": "kitchen-refresh-buy-skip-wait",
+    "verifiedAt": "2026-05-13"
+  },
+  {
+    "category": "other",
+    "item": "Architect fees for typical residential ADU design",
+    "costLow": 5000,
+    "costHigh": 15000,
+    "rebate": null,
+    "paybackNotes": "Design-build contractors sometimes bundle design into the contract.",
+    "region": "VT",
+    "sourceGuideSlug": "vermont-adu-permit-cost-2026",
+    "verifiedAt": "2026-05-03"
+  },
+  {
+    "category": "other",
+    "item": "Bathroom remodel, full gut (studs, new rough-in, radiant floor, custom tile)",
+    "costLow": 25000,
+    "costHigh": 55000,
+    "rebate": null,
+    "paybackNotes": "$55,000+ open-ended. 4-8 weeks active construction; older homes add time for knob-and-tube, galvanized pipe, subfloor damage.",
+    "region": "VT",
+    "sourceGuideSlug": "how-long-does-bathroom-remodel-take-vermont",
+    "verifiedAt": "2026-05-03"
+  },
+  {
+    "category": "other",
+    "item": "Bathroom remodel, mid-range renovation",
+    "costLow": 12000,
+    "costHigh": 28000,
+    "rebate": null,
+    "paybackNotes": "2-4 weeks active construction (new tile, modest fixture relocation, new shower/tub surround).",
+    "region": "VT",
+    "sourceGuideSlug": "how-long-does-bathroom-remodel-take-vermont",
+    "verifiedAt": "2026-05-03"
+  },
+  {
+    "category": "other",
+    "item": "Bathroom remodel, minor refresh",
+    "costLow": 5000,
+    "costHigh": 12000,
+    "rebate": null,
+    "paybackNotes": "1-2 weeks active construction; same-layout scope typically needs no permit. Lead time before demo: 6-10 weeks (contractor booking 3-6 weeks out, tile 4-8 weeks, permits 2-4 weeks).",
+    "region": "VT",
+    "sourceGuideSlug": "how-long-does-bathroom-remodel-take-vermont",
+    "verifiedAt": "2026-05-03"
+  },
+  {
+    "category": "other",
+    "item": "Contractor deposit norms and registration threshold",
+    "costLow": null,
+    "costHigh": null,
+    "rebate": null,
+    "paybackNotes": "Deposit 20-33% on signing is standard; over 33% is a yellow flag. Guide cites 9 V.S.A. \u00a7 4205 requiring registered contractors for jobs over $10,000. NOTE: the rebate-stack topic guides instead cite the VT AG Consumer Assistance Program registration threshold at $3,500+ \u2014 the two thresholds/statutes conflict across guides.",
+    "region": "VT",
+    "sourceGuideSlug": "vermont-home-project-cost-reality-2026",
+    "verifiedAt": "2026-05-13"
+  },
+  {
+    "category": "other",
+    "item": "Detached ADU, 700-900 sq ft, fully built",
+    "costLow": 85000,
+    "costHigh": 175000,
+    "rebate": null,
+    "paybackNotes": "Resort-tier towns reach $140,000-230,000. Attached ADU: $90,000-180,000. Garage conversion: $50,000-130,000. Total elapsed time 12-18 months; build phase 4-8 months detached. Verified April 2026 per guide.",
+    "region": "VT",
+    "sourceGuideSlug": "vermont-adu-permit-cost-2026",
+    "verifiedAt": "2026-05-03"
+  },
+  {
+    "category": "other",
+    "item": "Handyman labor rate (facts.ts canonical, cross-guide reference)",
+    "costLow": 40,
+    "costHigh": 75,
+    "rebate": null,
+    "paybackNotes": "$40-75/hour or $300-600/day, materials extra; full seasonal prep visit with materials $400-800. From facts.ts 'vt-cost-handyman-rate' (verified 2026-04-15).",
+    "region": "VT",
+    "sourceGuideSlug": "handyman-seasonal-home-vermont",
+    "verifiedAt": "2026-04-15"
+  },
+  {
+    "category": "other",
+    "item": "Lake season outdoor setup (first-time Champlain camp/lake property)",
+    "costLow": 2400,
+    "costHigh": 7500,
+    "rebate": null,
+    "paybackNotes": "Lean mid-tier setup $2,400-3,800; catalog-driven $4,800-7,500; premium custom $8,000-15,000+. Memorial Day vs November buying: 30-50% price differential on furniture.",
+    "region": "VT",
+    "sourceGuideSlug": "vermont-home-project-cost-reality-2026",
+    "verifiedAt": "2026-05-13"
+  },
+  {
+    "category": "other",
+    "item": "Renovation durations (planning claims)",
+    "costLow": null,
+    "costHigh": null,
+    "rebate": null,
+    "paybackNotes": "Kitchen 6-14 weeks; bathroom 3-6 weeks; basement finishing 6-10 weeks; deck 1-3 weeks; roof replacement 1-4 days; whole-house window replacement 1-3 days; heat pump install 2-5 days. Add 4-12 weeks lead time for contractor availability. Winter interior-work discounts: some contractors discount 5-15% for January-March schedules.",
+    "region": "VT",
+    "sourceGuideSlug": "vermont-home-project-cost-reality-2026",
+    "verifiedAt": "2026-05-13"
+  },
+  {
+    "category": "other",
+    "item": "Septic system upgrade, conventional (ADU capacity trigger)",
+    "costLow": 15000,
+    "costHigh": 30000,
+    "rebate": null,
+    "paybackNotes": "Engineered/mound systems: $30,000-45,000. Vermont sizes septic by bedroom count with a 'could be used as' bedroom test.",
+    "region": "VT",
+    "sourceGuideSlug": "vermont-adu-permit-cost-2026",
+    "verifiedAt": "2026-05-03"
+  },
+  {
+    "category": "permits",
+    "item": "Deck building permit (required in all VT municipalities)",
+    "costLow": 100,
+    "costHigh": 500,
+    "rebate": null,
+    "paybackNotes": "Cost figure from cost-reality guide ('Permitting in most VT towns: $100-500'). Deck guide: plan 2-4 weeks for approval; structural inspection during framing; no size threshold exempts residential decks.",
+    "region": "VT",
+    "sourceGuideSlug": "vermont-home-project-cost-reality-2026",
+    "verifiedAt": "2026-05-13"
+  },
+  {
+    "category": "permits",
+    "item": "Residential renovation building permit fees (most municipalities)",
+    "costLow": 150,
+    "costHigh": 800,
+    "rebate": null,
+    "paybackNotes": "Varies by municipality and project size; larger projects often calculated as a percentage of project value. Review takes 2-4 weeks for standard residential work.",
+    "region": "VT",
+    "sourceGuideSlug": "vermont-renovation-permit-guide",
+    "verifiedAt": "2026-05-03"
+  },
+  {
+    "category": "permits",
+    "item": "Short-term rental (STR) town registration for ADU",
+    "costLow": 100,
+    "costHigh": 500,
+    "rebate": null,
+    "paybackNotes": "Per year, typical. Vermont state lodging tax 9% combined also applies to STRs.",
+    "region": "VT",
+    "sourceGuideSlug": "vermont-adu-permit-cost-2026",
+    "verifiedAt": "2026-05-03"
+  },
+  {
+    "category": "permits",
+    "item": "Town building permit for ADU",
+    "costLow": 500,
+    "costHigh": 2000,
+    "rebate": null,
+    "paybackNotes": "Processing 2-8 weeks. Resort towns layer on design review costs $1,500-5,000. Total ADU permit burden per guide: $2,000-5,000 in state wastewater permits, septic engineer fees, and town permits.",
+    "region": "VT",
+    "sourceGuideSlug": "vermont-adu-permit-cost-2026",
+    "verifiedAt": "2026-05-03"
+  },
+  {
+    "category": "permits",
+    "item": "Vermont DEC wastewater/potable water permit (ADU or added bedroom capacity)",
+    "costLow": 300,
+    "costHigh": 1500,
+    "rebate": null,
+    "paybackNotes": "Plus $500-1,500 for licensed septic engineer's evaluation. Processing 4-12 weeks. Triggered by nearly all ADUs.",
+    "region": "VT",
+    "sourceGuideSlug": "vermont-adu-permit-cost-2026",
+    "verifiedAt": "2026-05-03"
+  },
+  {
+    "category": "preventive_maintenance",
+    "item": "EVT audit-driven scope priority (what to fix before windows)",
+    "costLow": null,
+    "costHigh": null,
+    "rebate": null,
+    "paybackNotes": "EVT audit sequencing puts rim-joist and attic-plate air sealing ahead of window replacement on typical pre-1990 VT homes; window replacement is rarely the highest-payback scope on a VT blower-door report. Trap cited: spending $10,000 on windows when the same money on professional weatherization would save 4x the energy.",
+    "region": "VT",
+    "sourceGuideSlug": "window-film-vs-replacement-vermont",
+    "verifiedAt": "2026-05-10"
+  },
+  {
+    "category": "roofing",
+    "item": "Asphalt shingle roof replacement",
+    "costLow": 8000,
+    "costHigh": 20000,
+    "rebate": null,
+    "paybackNotes": "1,500 sq ft ranch in Burlington: $9,000-13,000 installed. Standard asphalt lasts 20-25 years in VT; architectural 25-30 years.",
+    "region": "VT",
+    "sourceGuideSlug": "how-much-does-roof-replacement-cost-vermont",
+    "verifiedAt": "2026-05-03"
+  },
+  {
+    "category": "roofing",
+    "item": "Roof replacement before solar (standing seam vs asphalt, from solar sequencing section)",
+    "costLow": 8000,
+    "costHigh": 32000,
+    "rebate": null,
+    "paybackNotes": "Standing seam metal $14,000-32,000 (40-70 year life); architectural asphalt $8,000-20,000 (25-30 year life). Rebate stack is empty for the roof itself; solar credits apply only to solar work.",
+    "region": "VT",
+    "sourceGuideSlug": "vermont-solar-battery-stack-2026",
+    "verifiedAt": "2026-05-03"
+  },
+  {
+    "category": "roofing",
+    "item": "Roofing per-square pricing (2,000 sq ft roof = 20 squares runs $8,000-24,000)",
+    "costLow": 8000,
+    "costHigh": 24000,
+    "rebate": null,
+    "paybackNotes": "Architectural asphalt (30-yr): $400-600/square. Standing-seam metal (60+ yr): $900-1,400/square. Cedar shake: $1,200-2,000/square. Tear-off and disposal: $1,000-3,000 added. NOTE: standing-seam per-square range here ($900-1,400) runs higher than the roof guide's $600-900.",
+    "region": "VT",
+    "sourceGuideSlug": "vermont-home-project-cost-reality-2026",
+    "verifiedAt": "2026-05-13"
+  },
+  {
+    "category": "roofing",
+    "item": "Standing seam metal roof",
+    "costLow": 20000,
+    "costHigh": 40000,
+    "rebate": null,
+    "paybackNotes": "$600-900 per square (100 sq ft). Metal lasts 40-70 years, sheds snow, resists ice dams. Metal roofing overall: $15,000-40,000; steel panels mid-range $15,000-25,000 at $400-600/square.",
+    "region": "VT",
+    "sourceGuideSlug": "how-much-does-roof-replacement-cost-vermont",
+    "verifiedAt": "2026-05-03"
+  },
+  {
+    "category": "solar",
+    "item": "8kW solar + 13.5 kWh battery, gross install",
+    "costLow": 42000,
+    "costHigh": 58000,
+    "rebate": null,
+    "paybackNotes": "Net after upfront credits example: $50,000 - $15,000 (25D) - $5,400 (EVT) = $29,600. System produces $1,800-2,400/year retail-rate offset plus ~$285/year net-metering adder credits. Guide's net range after credits: $28,000-42,000. [Federal 25C credit expired Dec 31, 2025 per 2026 rebate-stack guides \u2014 no longer counted as a rebate.]",
+    "region": "VT",
+    "sourceGuideSlug": "vermont-solar-battery-stack-2026",
+    "verifiedAt": "2026-05-03"
+  },
+  {
+    "category": "solar",
+    "item": "Battery storage paired with solar (EVT incentive)",
+    "costLow": null,
+    "costHigh": null,
+    "rebate": {
+      "program": "EVT solar + storage incentive",
+      "amount": "$0.40/Wh of battery capacity \u2014 Tesla Powerwall (13.5 kWh) = $5,400; Enphase pair (20 kWh) = $8,000",
+      "verifiedAt": "2026-04-15"
+    },
+    "paybackNotes": "Battery must be paired with solar; standalone storage doesn't qualify. Paid through participating contractor at install completion. Incentive can be reduced if homeowner declines grid-services participation.",
+    "region": "VT",
+    "sourceGuideSlug": "vermont-solar-battery-stack-2026",
+    "verifiedAt": "2026-05-03"
+  },
+  {
+    "category": "solar",
+    "item": "Solar + battery + heat pump combined stack, standard tier (on ~$65,000 combined project)",
+    "costLow": 65000,
+    "costHigh": 65000,
+    "rebate": null,
+    "paybackNotes": "Components: 25D $15,000 (on $50,000 solar+battery), EVT solar+storage $5,400 (Powerwall 13.5 kWh), EVT ducted $2,200 + $400 + $500, net metering adder ~$7,125 over 25 years. [Federal 25C credit expired Dec 31, 2025 per 2026 rebate-stack guides \u2014 no longer counted as a rebate.]",
+    "region": "VT",
+    "sourceGuideSlug": "vermont-rebate-stack-2026",
+    "verifiedAt": "2026-05-03"
+  },
+  {
+    "category": "solar",
+    "item": "Solar removal + reinstall for later roof replacement (mistiming penalty)",
+    "costLow": 4000,
+    "costHigh": 12000,
+    "rebate": null,
+    "paybackNotes": "Replace roof first if under 15 years remaining life. NREL studies cited: $3,000-5,000 bundling savings when roof + solar done together vs sequentially.",
+    "region": "VT",
+    "sourceGuideSlug": "vermont-solar-battery-stack-2026",
+    "verifiedAt": "2026-05-03"
+  },
+  {
+    "category": "solar",
+    "item": "Vermont 8kW solar + battery, net after credits (facts.ts canonical range)",
+    "costLow": 28000,
+    "costHigh": 42000,
+    "rebate": null,
+    "paybackNotes": "From facts.ts 'vt-cost-solar-8kw' (verified 2026-04-15), the fact record backing the solar-battery-stack guide. [Federal 25C credit expired Dec 31, 2025 per 2026 rebate-stack guides \u2014 no longer counted as a rebate.]",
+    "region": "VT",
+    "sourceGuideSlug": "vermont-solar-battery-stack-2026",
+    "verifiedAt": "2026-04-15"
+  },
+  {
+    "category": "solar",
+    "item": "Vermont Net Metering Group 2 (residential up to 15 kW)",
+    "costLow": null,
+    "costHigh": null,
+    "rebate": {
+      "program": "Vermont Net Metering Group 2",
+      "amount": "Full retail rate credit + $0.03/kWh adder for in-state solar",
+      "verifiedAt": "2026-04-15"
+    },
+    "paybackNotes": "Typical 8 kW system produces 9,000-11,000 kWh annually; adder alone adds $270-330/year in credits; ~$7,125 over 25 years on 9,500 kWh production. Installer files PUC paperwork.",
+    "region": "VT",
+    "sourceGuideSlug": "vermont-solar-battery-stack-2026",
+    "verifiedAt": "2026-05-03"
+  },
+  {
+    "category": "storage",
+    "item": "Kitchen drawer organizers and pull-out storage",
+    "costLow": 30,
+    "costHigh": 150,
+    "rebate": null,
+    "paybackNotes": "Drawer organizers $30-80 (bamboo/wood); soft-close pull-out trash/recycling kit $80-150; floating open shelving $40-80 per wall.",
+    "region": "VT",
+    "sourceGuideSlug": "kitchen-refresh-buy-skip-wait",
+    "verifiedAt": "2026-05-13"
+  },
+  {
+    "category": "windows",
+    "item": "Vermont window replacement, 12-window project (facts.ts canonical range)",
+    "costLow": 12000,
+    "costHigh": 28000,
+    "rebate": null,
+    "paybackNotes": "From facts.ts 'vt-cost-windows-replacement' (verified 2026-04-15): modern double-pane vinyl or fiberglass; historic district approval adds time but rarely cost.",
+    "region": "VT",
+    "sourceGuideSlug": "window-film-vs-replacement-vermont",
+    "verifiedAt": "2026-04-15"
+  },
+  {
+    "category": "windows",
+    "item": "Window replacement energy payback (single-pane to double-pane)",
+    "costLow": null,
+    "costHigh": null,
+    "rebate": null,
+    "paybackNotes": "Replacing a $1,200 single-pane double-hung saves roughly $30-80/year in heating cost; payback 15-40 years on energy alone. Comfort and resale value are the faster justification. EVT does not currently rebate window replacement on most residential projects.",
+    "region": "VT",
+    "sourceGuideSlug": "window-film-vs-replacement-vermont",
+    "verifiedAt": "2026-05-10"
+  },
+  {
+    "category": "windows",
+    "item": "Window replacement, standard double-pane vinyl/fiberglass, per window installed",
+    "costLow": 800,
+    "costHigh": 1500,
+    "rebate": null,
+    "paybackNotes": "8-window typical home: $8,000-16,000. Historic-restoration replacement: $2,000-4,000/window; historic farmhouse with restoration matching: $20,000-40,000+. Standard new-construction (2000s+): $6,000-12,000 for same window count.",
+    "region": "VT",
+    "sourceGuideSlug": "vermont-home-project-cost-reality-2026",
+    "verifiedAt": "2026-05-13"
+  }
+]

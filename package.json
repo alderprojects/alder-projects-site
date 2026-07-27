@@ -14,7 +14,8 @@
     "prisma:studio": "prisma studio",
     "vision:eval": "tsx src/lib/vision/eval.ts",
     "catalog:refresh:dry": "tsx src/lib/catalog/refresh.ts --dry-run",
-    "catalog:refresh:write": "tsx src/lib/catalog/refresh.ts --write"
+    "catalog:refresh:write": "tsx src/lib/catalog/refresh.ts --write",
+    "check:eval": "tsx scripts/eval-photos.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.30.1",

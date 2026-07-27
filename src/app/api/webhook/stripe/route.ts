@@ -32,6 +32,8 @@ import { logBuyerEvent, hashEmail } from '@/lib/buyer-events'
 import { readSessionFromCookies } from '@/lib/session-tracking'
 import { buildWorthItPlan, type WorthItInput } from '@/lib/buildWorthItPlan'
 import { inferSeason } from '@/lib/season-helpers'
+import { kv } from '@vercel/kv'
+import { deliverReportCart } from '@/lib/recommend/cart-delivery'
 import {
   isV2Combination,
   getScenarioDefaults,
@@ -119,6 +121,20 @@ async function handleSessionCompleted(session: Stripe.Checkout.Session) {
     ?? ''
   const reference = session.client_reference_id ?? ''
   const season = inferSeason(new Date())
+
+  // v7.4.2 — report cart: the paid disclosure layer of an Alder Check.
+  // Fulfillment renders the PRE-COMPUTED CartCandidate rows (single-pass
+  // rule) — no synthesis engine runs on this path. Throwing lets Stripe
+  // retry on transient failures (email send, DB).
+  if (productType === 'report_cart') {
+    const reportId = reference
+    if (!reportId) throw new Error('report_cart session missing client_reference_id')
+    const pending = (await kv.get<{ email?: string }>(`pending:reportcart:${reportId}`)) ?? null
+    const buyerEmail = customerEmail || pending?.email || ''
+    if (!buyerEmail) throw new Error(`report_cart ${reportId}: no buyer email on session or pending record`)
+    await deliverReportCart(reportId, buyerEmail)
+    return
+  }
 
   if (productType === 'smart_cart') {
     const cartId = reference

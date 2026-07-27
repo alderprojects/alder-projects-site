@@ -52,10 +52,15 @@ export async function GET(
   // a "photos uploaded — return to your desktop" message rather than
   // letting the visitor synthesize on mobile (which strands the
   // desktop session at the QR + duplicates the buyer journey).
-  const res = NextResponse.redirect(
-    new URL('/project-read/home?source=handoff', request.url),
-    303
-  )
+  //
+  // v7.4.2b: `?to=` selects the destination surface (allowlisted —
+  // never an open redirect). 'check' is the Alder Check flow; default
+  // stays the project-read beta for old QRs in the wild.
+  const dest =
+    request.nextUrl.searchParams.get('to') === 'check'
+      ? '/check?source=handoff'
+      : '/project-read/home?source=handoff'
+  const res = NextResponse.redirect(new URL(dest, request.url), 303)
   res.cookies.set(VISITOR_ANON_COOKIE, result.anonId, {
     maxAge: 60 * 60 * 24 * VISITOR_ANON_TTL_DAYS,
     httpOnly: true,

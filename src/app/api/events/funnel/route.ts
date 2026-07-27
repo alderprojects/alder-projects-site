@@ -46,6 +46,16 @@ const FUNNEL_EVENT_ALLOWLIST = [
   // page renders the §1.2 clarification surface. Lets the retro
   // distinguish "we guessed right" from "user told us the answer."
   'CATEGORY_CLARIFICATION_SUBMITTED',
+  // v7.4.1b — homepage-is-the-product funnel (click-depth to upload,
+  // target: 1 tap). Server-side events (REPORT_GENERATED,
+  // QUESTION_ANSWERED, VERDICT_CHANGED, EMAIL_CAPTURED, REPORT_DELETED)
+  // are written by their owning routes and stay off this allowlist.
+  'HOME_HERO_VIEWED',
+  'HOME_CTA_TAPPED',
+  'RECS_VIEWED',
+  'SMARTCART_UPSELL_CLICKED',
+  'AFFILIATE_CLICKED',
+  'FEEDBACK_SUBMITTED',
 ] as const
 
 const FunnelEventEnum = z.enum(FUNNEL_EVENT_ALLOWLIST)

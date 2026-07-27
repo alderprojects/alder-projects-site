@@ -24,11 +24,21 @@ export async function GET(request: NextRequest): Promise<Response> {
   }
 
   const { sendDailyDigest } = await import('@/lib/email/digest')
+  // v7.4.2 — report drip rides the existing daily cron (no new cron
+  // slot on Hobby). Drip failure never blocks the digest and vice versa.
+  const { runReportDrip } = await import('@/lib/recommend/drip')
+  let drip: Awaited<ReturnType<typeof runReportDrip>> | { error: string }
+  try {
+    drip = await runReportDrip()
+  } catch (e) {
+    console.error('Report drip failed:', e)
+    drip = { error: (e as Error).message }
+  }
   try {
     const result = await sendDailyDigest()
-    return Response.json({ ok: true, ...result })
+    return Response.json({ ok: true, ...result, drip })
   } catch (e) {
     console.error('Daily digest failed:', e)
-    return Response.json({ ok: false, error: (e as Error).message }, { status: 500 })
+    return Response.json({ ok: false, error: (e as Error).message, drip }, { status: 500 })
   }
 }

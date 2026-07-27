@@ -57,6 +57,12 @@ export default async function AdminConsoleLayout({
           <Link href="/admin" style={{ color: '#1d4ed8', textDecoration: 'none' }}>
             Sessions
           </Link>
+          <Link href="/admin/dashboard" style={{ color: '#1d4ed8', textDecoration: 'none' }}>
+            Dashboard
+          </Link>
+          <Link href="/admin/queue" style={{ color: '#1d4ed8', textDecoration: 'none' }}>
+            Queue
+          </Link>
           <Link href="/admin/reports" style={{ color: '#1d4ed8', textDecoration: 'none' }}>
             Reports (lite)
           </Link>

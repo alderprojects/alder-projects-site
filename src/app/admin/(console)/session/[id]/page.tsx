@@ -36,10 +36,28 @@ const box: React.CSSProperties = {
   marginBottom: 16,
 }
 
+// v7.4.6 — typed icons for the EventLog timeline. Unknown types render
+// with the generic dot; the timeline must never crash on a new type.
+function eventIcon(eventType: string): string {
+  if (eventType.startsWith('PHOTO_') || eventType === 'UPLOAD_FAILED') return '📤'
+  if (eventType.startsWith('VISION_')) return '🧠'
+  if (eventType.startsWith('REPORT_') || eventType === 'RECS_VIEWED') return '📋'
+  if (eventType.startsWith('RESULT_')) return '👀'
+  if (eventType.startsWith('EMAIL_') || eventType === 'DRIP_SENT') return '✉️'
+  if (eventType.includes('CART') || eventType.includes('PAID') || eventType.includes('CHECKOUT')) return '💳'
+  if (eventType === 'EXIF_STRIPPED' || eventType.includes('DELET') || eventType.includes('CLEANUP')) return '🛡️'
+  if (eventType.startsWith('ADMIN_') || eventType.startsWith('QA_')) return '👁️'
+  if (eventType.startsWith('QUESTION') || eventType === 'VERDICT_CHANGED' || eventType.includes('CLARIF')) return '❓'
+  if (eventType.startsWith('ZIP_')) return '📍'
+  return '•'
+}
+
 export default async function AdminSessionDetailPage({
   params,
+  searchParams,
 }: {
   params: { id: string }
+  searchParams: { queue?: string }
 }) {
   const check = await checkAdmin()
   if (check.status !== 'ok') notFound() // layout already gated; belt & suspenders
@@ -68,6 +86,32 @@ export default async function AdminSessionDetailPage({
       })
     : []
   const photos = snapshots.flatMap((s) => s.photos)
+
+  // v7.4.6 — full event timeline for the session: everything keyed to
+  // the report/photos/snapshots plus the owning anon's events.
+  const timeline = await prisma.eventLog.findMany({
+    where: {
+      OR: [
+        { subjectId: { in: [report.id, ...photos.map((p) => p.id), ...report.snapshotIds] } },
+        ...(report.visitorAnonId ? [{ anonId: report.visitorAnonId }] : []),
+      ],
+    },
+    orderBy: { occurredAt: 'asc' },
+    take: 200,
+    select: { id: true, eventType: true, occurredAt: true, source: true, subjectType: true, payloadJson: true },
+  })
+
+  // v7.4.6 — queue mode: precompute where "mark reviewed" advances to.
+  const queueMode = searchParams.queue === '1'
+  let advanceTo: string | undefined
+  if (queueMode) {
+    const next = await prisma.report.findFirst({
+      where: { reviewedAt: null, deletedAt: null, id: { not: report.id } },
+      orderBy: { createdAt: 'asc' },
+      select: { id: true },
+    })
+    advanceTo = next ? `/admin/session/${next.id}?queue=1` : '/admin/queue'
+  }
 
   await Promise.all([
     logAdminAccess(check.user.email, 'SESSION_VIEWED', report.id),
@@ -98,6 +142,7 @@ export default async function AdminSessionDetailPage({
             reportId={report.id}
             reviewedAt={report.reviewedAt?.toISOString() ?? null}
             reviewedBy={report.reviewedBy}
+            advanceTo={advanceTo}
           />
         </span>
       </div>
@@ -263,6 +308,26 @@ export default async function AdminSessionDetailPage({
                 </div>
               </div>
             ))}
+          </section>
+
+          <section style={box}>
+            <h2 style={{ fontSize: 15, margin: '0 0 10px' }}>
+              Event timeline · {timeline.length}
+              {timeline.length === 200 ? ' (capped)' : ''}
+            </h2>
+            {timeline.length === 0 && <p style={{ fontSize: 13, color: '#888' }}>No events.</p>}
+            <div style={{ maxHeight: 420, overflowY: 'auto' }}>
+              {timeline.map((e) => (
+                <div key={e.id} style={{ display: 'flex', gap: 8, fontSize: 12.5, padding: '3px 0', borderBottom: '1px solid #f2f1ea' }}>
+                  <span style={{ width: 18, textAlign: 'center' }}>{eventIcon(e.eventType)}</span>
+                  <span style={{ color: '#999', width: 118, flexShrink: 0 }}>
+                    {e.occurredAt.toISOString().slice(5, 19).replace('T', ' ')}
+                  </span>
+                  <code style={{ fontSize: 11.5 }}>{e.eventType}</code>
+                  <span style={{ color: '#aaa', fontSize: 11.5, marginLeft: 'auto', flexShrink: 0 }}>{e.source ?? ''}</span>
+                </div>
+              ))}
+            </div>
           </section>
         </div>
       </div>

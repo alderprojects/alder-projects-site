@@ -62,11 +62,20 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     return NextResponse.json({ ok: false, error: 'stripe_not_configured' }, { status: 500 })
   }
 
-  await kv.set(
-    `pending:reportcart:${report.id}`,
-    { reportId: report.id, email: body.email.trim().toLowerCase(), anonId, ts: new Date().toISOString() },
-    { ex: PENDING_TTL_SECONDS }
-  )
+  // Best-effort: the pending row is defense-in-depth only — the Stripe
+  // session itself carries client_reference_id (reportId) and
+  // prefilled_email, which is everything the webhook needs. v7.4.2e:
+  // prod KV (Upstash) was found dead (ENOTFOUND); a broken KV must not
+  // block a $19.99 checkout.
+  try {
+    await kv.set(
+      `pending:reportcart:${report.id}`,
+      { reportId: report.id, email: body.email.trim().toLowerCase(), anonId, ts: new Date().toISOString() },
+      { ex: PENDING_TTL_SECONDS }
+    )
+  } catch (e) {
+    console.error('[report/cart/checkout] KV pending write failed (non-fatal):', (e as Error).message.slice(0, 150))
+  }
 
   const url = new URL(baseLink)
   url.searchParams.set('client_reference_id', report.id)

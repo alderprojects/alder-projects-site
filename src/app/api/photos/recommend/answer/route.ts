@@ -19,7 +19,10 @@ import type { DisclosureTier } from '@/lib/recommend/types'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
-export const maxDuration = 60
+// 90 like the recommend route: non-tenure answers re-run candidate
+// generation (the same LLM long pole). Tenure answers are rules-only
+// and return in ~2s regardless.
+export const maxDuration = 90
 
 const BodySchema = z.object({
   reportId: z.string().min(1),

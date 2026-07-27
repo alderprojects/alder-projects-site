@@ -11,8 +11,10 @@
  * alder_anon_id. Tier resolution: 'email' once the visitor session has
  * been claimed by a user (magic-link capture), else 'free'.
  *
- * Runs the full-depth pipeline synchronously. maxDuration 60 (Hobby cap
- * with fluid compute) — budget: candidate generation is the long pole.
+ * Runs the full-depth pipeline synchronously. maxDuration 90 (Hobby
+ * fluid compute allows up to 300) — measured 2026-07-27: the candidate
+ * LLM call is ~98% of wall time at ~90-110 output tok/s; observed range
+ * 32-61s per report, so 60 was too tight at p95.
  */
 
 import { NextRequest, NextResponse } from 'next/server'
@@ -25,7 +27,7 @@ import type { DisclosureTier } from '@/lib/recommend/types'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
-export const maxDuration = 60
+export const maxDuration = 90
 
 const BodySchema = z.object({
   snapshotIds: z.array(z.string().min(1)).min(1).max(10),

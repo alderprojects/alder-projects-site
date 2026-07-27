@@ -24,6 +24,10 @@ import { CandidateSetSchema, type CandidateSet, type MergedFeature, type Tenure 
 import { RECOMMEND_MODEL, RECOMMEND_PROMPT_VERSION } from './version'
 import { datasetCategories } from './dataset'
 
+// Generous CEILING to prevent JSON truncation — latency scales with
+// tokens actually emitted (controlled by the prompt's 3-5-candidate
+// discipline), not with this cap. Lowering it once caused truncated
+// JSON mid-string (2026-07-27); don't.
 const MAX_TOKENS = 8192
 
 export const CANDIDATE_SYSTEM_PROMPT = `You are the recommendation engine for Alder, a home-spending advisor. You receive structured observations extracted from a SET of photos of one home, plus optional context from the homeowner or renter. You propose candidate recommendations about what is worth buying, what can wait, and what to skip. Your advice applies to any home; the cost dataset downstream is regional (currently deepest for Vermont), and candidates it can't price simply carry no numbers — never compensate by inventing figures.
@@ -39,6 +43,7 @@ You are the honest advisor whose differentiation is telling people what NOT to b
 5. If equipment already visible in the photos does the job (dehumidifier present, sump pump present), set duplicate_of_present_equipment = true on any candidate that would duplicate it.
 6. Set risk_flags for anything structural, electrical-panel, gas, roofing, suspected mold, foundation, major plumbing, or fire-safety. These route to professional verification — never diagnose safety from a photo.
 7. Clarifying questions: at most 3 per candidate, and ONLY questions whose answer can change the verdict or the cart contents. "Do you own or rent?" is handled globally — do not include it.
+8. Emit 3 to 5 candidates for a typical photo set — never more than 6. Do NOT pad with INVESTIGATE candidates: emit needs_verification/risk-flagged candidates only when a genuine safety concern or verdict-blocking uncertainty is visible. Fewer, better-grounded candidates beat coverage. Keep summaries to 2 sentences and evidence entries short — this response renders while a homeowner waits.
 
 # Hard prohibitions
 

@@ -11,7 +11,9 @@
 export const RECOMMEND_MODEL = process.env.RECOMMEND_MODEL || 'claude-opus-4-8'
 
 // Bump on any change to the candidate-generation prompt in candidates.ts.
-export const RECOMMEND_PROMPT_VERSION = 'recommend-v1.0.0'
+// v1.1.0 — latency discipline: 3-5 candidates (max 6), no INVESTIGATE
+// padding, terse summaries. Measured: output tokens ≈ 98% of wall time.
+export const RECOMMEND_PROMPT_VERSION = 'recommend-v1.1.0'
 
 // Bump on any change to deterministic verdict rules (verdicts.ts),
 // safety routing (safety.ts), or the validation pass (validate.ts).

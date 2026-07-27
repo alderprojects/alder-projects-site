@@ -101,7 +101,10 @@ export const CandidateSchema = z.object({
 export type Candidate = z.infer<typeof CandidateSchema>
 
 export const CandidateSetSchema = z.object({
-  candidates: z.array(CandidateSchema).min(1).max(8),
+  // v1.1.0: capped 8→6. Output tokens are ~98% of pipeline wall time
+  // (measured 2026-07-27: 3k tokens ≈ 31s); 6 well-grounded candidates
+  // beat 8 padded ones on both latency and honesty.
+  candidates: z.array(CandidateSchema).min(1).max(6),
   recency_conflict: z
     .object({ detected: z.boolean(), detail: z.string().max(300).default('') })
     .default({ detected: false, detail: '' }),

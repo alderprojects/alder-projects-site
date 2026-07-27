@@ -170,6 +170,11 @@ export default function Footer() {
                   How we keep this free (affiliate disclosure)
                 </Link>
               </li>
+              <li>
+                <Link href="/privacy" style={linkStyle}>
+                  Privacy &amp; your photos
+                </Link>
+              </li>
             </ul>
           </div>
         </div>

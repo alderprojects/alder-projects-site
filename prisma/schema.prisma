@@ -260,6 +260,19 @@ model Photo {
   // Integrity + dedup
   perceptualHash   String // 64-bit pHash, hex-encoded
   exifStrippedAt   DateTime?
+  // v7.4.5 §1.3 — EXIF fields captured BEFORE the strip, then the stored
+  // bytes carry zero metadata. R1 GUARD (do not remove): GPS coordinates
+  // from uploaded photos are NEVER persisted, logged as values, or used
+  // anywhere. Adding any GPS/lat/lng/location column to Photo or any
+  // photo-derived table is forbidden. hadGps (presence only) is the sole
+  // permitted derivative.
+  capturedAt       DateTime? // EXIF DateTimeOriginal (no TZ in EXIF; parsed as UTC)
+  deviceMake       String?
+  deviceModel      String?
+  origWidth        Int? // pre-resize pixel dims as received
+  origHeight       Int?
+  orientation      Int? // EXIF orientation 1-8 as received (stored bytes are rotation-baked)
+  hadGps           Boolean      @default(false)
   // Confirms the blob write succeeded — set after Vercel Blob put()
   // returns a URL. Photo rows with null blobConfirmedAt are orphans
   // pending cleanup (anon cleanup cron sweeps them).
@@ -1017,6 +1030,9 @@ model Report {
   // NO accounts, NO sign-in: possession of the key grants access to
   // this one report. Generated at creation; rotates never.
   accessKey       String?   @unique
+  // v7.4.5 admin console — QA review stamp
+  reviewedAt      DateTime?
+  reviewedBy      String? // admin email
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
   // delete-my-report control (bytes + rows cleanup handled by DeletionRequest)
@@ -1025,6 +1041,7 @@ model Report {
   recommendations Recommendation[]
   clarifyingAnswers ClarifyingAnswer[]
   feedback        ReportFeedback[]
+  qaFlags         QAFlag[]
 
   @@index([visitorAnonId])
   @@index([userId])
@@ -1158,6 +1175,43 @@ model DeletionRequest {
   detailJson  Json?
 
   @@index([status, requestedAt])
+}
+
+// =============================================================================
+// ADMIN REVIEW CONSOLE — v7.4.5
+// =============================================================================
+
+model QAFlag {
+  // QA labels an admin attaches to a report ("photo session") during
+  // review. Written alongside — never instead of — user reactions;
+  // future LearningStore consumers can join on reportId. PEOPLE_VISIBLE
+  // exists so flagged sessions are structurally excludable from any
+  // future dataset work.
+  id        String   @id @default(cuid())
+  reportId  String
+  report    Report   @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  type      String // "HALLUCINATION" | "EXTRACTION_MISS" | "LANE_ERROR" | "PEOPLE_VISIBLE" | "OTHER"
+  note      String   @default("")
+  createdBy String // admin email
+  createdAt DateTime @default(now())
+
+  @@index([reportId])
+  @@index([type, createdAt])
+}
+
+model AdminAccessLog {
+  // Append-only audit of admin access to customer data. Written on every
+  // session-detail load and photo passthrough issuance — no exceptions,
+  // including the owner account.
+  id         String   @id @default(cuid())
+  adminEmail String
+  action     String // "SESSION_VIEWED" | "PHOTO_VIEWED" | "FLAG_CREATED" | "DENIED"
+  targetId   String? // reportId or photoId; null for DENIED
+  createdAt  DateTime @default(now())
+
+  @@index([adminEmail, createdAt])
+  @@index([action, createdAt])
+  @@index([createdAt])
 }
 
 model CategoryObservation {

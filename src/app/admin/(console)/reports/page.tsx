@@ -1,10 +1,11 @@
 /**
- * v7.4.4 — Admin-lite: /admin/reports?adminToken=...
- *
- * One protected page listing recent reports with structured
- * observations, verdict mix, confidence, flags, feedback, raw pipeline
- * log access, the disable-recommendation toggle, and the flywheel
- * CategoryObservation counts. No full console — by design.
+ * v7.4.4 — Admin-lite: /admin/reports
+ * v7.4.5 — moved behind the console's magic-link + ADMIN_EMAILS auth
+ * (was ADMIN_REFUND_TOKEN in the query string). Content unchanged: recent
+ * reports with structured observations, verdict mix, confidence, flags,
+ * feedback, raw pipeline log access, the disable-recommendation toggle,
+ * and the flywheel CategoryObservation counts. The full review surface
+ * is /admin (session list) — this stays the quick-scan ops view.
  */
 
 import { prisma } from '@/lib/db'
@@ -16,13 +17,8 @@ export const metadata = { title: 'Reports — admin-lite', robots: { index: fals
 export default async function AdminReportsPage({
   searchParams,
 }: {
-  searchParams: { adminToken?: string; days?: string }
+  searchParams: { days?: string }
 }) {
-  const expected = process.env.ADMIN_REFUND_TOKEN
-  if (!expected || searchParams.adminToken !== expected) {
-    return <main style={{ padding: 40, fontFamily: 'monospace' }}>401</main>
-  }
-  const token = searchParams.adminToken
   const days = Math.min(90, Math.max(1, parseInt(searchParams.days ?? '7', 10) || 7))
   const since = new Date(Date.now() - days * 24 * 3600 * 1000)
 
@@ -88,7 +84,7 @@ export default async function AdminReportsPage({
                       </div>
                     </td>
                     <td style={td}>
-                      <ToggleButton recommendationId={rec.id} disabled={rec.disabledAt != null} adminToken={token} />
+                      <ToggleButton recommendationId={rec.id} disabled={rec.disabledAt != null} />
                     </td>
                   </tr>
                 ))}

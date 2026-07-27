@@ -31,7 +31,7 @@ export const CHECK_FAQS = [
   },
   {
     q: 'What happens to my photos?',
-    a: 'Photos are analyzed only to create your report. Images containing people, faces, documents, or readable screens are detected and excluded before analysis, and every exclusion is reported to you. Photos are stored no longer than the retention window (90 days by default), and every report includes a working delete control that removes both the report and the photo files immediately.',
+    a: 'Photos are analyzed only to create your report. Images containing people, faces, documents, or readable screens are detected and excluded before analysis, and every exclusion is reported to you. We automatically remove location data (GPS) embedded in your photos when you upload them, and uploads may be reviewed internally for quality and safety. Photos are stored no longer than the retention window (90 days by default), and every report includes a working delete control that removes both the report and the photo files immediately.',
   },
 ]
 

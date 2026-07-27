@@ -8,7 +8,7 @@
  * login wall. There are no accounts in this product.
  */
 
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import VerdictCard, { PALETTE, type VerdictCardData } from './VerdictCard'
 import { fireFunnel } from '@/lib/check/funnel'
 
@@ -52,6 +52,44 @@ export default function ReportView({
     (body: Record<string, unknown>) => (accessKey ? { ...body, key: accessKey } : body),
     [accessKey]
   )
+
+  // v7.4.6 — commerce-moment instrumentation for the Check report,
+  // mirroring V3CartView: RESULT_VIEW_SECONDS on pagehide +
+  // RESULT_SECTION_ENGAGEMENT on first scroll-into-view per
+  // [data-engage] section. Feeds the /admin/dashboard cards that drive
+  // the v7.5 tier decision. Sections are captured at mount; blocks that
+  // appear only after later state changes aren't re-observed (fine for
+  // this telemetry — all engagement sections render at mount).
+  const rootRef = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    const mountedAt = Date.now()
+    const reportId = initialReport.reportId
+    const onHide = () => {
+      const secondsOnPage = Math.round((Date.now() - mountedAt) / 1000)
+      if (secondsOnPage > 0) {
+        fireFunnel('RESULT_VIEW_SECONDS', { reportId, secondsOnPage, surface: 'check_report' })
+      }
+    }
+    window.addEventListener('pagehide', onHide)
+    const seen = new Set<string>()
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) {
+          const section = (e.target as HTMLElement).dataset.engage
+          if (e.isIntersecting && section && !seen.has(section)) {
+            seen.add(section)
+            fireFunnel('RESULT_SECTION_ENGAGEMENT', { reportId, section, surface: 'check_report' })
+          }
+        }
+      },
+      { threshold: 0.4 }
+    )
+    rootRef.current?.querySelectorAll('[data-engage]').forEach((el) => observer.observe(el))
+    return () => {
+      window.removeEventListener('pagehide', onHide)
+      observer.disconnect()
+    }
+  }, [initialReport.reportId])
 
   const answerQuestion = useCallback(
     async (questionKey: string, answerText: string, recommendationId?: string) => {
@@ -137,7 +175,7 @@ export default function ReportView({
   const cartHref = `/report/${report.reportId}/cart${accessKey ? `?key=${encodeURIComponent(accessKey)}` : ''}`
 
   return (
-    <div style={{ ...boxStyle, textAlign: 'left' }}>
+    <div ref={rootRef} style={{ ...boxStyle, textAlign: 'left' }}>
       {report.exclusionNotice && <p style={noticeStyle}>{report.exclusionNotice} Not stored, not analyzed.</p>}
 
       {report.changes && report.changes.length > 0 && (
@@ -175,7 +213,7 @@ export default function ReportView({
         />
       )}
 
-      <div style={{ display: 'grid', gap: 14, margin: '16px 0' }}>
+      <div data-engage="verdicts" style={{ display: 'grid', gap: 14, margin: '16px 0' }}>
         {report.recommendations.map((rec) => (
           <div key={rec.key}>
             <VerdictCard
@@ -202,7 +240,7 @@ export default function ReportView({
       </div>
 
       {report.lockedRecommendations.length > 0 && (
-        <div style={{ border: `1px dashed ${PALETTE.gold}`, borderRadius: 12, padding: '16px 18px', marginBottom: 16 }}>
+        <div data-engage="email_unlock" style={{ border: `1px dashed ${PALETTE.gold}`, borderRadius: 12, padding: '16px 18px', marginBottom: 16 }}>
           <p style={{ margin: '0 0 8px', color: PALETTE.ink, fontSize: 15, fontWeight: 600 }}>
             {report.lockedRecommendations.length} more finding
             {report.lockedRecommendations.length === 1 ? '' : 's'} in your Check:
@@ -240,7 +278,7 @@ export default function ReportView({
       )}
 
       {buyCount > 0 ? (
-        <div style={{ background: PALETTE.green, borderRadius: 12, padding: '18px 20px', marginBottom: 16 }}>
+        <div data-engage="cart_upsell" style={{ background: PALETTE.green, borderRadius: 12, padding: '18px 20px', marginBottom: 16 }}>
           <p style={{ color: PALETTE.cream, fontSize: 15.5, margin: '0 0 10px', lineHeight: 1.5 }}>
             Your Check found <strong>{buyCount}</strong> thing{buyCount === 1 ? '' : 's'} worth buying. Smart Cart turns{' '}
             {buyCount === 1 ? 'it' : 'them'} into the exact products and specs — $19.99.
@@ -261,7 +299,7 @@ export default function ReportView({
       )}
 
       {!feedbackDone ? (
-        <div style={{ display: 'flex', gap: 10, alignItems: 'center', fontSize: 14, color: PALETTE.inkSoft }}>
+        <div data-engage="feedback" style={{ display: 'flex', gap: 10, alignItems: 'center', fontSize: 14, color: PALETTE.inkSoft }}>
           Was this useful?
           <button onClick={() => sendFeedback(true)} style={secondaryBtn}>
             Yes

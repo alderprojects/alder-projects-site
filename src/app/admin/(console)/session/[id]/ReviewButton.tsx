@@ -9,10 +9,14 @@ export default function ReviewButton({
   reportId,
   reviewedAt,
   reviewedBy,
+  advanceTo,
 }: {
   reportId: string
   reviewedAt: string | null
   reviewedBy: string | null
+  /** v7.4.6 queue mode: after marking reviewed, jump here (next
+   *  unreviewed session, or back to /admin/queue when none left). */
+  advanceTo?: string
 }) {
   const router = useRouter()
   const [busy, setBusy] = useState(false)
@@ -28,7 +32,10 @@ export default function ReviewButton({
         body: JSON.stringify({ reportId, reviewed: !reviewed }),
       })
       const json = (await res.json()) as { ok: boolean }
-      if (json.ok) router.refresh()
+      if (json.ok) {
+        if (!reviewed && advanceTo) router.push(advanceTo)
+        else router.refresh()
+      }
     } finally {
       setBusy(false)
     }
@@ -53,7 +60,7 @@ export default function ReviewButton({
           cursor: 'pointer',
         }}
       >
-        {busy ? '…' : reviewed ? 'Mark unreviewed' : 'Mark reviewed'}
+        {busy ? '…' : reviewed ? 'Mark unreviewed' : advanceTo ? 'Mark reviewed → next' : 'Mark reviewed'}
       </button>
     </span>
   )

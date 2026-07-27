@@ -1,17 +1,18 @@
 'use client'
 
-/** v7.4.4 — disable/enable a recommendation from admin-lite. */
+/**
+ * v7.4.4 — disable/enable a recommendation from admin-lite.
+ * v7.4.5 — session-cookie auth (no more adminToken in the URL).
+ */
 
 import { useState } from 'react'
 
 export default function ToggleButton({
   recommendationId,
   disabled,
-  adminToken,
 }: {
   recommendationId: string
   disabled: boolean
-  adminToken: string
 }) {
   const [isDisabled, setIsDisabled] = useState(disabled)
   const [busy, setBusy] = useState(false)
@@ -19,7 +20,7 @@ export default function ToggleButton({
   async function toggle() {
     setBusy(true)
     try {
-      const res = await fetch(`/api/admin/reports?adminToken=${encodeURIComponent(adminToken)}`, {
+      const res = await fetch('/api/admin/reports', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ recommendationId, disabled: !isDisabled }),

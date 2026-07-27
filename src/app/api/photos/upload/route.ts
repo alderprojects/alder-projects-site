@@ -46,6 +46,7 @@ import { prisma } from '@/lib/db'
 import { ensureVisitorSession } from '@/lib/visitor/session'
 import { extractOpenFeatures, MODEL_VERSION } from '@/lib/vision/extract'
 import { dhashFromBuffer } from '@/lib/photos/dhash'
+import { captureExifFields } from '@/lib/photos/exif'
 import { logEvent } from '@/lib/events/log'
 
 export const runtime = 'nodejs'
@@ -164,7 +165,12 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     return NextResponse.json({ ok: false, error: 'empty_image' }, { status: 400 })
   }
 
-  // 2. EXIF strip + auto-rotate + resize cap + re-encode to JPEG
+  // 2a. v7.4.5 §1.3 — parse EXIF ONCE from the raw bytes, before the
+  // re-encode strips it. Only the allowed field set crosses the
+  // captureExifFields boundary (R1: GPS presence-only, never values).
+  const exifFields = await captureExifFields(raw)
+
+  // 2b. EXIF strip + auto-rotate + resize cap + re-encode to JPEG
   let processed: Buffer
   let widthPx: number | undefined
   let heightPx: number | undefined
@@ -293,6 +299,20 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     if (existing) {
       reusedExistingPhoto = true
       photo = existing
+      // v7.4.5: legacy rows predate the EXIF-field columns. Same anon +
+      // same content-addressed bytes → same EXIF, so backfill once when
+      // every retained field is still empty.
+      if (
+        photo.capturedAt === null &&
+        photo.deviceMake === null &&
+        photo.deviceModel === null &&
+        photo.origWidth === null
+      ) {
+        photo = await prisma.photo.update({
+          where: { id: photo.id },
+          data: { ...exifFields },
+        })
+      }
     } else {
       photo = await prisma.photo.create({
         data: {
@@ -305,10 +325,21 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
           heightPx,
           perceptualHash: dhash,
           exifStrippedAt: new Date(),
+          ...exifFields,
           captureMethod: 'web_upload',
           consentFlagsJson: consentFlags as never,
           visitorAnonId: anonId,
         },
+      })
+      // v7.4.5 §1.3 — the stored artifact for this Photo carries zero
+      // EXIF. Logged per photo; payload records presence-only hadGps.
+      await logEvent({
+        eventType: 'EXIF_STRIPPED',
+        subjectType: 'Photo',
+        subjectId: photo.id,
+        anonId,
+        source: 'web',
+        payload: { hadGps: exifFields.hadGps },
       })
     }
   } catch (e) {

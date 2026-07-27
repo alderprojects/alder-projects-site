@@ -23,7 +23,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
-import { consumeMagicLink } from '@/lib/auth/magic-link'
+import { consumeMagicLink, sanitizeInternalPath } from '@/lib/auth/magic-link'
 import { mintSession } from '@/lib/auth/session'
 
 export const runtime = 'nodejs'
@@ -42,9 +42,13 @@ export async function GET(
 
   await mintSession(result.userId)
 
-  // 303 See Other so the browser switches to GET on /account (which is
-  // the default redirect behavior, but explicit for clarity).
-  return NextResponse.redirect(new URL('/account', request.url), 303)
+  // v7.4.5: honor a sanitized internal ?next= destination (e.g. /admin);
+  // default stays /account.
+  const nextPath = sanitizeInternalPath(request.nextUrl.searchParams.get('next'))
+
+  // 303 See Other so the browser switches to GET on the destination
+  // (which is the default redirect behavior, but explicit for clarity).
+  return NextResponse.redirect(new URL(nextPath ?? '/account', request.url), 303)
 }
 
 function errorHtml(reason: string): Response {

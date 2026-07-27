@@ -10,28 +10,24 @@
  *   The disable toggle — sets/clears Recommendation.disabledAt. A
  *   disabled rec renders nowhere (wire, unlock, cart page, delivery).
  *
- * Auth: ADMIN_REFUND_TOKEN via ?adminToken= or Bearer (existing admin
- * API convention).
+ * Auth (v7.4.5): admin session (magic link + ADMIN_EMAILS) — the
+ * adminToken query-param convention is retired for this endpoint.
  */
 
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
+import { checkAdmin } from '@/lib/auth/admin'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 export const maxDuration = 15
 
-function authorized(req: Request): boolean {
-  const expected = process.env.ADMIN_REFUND_TOKEN
-  if (!expected) return false
-  const url = new URL(req.url)
-  if (url.searchParams.get('adminToken') === expected) return true
-  if (req.headers.get('authorization') === `Bearer ${expected}`) return true
-  return false
+async function authorized(): Promise<boolean> {
+  return (await checkAdmin()).status === 'ok'
 }
 
 export async function GET(req: NextRequest): Promise<NextResponse> {
-  if (!authorized(req)) return NextResponse.json({ ok: false, error: 'unauthorized' }, { status: 401 })
+  if (!(await authorized())) return NextResponse.json({ ok: false, error: 'unauthorized' }, { status: 401 })
 
   const days = Math.min(90, Math.max(1, parseInt(req.nextUrl.searchParams.get('days') ?? '7', 10) || 7))
   const since = new Date(Date.now() - days * 24 * 3600 * 1000)
@@ -96,7 +92,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 }
 
 export async function POST(req: NextRequest): Promise<NextResponse> {
-  if (!authorized(req)) return NextResponse.json({ ok: false, error: 'unauthorized' }, { status: 401 })
+  if (!(await authorized())) return NextResponse.json({ ok: false, error: 'unauthorized' }, { status: 401 })
   let body: { recommendationId?: string; disabled?: boolean }
   try {
     body = await req.json()

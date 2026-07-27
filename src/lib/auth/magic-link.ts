@@ -66,11 +66,25 @@ export interface RequestResult {
 }
 
 /**
+ * v7.4.5 — optional post-sign-in destination carried on the link URL
+ * (e.g. /admin). Internal paths only; anything else falls back to the
+ * default /account landing.
+ */
+export function sanitizeInternalPath(p: unknown): string | null {
+  if (typeof p !== 'string') return null
+  if (!p.startsWith('/') || p.startsWith('//') || p.includes('\\') || p.length > 200) return null
+  return p
+}
+
+/**
  * Generate and send a magic link. Always returns ok: true to the caller
  * unless the email is structurally invalid (in which case we surface to
  * the user). Send failures are logged but not exposed.
  */
-export async function requestMagicLink(emailRaw: string): Promise<RequestResult> {
+export async function requestMagicLink(
+  emailRaw: string,
+  options: { nextPath?: string | null } = {}
+): Promise<RequestResult> {
   const email = normalizeEmail(emailRaw)
   if (!isValidEmail(email)) {
     return { ok: false, reason: 'invalid_email' }
@@ -99,7 +113,10 @@ export async function requestMagicLink(emailRaw: string): Promise<RequestResult>
   })
 
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'http://localhost:3000'
-  const link = `${baseUrl}/account/sign-in/verify/${plaintext}`
+  const nextPath = sanitizeInternalPath(options.nextPath)
+  const link = `${baseUrl}/account/sign-in/verify/${plaintext}${
+    nextPath ? `?next=${encodeURIComponent(nextPath)}` : ''
+  }`
 
   const resend = getResend()
   if (!resend) {

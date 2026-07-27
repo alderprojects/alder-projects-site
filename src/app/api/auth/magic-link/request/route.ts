@@ -12,7 +12,7 @@ export const maxDuration = 10
 // enumeration.
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
-  let body: { email?: unknown }
+  let body: { email?: unknown; next?: unknown }
   try {
     body = await request.json()
   } catch {
@@ -24,7 +24,11 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     return NextResponse.json({ ok: false, reason: 'invalid_email' }, { status: 400 })
   }
 
-  const result = await requestMagicLink(email)
+  // v7.4.5: optional internal-path destination (e.g. /admin) carried
+  // through the emailed link. Sanitized inside requestMagicLink.
+  const result = await requestMagicLink(email, {
+    nextPath: typeof body.next === 'string' ? body.next : null,
+  })
   if (!result.ok && result.reason === 'invalid_email') {
     return NextResponse.json({ ok: false, reason: 'invalid_email' }, { status: 400 })
   }

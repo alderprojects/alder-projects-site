@@ -4,22 +4,28 @@ import Nav from '@/components/Nav'
 import Footer from '@/components/Footer'
 import CheckCta from '@/components/check/CheckCta'
 import VerdictCard from '@/components/check/VerdictCard'
+import {
+  CHECK_PALETTE as C,
+  CHECK_SUBLINE,
+  DIFFERENTIATION_STRIP,
+  EXAMPLE_BUY,
+  EXAMPLE_WAIT,
+  GUIDE_LINKS,
+} from '@/lib/check/content'
 
-// v7.4.1b homepage takeover — the homepage IS the product. Zero clicks
-// to value: the photo flow lives at `/`, the report renders in place.
-// The hero is server-rendered with no client JS until CTA interaction
-// (CheckCta lazy-imports the flow bundle on first tap). Replaces the V8
-// "receipt" homepage; guides move to the compact footer section below;
-// contractor SEO pages keep ranking on their own.
+// v7.4.2b — `/` is the Alder Projects brand home. The Alder Check flow
+// still lives in the hero (one tap to camera — zero clicks lost), but
+// the page reads as the company: Check (free) → Smart Cart ($19.99) →
+// guides + assistant. Alder Check's canonical product page is /check.
 
 export const metadata: Metadata = {
-  title: 'Alder Check — Photograph Your Home, Get a Free Buy / Skip / Wait Plan | Vermont',
+  title: 'Alder Projects — Spend Smarter on Your Home',
   description:
-    'Upload a photo of any room. Your free Alder Check spots what’s worth buying, what can wait, and what to skip — with real Vermont costs and Efficiency Vermont rebates. No account required.',
+    'Alder tells you what’s worth buying for your home, what can wait, and what to skip. Start with a free photo Check — honest Buy / Skip / Wait verdicts with verified costs and rebates, deepest in Vermont.',
   openGraph: {
-    title: 'Alder Check — Photograph Your Home, Get a Free Buy / Skip / Wait Plan',
+    title: 'Alder Projects — Spend Smarter on Your Home',
     description:
-      'Take a photo of any room. Your free Alder Check tells you what’s worth buying in Vermont, what can wait, and what to skip — no account required.',
+      'Free photo Check: honest Buy / Skip / Wait verdicts for your home. Smart Cart turns the Buys into exact products — $19.99.',
     url: 'https://alderprojects.com',
     siteName: 'Alder Projects',
     locale: 'en_US',
@@ -27,111 +33,68 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Alder Check — free Buy / Skip / Wait plan from a photo',
-    description:
-      'Photograph any room. Get honest verdicts with real Vermont costs and Efficiency Vermont rebates. Free, no account.',
+    title: 'Alder Projects — Spend Smarter on Your Home',
+    description: 'Photograph any room, get the honest plan. Free Check, $19.99 Smart Cart.',
   },
   alternates: { canonical: 'https://alderprojects.com/' },
 }
 
-// FAQ content doubles as AEO surface for the (ai_assistant) channel —
-// answers are complete, citable standalone sentences.
-const FAQS = [
+const websiteJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: 'Alder Projects',
+  url: 'https://alderprojects.com/',
+}
+
+const orgJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name: 'Alder Projects',
+  url: 'https://alderprojects.com/',
+  logo: 'https://alderprojects.com/favicon.ico',
+  foundingLocation: {
+    '@type': 'Place',
+    address: { '@type': 'PostalAddress', addressRegion: 'VT', addressCountry: 'US' },
+  },
+  contactPoint: {
+    '@type': 'ContactPoint',
+    contactType: 'customer support',
+    email: 'hello@alderprojects.com',
+  },
+}
+
+const PRODUCTS = [
   {
-    q: 'Is Alder Check free?',
-    a: 'Yes. The Alder Check photo report is free and does not require an account. You upload one to five photos of any room, and Alder returns Buy, Skip, Wait, or Investigate verdicts with evidence from your photos. The optional Smart Cart upgrade, which turns Buy verdicts into specific products with confirmed specs, costs $19.99.',
+    eyebrow: 'Start here · Free',
+    title: 'Alder Check',
+    body: 'Photograph any room. Get honest Buy / Skip / Wait verdicts with evidence from your photos — and at least one thing NOT to buy, every time.',
+    cta: 'Alder Check has its own page →',
+    href: '/check',
   },
   {
-    q: 'Do I need an account to use Alder Check?',
-    a: 'No. Your first Alder Check report renders immediately after upload with no account, no ZIP code, and no signup form. An email address is only requested if you want to unlock the full set of recommendations beyond the first two, or to save your report.',
+    eyebrow: '$19.99 · Built from your Check',
+    title: 'Smart Cart',
+    body: 'Turns your Check’s Buy verdicts into the exact products — Good / Better / Best tiers, the specs that matter, quantities, and install difficulty.',
+    cta: 'How Smart Cart works →',
+    href: '/smart-cart',
   },
   {
-    q: 'How does Alder know Vermont costs and rebates?',
-    a: 'Every cost range and rebate figure in an Alder Check comes from a maintained Vermont dataset with a verification date, built from Alder’s published Vermont cost guides — including Efficiency Vermont rebate amounts, installed costs from Vermont contractors, and Vermont permit rules. Each recommendation cites the guide its numbers come from, and rebate figures older than 120 days display “check current program” instead of a stale number.',
-  },
-  {
-    q: 'What happens to my photos?',
-    a: 'Photos are analyzed only to create your report. Images containing people or sensitive information are excluded or redacted where possible, and excluded photos are reported to you and not analyzed. Every report includes a working delete control that removes the report and the photo files.',
+    eyebrow: 'Free · No signup',
+    title: 'Guides & assistant',
+    body: 'The verified cost guides behind every Check — rebates, permits, real installed costs — plus a free assistant for the questions photos can’t answer.',
+    cta: 'Browse the guides →',
+    href: '/guides',
   },
 ]
-
-const webAppJsonLd = {
-  '@context': 'https://schema.org',
-  '@type': 'WebApplication',
-  name: 'Alder Check',
-  url: 'https://alderprojects.com/',
-  applicationCategory: 'LifestyleApplication',
-  operatingSystem: 'Web',
-  offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
-  description:
-    'Free photo-based Buy / Skip / Wait report for Vermont homes, with real Vermont costs and Efficiency Vermont rebates.',
-  provider: { '@type': 'Organization', name: 'Alder Projects', url: 'https://alderprojects.com/' },
-}
-
-const faqJsonLd = {
-  '@context': 'https://schema.org',
-  '@type': 'FAQPage',
-  mainEntity: FAQS.map((f) => ({
-    '@type': 'Question',
-    name: f.q,
-    acceptedAnswer: { '@type': 'Answer', text: f.a },
-  })),
-}
-
-// Static example verdicts (server-rendered): one real BUY and one real
-// WAIT from the eval-fixture home (VT lake house), numbers from
-// data/vermont-costs.json — crawlers and AI assistants see concrete
-// product output, not marketing prose.
-const EXAMPLE_BUY = {
-  verdict: 'BUY',
-  title: 'Cold-climate mini-split for the main living area',
-  summary:
-    'Your photos show hydronic baseboard heat and no visible heat pump. In Vermont, a single-zone cold-climate mini-split typically cuts winter heating cost in the room it serves and adds summer cooling.',
-  visibleEvidence: [
-    'Hydronic baseboard along the exterior wall',
-    'No mini-split head or condenser visible',
-    'Open living area suited to a single zone',
-  ],
-  costLow: 3500,
-  costHigh: 5500,
-  rebate: { program: 'Efficiency Vermont', display: '$475 per indoor head' },
-  citations: [
-    {
-      guideSlug: 'vermont-heat-pump-rebate-stack-2026',
-      guideTitle: 'Vermont Heat Pump Rebate Stack 2026',
-      verifiedAt: '2026-05-03',
-    },
-  ],
-  nextAction: 'Get two quotes from EVT-participating installers — the rebate is paid through the contractor.',
-}
-
-const EXAMPLE_WAIT = {
-  verdict: 'WAIT',
-  title: 'Refrigerator replacement',
-  summary:
-    'The fridge looks dated but shows no failure signs — no rust at the seals, no condensation streaks. An aging-but-working fridge usually isn’t worth replacing for efficiency alone; wait for a real symptom.',
-  visibleEvidence: [
-    'Older finish and hardware, consistent with a 2000s unit',
-    'Door seals appear intact',
-    'No visible leaks or frost buildup',
-  ],
-  costLow: null,
-  costHigh: null,
-  rebate: null,
-  citations: [],
-  nextAction: 'Re-check if you hear compressor cycling issues or see condensation inside — that changes the math.',
-}
-
-const C = { green: '#1f3d2b', cream: '#f6f2e8', gold: '#b08d2f', ink: '#22301f', inkSoft: 'rgba(34,48,31,0.68)' }
 
 export default function HomePage() {
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(webAppJsonLd) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(orgJsonLd) }} />
       <Nav />
       <main style={{ background: C.cream, minHeight: '100vh' }}>
-        {/* ── Hero = the flow ─────────────────────────────────────── */}
+        {/* ── Hero: the brand promise, with the Check flow inline ──── */}
         <section style={{ maxWidth: 860, margin: '0 auto', padding: '56px 20px 32px', textAlign: 'center' }}>
           <h1
             style={{
@@ -144,26 +107,12 @@ export default function HomePage() {
           >
             Spend smarter on your home.
           </h1>
-          <p
-            style={{
-              fontSize: 'clamp(16px, 2.5vw, 19px)',
-              color: C.inkSoft,
-              maxWidth: 640,
-              margin: '0 auto 26px',
-              lineHeight: 1.55,
-            }}
-          >
-            Take a photo of any room. Your free Alder Check tells you what’s worth buying in Vermont, what can wait,
-            and what to skip — no account required.
+          <p style={{ fontSize: 'clamp(16px, 2.5vw, 19px)', color: C.inkSoft, maxWidth: 640, margin: '0 auto 26px', lineHeight: 1.55 }}>
+            {CHECK_SUBLINE}
           </p>
           <CheckCta />
-          {/* Differentiation strip — the three claims no generic AI or retailer makes */}
           <div style={{ display: 'flex', gap: 10, justifyContent: 'center', flexWrap: 'wrap', marginTop: 26 }}>
-            {[
-              'We tell you what NOT to buy',
-              'Vermont costs & Efficiency Vermont rebates built in',
-              'Photos with people are excluded automatically',
-            ].map((t) => (
+            {DIFFERENTIATION_STRIP.map((t) => (
               <span
                 key={t}
                 style={{
@@ -182,8 +131,38 @@ export default function HomePage() {
           </div>
         </section>
 
+        {/* ── The Alder continuum: Check → Smart Cart → Guides ─────── */}
+        <section style={{ maxWidth: 980, margin: '0 auto', padding: '12px 20px 40px' }}>
+          <div style={{ display: 'grid', gap: 14, gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))' }}>
+            {PRODUCTS.map((p) => (
+              <Link
+                key={p.title}
+                href={p.href}
+                style={{
+                  display: 'block',
+                  background: '#fff',
+                  border: '1px solid rgba(31,61,43,0.14)',
+                  borderRadius: 12,
+                  padding: '20px 22px',
+                  textDecoration: 'none',
+                  textAlign: 'left',
+                }}
+              >
+                <div style={{ fontSize: 11.5, letterSpacing: '0.1em', textTransform: 'uppercase', color: C.gold, fontWeight: 700, marginBottom: 8 }}>
+                  {p.eyebrow}
+                </div>
+                <div style={{ fontSize: 20, fontWeight: 700, color: C.green, fontFamily: "'Playfair Display', Georgia, serif", marginBottom: 6 }}>
+                  {p.title}
+                </div>
+                <p style={{ fontSize: 14, color: C.inkSoft, lineHeight: 1.55, margin: '0 0 10px' }}>{p.body}</p>
+                <span style={{ fontSize: 13.5, color: C.green, fontWeight: 600 }}>{p.cta}</span>
+              </Link>
+            ))}
+          </div>
+        </section>
+
         {/* ── Example verdicts (static, server-rendered) ───────────── */}
-        <section style={{ maxWidth: 860, margin: '0 auto', padding: '8px 20px 40px' }}>
+        <section style={{ maxWidth: 860, margin: '0 auto', padding: '0 20px 40px' }}>
           <h2
             style={{
               fontSize: 14,
@@ -202,32 +181,15 @@ export default function HomePage() {
             <VerdictCard data={EXAMPLE_WAIT} />
           </div>
           <p style={{ textAlign: 'center', fontSize: 13.5, color: C.inkSoft, marginTop: 12 }}>
-            Real output from a Vermont lake-house Check. Every number carries a verified date and cites its source
-            guide.
+            Real output. Every number carries a verified date and cites its source guide —{' '}
+            <Link href="/check" style={{ color: C.green, textDecoration: 'underline' }}>
+              more on how the Check works
+            </Link>
+            .
           </p>
         </section>
 
-        {/* ── FAQ (on-page; JSON-LD above) ─────────────────────────── */}
-        <section style={{ maxWidth: 720, margin: '0 auto', padding: '0 20px 48px' }}>
-          <h2
-            style={{
-              fontSize: 24,
-              color: C.green,
-              fontFamily: "'Playfair Display', Georgia, serif",
-              marginBottom: 14,
-            }}
-          >
-            Questions, answered
-          </h2>
-          {FAQS.map((f) => (
-            <details key={f.q} style={{ borderBottom: '1px solid rgba(31,61,43,0.12)', padding: '12px 0' }}>
-              <summary style={{ fontSize: 16, fontWeight: 600, color: C.ink, cursor: 'pointer' }}>{f.q}</summary>
-              <p style={{ fontSize: 14.5, color: C.inkSoft, lineHeight: 1.6, margin: '8px 0 0' }}>{f.a}</p>
-            </details>
-          ))}
-        </section>
-
-        {/* ── Compact guides section (topical authority, zero above-fold weight) */}
+        {/* ── Compact guides section (topical authority) ───────────── */}
         <section style={{ background: '#efe9db', padding: '28px 20px' }}>
           <div style={{ maxWidth: 860, margin: '0 auto' }}>
             <h2
@@ -240,21 +202,10 @@ export default function HomePage() {
                 fontWeight: 700,
               }}
             >
-              Vermont cost guides — the data behind your Check
+              Verified cost guides — the data behind every Check
             </h2>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px 18px', fontSize: 13.5 }}>
-              {[
-                ['vermont-heat-pump-rebate-stack-2026', 'Heat Pump Rebate Stack 2026'],
-                ['vermont-weatherization-evt-rebate', 'Weatherization & EVT Rebates'],
-                ['how-much-does-roof-replacement-cost-vermont', 'Roof Replacement Costs'],
-                ['how-much-does-kitchen-remodel-cost-vermont', 'Kitchen Remodel Costs'],
-                ['how-much-does-a-deck-cost-vermont', 'Deck Costs'],
-                ['vermont-adu-permit-cost-2026', 'ADU Permit Costs 2026'],
-                ['vermont-home-project-cost-reality-2026', 'Cost Reality Check 2026'],
-                ['before-finishing-basement-moisture-checks-vermont', 'Basement Moisture Checks'],
-                ['vermont-solar-battery-stack-2026', 'Solar + Battery Stack 2026'],
-                ['window-film-vs-replacement-vermont', 'Window Film vs Replacement'],
-              ].map(([slug, title]) => (
+              {GUIDE_LINKS.map(([slug, title]) => (
                 <Link key={slug} href={`/guides/${slug}`} style={{ color: C.green, textDecoration: 'underline' }}>
                   {title}
                 </Link>

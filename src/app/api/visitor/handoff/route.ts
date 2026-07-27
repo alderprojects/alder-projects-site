@@ -32,10 +32,20 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     )
   }
 
+  // v7.4.2b: optional destination surface for the redeem redirect.
+  // Validated here AND in the redeem route (allowlist, not open).
+  let dest: 'check' | null = null
+  try {
+    const body = (await req.json()) as { dest?: string }
+    if (body?.dest === 'check') dest = 'check'
+  } catch {
+    /* empty body — legacy callers */
+  }
+
   const { rawToken, expiresAt } = await issueHandoffToken(anonId)
   const baseUrl =
     process.env.NEXT_PUBLIC_BASE_URL ?? new URL(req.url).origin
-  const url = `${baseUrl}/handoff/${rawToken}`
+  const url = `${baseUrl}/handoff/${rawToken}${dest ? `?to=${dest}` : ''}`
 
   const qrDataUrl = await QRCode.toDataURL(url, {
     margin: 1,

@@ -54,15 +54,23 @@ interface ReportState {
 
 type Stage = 'uploading' | 'analyzing' | 'report' | 'error'
 
-const ANALYZE_COPY = ['Looking at the room…', 'Comparing cost and likely benefit…', 'Checking Vermont costs and rebates…']
+const ANALYZE_COPY = ['Looking at the room…', 'Comparing cost and likely benefit…', 'Checking local costs and rebates…']
 
-export default function CheckFlow({ initialFiles }: { initialFiles: File[] }) {
-  const [stage, setStage] = useState<Stage>('uploading')
+export default function CheckFlow({
+  initialFiles,
+  initialReport,
+}: {
+  initialFiles?: File[]
+  /** v7.4.2b — QR handoff: desktop polls up a report the phone created
+   * and renders it directly, skipping the upload stages. */
+  initialReport?: ReportState
+}) {
+  const [stage, setStage] = useState<Stage>(initialReport ? 'report' : 'uploading')
   const [thumbs, setThumbs] = useState<string[]>([])
   const [uploadedCount, setUploadedCount] = useState(0)
   const [statusCopy, setStatusCopy] = useState('Uploading photo…')
   const [error, setError] = useState<string | null>(null)
-  const [report, setReport] = useState<ReportState | null>(null)
+  const [report, setReport] = useState<ReportState | null>(initialReport ?? null)
   const [context, setContext] = useState('')
   const [busy, setBusy] = useState(false)
   const [feedbackDone, setFeedbackDone] = useState(false)
@@ -163,8 +171,13 @@ export default function CheckFlow({ initialFiles }: { initialFiles: File[] }) {
   useEffect(() => {
     if (startedRef.current) return
     startedRef.current = true
-    fireFunnel('PHOTO_UPLOAD_STARTED', { source: 'homepage_hero', count: initialFiles.length })
-    enqueueFiles(initialFiles)
+    if (initialReport) {
+      fireFunnel('RECS_VIEWED', { reportId: initialReport.reportId, source: 'handoff_poll' })
+      return
+    }
+    const files = initialFiles ?? []
+    fireFunnel('PHOTO_UPLOAD_STARTED', { source: 'homepage_hero', count: files.length })
+    enqueueFiles(files)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 

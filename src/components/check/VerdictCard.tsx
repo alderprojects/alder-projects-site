@@ -104,7 +104,7 @@ export default function VerdictCard({
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 16, marginBottom: 12, fontSize: 14 }}>
           {hasCost && (
             <div>
-              <span style={{ color: PALETTE.inkSoft }}>Vermont cost: </span>
+              <span style={{ color: PALETTE.inkSoft }}>Typical cost: </span>
               <strong style={{ color: PALETTE.ink }}>
                 ${data.costLow!.toLocaleString()}–${data.costHigh!.toLocaleString()}
               </strong>

@@ -10,6 +10,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react'
 import VerdictCard, { PALETTE, type VerdictCardData } from './VerdictCard'
+import AddressModule from './AddressModule'
 import { fireFunnel } from '@/lib/check/funnel'
 
 interface WireRec extends VerdictCardData {
@@ -38,9 +39,13 @@ export interface ReportPayload {
 export default function ReportView({
   initialReport,
   accessKey,
+  addressCapture,
 }: {
   initialReport: ReportPayload
   accessKey?: string
+  /** v7.4.8 — present ONLY when ADDRESS_CAPTURE_ENABLED is on
+   *  server-side. Undefined ⇒ zero address UI exists. */
+  addressCapture?: { consentText: string; zip: string | null }
 }) {
   const [report, setReport] = useState<ReportPayload>(initialReport)
   const [busy, setBusy] = useState(false)
@@ -323,6 +328,17 @@ export default function ReportView({
           Nothing worth buying right now — that’s the honest answer. Save this page (the email link works on any
           device) and re-check when the season or the symptoms change.
         </div>
+      )}
+
+      {/* v7.4.8 — address module sits AFTER the email-capture slot;
+          anonymous-first order preserved: results → email → address. */}
+      {addressCapture && (
+        <AddressModule
+          reportId={report.reportId}
+          accessKey={accessKey}
+          prefillZip={addressCapture.zip}
+          consentText={addressCapture.consentText}
+        />
       )}
 
       {zipBanner === 'show' && (

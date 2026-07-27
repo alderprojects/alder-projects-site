@@ -59,6 +59,11 @@ const FUNNEL_EVENT_ALLOWLIST = [
   // v7.4.7 — ZIP capture surfaces (ZIP_SUBMITTED itself is written
   // server-side by the owning routes, never through this endpoint).
   'ZIP_PROMPT_SHOWN',
+  // v7.4.8 — address module impression. ADDRESS_SUBMITTED,
+  // CONSENT_GRANTED/REVOKED and CREDIT_ISSUED/REDEEMED are all written
+  // server-side by their owning routes — consent and credit events must
+  // never be client-forgeable.
+  'ADDRESS_PROMPT_SHOWN',
 ] as const
 
 const FunnelEventEnum = z.enum(FUNNEL_EVENT_ALLOWLIST)

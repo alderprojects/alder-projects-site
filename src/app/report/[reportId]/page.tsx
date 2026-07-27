@@ -17,6 +17,7 @@ import { HeroArt } from '@/components/check/CheckArt'
 import { getAnonId } from '@/lib/visitor/session'
 import { authorizeReport, reportPayload } from '@/lib/recommend/access'
 import { CHECK_PALETTE as C } from '@/lib/check/content'
+import { CONSENT_TEXT, addressCaptureEnabled } from '@/lib/consent/licensing'
 
 export const dynamic = 'force-dynamic'
 
@@ -63,7 +64,17 @@ export default async function ReportPage({
             </div>
           </div>
 
-          <ReportView initialReport={payload} accessKey={auth.byKey ? (searchParams.key as string) : undefined} />
+          <ReportView
+            initialReport={payload}
+            accessKey={auth.byKey ? (searchParams.key as string) : undefined}
+            // v7.4.8 — undefined unless the flag is on, so with the flag
+            // off the address module never reaches the client at all.
+            addressCapture={
+              addressCaptureEnabled()
+                ? { consentText: CONSENT_TEXT, zip: auth.report.zip ?? null }
+                : undefined
+            }
+          />
 
           <p style={{ textAlign: 'center', marginTop: 20, fontSize: 13.5, color: C.inkSoft }}>
             Need a fresh read after a fix or a season change?{' '}

@@ -21,13 +21,16 @@ export default function ContractorDiyBanner() {
   }
   if (!config) return null
 
-  const ctaHref = config.product === 'smart_cart'
-    ? `/smart-cart?topic=${config.topic}&scope=${config.scope}&utm_source=contractor_page&utm_medium=diy_banner&utm_campaign=${encodeURIComponent(pathname || 'unknown')}`
-    : `/worth-it?utm_source=contractor_page&utm_medium=diy_banner&utm_campaign=${encodeURIComponent(pathname || 'unknown')}`
+  // v7.4.1c: primary CTA repointed to the free Alder Check ("get a free
+  // photo report first — know what's worth doing before you call a
+  // contractor"). The paid product drops to the secondary slot.
+  const ctaHref = `/check?utm_source=contractor_page&utm_medium=diy_banner&utm_campaign=${encodeURIComponent(pathname || 'unknown')}`
+  const ctaLabel = 'Get a free photo Check first →'
 
-  const ctaLabel = config.product === 'smart_cart'
-    ? 'Build my Smart Cart — $19.99 →'
-    : 'See Worth-It Plan — $39 →'
+  const paidHref = config.product === 'smart_cart'
+    ? `/smart-cart?topic=${config.topic}&scope=${config.scope}&utm_source=contractor_page&utm_medium=diy_banner_secondary&utm_campaign=${encodeURIComponent(pathname || 'unknown')}`
+    : `/worth-it?utm_source=contractor_page&utm_medium=diy_banner_secondary&utm_campaign=${encodeURIComponent(pathname || 'unknown')}`
+  const paidLabel = config.product === 'smart_cart' ? 'Smart Cart — $19.99' : 'Worth-It Plan — $39'
 
   return (
     <div
@@ -79,6 +82,15 @@ export default function ContractorDiyBanner() {
           }}
         >
           {ctaLabel}
+        </Link>
+        <Link
+          href={paidHref}
+          style={{
+            fontSize: '13px', color: 'rgba(28,43,26,0.65)',
+            textDecoration: 'underline',
+          }}
+        >
+          {paidLabel}
         </Link>
         {config.guideHref && (
           <Link

@@ -276,7 +276,37 @@ export const getResultEngagement = unstable_cache(
 )
 
 // ---------------------------------------------------------------------------
-// 8. Review coverage (% of last-7-day sessions reviewed)
+// 8. ZIP capture (v7.4.7): submission rate + sessions per ZIP3
+//    (Track A aggregate groundwork — counts only, nothing else)
+// ---------------------------------------------------------------------------
+
+export const getZipStats = unstable_cache(
+  async (): Promise<Timed<{ total: number; withZip: number; bySource: Record<string, number>; zip3: Array<{ zip3: string; n: number }> }>> =>
+    timed(async () => {
+      const [total, withZip, sources, zip3rows] = await Promise.all([
+        prisma.report.count({ where: { createdAt: { gte: since(WINDOW_30D) }, deletedAt: null } }),
+        prisma.report.count({ where: { createdAt: { gte: since(WINDOW_30D) }, deletedAt: null, zip: { not: null } } }),
+        prisma.report.groupBy({
+          by: ['zipSource'],
+          where: { zip: { not: null }, deletedAt: null },
+          _count: { _all: true },
+        }),
+        prisma.$queryRaw<{ z: string; n: bigint }[]>`
+          SELECT left("zip", 3) AS z, count(*) AS n
+          FROM "Report"
+          WHERE "zip" IS NOT NULL AND "deletedAt" IS NULL
+          GROUP BY 1 ORDER BY 2 DESC LIMIT 25`,
+      ])
+      const bySource: Record<string, number> = {}
+      for (const s of sources) bySource[s.zipSource ?? 'unknown'] = s._count._all
+      return { total, withZip, bySource, zip3: zip3rows.map((r) => ({ zip3: r.z, n: Number(r.n) })) }
+    }),
+  ['admin-metrics-zip'],
+  { revalidate: CACHE_SECONDS }
+)
+
+// ---------------------------------------------------------------------------
+// 9. Review coverage (% of last-7-day sessions reviewed)
 // ---------------------------------------------------------------------------
 
 export const getReviewCoverage = unstable_cache(

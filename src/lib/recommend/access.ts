@@ -57,13 +57,15 @@ export async function authorizeReport(opts: {
 /** The standard wire payload every report surface returns/renders. */
 export function reportPayload(report: AuthorizedReport['report'], tier: DisclosureTier) {
   const { visible, locked } = shapeRows(report.recommendations, tier)
-  // (disabledAt filtering arrives with the v7.4.4 admin-lite PR; until
-  // then all persisted recs are live.)
-  const buyCount = report.recommendations.filter((r) => r.verdict === 'BUY').length
+  // v7.4.7: buyCount now matches shapeRows' disabledAt filtering (a
+  // disabled BUY must not inflate the upsell count).
+  const buyCount = report.recommendations.filter((r) => r.verdict === 'BUY' && r.disabledAt == null).length
   return {
     reportId: report.id,
     status: report.status,
     tier,
+    // v7.4.7 — post-result ZIP banner renders only when absent
+    hasZip: report.zip != null,
     recommendations: visible,
     lockedRecommendations: locked,
     upsell: buyCount > 0 ? { eligible: true, buyCount } : { eligible: false, buyCount: 0 },

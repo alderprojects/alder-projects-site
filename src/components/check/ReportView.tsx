@@ -25,6 +25,7 @@ export interface ReportPayload {
   reportId: string
   tier: string
   status: string
+  hasZip: boolean
   recommendations: WireRec[]
   lockedRecommendations: Array<{ verdict: string; title: string }>
   upsell: { eligible: boolean; buyCount: number }
@@ -47,6 +48,12 @@ export default function ReportView({
   const [emailValue, setEmailValue] = useState('')
   const [emailState, setEmailState] = useState<'idle' | 'sending' | 'done' | 'error'>('idle')
   const [deleted, setDeleted] = useState(false)
+  // v7.4.7 — post-result ZIP banner (only for sessions without a ZIP)
+  const [zipBanner, setZipBanner] = useState<'show' | 'dismissed' | 'saved'>(
+    initialReport.hasZip ? 'dismissed' : 'show'
+  )
+  const [zipValue, setZipValue] = useState('')
+  const [zipBusy, setZipBusy] = useState(false)
 
   const withKey = useCallback(
     (body: Record<string, unknown>) => (accessKey ? { ...body, key: accessKey } : body),
@@ -90,6 +97,26 @@ export default function ReportView({
       observer.disconnect()
     }
   }, [initialReport.reportId])
+
+  useEffect(() => {
+    if (!initialReport.hasZip) fireFunnel('ZIP_PROMPT_SHOWN', { surface: 'post_result', reportId: initialReport.reportId })
+  }, [initialReport.hasZip, initialReport.reportId])
+
+  const submitZip = useCallback(async () => {
+    if (!/^\d{5}$/.test(zipValue) || zipBusy) return
+    setZipBusy(true)
+    try {
+      const res = await fetch('/api/report/zip', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(withKey({ reportId: report.reportId, zip: zipValue })),
+      })
+      const json = (await res.json()) as { ok: boolean }
+      if (json.ok) setZipBanner('saved')
+    } finally {
+      setZipBusy(false)
+    }
+  }, [zipValue, zipBusy, report.reportId, withKey])
 
   const answerQuestion = useCallback(
     async (questionKey: string, answerText: string, recommendationId?: string) => {
@@ -296,6 +323,43 @@ export default function ReportView({
           Nothing worth buying right now — that’s the honest answer. Save this page (the email link works on any
           device) and re-check when the season or the symptoms change.
         </div>
+      )}
+
+      {zipBanner === 'show' && (
+        <div style={{ ...noticeStyle, display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap', marginBottom: 16 }}>
+          <span style={{ fontSize: 13.5 }}>
+            Add your ZIP? Better accuracy for your region — frost depth, humidity, local codes and pricing.
+          </span>
+          <input
+            type="text"
+            inputMode="numeric"
+            maxLength={5}
+            value={zipValue}
+            onChange={(e) => setZipValue(e.target.value.replace(/[^\d]/g, ''))}
+            placeholder="05401"
+            aria-label="ZIP code (optional)"
+            style={{ width: 90, padding: '7px 10px', borderRadius: 6, border: `1px solid ${PALETTE.line}`, fontSize: 13.5 }}
+          />
+          <button
+            onClick={() => void submitZip()}
+            disabled={zipBusy || !/^\d{5}$/.test(zipValue)}
+            style={{ ...secondaryBtn, opacity: /^\d{5}$/.test(zipValue) ? 1 : 0.5 }}
+          >
+            {zipBusy ? '…' : 'Save'}
+          </button>
+          <button
+            onClick={() => setZipBanner('dismissed')}
+            aria-label="Dismiss ZIP prompt"
+            style={{ background: 'none', border: 'none', color: PALETTE.inkSoft, cursor: 'pointer', fontSize: 13, marginLeft: 'auto' }}
+          >
+            No thanks
+          </button>
+        </div>
+      )}
+      {zipBanner === 'saved' && (
+        <p style={{ ...noticeStyle, background: '#eef4ec', borderColor: '#c7dcc0', marginBottom: 16, fontSize: 13.5 }}>
+          Saved — answers you give from here (and future re-checks) use your region&apos;s frost, humidity, and pricing context.
+        </p>
       )}
 
       {!feedbackDone ? (

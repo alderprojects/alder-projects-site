@@ -23,6 +23,7 @@ import { prisma } from '@/lib/db'
 import { ensureVisitorSession } from '@/lib/visitor/session'
 import { runPipeline, PipelineError } from '@/lib/recommend/pipeline'
 import { shapeResponse } from '@/lib/recommend/disclosure'
+import { logEvent } from '@/lib/events/log'
 import type { DisclosureTier } from '@/lib/recommend/types'
 
 export const runtime = 'nodejs'
@@ -33,6 +34,11 @@ const BodySchema = z.object({
   snapshotIds: z.array(z.string().min(1)).min(1).max(10),
   userPrompt: z.string().max(500).optional(),
   tenure: z.enum(['own', 'rent']).optional(),
+  // v7.4.7 — optional 5-digit ZIP for regionalized synthesis
+  zip: z
+    .string()
+    .regex(/^\d{5}$/)
+    .optional(),
 })
 
 export async function POST(req: NextRequest): Promise<NextResponse> {
@@ -79,7 +85,21 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       anonId,
       userPrompt: body.userPrompt,
       tenure: body.tenure,
+      zip: body.zip,
     })
+
+    // v7.4.7 — ZIP submission event (upload-form path). The pipeline
+    // stored zip/zipSource on the report row.
+    if (body.zip) {
+      await logEvent({
+        eventType: 'ZIP_SUBMITTED',
+        subjectType: 'Report',
+        subjectId: out.reportId,
+        anonId,
+        source: 'web',
+        payload: { source: 'UPLOAD_FORM', zip3: body.zip.slice(0, 3) },
+      })
+    }
 
     const { visible, locked } = shapeResponse(out.recs, callerTier)
 

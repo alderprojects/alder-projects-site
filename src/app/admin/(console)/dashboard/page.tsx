@@ -16,6 +16,7 @@ import {
   getFunnel,
   getResultEngagement,
   getReviewCoverage,
+  getZipStats,
 } from '@/lib/admin/metrics'
 
 export const dynamic = 'force-dynamic'
@@ -79,7 +80,7 @@ const big: React.CSSProperties = { fontSize: 26, fontWeight: 650, color: '#1C2B1
 const sub: React.CSSProperties = { fontSize: 12.5, color: '#777' }
 
 export default async function AdminDashboardPage() {
-  const [uploads, extraction, kill, flags, lanes, funnel, engagement, coverage] = await Promise.all([
+  const [uploads, extraction, kill, flags, lanes, funnel, engagement, coverage, zips] = await Promise.all([
     getUploadVolume(),
     getExtractionStats(),
     getKillMetric(),
@@ -88,6 +89,7 @@ export default async function AdminDashboardPage() {
     getFunnel(),
     getResultEngagement(),
     getReviewCoverage(),
+    getZipStats(),
   ])
 
   const pct = (v: number | null) => (v == null ? '—' : `${(v * 100).toFixed(1)}%`)
@@ -228,6 +230,25 @@ export default async function AdminDashboardPage() {
               </span>
             ))}
           </p>
+        </Card>
+
+        <Card title="ZIP capture (v7.4.7)" queryMs={zips.queryMs}>
+          <div style={big}>
+            {zips.data.total > 0 ? `${((zips.data.withZip / zips.data.total) * 100).toFixed(0)}%` : '—'}
+          </div>
+          <p style={sub}>
+            {zips.data.withZip}/{zips.data.total} 30d sessions with ZIP
+            {Object.keys(zips.data.bySource).length > 0 &&
+              ` · ${Object.entries(zips.data.bySource)
+                .map(([k, v]) => `${k} ${v}`)
+                .join(' · ')}`}
+          </p>
+          {zips.data.zip3.length > 0 && (
+            <p style={{ ...sub, marginTop: 6 }}>
+              sessions per ZIP3 (all-time):{' '}
+              {zips.data.zip3.map((z) => `${z.zip3}xx ${z.n}`).join(' · ')}
+            </p>
+          )}
         </Card>
 
         <Card title="Review coverage (7d)" queryMs={coverage.queryMs}>

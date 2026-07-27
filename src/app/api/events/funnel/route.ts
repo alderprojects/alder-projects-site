@@ -56,6 +56,9 @@ const FUNNEL_EVENT_ALLOWLIST = [
   'SMARTCART_UPSELL_CLICKED',
   'AFFILIATE_CLICKED',
   'FEEDBACK_SUBMITTED',
+  // v7.4.7 — ZIP capture surfaces (ZIP_SUBMITTED itself is written
+  // server-side by the owning routes, never through this endpoint).
+  'ZIP_PROMPT_SHOWN',
 ] as const
 
 const FunnelEventEnum = z.enum(FUNNEL_EVENT_ALLOWLIST)

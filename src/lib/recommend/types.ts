@@ -53,7 +53,12 @@ export const CandidateSchema = z.object({
   dataset_category: z.string().max(60),
   // Evidence must reference what is VISIBLE in the photos
   visible_evidence: z.array(z.string().max(300)).min(1).max(6),
-  benefit_type: z.enum(['cost_savings', 'comfort', 'safety', 'prevention', 'resale']),
+  // Non-load-bearing fields carry .catch() fallbacks (v7.4.2e): a model
+  // emitting quantity:0 or a typo'd enum must not kill the whole report
+  // (observed in prod 2026-07-27). Load-bearing verdict inputs stay
+  // strict; suggested_lean's fallback is needs_verification, which
+  // deterministically routes to INVESTIGATE — the honest failure mode.
+  benefit_type: z.enum(['cost_savings', 'comfort', 'safety', 'prevention', 'resale']).catch('prevention'),
   // Flags the deterministic layer reads
   risk_flags: z
     .array(
@@ -69,12 +74,13 @@ export const CandidateSchema = z.object({
         'none',
       ])
     )
+    .catch(['none'])
     .default(['none']),
   // Equipment already present that makes this redundant
   duplicate_of_present_equipment: z.boolean().default(false),
   // Can a renter do this reversibly?
   renter_reversible: z.boolean(),
-  confidence: z.number().min(0).max(1),
+  confidence: z.number().min(0).max(1).catch(0.4),
   assumptions: z.array(z.string().max(300)).max(6).default([]),
   limitations: z.array(z.string().max(300)).max(6).default([]),
   // Only questions whose answer can CHANGE the verdict or cart
@@ -93,10 +99,11 @@ export const CandidateSchema = z.object({
   product_category: z.string().max(80),
   required_specs: z.array(z.object({ spec: z.string().max(80), why: z.string().max(200) })).max(5).default([]),
   amazon_search_query: z.string().max(120),
-  quantity: z.number().int().min(1).max(20).default(1),
-  install_difficulty: z.enum(['diy_easy', 'diy_moderate', 'hire_pro']),
-  // The model's non-binding lean — deterministic rules decide the real verdict
-  suggested_lean: z.enum(['worth_buying', 'can_wait', 'not_worth_it', 'needs_verification']),
+  quantity: z.number().int().min(1).max(20).catch(1).default(1),
+  install_difficulty: z.enum(['diy_easy', 'diy_moderate', 'hire_pro']).catch('diy_moderate'),
+  // The model's non-binding lean — deterministic rules decide the real
+  // verdict. Invalid lean → needs_verification → INVESTIGATE (honest).
+  suggested_lean: z.enum(['worth_buying', 'can_wait', 'not_worth_it', 'needs_verification']).catch('needs_verification'),
 })
 export type Candidate = z.infer<typeof CandidateSchema>
 

@@ -129,7 +129,15 @@ async function handleSessionCompleted(session: Stripe.Checkout.Session) {
   if (productType === 'report_cart') {
     const reportId = reference
     if (!reportId) throw new Error('report_cart session missing client_reference_id')
-    const pending = (await kv.get<{ email?: string }>(`pending:reportcart:${reportId}`)) ?? null
+    // KV is best-effort (v7.4.2e): the Stripe session's customer email /
+    // prefilled_email is the primary source; the pending row only backs
+    // it up. A dead KV must not fail fulfillment of a paid cart.
+    let pending: { email?: string } | null = null
+    try {
+      pending = (await kv.get<{ email?: string }>(`pending:reportcart:${reportId}`)) ?? null
+    } catch (e) {
+      console.error('[webhook] KV pending read failed (non-fatal):', (e as Error).message.slice(0, 150))
+    }
     const buyerEmail = customerEmail || pending?.email || ''
     if (!buyerEmail) throw new Error(`report_cart ${reportId}: no buyer email on session or pending record`)
     await deliverReportCart(reportId, buyerEmail)

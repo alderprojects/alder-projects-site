@@ -94,13 +94,26 @@ export async function sendDailyDigest(): Promise<DigestRunResult> {
   const tokens = await issueTokens(pendingChanges, pendingCandidates)
 
   // Build the HTML email
-  const html = buildEmailHtml({
+  let html = buildEmailHtml({
     pendingChanges,
     pendingCandidates,
     evidenceBlockedCandidates,
     gscSignals,
     tokens,
   })
+
+  // v7.4.4 — prepend the Alder Check confidence-drift section (24h
+  // report stats). Failure must never block the catalog digest.
+  try {
+    const { buildReportDriftSection } = await import('@/lib/recommend/drift-digest')
+    const drift = await buildReportDriftSection()
+    html = html.replace('<body', `<!-- drift --><body`).replace(
+      /(<table[^>]*>)/,
+      `$1<tr><td style="padding: 0 20px;">${drift.html}</td></tr>`
+    )
+  } catch (e) {
+    errors.push(`Drift section failed: ${(e as Error).message}`)
+  }
 
   // Send via Resend
   let emailSent = false

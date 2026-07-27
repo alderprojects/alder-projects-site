@@ -1066,6 +1066,9 @@ model Recommendation {
   // (recs 3+). Element-level overrides (e.g. assumptions detail = email)
   // live in disclosureOverridesJson.
   disclosureTier   String   @default("free")
+  // v7.4.4 admin-lite kill switch: when set, the rec renders nowhere
+  // (free wire, unlock, cart page, paid delivery). Null = live.
+  disabledAt       DateTime?
   disclosureOverridesJson Json?
   // Free-tier commerce surface: category-search affiliate link (never a SKU)
   categorySearchQuery String?

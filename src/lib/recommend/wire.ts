@@ -22,7 +22,8 @@ export function shapeRows(
   const visible: WireRecommendation[] = []
   const locked: LockedStub[] = []
 
-  const sorted = [...rows].sort((a, b) => a.sortOrder - b.sortOrder)
+  // v7.4.4: admin-disabled recs render nowhere, at any tier.
+  const sorted = [...rows].filter((r) => r.disabledAt == null).sort((a, b) => a.sortOrder - b.sortOrder)
   for (const row of sorted) {
     const rowTier = (row.disclosureTier as DisclosureTier) ?? 'free'
     if (TIER_RANK[rowTier] > rank) {

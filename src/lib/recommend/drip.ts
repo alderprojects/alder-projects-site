@@ -80,7 +80,9 @@ export async function runReportDrip(now = new Date()): Promise<DripResult> {
           ? 'Your Alder Check: nothing worth buying right now — and that’s the point'
           : 'Worth a re-check when something changes'
 
-    const cartUrl = `${BASE_URL}/report/${report.id}/cart`
+    const keyParam = report.accessKey ? `?key=${encodeURIComponent(report.accessKey)}` : ''
+    const cartUrl = `${BASE_URL}/report/${report.id}/cart${keyParam}`
+    const reportUrl = `${BASE_URL}/report/${report.id}${keyParam}`
     const html =
       buyCount > 0
         ? `<div style="font-family:Georgia,serif;max-width:560px;color:#22301f">
@@ -93,7 +95,7 @@ export async function runReportDrip(now = new Date()): Promise<DripResult> {
         : `<div style="font-family:Georgia,serif;max-width:560px;color:#22301f">
             <p>Your Alder Check came back with no Buy verdicts — the honest read was wait and skip. That answer is the product working.</p>
             <p>Seasons change the math (heating season, rebate cycles, wet springs). Take new photos any time for a fresh Check — it's free.</p>
-            <p><a href="${BASE_URL}/" style="color:#1f3d2b;font-weight:700">Run a fresh Check →</a></p>
+            <p><a href="${reportUrl}" style="color:#1f3d2b">Revisit your report</a> &nbsp;·&nbsp; <a href="${BASE_URL}/check" style="color:#1f3d2b;font-weight:700">Run a fresh Check →</a></p>
             <p style="font-size:12px;color:#888">You're getting this because you unlocked an Alder Check report with this email. No more than two of these, ever.</p>
           </div>`
 

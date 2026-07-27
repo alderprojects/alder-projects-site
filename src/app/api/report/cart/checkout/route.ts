@@ -23,6 +23,7 @@ export const maxDuration = 10
 const BodySchema = z.object({
   reportId: z.string().min(1),
   email: z.string().email().max(254),
+  key: z.string().max(64).optional(),
 })
 
 const PENDING_TTL_SECONDS = 30 * 60
@@ -35,11 +36,11 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     return NextResponse.json({ ok: false, error: 'invalid_body' }, { status: 400 })
   }
 
-  let anonId: string
+  let anonId: string | null = null
   try {
     anonId = await ensureVisitorSession({ firstSource: 'report_cart' })
   } catch {
-    return NextResponse.json({ ok: false, error: 'no_anon_cookie' }, { status: 400 })
+    if (!body.key) return NextResponse.json({ ok: false, error: 'no_anon_cookie' }, { status: 400 })
   }
 
   const report = await prisma.report.findUnique({
@@ -49,7 +50,9 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
   if (!report || report.deletedAt) {
     return NextResponse.json({ ok: false, error: 'report_not_found' }, { status: 404 })
   }
-  if (report.visitorAnonId !== anonId) {
+  const byCookie = anonId != null && report.visitorAnonId === anonId
+  const byKey = body.key != null && report.accessKey != null && body.key === report.accessKey
+  if (!byCookie && !byKey) {
     return NextResponse.json({ ok: false, error: 'not_your_report' }, { status: 403 })
   }
   // Nudge rule, server-enforced: no BUY verdicts → no cart, ever.
@@ -70,7 +73,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
   try {
     await kv.set(
       `pending:reportcart:${report.id}`,
-      { reportId: report.id, email: body.email.trim().toLowerCase(), anonId, ts: new Date().toISOString() },
+      { reportId: report.id, email: body.email.trim().toLowerCase(), anonId: report.visitorAnonId ?? anonId, ts: new Date().toISOString() },
       { ex: PENDING_TTL_SECONDS }
     )
   } catch (e) {
@@ -81,7 +84,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
   url.searchParams.set('client_reference_id', report.id)
   url.searchParams.set('prefilled_email', body.email.trim().toLowerCase())
   url.searchParams.set('metadata_product_type', 'report_cart')
-  url.searchParams.set('metadata_anon_id', anonId)
+  if (report.visitorAnonId ?? anonId) url.searchParams.set('metadata_anon_id', (report.visitorAnonId ?? anonId) as string)
 
   return NextResponse.json({ ok: true, checkoutUrl: url.toString() })
 }

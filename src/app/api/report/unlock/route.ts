@@ -1,33 +1,42 @@
 /**
- * v7.4.2 — POST /api/report/unlock
+ * v7.4.2f — POST /api/report/unlock
  *
- * The email gate: recommendations 3+ unlock with an email address.
- * Performs the anonymous→user merge (the piece v7.3.3-C schema'd but
- * never wired): find-or-create User, claim the VisitorSession, reassign
- * anon Consent rows, stamp the report, and send a magic link so the
- * visitor can reach the report from email later. The report unlocks
- * immediately in-session — the magic link is access, not a gate.
+ * The email gate, account-free (rewritten after live testing caught
+ * the old version sending a SIGN-IN magic link that dead-ended on a
+ * placeholder page — wrong product: there are no accounts here).
  *
- * Body: { reportId, email }
- * Returns the email-tier recommendations so the client can render the
- * unlocked report without a second fetch.
+ * What happens now:
+ *   1. Unlock is immediate in-session (response carries email-tier recs).
+ *   2. The FULL report is emailed inline, plus a capability link
+ *      (/report/[id]?key=...) that opens the report on any device.
+ *   3. The anonymous→user merge still runs silently (User row, session
+ *      claim, consent reassignment) so drip + analytics have identity —
+ *      but the visitor never sees a login of any kind.
+ *
+ * Body: { reportId, email, key? } — key allows unlocking from an
+ * email-link session on another device.
  */
 
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { prisma } from '@/lib/db'
-import { ensureVisitorSession } from '@/lib/visitor/session'
-import { requestMagicLink } from '@/lib/auth/magic-link'
+import { getAnonId } from '@/lib/visitor/session'
+import { sendEmail } from '@/lib/email/send'
 import { logEvent } from '@/lib/events/log'
+import { authorizeReport, newAccessKey } from '@/lib/recommend/access'
 import { shapeRows } from '@/lib/recommend/wire'
+import { renderReportEmail } from '@/lib/recommend/report-email'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 export const maxDuration = 15
 
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://alderprojects.com'
+
 const BodySchema = z.object({
   reportId: z.string().min(1),
   email: z.string().email().max(254),
+  key: z.string().max(64).optional(),
 })
 
 export async function POST(req: NextRequest): Promise<NextResponse> {
@@ -38,70 +47,57 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     return NextResponse.json({ ok: false, error: 'invalid_body' }, { status: 400 })
   }
 
-  let anonId: string
-  try {
-    anonId = await ensureVisitorSession({ firstSource: 'report_unlock' })
-  } catch (e) {
-    return NextResponse.json({ ok: false, error: 'no_anon_cookie' }, { status: 400 })
-  }
-
-  const report = await prisma.report.findUnique({
-    where: { id: body.reportId },
-    include: { recommendations: true },
-  })
-  if (!report || report.deletedAt) {
-    return NextResponse.json({ ok: false, error: 'report_not_found' }, { status: 404 })
-  }
-  if (report.visitorAnonId !== anonId && report.userId === null) {
-    return NextResponse.json({ ok: false, error: 'not_your_report' }, { status: 403 })
-  }
+  const anonId = await getAnonId()
+  const auth = await authorizeReport({ reportId: body.reportId, anonId, key: body.key ?? null })
+  if (!auth) return NextResponse.json({ ok: false, error: 'report_not_found' }, { status: 404 })
+  const report = auth.report
 
   const email = body.email.trim().toLowerCase()
 
-  // 1. Find-or-create the user.
-  const user = await prisma.user.upsert({
-    where: { email },
-    create: { email },
-    update: {},
-  })
+  // 1. Silent identity merge (no login anywhere).
+  const user = await prisma.user.upsert({ where: { email }, create: { email }, update: {} })
+  if (report.visitorAnonId) {
+    await prisma.visitorSession.updateMany({
+      where: { anonId: report.visitorAnonId, claimedByUserId: null },
+      data: { claimedByUserId: user.id, claimedAt: new Date() },
+    })
+    await prisma.consent.updateMany({
+      where: { anonId: report.visitorAnonId, userId: null },
+      data: { userId: user.id },
+    })
+  }
 
-  // 2. Claim the visitor session (anonymous → user merge).
-  await prisma.visitorSession.updateMany({
-    where: { anonId, claimedByUserId: null },
-    data: { claimedByUserId: user.id, claimedAt: new Date() },
-  })
-
-  // 3. Reassign anon consent rows to the user (keep anonId for audit).
-  await prisma.consent.updateMany({
-    where: { anonId, userId: null },
-    data: { userId: user.id },
-  })
-
-  // 4. Stamp the report.
+  // 2. Ensure a capability key exists (legacy reports predate the column).
+  let accessKey = report.accessKey
+  if (!accessKey) {
+    accessKey = newAccessKey()
+    await prisma.report.update({ where: { id: report.id }, data: { accessKey } })
+  }
   await prisma.report.update({
     where: { id: report.id },
     data: { userId: user.id, emailCapturedAt: report.emailCapturedAt ?? new Date() },
   })
 
-  // 5. Send the magic link (fire-and-forget semantics — send failure
-  //    must not block the unlock; the report is already unlocked
-  //    in-session and the drip re-engages).
-  try {
-    await requestMagicLink(email)
-  } catch (e) {
-    console.error('[report/unlock] magic link send failed:', (e as Error).message)
-  }
+  // 3. Email the FULL report + the any-device link. Send failure doesn't
+  //    block the in-session unlock (the response below carries the recs).
+  const reportUrl = `${BASE_URL}/report/${report.id}?key=${encodeURIComponent(accessKey)}`
+  const sent = await sendEmail({
+    to: email,
+    subject: 'Your Alder Check — the full Buy / Skip / Wait plan',
+    html: renderReportEmail(report.recommendations, reportUrl),
+  })
+  if (!sent.ok) console.error('[report/unlock] report email failed:', sent.reason)
 
   await logEvent({
     eventType: 'EMAIL_CAPTURED',
     subjectType: 'Report',
     subjectId: report.id,
-    anonId,
+    anonId: report.visitorAnonId,
     actorId: user.id,
     source: 'web',
-    payload: { reportId: report.id },
+    payload: { reportId: report.id, emailSent: sent.ok },
   })
 
   const { visible } = shapeRows(report.recommendations, 'email')
-  return NextResponse.json({ ok: true, tier: 'email', recommendations: visible })
+  return NextResponse.json({ ok: true, tier: 'email', emailSent: sent.ok, recommendations: visible })
 }

@@ -26,9 +26,15 @@ export const metadata = {
 
 const C = { green: '#1f3d2b', cream: '#f6f2e8', gold: '#b08d2f', ink: '#22301f', inkSoft: 'rgba(34,48,31,0.68)' }
 
-export default async function ReportCartPage({ params }: { params: { reportId: string } }) {
+export default async function ReportCartPage({
+  params,
+  searchParams,
+}: {
+  params: { reportId: string }
+  searchParams: { key?: string }
+}) {
   const anonId = await getAnonId()
-  if (!anonId) notFound()
+  const key = searchParams.key ?? null
 
   const report = await prisma.report.findUnique({
     where: { id: params.reportId },
@@ -41,7 +47,10 @@ export default async function ReportCartPage({ params }: { params: { reportId: s
       clarifyingAnswers: true,
     },
   })
-  if (!report || report.deletedAt || report.visitorAnonId !== anonId) notFound()
+  if (!report || report.deletedAt) notFound()
+  const byCookie = anonId != null && report.visitorAnonId === anonId
+  const byKey = key != null && report.accessKey != null && key === report.accessKey
+  if (!byCookie && !byKey) notFound()
   if (report.recommendations.length === 0) notFound() // nudge rule: no BUY → no cart surface
 
   // State machine: CHECK_* → CART_OFFERED on first view.
@@ -51,7 +60,7 @@ export default async function ReportCartPage({ params }: { params: { reportId: s
       eventType: 'CART_OFFERED',
       subjectType: 'Report',
       subjectId: report.id,
-      anonId,
+      anonId: report.visitorAnonId,
       source: 'web',
       payload: { buyCount: report.recommendations.length },
     })
@@ -107,7 +116,7 @@ export default async function ReportCartPage({ params }: { params: { reportId: s
           })}
         </div>
 
-        <ReportCartCheckout reportId={report.id} questions={questions} defaultEmail={''} />
+        <ReportCartCheckout reportId={report.id} questions={questions} defaultEmail={''} accessKey={byKey ? (key as string) : undefined} />
       </div>
     </main>
   )

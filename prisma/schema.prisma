@@ -1013,6 +1013,10 @@ model Report {
   pipelineLogJson Json?
   // Email-gate + upsell lifecycle
   emailCapturedAt DateTime?
+  // v7.4.2f — capability key for cookie-less access (email links).
+  // NO accounts, NO sign-in: possession of the key grants access to
+  // this one report. Generated at creation; rotates never.
+  accessKey       String?   @unique
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
   // delete-my-report control (bytes + rows cleanup handled by DeletionRequest)

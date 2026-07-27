@@ -14,6 +14,9 @@ const nextConfig = {
     // 308s preserve any external SEO equity by sending it to the homepage
     // where users can enter their address.
     return [
+      // v7.4.1b: the homepage IS the product — /photo-report 308s home
+      // (avoid duplicate content; all funnel deep links point home).
+      { source: '/photo-report', destination: '/', permanent: true },
       { source: '/calculator', destination: '/', permanent: true },
       { source: '/seasonal-home-report', destination: '/', permanent: true },
       { source: '/owners', destination: '/', permanent: true },

@@ -4,10 +4,11 @@ import Nav from '@/components/Nav'
 import Footer from '@/components/Footer'
 import CheckCta from '@/components/check/CheckCta'
 import VerdictCard from '@/components/check/VerdictCard'
+import HowItWorks from '@/components/check/HowItWorks'
+import { HeroArt } from '@/components/check/CheckArt'
 import {
   CHECK_FAQS,
   CHECK_PALETTE as C,
-  CHECK_SUBLINE,
   DIFFERENTIATION_STRIP,
   EXAMPLE_BUY,
   EXAMPLE_WAIT,
@@ -49,25 +50,33 @@ export default function CheckPage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(FAQ_JSONLD) }} />
       <Nav />
       <main style={{ background: C.cream, minHeight: '100vh' }}>
-        <section style={{ maxWidth: 860, margin: '0 auto', padding: '56px 20px 32px', textAlign: 'center' }}>
-          <p style={{ fontSize: 13, letterSpacing: '0.12em', textTransform: 'uppercase', color: C.gold, fontWeight: 700, marginBottom: 10 }}>
-            Alder Check · Free
-          </p>
-          <h1
-            style={{
-              fontSize: 'clamp(32px, 6vw, 52px)',
-              color: C.green,
-              margin: '0 0 14px',
-              fontFamily: "'Playfair Display', Georgia, serif",
-              lineHeight: 1.12,
-            }}
-          >
-            Photograph your home. Get the honest plan.
-          </h1>
-          <p style={{ fontSize: 'clamp(16px, 2.5vw, 19px)', color: C.inkSoft, maxWidth: 640, margin: '0 auto 26px', lineHeight: 1.55 }}>
-            {CHECK_SUBLINE}
-          </p>
-          <CheckCta />
+        <section style={{ maxWidth: 1040, margin: '0 auto', padding: '48px 20px 32px' }}>
+          <div className="md:grid" style={{ gridTemplateColumns: '1.15fr 0.85fr', gap: 32, alignItems: 'center' }}>
+            <div style={{ textAlign: 'center' }}>
+              <p style={{ fontSize: 13, letterSpacing: '0.12em', textTransform: 'uppercase', color: C.gold, fontWeight: 700, marginBottom: 10 }}>
+                Alder Check · Free · No account
+              </p>
+              <h1
+                style={{
+                  fontSize: 'clamp(30px, 5vw, 46px)',
+                  color: C.green,
+                  margin: '0 0 14px',
+                  fontFamily: "'Playfair Display', Georgia, serif",
+                  lineHeight: 1.12,
+                }}
+              >
+                Photograph any room. Get your Buy / Skip / Wait plan.
+              </h1>
+              <p style={{ fontSize: 'clamp(16px, 2.5vw, 18px)', color: C.inkSoft, maxWidth: 620, margin: '0 auto 26px', lineHeight: 1.55 }}>
+                Upload 1–5 photos of any room. Alder reads what’s actually there and comes back with honest verdicts,
+                verified costs and rebates, and at least one thing not to buy. Free, no account required.
+              </p>
+              <CheckCta />
+            </div>
+            <div className="hidden md:block">
+              <HeroArt />
+            </div>
+          </div>
           <div style={{ display: 'flex', gap: 10, justifyContent: 'center', flexWrap: 'wrap', marginTop: 26 }}>
             {DIFFERENTIATION_STRIP.map((t) => (
               <span
@@ -88,6 +97,9 @@ export default function CheckPage() {
           </div>
         </section>
 
+        {/* ── How a Check works (illustrated) ──────────────────────── */}
+        <HowItWorks />
+
         <section style={{ maxWidth: 860, margin: '0 auto', padding: '8px 20px 40px' }}>
           <h2
             style={{
@@ -107,13 +119,14 @@ export default function CheckPage() {
             <VerdictCard data={EXAMPLE_WAIT} />
           </div>
           <p style={{ textAlign: 'center', fontSize: 13.5, color: C.inkSoft, marginTop: 12 }}>
-            Real output from a lake-house Check. Every number carries a verified date and cites its source guide.
+            Real output from a lake-house Check — every number carries a verified date and names the guide it came
+            from.
           </p>
         </section>
 
         <section style={{ maxWidth: 720, margin: '0 auto', padding: '0 20px 48px' }}>
           <h2 style={{ fontSize: 24, color: C.green, fontFamily: "'Playfair Display', Georgia, serif", marginBottom: 14 }}>
-            Questions, answered
+            The questions people ask before uploading
           </h2>
           {CHECK_FAQS.map((f) => (
             <details key={f.q} style={{ borderBottom: '1px solid rgba(31,61,43,0.12)', padding: '12px 0' }}>
@@ -135,7 +148,7 @@ export default function CheckPage() {
                 fontWeight: 700,
               }}
             >
-              The cost guides behind your Check
+              Where your Check’s numbers come from
             </h2>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px 18px', fontSize: 13.5 }}>
               {GUIDE_LINKS.map(([slug, title]) => (

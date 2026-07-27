@@ -4,6 +4,8 @@ import Nav from '@/components/Nav'
 import Footer from '@/components/Footer'
 import CheckCta from '@/components/check/CheckCta'
 import VerdictCard from '@/components/check/VerdictCard'
+import HowItWorks from '@/components/check/HowItWorks'
+import { HeroArt, IconCheckBadge, IconCart, IconGuides } from '@/components/check/CheckArt'
 import {
   CHECK_PALETTE as C,
   CHECK_SUBLINE,
@@ -67,25 +69,30 @@ const PRODUCTS = [
   {
     eyebrow: 'Start here · Free',
     title: 'Alder Check',
-    body: 'Photograph any room. Get honest Buy / Skip / Wait verdicts with evidence from your photos — and at least one thing NOT to buy, every time.',
-    cta: 'Alder Check has its own page →',
+    body: 'Every project list has something on it that isn’t worth the money. Photograph the room and get Buy / Skip / Wait verdicts backed by what’s visible in your photos — including at least one thing NOT to buy, every time.',
+    cta: 'Run your free Check →',
     href: '/check',
+    icon: 'check' as const,
   },
   {
     eyebrow: '$19.99 · Built from your Check',
     title: 'Smart Cart',
-    body: 'Turns your Check’s Buy verdicts into the exact products — Good / Better / Best tiers, the specs that matter, quantities, and install difficulty.',
-    cta: 'How Smart Cart works →',
+    body: 'A Buy verdict still leaves you comparing forty near-identical models. Smart Cart names the exact products — Good / Better / Best tiers, the specs that matter, quantities, and how hard the install really is.',
+    cta: 'Get the exact products →',
     href: '/smart-cart',
+    icon: 'cart' as const,
   },
   {
     eyebrow: 'Free · No signup',
     title: 'Guides & assistant',
-    body: 'The verified cost guides behind every Check — rebates, permits, real installed costs — plus a free assistant for the questions photos can’t answer.',
-    cta: 'Browse the guides →',
+    body: 'Photos can’t tell you what a permit costs or which rebates stack. The verified cost guides behind every Check can — real installed costs, rebates, permits — plus a free assistant for the rest.',
+    cta: 'Check the real costs →',
     href: '/guides',
+    icon: 'guides' as const,
   },
 ]
+
+const PRODUCT_ICONS = { check: IconCheckBadge, cart: IconCart, guides: IconGuides }
 
 export default function HomePage() {
   return (
@@ -94,23 +101,32 @@ export default function HomePage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(orgJsonLd) }} />
       <Nav />
       <main style={{ background: C.cream, minHeight: '100vh' }}>
-        {/* ── Hero: the brand promise, with the Check flow inline ──── */}
-        <section style={{ maxWidth: 860, margin: '0 auto', padding: '56px 20px 32px', textAlign: 'center' }}>
-          <h1
-            style={{
-              fontSize: 'clamp(32px, 6vw, 52px)',
-              color: C.green,
-              margin: '0 0 14px',
-              fontFamily: "'Playfair Display', Georgia, serif",
-              lineHeight: 1.12,
-            }}
-          >
-            Spend smarter on your home.
-          </h1>
-          <p style={{ fontSize: 'clamp(16px, 2.5vw, 19px)', color: C.inkSoft, maxWidth: 640, margin: '0 auto 26px', lineHeight: 1.55 }}>
-            {CHECK_SUBLINE}
-          </p>
-          <CheckCta />
+        {/* ── Hero: the brand promise, with the Check flow inline.
+            Two columns on desktop (copy + flow left, illustration
+            right); the art collapses away on mobile. ─────────────── */}
+        <section style={{ maxWidth: 1040, margin: '0 auto', padding: '48px 20px 32px' }}>
+          <div className="md:grid" style={{ gridTemplateColumns: '1.15fr 0.85fr', gap: 32, alignItems: 'center' }}>
+            <div style={{ textAlign: 'center' }}>
+              <h1
+                style={{
+                  fontSize: 'clamp(32px, 5vw, 48px)',
+                  color: C.green,
+                  margin: '0 0 14px',
+                  fontFamily: "'Playfair Display', Georgia, serif",
+                  lineHeight: 1.12,
+                }}
+              >
+                Know what’s worth buying — and what to skip.
+              </h1>
+              <p style={{ fontSize: 'clamp(16px, 2.5vw, 18px)', color: C.inkSoft, maxWidth: 620, margin: '0 auto 26px', lineHeight: 1.55 }}>
+                {CHECK_SUBLINE}
+              </p>
+              <CheckCta />
+            </div>
+            <div className="hidden md:block">
+              <HeroArt />
+            </div>
+          </div>
           <div style={{ display: 'flex', gap: 10, justifyContent: 'center', flexWrap: 'wrap', marginTop: 26 }}>
             {DIFFERENTIATION_STRIP.map((t) => (
               <span
@@ -131,33 +147,42 @@ export default function HomePage() {
           </div>
         </section>
 
+        {/* ── How a Check works (illustrated) ──────────────────────── */}
+        <HowItWorks />
+
         {/* ── The Alder continuum: Check → Smart Cart → Guides ─────── */}
-        <section style={{ maxWidth: 980, margin: '0 auto', padding: '12px 20px 40px' }}>
+        <section style={{ maxWidth: 980, margin: '0 auto', padding: '0 20px 40px' }}>
           <div style={{ display: 'grid', gap: 14, gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))' }}>
-            {PRODUCTS.map((p) => (
-              <Link
-                key={p.title}
-                href={p.href}
-                style={{
-                  display: 'block',
-                  background: '#fff',
-                  border: '1px solid rgba(31,61,43,0.14)',
-                  borderRadius: 12,
-                  padding: '20px 22px',
-                  textDecoration: 'none',
-                  textAlign: 'left',
-                }}
-              >
-                <div style={{ fontSize: 11.5, letterSpacing: '0.1em', textTransform: 'uppercase', color: C.gold, fontWeight: 700, marginBottom: 8 }}>
-                  {p.eyebrow}
-                </div>
-                <div style={{ fontSize: 20, fontWeight: 700, color: C.green, fontFamily: "'Playfair Display', Georgia, serif", marginBottom: 6 }}>
-                  {p.title}
-                </div>
-                <p style={{ fontSize: 14, color: C.inkSoft, lineHeight: 1.55, margin: '0 0 10px' }}>{p.body}</p>
-                <span style={{ fontSize: 13.5, color: C.green, fontWeight: 600 }}>{p.cta}</span>
-              </Link>
-            ))}
+            {PRODUCTS.map((p) => {
+              const Icon = PRODUCT_ICONS[p.icon]
+              return (
+                <Link
+                  key={p.title}
+                  href={p.href}
+                  style={{
+                    display: 'block',
+                    background: '#fff',
+                    border: '1px solid rgba(31,61,43,0.14)',
+                    borderRadius: 12,
+                    padding: '20px 22px',
+                    textDecoration: 'none',
+                    textAlign: 'left',
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+                    <div style={{ fontSize: 11.5, letterSpacing: '0.1em', textTransform: 'uppercase', color: C.gold, fontWeight: 700 }}>
+                      {p.eyebrow}
+                    </div>
+                    <Icon />
+                  </div>
+                  <div style={{ fontSize: 20, fontWeight: 700, color: C.green, fontFamily: "'Playfair Display', Georgia, serif", marginBottom: 6 }}>
+                    {p.title}
+                  </div>
+                  <p style={{ fontSize: 14, color: C.inkSoft, lineHeight: 1.55, margin: '0 0 10px' }}>{p.body}</p>
+                  <span style={{ fontSize: 13.5, color: C.green, fontWeight: 600 }}>{p.cta}</span>
+                </Link>
+              )
+            })}
           </div>
         </section>
 
@@ -181,9 +206,9 @@ export default function HomePage() {
             <VerdictCard data={EXAMPLE_WAIT} />
           </div>
           <p style={{ textAlign: 'center', fontSize: 13.5, color: C.inkSoft, marginTop: 12 }}>
-            Real output. Every number carries a verified date and cites its source guide —{' '}
+            Real output. Every number carries a verified date and names the guide it came from —{' '}
             <Link href="/check" style={{ color: C.green, textDecoration: 'underline' }}>
-              more on how the Check works
+              get your own free Check
             </Link>
             .
           </p>
@@ -202,7 +227,7 @@ export default function HomePage() {
                 fontWeight: 700,
               }}
             >
-              Verified cost guides — the data behind every Check
+              The verified cost data behind every Check
             </h2>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px 18px', fontSize: 13.5 }}>
               {GUIDE_LINKS.map(([slug, title]) => (

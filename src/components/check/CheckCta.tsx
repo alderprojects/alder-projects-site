@@ -167,7 +167,7 @@ export default function CheckCta() {
           boxShadow: '0 2px 10px rgba(31,61,43,0.25)',
         }}
       >
-        Get My Free Alder Check
+        Start My Free Check
       </button>
 
       {/* Desktop: drop zone + QR side by side. Mobile: neither (the
@@ -199,7 +199,7 @@ export default function CheckCta() {
             justifyContent: 'center',
           }}
         >
-          …or drag photos here. 1–5 photos of any room. Free. No account required.
+          …or drag photos here — 1–5 of any room. Free, no account required.
         </div>
 
         {handoff.stage === 'ready' && (
@@ -218,8 +218,9 @@ export default function CheckCta() {
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={handoff.qrDataUrl} alt="Scan to continue on your phone" width={96} height={96} style={{ borderRadius: 6 }} />
             <div style={{ textAlign: 'left', fontSize: 13, color: 'rgba(34,48,31,0.75)', lineHeight: 1.45 }}>
-              <strong style={{ color: '#1f3d2b', display: 'block', fontSize: 13.5 }}>Photos on your phone?</strong>
-              Scan with your camera — shoot and upload from the phone, and your report appears right here.
+              <strong style={{ color: '#1f3d2b', display: 'block', fontSize: 13.5 }}>Shooting from your phone?</strong>
+              Point your camera at this code, shoot the room from your phone, and the report appears right here on this
+              screen.
             </div>
           </div>
         )}
@@ -227,7 +228,7 @@ export default function CheckCta() {
 
       {/* Mobile hint line (desktop shows the drop zone instead) */}
       <p className="md:hidden" style={{ marginTop: 12, fontSize: 13.5, color: 'rgba(34,48,31,0.6)' }}>
-        One tap opens your camera. 1–5 photos of any room. Free. No account required.
+        One tap opens your camera. 1–5 photos of any room. Free, no account required.
       </p>
     </div>
   )

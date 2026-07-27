@@ -80,12 +80,28 @@ export const EXAMPLE_WAIT = {
 
 export const DIFFERENTIATION_STRIP = [
   'We tell you what NOT to buy',
-  'Real costs & rebates built in — deepest in Vermont',
+  'Every cost verified and dated — deepest in Vermont',
   'Photos with people are excluded automatically',
 ]
 
 export const CHECK_SUBLINE =
-  'Take a photo of any room. Your free Alder Check tells you what’s worth buying, what can wait, and what to skip — no account required.'
+  'Take a photo of any room. Your free Alder Check comes back with Buy / Skip / Wait verdicts — evidence from your photos, verified costs and rebates, no account required.'
+
+// v7.4.2c — SEO copy pass: three illustrated steps (see HowItWorks.tsx)
+export const HOW_IT_WORKS = {
+  header: 'How a Check works',
+  steps: [
+    { title: 'Snap 1–5 photos', body: 'Any room, any angle. One tap opens your camera. No account, no forms.' },
+    {
+      title: 'Get your verdicts',
+      body: 'Buy / Skip / Wait / Investigate — with photo evidence, verified costs, and rebates.',
+    },
+    {
+      title: 'Turn Buys into products',
+      body: 'Optional $19.99 Smart Cart: exact products, Good / Better / Best, quantities, install difficulty.',
+    },
+  ],
+}
 
 export const GUIDE_LINKS: Array<[string, string]> = [
   ['vermont-heat-pump-rebate-stack-2026', 'Heat Pump Rebate Stack 2026'],

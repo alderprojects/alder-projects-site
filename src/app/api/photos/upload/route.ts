@@ -350,10 +350,17 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
   if (!reusedExistingPhoto || !photo.blobConfirmedAt) {
     let blobUrl: string
     try {
+      // v7.4.3: addRandomSuffix — the stored URL gains an unguessable
+      // random component on top of the content hash, and the URL is
+      // never exposed in any API response (reads go through the
+      // session-gated /api/photos/view route). @vercel/blob has no
+      // private-ACL mode on this plan/SDK; capability-URL + no-exposure
+      // is the documented equivalent. Dedup still keys on blobKey
+      // (the content path we compute), not the returned URL.
       const blob = await put(blobKey, processed, {
         access: 'public',
         contentType: 'image/jpeg',
-        addRandomSuffix: false,
+        addRandomSuffix: true,
       })
       blobUrl = blob.url
     } catch (e) {

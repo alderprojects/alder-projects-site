@@ -31,7 +31,7 @@ export const CHECK_FAQS = [
   },
   {
     q: 'What happens to my photos?',
-    a: 'Photos are analyzed only to create your report. Images containing people or sensitive information are excluded or redacted where possible, and excluded photos are reported to you and not analyzed. Every report includes a working delete control that removes the report and the photo files.',
+    a: 'Photos are analyzed only to create your report. Images containing people, faces, documents, or readable screens are detected and excluded before analysis, and every exclusion is reported to you. Photos are stored no longer than the retention window (90 days by default), and every report includes a working delete control that removes both the report and the photo files immediately.',
   },
 ]
 

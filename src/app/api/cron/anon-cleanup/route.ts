@@ -108,6 +108,34 @@ export async function GET(request: NextRequest): Promise<Response> {
     sessionsFullyDeleted++
   }
 
+  // ── v7.4.3 retention sweep ─────────────────────────────────────────
+  // Configurable photo retention (PHOTO_RETENTION_DAYS, default 90):
+  // photo BYTES + rows older than the window are purged regardless of
+  // claim status — reports keep their Recommendation rows (evidence
+  // text is persisted there), only the images age out. VisionExtraction
+  // rows cascade with the Photo delete.
+  const retentionDays = Math.max(1, parseInt(process.env.PHOTO_RETENTION_DAYS || '90', 10) || 90)
+  const retentionCutoff = new Date(now - retentionDays * 24 * 60 * 60 * 1000)
+  let retentionPhotosDeleted = 0
+  let retentionBlobsDeleted = 0
+  const expiredPhotos = await prisma.photo.findMany({
+    where: { uploadedAt: { lt: retentionCutoff } },
+    take: BATCH_LIMIT,
+    orderBy: { uploadedAt: 'asc' },
+  })
+  for (const photo of expiredPhotos) {
+    try {
+      if (photo.blobUrl && photo.blobConfirmedAt) {
+        await del(photo.blobUrl)
+        retentionBlobsDeleted++
+      }
+    } catch {
+      blobErrors++
+    }
+    await prisma.photo.delete({ where: { id: photo.id } })
+    retentionPhotosDeleted++
+  }
+
   await logEvent({
     eventType: 'ANON_CLEANUP_RUN_COMPLETED',
     subjectType: 'system',
@@ -120,6 +148,9 @@ export async function GET(request: NextRequest): Promise<Response> {
       photosDeleted,
       blobsDeleted,
       blobErrors,
+      retentionDays,
+      retentionPhotosDeleted,
+      retentionBlobsDeleted,
     },
   })
 
@@ -131,5 +162,8 @@ export async function GET(request: NextRequest): Promise<Response> {
     photosDeleted,
     blobsDeleted,
     blobErrors,
+    retentionDays,
+    retentionPhotosDeleted,
+    retentionBlobsDeleted,
   })
 }

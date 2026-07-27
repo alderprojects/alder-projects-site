@@ -1186,6 +1186,92 @@ model DeletionRequest {
 }
 
 // =============================================================================
+// CONSENTED ADDRESS PIPELINE — v7.4.8 (FLAG-GATED: ADDRESS_CAPTURE_ENABLED)
+// =============================================================================
+//
+// Ships dark. Every surface below renders only when the env flag is on,
+// which flips after counsel review of the T&Cs, financial-incentive
+// notice, and sale-disclosure language.
+//
+// WHY ConsentRecord instead of extending the existing Consent table:
+// Consent carries partial UNIQUE indexes on (userId, purpose, dataType)
+// and (anonId, purpose, dataType) — at most ONE row per owner+purpose.
+// Licensing consent requires an append-only chain: revoking must never
+// mutate the granting row, and re-consent must create a NEW row with
+// its own policyVersion + textHash. That is structurally impossible
+// under those uniques, so the licensing consent gets its own table.
+// Photo-upload consents keep using Consent, unchanged.
+
+model PropertyRecord {
+  id             String   @id @default(cuid())
+  // Ownership follows the existing anon-first claim pattern.
+  reportId       String?
+  visitorAnonId  String?
+  userId         String?
+  // Address exactly as the visitor entered it (no third-party
+  // verification in this release — verifiedVia is NONE for now).
+  line1          String
+  line2          String?
+  city           String
+  state          String
+  zip            String
+  // Uppercased, whitespace-collapsed join of the address fields, for
+  // dedupe only.
+  normalizedHash String
+  verifiedVia    String   @default("NONE") // "NONE" (v7.6+ expands: USPS, ...)
+  createdAt      DateTime @default(now())
+
+  @@index([visitorAnonId])
+  @@index([userId])
+  @@index([reportId])
+  @@index([normalizedHash])
+}
+
+model ConsentRecord {
+  // Append-only, version-stamped consent. NEVER updated except to set
+  // revokedAt on the row being revoked; re-consent inserts a new row.
+  // textHash is the audit chain: SHA-256 of the EXACT consent language
+  // shown at grant time, so a later copy change is provably a different
+  // consent.
+  id            String    @id @default(cuid())
+  scope         String // "DATA_LICENSING"
+  visitorAnonId String?
+  userId        String?
+  reportId      String?
+  propertyRecordId String?
+  policyVersion String
+  textHash      String
+  grantedAt     DateTime  @default(now())
+  revokedAt     DateTime?
+  source        String // "post_result_address_module" | ...
+
+  @@index([scope, revokedAt])
+  @@index([visitorAnonId])
+  @@index([userId])
+  @@index([propertyRecordId])
+}
+
+model SmartCartCredit {
+  // One-time Smart Cart credit issued as consideration for the
+  // licensing consent specifically (never for the address alone).
+  // Redeems through the SAME fulfillment path a paid cart uses
+  // (deliverReportCart) — one delivery path, two entry points.
+  id              String    @id @default(cuid())
+  code            String    @unique
+  visitorAnonId   String?
+  userId          String?
+  reportId        String?
+  consentRecordId String?
+  issuedAt        DateTime  @default(now())
+  redeemedAt      DateTime?
+  redeemedForReportId String?
+
+  @@index([visitorAnonId])
+  @@index([userId])
+  @@index([redeemedAt])
+}
+
+// =============================================================================
 // ADMIN REVIEW CONSOLE — v7.4.5
 // =============================================================================
 

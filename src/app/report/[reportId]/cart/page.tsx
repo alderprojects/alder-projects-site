@@ -34,7 +34,7 @@ export default async function ReportCartPage({ params }: { params: { reportId: s
     where: { id: params.reportId },
     include: {
       recommendations: {
-        where: { verdict: 'BUY' },
+        where: { verdict: 'BUY', disabledAt: null },
         orderBy: { sortOrder: 'asc' },
         include: { cartCandidates: { where: { fitStatus: { not: 'removed' } } } },
       },

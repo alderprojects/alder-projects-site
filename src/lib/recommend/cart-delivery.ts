@@ -17,7 +17,7 @@ export async function deliverReportCart(reportId: string, buyerEmail: string): P
     where: { id: reportId },
     include: {
       recommendations: {
-        where: { verdict: 'BUY' },
+        where: { verdict: 'BUY', disabledAt: null },
         orderBy: { sortOrder: 'asc' },
         include: { cartCandidates: { where: { fitStatus: { not: 'removed' } }, orderBy: { sortOrder: 'asc' } } },
       },

@@ -16,7 +16,9 @@
     "catalog:refresh:dry": "tsx src/lib/catalog/refresh.ts --dry-run",
     "catalog:refresh:write": "tsx src/lib/catalog/refresh.ts --write",
     "check:eval": "tsx scripts/eval-photos.ts",
-    "score:test": "tsx scripts/score/unit-tests.ts && tsx scripts/score/db-tests.ts && tsx scripts/score/commerce-tests.ts"
+    "score:test": "tsx scripts/score/unit-tests.ts && tsx scripts/score/db-tests.ts && tsx scripts/score/commerce-tests.ts",
+    "coverage:test": "tsx scripts/coverage/unit-tests.ts",
+    "coverage:dryrun": "tsx scripts/coverage/dry-run.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.30.1",

@@ -91,10 +91,8 @@ export function coachingMessage(systemId: string, slotId: string): string {
   if (slotId === GENERIC_SLOT_ID) {
     return 'Almost — a little more light and a step back would let us read this one. Retake?'
   }
+  // The schema's guidance is written as a standalone instruction, so it
+  // stands as its own sentence here rather than being spliced mid-clause.
   const guidance = getSlot(systemId, slotId)?.guidance
-  return guidance ? `Almost — ${lowerFirst(guidance)} Retake?` : 'Almost — a bit more light would let us read this one. Retake?'
-}
-
-function lowerFirst(s: string): string {
-  return s.charAt(0).toLowerCase() + s.slice(1)
+  return guidance ? `Almost. ${guidance} Retake?` : 'Almost — a bit more light would let us read this one. Retake?'
 }

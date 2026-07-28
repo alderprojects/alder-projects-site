@@ -1097,6 +1097,9 @@ model Recommendation {
   suppressedReason String?
   // Per-claim grounding linkage (ClaimLink[]) — the GroundingScore substrate.
   claimLinksJson   Json?
+  // v7.4.10 — commerce resolution outcome (BUY/WAIT only; CR4).
+  // {resolutionMode, asin, url, imageUrl, illustration, price, priceAsOf, matchScore}
+  resolutionJson   Json?
   // Disclosure tier for the rec as a whole: "free" (recs 1-2) | "email"
   // (recs 3+). Element-level overrides (e.g. assumptions detail = email)
   // live in disclosureOverridesJson.
@@ -1431,3 +1434,35 @@ model CategoryObservation {
 //     hot (e.g. zip-code-level rebate eligibility)
 //
 // =============================================================================
+
+// =============================================================================
+// COMMERCE RESOLUTION LAYER — v7.4.10
+// =============================================================================
+
+model ResolvedProduct {
+  // Cache keyed on specHash: identical specs resolve ONCE. Price always
+  // renders with its "as of" date; a stale row is re-resolved on next
+  // use (24h TTL) rather than served silently.
+  //
+  // resolutionMode ASIN requires matchScore >= RESOLUTION_FLOOR. Below
+  // the floor we ship a tagged SEARCH url and never guess an ASIN — a
+  // wrong specific product under the Alder brand costs more than a
+  // search link earns.
+  specHash       String    @id
+  query          String
+  asin           String?
+  detailUrl      String?
+  searchUrl      String?
+  imageUrl       String?
+  title          String?
+  price          Float?
+  priceAsOf      DateTime?
+  matchScore     Float     @default(0)
+  resolutionMode String // "ASIN" | "SEARCH"
+  category       String? // illustration category key
+  resolvedAt     DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  @@index([resolutionMode])
+  @@index([resolvedAt])
+}

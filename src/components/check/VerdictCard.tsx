@@ -9,6 +9,8 @@
  * UI copy only — this component's data shapes stay report/recommendation.
  */
 
+import ProductCard from './ProductCard'
+
 const PALETTE = {
   green: '#1f3d2b',
   cream: '#f6f2e8',
@@ -38,6 +40,20 @@ export interface VerdictCardData {
   nextAction?: string
   categorySearchUrl?: string | null
   confidenceLabel?: string
+  /** v7.4.10 — product card payload; BUY/WAIT only (CR4). */
+  product?: {
+    productName?: string
+    spec?: string | null
+    resolutionMode: 'ASIN' | 'SEARCH'
+    url: string
+    imageUrl: string | null
+    illustration: string
+    title: string | null
+    price: number | null
+    priceAsOf: string | null
+  } | null
+  productName?: string
+  productSpec?: string | null
 }
 
 function fmtMonthYear(iso: string): string {
@@ -125,7 +141,29 @@ export default function VerdictCard({
         </p>
       )}
 
-      {data.categorySearchUrl && (
+      {/* v7.4.10 — resolved product card (BUY/WAIT only; ProductCard
+          itself returns null for other lanes, so CR4 is enforced in one
+          place rather than trusted to every caller). */}
+      {data.product && (
+        <ProductCard
+          data={{
+            verdict: data.verdict,
+            productName: data.product.productName || data.productName || data.product.title || 'Recommended option',
+            spec: data.product.spec ?? data.productSpec ?? null,
+            price: data.product.price,
+            priceAsOf: data.product.priceAsOf,
+            url: data.product.url,
+            imageUrl: data.product.imageUrl,
+            illustration: data.product.illustration,
+            resolutionMode: data.product.resolutionMode,
+          }}
+          onAffiliateClick={onAffiliateClick}
+        />
+      )}
+
+      {/* Legacy category link only when nothing was resolved and the lane
+          allows a link at all (never SKIP/INVESTIGATE). */}
+      {!data.product && data.categorySearchUrl && data.verdict === 'BUY' && (
         <a
           href={data.categorySearchUrl}
           target="_blank"

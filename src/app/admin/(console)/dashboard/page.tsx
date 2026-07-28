@@ -17,6 +17,7 @@ import {
   getResultEngagement,
   getReviewCoverage,
   getZipStats,
+  getCommerceStats,
 } from '@/lib/admin/metrics'
 
 export const dynamic = 'force-dynamic'
@@ -80,7 +81,7 @@ const big: React.CSSProperties = { fontSize: 26, fontWeight: 650, color: '#1C2B1
 const sub: React.CSSProperties = { fontSize: 12.5, color: '#777' }
 
 export default async function AdminDashboardPage() {
-  const [uploads, extraction, kill, flags, lanes, funnel, engagement, coverage, zips] = await Promise.all([
+  const [uploads, extraction, kill, flags, lanes, funnel, engagement, coverage, zips, commerce] = await Promise.all([
     getUploadVolume(),
     getExtractionStats(),
     getKillMetric(),
@@ -90,6 +91,7 @@ export default async function AdminDashboardPage() {
     getResultEngagement(),
     getReviewCoverage(),
     getZipStats(),
+    getCommerceStats(),
   ])
 
   const pct = (v: number | null) => (v == null ? '—' : `${(v * 100).toFixed(1)}%`)
@@ -249,6 +251,29 @@ export default async function AdminDashboardPage() {
               {zips.data.zip3.map((z) => `${z.zip3}xx ${z.n}`).join(' · ')}
             </p>
           )}
+        </Card>
+
+        <Card title="Link coverage on BUY items (v7.4.10)" queryMs={commerce.queryMs}>
+          <div style={big}>
+            {commerce.data.buyTotal > 0
+              ? `${(((commerce.data.coverage.ASIN + commerce.data.coverage.SEARCH) / commerce.data.buyTotal) * 100).toFixed(0)}%`
+              : '—'}
+          </div>
+          <p style={sub}>
+            of {commerce.data.buyTotal} BUY items linked · ASIN {commerce.data.coverage.ASIN} · SEARCH{' '}
+            {commerce.data.coverage.SEARCH} · none {commerce.data.coverage.none}
+          </p>
+          <p style={{ ...sub, marginTop: 6 }}>
+            resolution-mode mix:{' '}
+            {Object.keys(commerce.data.modeMix).length
+              ? Object.entries(commerce.data.modeMix).map(([k, v]) => `${k} ${v}`).join(' · ')
+              : '—'}{' '}
+            · fallback rate {pct(commerce.data.paapiErrorRate)}
+          </p>
+          <p style={{ ...sub, marginTop: 6 }}>
+            clicks by lane:{' '}
+            {commerce.data.ctrByLane.map((l) => `${l.lane} ${l.clicks}/${l.impressions}`).join(' · ') || '—'}
+          </p>
         </Card>
 
         <Card title="Review coverage (7d)" queryMs={coverage.queryMs}>

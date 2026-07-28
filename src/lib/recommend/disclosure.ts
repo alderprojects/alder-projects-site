@@ -16,7 +16,24 @@ import { categorySearchUrl } from './verdicts'
 
 const TIER_RANK: Record<DisclosureTier, number> = { free: 0, email: 1, paid: 2 }
 
+/** v7.4.10 — product card payload; BUY/WAIT only (CR4). */
+export interface WireProduct {
+  productName?: string
+  spec?: string | null
+  resolutionMode: 'ASIN' | 'SEARCH'
+  asin: string | null
+  url: string
+  imageUrl: string | null
+  illustration: string
+  category: string
+  title: string | null
+  price: number | null
+  priceAsOf: string | null
+  matchScore: number
+}
+
 export interface WireRecommendation {
+  product?: WireProduct | null
   id?: string
   key: string
   verdict: string

@@ -18,6 +18,7 @@
 import { prisma } from '@/lib/db'
 import { SCORING_CONFIG } from '@/lib/score/config'
 import type { AutoEvalResult } from '@/lib/score/autoeval'
+import { buildLayeredStats } from './layers'
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://alderprojects.com'
 
@@ -45,82 +46,132 @@ export interface ScoreboardResult {
 // ---------------------------------------------------------------------------
 
 export async function buildDailyScoreboard(run: AutoEvalResult): Promise<ScoreboardResult> {
-  const metrics = run.metricsId
-    ? await prisma.dailyEvalMetrics.findUnique({ where: { id: run.metricsId } })
-    : null
+  const now = new Date()
+  const dayStart = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()))
+  const from = new Date(dayStart.getTime() - 24 * 3600 * 1000)
+  const stats = await buildLayeredStats(from, dayStart)
+  stats.backend.judgeCacheHits = run.judgeCacheHits
+  stats.backend.judgeModelCalls = run.judgeModelCalls
 
   const hasActivity =
-    (metrics?.sessions ?? 0) > 0 || run.judgeFlagsCreated > 0 || run.autoRulesCreated > 0
+    stats.exec.sessions > 0 || stats.backend.photosUploaded > 0 || run.judgeFlagsCreated > 0 || run.autoRulesCreated > 0
   if (!hasActivity) {
-    return { sent: false, skippedReason: 'zero-activity day (no sessions, no flags, no rules)', alerts: [] }
+    return { sent: false, skippedReason: 'zero-activity day (no sessions, no photos, no flags, no rules)', alerts: [] }
   }
 
   const alerts: string[] = []
-  const flag = (label: string, value: number, threshold: number, higherIsWorse = true) => {
-    const bad = higherIsWorse ? value > threshold : value < threshold
-    if (bad) alerts.push(`${label} ${(value * 100).toFixed(1)}% (threshold ${(threshold * 100).toFixed(0)}%)`)
-    return bad
+  if ((stats.backend.suppressionRatePct ?? 0) > 15) alerts.push(`Suppression rate ${fmtPct(stats.backend.suppressionRatePct)}`)
+  if (stats.backend.decodeFailureRate > 0.05) alerts.push(`Decode failures ${pct(stats.backend.decodeFailureRate)}`)
+  if (stats.exec.sessions > 0 && (stats.backend.skipWaitSharePct ?? 100) < 20) {
+    alerts.push(`SKIP+WAIT share ${fmtPct(stats.backend.skipWaitSharePct)} — honesty invariant thinning`)
+  }
+  if (run.judgeFlagsCreated > 0) alerts.push(`${run.judgeFlagsCreated} judge flag(s)`)
+
+  // ---------------- EXEC ----------------
+  const e = stats.exec
+  const trend =
+    e.sessionsPrev7DayAvg > 0
+      ? `${e.sessions >= e.sessionsPrev7DayAvg ? '▲' : '▼'} vs ${e.sessionsPrev7DayAvg.toFixed(1)}/day trailing 7d`
+      : 'no prior week to compare'
+  const execRows = [
+    metricRow('Sessions', `${e.sessions} <span style="${MUTED_INLINE}">${trend}</span>`),
+    metricRow(
+      'Reports delivered',
+      e.reportsDelivered === e.sessions
+        ? String(e.reportsDelivered)
+        : `${e.reportsDelivered} <span style="${MUTED_INLINE}">incl. since-deleted sessions (events are append-only)</span>`
+    ),
+    metricRow('Photo changed the recommendation', e.killMetricPct != null ? fmtPct(e.killMetricPct) : '— <span style="' + MUTED_INLINE + '">no dual-synthesis carts</span>'),
+    metricRow('Review coverage', e.reviewCoveragePct != null ? fmtPct(e.reviewCoveragePct) : '—'),
+  ]
+  const attention = e.needsAttention.length
+    ? `<div style="${CARD}"><strong>Needs you:</strong><div style="${MUTED}">${e.needsAttention.map(esc).join(' · ')}</div>
+       <div style="${MUTED}"><a href="${BASE_URL}/admin/queue">review queue</a> · <a href="${BASE_URL}/admin/curation">curation rules</a></div></div>`
+    : `<div style="${CARD}">Nothing needs a decision today.</div>`
+
+  // ---------------- BACKEND ----------------
+  const b = stats.backend
+  const backendRows = [
+    sectionRow('Photos'),
+    metricRow('Uploaded', String(b.photosUploaded)),
+    metricRow('Upload failures', b.uploadFailures === 0 ? '0' : `${b.uploadFailures} <span style="${MUTED_INLINE}">${Object.entries(b.uploadFailuresByStage).map(([k, v]) => `${k} ${v}`).join(' · ')}</span>`, b.uploadFailures > 0),
+    metricRow('Decode failure rate', pct(b.decodeFailureRate), b.decodeFailureRate > 0.05),
+    sectionRow('Extraction'),
+    metricRow('Extractions', String(b.extractions)),
+    metricRow('Mean confidence', b.meanExtractionConfidence != null ? b.meanExtractionConfidence.toFixed(3) : '—'),
+    metricRow('Extraction failures', String(b.extractionFailures), b.extractionFailures > 0),
+    sectionRow('Recommendation distribution'),
+    metricRow('Lane mix', laneMix(b.laneMix)),
+    metricRow('SKIP + WAIT share', fmtPct(b.skipWaitSharePct), (b.skipWaitSharePct ?? 100) < 20),
+    sectionRow('Recommendation quality'),
+    metricRow('Grounding violations (suppressed)', String(b.groundingViolations), b.groundingViolations > 0),
+    metricRow('Suppression rate', fmtPct(b.suppressionRatePct), (b.suppressionRatePct ?? 0) > 15),
+    metricRow('Score p10 / p50 / p90', `${num(b.scoreP10)} / ${num(b.scoreP50)} / ${num(b.scoreP90)}`),
+    metricRow('Judge flags raised', String(b.judgeFlags), b.judgeFlags > 0),
+    metricRow('Judge cache hits / model calls', `${b.judgeCacheHits} / ${b.judgeModelCalls}`),
+    metricRow('Auto-demotion rules created', String(b.autoRules)),
+    metricRow('Median pipeline time', b.medianPipelineMs != null ? `${(b.medianPipelineMs / 1000).toFixed(1)}s` : '—'),
+  ]
+
+  // ---------------- CFO ----------------
+  const c = stats.cfo
+  const f = c.funnel
+  const step = (a: number, bb: number) => (a > 0 ? `${((bb / a) * 100).toFixed(0)}%` : '—')
+  const cfoRows = [
+    sectionRow('Funnel'),
+    metricRow('Uploaded', String(f.uploaded)),
+    metricRow('Result viewed', `${f.resultViewed} <span style="${MUTED_INLINE}">${step(f.uploaded, f.resultViewed)} of uploads</span>`),
+    metricRow('Email captured', `${f.emailCaptured} <span style="${MUTED_INLINE}">${step(f.resultViewed, f.emailCaptured)} of views</span>`),
+    metricRow('Smart Cart purchased', `${f.purchased} <span style="${MUTED_INLINE}">${step(f.emailCaptured, f.purchased)} of captures</span>`),
+    sectionRow('Revenue'),
+    metricRow('Smart Cart revenue', `$${c.cartRevenueUsd.toFixed(2)}`),
+    metricRow('Affiliate clicks', c.affiliateClicks === 0 ? '0' : `${c.affiliateClicks} <span style="${MUTED_INLINE}">${Object.entries(c.affiliateClicksByLane).map(([k, v]) => `${k} ${v}`).join(' · ')}</span>`),
+    sectionRow('Commerce coverage'),
+    metricRow('BUY items', String(c.buyItems)),
+    metricRow('Link coverage', c.buyItems > 0
+      ? `${(((c.linkCoverage.ASIN + c.linkCoverage.SEARCH) / c.buyItems) * 100).toFixed(0)}% <span style="${MUTED_INLINE}">ASIN ${c.linkCoverage.ASIN} · SEARCH ${c.linkCoverage.SEARCH} · none ${c.linkCoverage.none}</span>`
+      : '—'),
+    sectionRow('Cost to run'),
+    metricRow('Vision extraction', `$${c.visionCostUsd.toFixed(4)}`),
+    metricRow('Report synthesis (est.)', `$${(c.estLlmCostUsd - c.visionCostUsd).toFixed(4)}`),
+    metricRow('Total LLM spend', `$${c.estLlmCostUsd.toFixed(4)}`),
+    metricRow('Gross margin', c.cartRevenueUsd > 0
+      ? `$${(c.cartRevenueUsd - c.estLlmCostUsd).toFixed(2)}`
+      : `–$${c.estLlmCostUsd.toFixed(4)} <span style="${MUTED_INLINE}">no cart sales yesterday</span>`),
+  ]
+
+  const sections: string[] = [
+    `<h2 style="${H1L}">Exec</h2><p style="${MUTED}">Is the product working, and does anything need a decision?</p>
+     ${attention}<table style="${TABLE}">${execRows.join('')}</table>`,
+    `<h2 style="${H1L}">Backend</h2><p style="${MUTED}">Photos in, what the engine said, and how honest it was.</p>
+     <table style="${TABLE}">${backendRows.join('')}</table>`,
+    `<h2 style="${H1L}">CFO</h2><p style="${MUTED}">Funnel, revenue, coverage, and what the day cost.</p>
+     <table style="${TABLE}">${cfoRows.join('')}</table>`,
+  ]
+
+  const newRules = await prisma.curationRule.findMany({
+    where: { source: 'AUTOEVAL', revokedAt: null, createdAt: { gte: from } },
+    select: { signature: true, reason: true },
+  })
+  if (newRules.length > 0) {
+    sections.push(`<h2 style="${H2}">Auto-demotions applied (${newRules.length})</h2>
+      <p style="${MUTED}">Demote-only, capped at ${SCORING_CONFIG.autoRule.maxNewRulesPerWeek}/week. Revoke at <a href="${BASE_URL}/admin/curation">/admin/curation</a>.</p>
+      ${newRules.map((r) => `<div style="${CARD}"><code>${esc(r.signature)}</code><div style="${MUTED}">${esc(r.reason)}</div></div>`).join('')}`)
+  }
+  if (run.autoRulesBlockedByCap > 0) {
+    sections.push(`<div style="${CARD}"><strong>${run.autoRulesBlockedByCap} finding(s) beyond the weekly cap</strong><div style="${MUTED}">Flagged, not acted on.</div></div>`)
   }
 
-  const gv = metrics?.groundingViolationRate ?? 0
-  const sup = metrics?.suppressionRate ?? 0
-  const dec = metrics?.decodeFailureRate ?? 0
-  const sw = metrics?.skipWaitShare ?? 0
-  const gvBad = flag('Grounding violations', gv, ABS_THRESHOLDS.groundingViolationRate)
-  const supBad = flag('Suppression rate', sup, ABS_THRESHOLDS.suppressionRate)
-  const decBad = flag('Decode failures', dec, ABS_THRESHOLDS.decodeFailureRate)
-  const swBad = metrics ? flag('SKIP+WAIT share', sw, ABS_THRESHOLDS.skipWaitShareFloor, false) : false
-
-  // Judge flags awaiting review (deep-linked)
   const openFlags = await prisma.qAFlag.findMany({
     where: { createdBy: 'autoeval', report: { reviewedAt: null, deletedAt: null } },
     orderBy: { createdAt: 'desc' },
     take: 8,
-    select: { id: true, reportId: true, type: true, note: true, createdAt: true },
+    select: { reportId: true, note: true },
   })
-
-  const rules = await prisma.curationRule.findMany({
-    where: { source: 'AUTOEVAL', revokedAt: null },
-    orderBy: { createdAt: 'desc' },
-    take: 10,
-    select: { signature: true, reason: true, evidenceN: true, createdAt: true },
-  })
-  const newRules = rules.filter((r) => Date.now() - r.createdAt.getTime() < 26 * 3600 * 1000)
-
-  const rows: string[] = [
-    metricRow('Sessions', String(metrics?.sessions ?? 0)),
-    metricRow('Grounding violation rate', pct(gv), gvBad),
-    metricRow('Suppression rate', pct(sup), supBad),
-    metricRow('Score p10 / p50 / p90', `${num(metrics?.scoreP10)} / ${num(metrics?.scoreP50)} / ${num(metrics?.scoreP90)}`),
-    metricRow('Lane mix', laneMix(metrics?.laneMixJson)),
-    metricRow('SKIP+WAIT share', pct(sw), swBad),
-    metricRow('photoChanged rate', metrics?.photoChangedRate != null ? pct(metrics.photoChangedRate) : '—'),
-    metricRow('Decode failure rate', pct(dec), decBad),
-    metricRow('Reactions / session', num(metrics?.reactionsPerSession)),
-    metricRow('Judge: cache hits / model calls', `${run.judgeCacheHits} / ${run.judgeModelCalls}`),
-  ]
-  if (metrics?.linkCoverageJson) {
-    rows.push(metricRow('Link coverage', linkCoverage(metrics.linkCoverageJson)))
-  }
-
-  const sections: string[] = [
-    `<h2 style="${H2}">Yesterday · ${run.day}</h2><table style="${TABLE}">${rows.join('')}</table>`,
-  ]
-
-  if (newRules.length > 0) {
-    sections.push(`<h2 style="${H2}">Auto-demotions applied (${newRules.length})</h2>
-      <p style="${MUTED}">Demote-only, capped at ${SCORING_CONFIG.autoRule.maxNewRulesPerWeek}/week. Revoke any of these at <a href="${BASE_URL}/admin/curation">/admin/curation</a>.</p>
-      ${newRules.map((r) => `<div style="${CARD}"><code>${esc(r.signature)}</code><div style="${MUTED}">${esc(r.reason)}</div></div>`).join('')}`)
-  }
-  if (run.autoRulesBlockedByCap > 0) {
-    sections.push(`<div style="${CARD}"><strong>${run.autoRulesBlockedByCap} finding(s) beyond the weekly cap</strong><div style="${MUTED}">Flagged, not acted on: ${run.beyondBoundsFindings.slice(0, 5).map((b) => esc(b.signature)).join(', ')}</div></div>`)
-  }
-
   if (openFlags.length > 0) {
     sections.push(`<h2 style="${H2}">Judge flags awaiting review (${openFlags.length})</h2>
-      ${openFlags.map((f) => `<div style="${CARD}"><a href="${BASE_URL}/admin/session/${f.reportId}?queue=1">${f.reportId.slice(-8)}</a><div style="${MUTED}">${esc(f.note.slice(0, 220))}</div></div>`).join('')}`)
+      ${openFlags.map((x) => `<div style="${CARD}"><a href="${BASE_URL}/admin/session/${x.reportId}?queue=1">${x.reportId.slice(-8)}</a><div style="${MUTED}">${esc(x.note.slice(0, 220))}</div></div>`).join('')}`)
   }
-
   if (run.errors.length > 0) {
     sections.push(`<h2 style="${H2}">Run errors (${run.errors.length})</h2><div style="${CARD}">${run.errors.slice(0, 6).map(esc).join('<br/>')}</div>`)
   }
@@ -129,10 +180,10 @@ export async function buildDailyScoreboard(run: AutoEvalResult): Promise<Scorebo
   if (catalog) sections.push(catalog)
 
   const subject = alerts.length
-    ? `Alder · ${alerts.length} alert${alerts.length === 1 ? '' : 's'} · ${metrics?.sessions ?? 0} session${metrics?.sessions === 1 ? '' : 's'}`
-    : `Alder · ${metrics?.sessions ?? 0} session${metrics?.sessions === 1 ? '' : 's'} · all clear`
+    ? `Alder · ${alerts.length} alert${alerts.length === 1 ? '' : 's'} · ${e.sessions} session${e.sessions === 1 ? '' : 's'}`
+    : `Alder · ${e.sessions} session${e.sessions === 1 ? '' : 's'} · $${c.cartRevenueUsd.toFixed(2)} · all clear`
 
-  return { sent: true, subject, html: wrap('Daily scoreboard', sections, alerts), alerts }
+  return { sent: true, subject, html: wrap(`Daily report · ${run.day}`, sections, alerts), alerts }
 }
 
 // ---------------------------------------------------------------------------
@@ -278,6 +329,7 @@ export async function sendScoreboard(result: ScoreboardResult): Promise<boolean>
 // Presentation helpers
 // ---------------------------------------------------------------------------
 
+const H1L = 'font-size:17px;font-weight:700;margin:26px 0 2px;color:#1C2B1A;border-bottom:2px solid #1C2B1A;padding-bottom:4px;'
 const H2 = 'font-size:14px;font-weight:600;margin:22px 0 6px;color:#1C2B1A;'
 const TABLE = 'border-collapse:collapse;width:100%;font-size:13px;'
 const CARD = 'background:#faf9f5;border:1px solid #e6e2d4;border-radius:6px;padding:9px 12px;margin:6px 0;font-size:13px;'
@@ -291,6 +343,12 @@ function metricRow(label: string, value: string, alert = false): string {
   </tr>`
 }
 
+function sectionRow(label: string): string {
+  return `<tr><td colspan="2" style="padding:12px 8px 3px;font-size:11px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:#8a8a80;">${label}</td></tr>`
+}
+function fmtPct(v: number | null): string {
+  return v == null ? '—' : `${v.toFixed(1)}%`
+}
 function pct(v: number): string {
   return `${(v * 100).toFixed(1)}%`
 }

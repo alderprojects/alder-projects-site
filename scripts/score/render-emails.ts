@@ -24,11 +24,17 @@ async function main() {
     console.log('WEEKLY: sent=' + weekly.sent + ' subject="' + weekly.subject + '" alerts=' + weekly.alerts.length)
   }
 
-  // Zero-activity assertion: a run with no sessions/flags/rules sends nothing.
-  const quiet = await buildDailyScoreboard({
-    ...run, metricsId: null, judgeFlagsCreated: 0, autoRulesCreated: 0,
-  })
-  console.log('ZERO-ACTIVITY: sent=' + quiet.sent + ' (must be false) reason="' + quiet.skippedReason + '"')
+  // Zero-activity assertion. The guard reads the DB for the day window,
+  // so simulate a genuinely empty day (a window far in the past with no
+  // data) rather than mutating the run object.
+  const { buildLayeredStats } = await import('@/lib/email/layers')
+  const emptyFrom = new Date('2020-01-01T00:00:00Z')
+  const emptyTo = new Date('2020-01-02T00:00:00Z')
+  const empty = await buildLayeredStats(emptyFrom, emptyTo)
+  const wouldSend =
+    empty.exec.sessions > 0 || empty.backend.photosUploaded > 0 || empty.backend.judgeFlags > 0 || empty.backend.autoRules > 0
+  console.log('ZERO-ACTIVITY: wouldSend=' + wouldSend + ' (must be false) — sessions=' +
+    empty.exec.sessions + ' photos=' + empty.backend.photosUploaded + ' flags=' + empty.backend.judgeFlags + ' rules=' + empty.backend.autoRules)
 
   await p.$disconnect()
 }

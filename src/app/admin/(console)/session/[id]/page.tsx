@@ -253,6 +253,44 @@ export default async function AdminSessionDetailPage({
                   {rec.costLow != null && rec.costHigh != null ? `$${rec.costLow}–$${rec.costHigh} · ` : ''}
                   {rec.benefitType} · risk {rec.riskLevel} · next: {rec.nextAction}
                 </div>
+                {/* v7.4.9 — score breakdown, frozen at synthesis */}
+                {rec.compositeScore != null && (
+                  <details style={{ marginTop: 6 }}>
+                    <summary style={{ fontSize: 12, color: '#555', cursor: 'pointer' }}>
+                      score {rec.compositeScore.toFixed(3)} · {rec.scoreVersion ?? '—'}
+                    </summary>
+                    <table style={{ borderCollapse: 'collapse', fontSize: 11.5, marginTop: 4 }}>
+                      <tbody>
+                        {Object.entries((rec.subScoresJson ?? {}) as Record<string, number>).map(([k, v]) => (
+                          <tr key={k}>
+                            <td style={{ padding: '2px 10px 2px 0', color: '#666' }}>{k}</td>
+                            <td style={{ padding: '2px 0', fontWeight: 600 }}>{typeof v === 'number' ? v.toFixed(4) : String(v)}</td>
+                            {k === 'grounding' && (
+                              <td style={{ padding: '2px 0 2px 10px', color: '#888' }}>gate — floor 0.8</td>
+                            )}
+                            {k === 'actionabilityTieBreak' && (
+                              <td style={{ padding: '2px 0 2px 10px', color: '#888' }}>BUY-only, cap 0.10</td>
+                            )}
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                    {Array.isArray(rec.claimLinksJson) && (
+                      <div style={{ marginTop: 6, fontSize: 11.5, color: '#666' }}>
+                        {(rec.claimLinksJson as Array<{ claim: string; featureRefs: number[]; groundedConfidence: number }>).map(
+                          (c, i) => (
+                            <div key={i}>
+                              <span style={{ color: c.groundedConfidence > 0 ? '#1f7a33' : '#b45309' }}>
+                                {c.groundedConfidence > 0 ? '✓' : '✗'}
+                              </span>{' '}
+                              {c.claim} <span style={{ color: '#aaa' }}>→ obs [{c.featureRefs.join(', ')}] @ {c.groundedConfidence.toFixed(2)}</span>
+                            </div>
+                          )
+                        )}
+                      </div>
+                    )}
+                  </details>
+                )}
                 {rec.cartCandidates.length > 0 && (
                   <details style={{ marginTop: 6 }}>
                     <summary style={{ fontSize: 12, color: '#555', cursor: 'pointer' }}>

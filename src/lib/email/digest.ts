@@ -43,6 +43,23 @@ export interface DigestRunResult {
 export async function sendDailyDigest(): Promise<DigestRunResult> {
   const errors: string[] = []
 
+  // v7.4.9 — LEGACY SENDER, FLAG-DISABLED (not deleted; one-line revert
+  // is setting DISABLE_DIGEST_EMAIL=false in Vercel). The auto-eval
+  // scoreboard at /api/cron/autoeval is the single live email system;
+  // it embeds a catalog-review summary so nothing is lost while this is
+  // off. This env var was already advertised in this email's own footer
+  // but never actually read — now it is.
+  if (process.env.DISABLE_DIGEST_EMAIL === 'true') {
+    return {
+      changesPending: 0,
+      candidatesPending: 0,
+      evidenceBlocked: 0,
+      gscSignals: 0,
+      emailSent: false,
+      errors: ['disabled: DISABLE_DIGEST_EMAIL=true (v7.4.9 — superseded by the auto-eval scoreboard)'],
+    }
+  }
+
   // Pull pending items
   const [pendingChanges, pendingCandidates, evidenceBlockedCandidates, gscSignals] = await Promise.all([
     prisma.recommendationChange.findMany({

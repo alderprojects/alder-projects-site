@@ -1087,6 +1087,16 @@ model Recommendation {
   // Provenance: [{guideSlug, guideTitle, verifiedAt}] resolved from the
   // dataset entries used (v7.4.1c citation layer)
   citationsJson    Json
+  // v7.4.9 RecScore — computed ONCE at synthesis against the config +
+  // priors current at that moment, then frozen (CR3: scores are immutable
+  // once served). Never recomputed at request time.
+  compositeScore   Float?
+  subScoresJson    Json? // {grounding, reactionPrior, photoQuality, regionFit, specificity, actionabilityTieBreak}
+  scoreVersion     String?
+  suppressed       Boolean  @default(false)
+  suppressedReason String?
+  // Per-claim grounding linkage (ClaimLink[]) — the GroundingScore substrate.
+  claimLinksJson   Json?
   // Disclosure tier for the rec as a whole: "free" (recs 1-2) | "email"
   // (recs 3+). Element-level overrides (e.g. assumptions detail = email)
   // live in disclosureOverridesJson.
@@ -1183,6 +1193,92 @@ model DeletionRequest {
   detailJson  Json?
 
   @@index([status, requestedAt])
+}
+
+// =============================================================================
+// RECSCORE + AUTO-EVAL — v7.4.9
+// =============================================================================
+
+model SignaturePrior {
+  // Nightly-materialized aggregate per feature signature. Serve-time
+  // scoring is a LOOKUP against this table — we pre-aggregate the
+  // INPUTS, never pre-score the outputs (which would be stale on
+  // arrival). Laplace-smoothed; neutral 0.5 until n >= 5.
+  signatureHash String   @id // sha256 of the `type:category:severity` signature
+  signature     String // human-readable original, for admin display
+  likeCount     Int      @default(0)
+  dismissCount  Int      @default(0)
+  doesntApplyCount Int   @default(0)
+  impressionCount  Int   @default(0)
+  n             Int      @default(0) // total reactions considered
+  prior         Float    @default(0.5) // smoothed (likeRate - doesntApplyRate) mapped to 0..1
+  updatedAt     DateTime @updatedAt
+
+  @@index([n])
+  @@index([updatedAt])
+}
+
+model CurationRule {
+  // Rules DEMOTE. Only the grounding gate suppresses (CR1). There is no
+  // promotion mechanism by design — auto-promotion is a package non-goal.
+  id            String    @id @default(cuid())
+  signatureHash String
+  signature     String
+  action        String // "DEMOTE" (the only permitted action)
+  reason        String
+  source        String // "AUTOEVAL" | "MANUAL"
+  evidenceN     Int       @default(0)
+  evidenceJson  Json? // the numbers that justified an AUTOEVAL rule
+  createdAt     DateTime  @default(now())
+  createdBy     String    @default("autoeval")
+  revokedAt     DateTime?
+  revokedBy     String?
+
+  @@index([signatureHash, revokedAt])
+  @@index([source, createdAt])
+  @@index([revokedAt])
+}
+
+model JudgeVerdict {
+  // LLM-judge cache. Keyed by the (extraction, synthesis) pair so a
+  // judged pair is NEVER re-judged — the cache is what keeps the nightly
+  // job's cost flat as the corpus grows.
+  id             String   @id @default(cuid())
+  reportId       String
+  extractionHash String
+  synthesisHash  String
+  unsupportedJson Json // [{recKey, claim, why}]
+  violationCount Int      @default(0)
+  modelVersion   String
+  createdAt      DateTime @default(now())
+
+  @@unique([extractionHash, synthesisHash])
+  @@index([reportId])
+  @@index([createdAt])
+}
+
+model DailyEvalMetrics {
+  // One row per nightly run — the scoreboard the digests read from.
+  id                      String   @id @default(cuid())
+  day                     DateTime @unique // UTC midnight of the day summarized
+  sessions                Int      @default(0)
+  groundingViolationRate  Float    @default(0)
+  suppressionRate         Float    @default(0)
+  scoreP10                Float?
+  scoreP50                Float?
+  scoreP90                Float?
+  laneMixJson             Json?
+  skipWaitShare           Float    @default(0)
+  photoChangedRate        Float?
+  decodeFailureRate       Float    @default(0)
+  reactionsPerSession     Float    @default(0)
+  judgeFlagsCreated       Int      @default(0)
+  autoRulesCreated        Int      @default(0)
+  // v7.4.10 link coverage (null until the commerce layer ships)
+  linkCoverageJson        Json?
+  createdAt               DateTime @default(now())
+
+  @@index([day])
 }
 
 // =============================================================================

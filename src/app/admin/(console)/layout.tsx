@@ -63,6 +63,9 @@ export default async function AdminConsoleLayout({
           <Link href="/admin/queue" style={{ color: '#1d4ed8', textDecoration: 'none' }}>
             Queue
           </Link>
+          <Link href="/admin/curation" style={{ color: '#1d4ed8', textDecoration: 'none' }}>
+            Curation
+          </Link>
           <Link href="/admin/reports" style={{ color: '#1d4ed8', textDecoration: 'none' }}>
             Reports (lite)
           </Link>

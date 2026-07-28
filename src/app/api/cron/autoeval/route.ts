@@ -19,11 +19,12 @@ export const dynamic = 'force-dynamic'
 export const maxDuration = 300
 
 export async function GET(request: NextRequest): Promise<Response> {
-  // Same auth convention as the other crons.
-  const secret = process.env.CRON_SECRET
-  const auth = request.headers.get('authorization')
-  const isVercelCron = request.headers.get('user-agent')?.includes('vercel-cron')
-  if (secret && auth !== `Bearer ${secret}` && !isVercelCron) {
+  // Bearer-only, matching the convention in the other cron routes.
+  // Vercel attaches `Authorization: Bearer $CRON_SECRET` to scheduled
+  // invocations automatically, so no user-agent fallback is needed — and
+  // a UA check would be trivially spoofable, letting anyone trigger a
+  // judge pass and an admin email.
+  if (request.headers.get('authorization') !== `Bearer ${process.env.CRON_SECRET}`) {
     return NextResponse.json({ ok: false, error: 'unauthorized' }, { status: 401 })
   }
   if (process.env.DISABLE_AUTOEVAL_CRON === 'true') {

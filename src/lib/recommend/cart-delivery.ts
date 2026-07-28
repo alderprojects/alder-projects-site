@@ -11,6 +11,14 @@ import { prisma } from '@/lib/db'
 import { sendEmail } from '@/lib/email/send'
 import { logEvent } from '@/lib/events/log'
 import { buildAmazonAsinUrl, buildAmazonUrl } from '@/lib/buildAmazonUrl'
+import { categoryForProduct } from '@/lib/commerce/categories'
+
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://alderprojects.com'
+
+/** CR5 — illustration category for a cart line with no resolved ASIN. */
+function illustrationCategory(productName: string, searchQuery: string): string {
+  return categoryForProduct(productName, searchQuery)
+}
 
 export async function deliverReportCart(reportId: string, buyerEmail: string): Promise<void> {
   const report = await prisma.report.findUnique({
@@ -61,6 +69,7 @@ interface RecWithCandidates {
     tier: string
     productName: string
     asin: string | null
+    imageUrl?: string | null
     searchQuery: string
     priceLow: number | null
     priceHigh: number | null
@@ -102,11 +111,26 @@ function renderCartEmail(recs: RecWithCandidates[]): string {
                 .join('; ')
             : ''
           const fit = c.fitStatus === 'confirmed_fit' ? 'Confirmed fit' : 'Likely fit'
+          // v7.4.10 §2.4 — same card grammar as the result page:
+          // hosted image, name + spec, price with "as of", bulletproof
+          // CTA. CR5: PA-API image only when we truly resolved an ASIN;
+          // otherwise the brand illustration.
+          const img = c.asin && c.imageUrl ? c.imageUrl : `${BASE_URL}/illustrations/${illustrationCategory(c.productName, c.searchQuery)}.svg`
           return `<tr>
-            <td style="padding:8px 10px;font-weight:600">${TIER_LABEL[c.tier] ?? c.tier}</td>
-            <td style="padding:8px 10px"><a href="${url}">${escapeHtml(c.productName)}</a>${c.quantity > 1 ? ` × ${c.quantity}` : ''}<br/>
-              <span style="color:#666;font-size:12px">${fit}${specs ? ` · Check: ${escapeHtml(specs)}` : ''}</span></td>
-            <td style="padding:8px 10px;white-space:nowrap">${price}</td>
+            <td style="padding:10px;vertical-align:top;width:76px">
+              <img src="${img}" width="64" height="64" alt="" style="width:64px;height:64px;object-fit:contain;border-radius:6px;background:#faf8f2;display:block"/>
+            </td>
+            <td style="padding:10px;vertical-align:top">
+              <div style="font-size:11px;font-weight:700;letter-spacing:0.06em;color:#1f7a33">${TIER_LABEL[c.tier] ?? c.tier}</div>
+              <div style="font-size:14px;font-weight:600;margin:2px 0">${escapeHtml(c.productName)}${c.quantity > 1 ? ` × ${c.quantity}` : ''}</div>
+              <div style="color:#666;font-size:12px">${fit}${specs ? ` · Check: ${escapeHtml(specs)}` : ''}</div>
+              <div style="font-size:13px;margin-top:4px"><strong>${price}</strong> <span style="color:#888;font-size:11.5px">as of ${new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span></div>
+              <table role="presentation" cellpadding="0" cellspacing="0" style="margin-top:8px"><tr>
+                <td bgcolor="#2F5233" style="border-radius:6px">
+                  <a href="${url}" target="_blank" rel="nofollow sponsored noopener" style="display:inline-block;padding:9px 16px;font-family:-apple-system,system-ui,sans-serif;font-size:13px;font-weight:600;color:#ffffff;text-decoration:none;border-radius:6px">View on Amazon &rarr;</a>
+                </td>
+              </tr></table>
+            </td>
           </tr>`
         })
         .join('')
@@ -123,7 +147,7 @@ function renderCartEmail(recs: RecWithCandidates[]): string {
     ${sections}
     ${totalLow > 0 ? `<p style="margin-top:20px;font-size:15px"><strong>Estimated total (Better tier): $${totalLow.toFixed(0)}${totalHigh > totalLow ? `–$${totalHigh.toFixed(0)}` : ''}</strong></p>` : ''}
     <p style="margin-top:8px;font-size:13px;color:#666">Prices shown were fetched when your Check ran and can drift — the links show live prices. Items marked “Likely fit” become “Confirmed fit” once you answer the compatibility questions on your cart page; if an answer rules a product out, we remove the line and refund its share.</p>
-    <p style="margin-top:16px;font-size:12px;color:#888">Affiliate disclosure: product links are Amazon affiliate links (tag alderprojects-20). Alder may earn a commission at no cost to you. That never changes a verdict — verdicts are set before any product is matched.</p>
+    <p style="margin-top:16px;font-size:12px;color:#888"><strong>As an Amazon Associate, Alder earns from qualifying purchases.</strong> Affiliate disclosure: product links are Amazon affiliate links (tag alderprojects-20). Alder may earn a commission at no cost to you. That never changes a verdict — verdicts are set before any product is matched.</p>
   </div>`
 }
 

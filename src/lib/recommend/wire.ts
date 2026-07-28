@@ -54,6 +54,10 @@ export function shapeRows(
         (q) => ({ key: q.key, question: q.question })
       ),
       smartCartEligible: row.smartCartEligible,
+      // v7.4.10 — product card payload. Present for BUY/WAIT only (the
+      // resolver never runs for SKIP/INVESTIGATE), so CR4 holds by
+      // construction all the way to the client.
+      product: (row.resolutionJson as WireRecommendation['product']) ?? null,
     }
     if (rank >= TIER_RANK.email) {
       wire.assumptions = (row.assumptionsJson as string[]) ?? []

@@ -26,6 +26,8 @@ export interface SearchResult {
   priceLow: number | null
   priceHigh: number | null
   availability: string
+  /** v7.4.10 CR5 — PA-API primary image, used UNMODIFIED or not at all. */
+  imageUrl: string | null
 }
 
 export async function searchItems(query: string, maxResults = 6): Promise<SearchResult[]> {
@@ -41,6 +43,8 @@ export async function searchItems(query: string, maxResults = 6): Promise<Search
     PartnerType: 'Associates',
     Resources: [
       'ItemInfo.Title',
+      // v7.4.10 — official product imagery for ASIN-resolved cards (CR5)
+      'Images.Primary.Large',
       'Offers.Listings.Availability.Type',
       'Offers.Listings.Price',
       'Offers.Summaries.HighestPrice',
@@ -74,6 +78,7 @@ interface SearchResponseShape {
     Items?: Array<{
       ASIN: string
       ItemInfo?: { Title?: { DisplayValue?: string } }
+      Images?: { Primary?: { Large?: { URL?: string } } }
       Offers?: {
         Listings?: Array<{ Availability?: { Type?: string }; Price?: { Amount?: number } }>
         Summaries?: Array<{ HighestPrice?: { Amount?: number }; LowestPrice?: { Amount?: number } }>
@@ -90,6 +95,7 @@ function parseResponse(data: SearchResponseShape): SearchResult[] {
     return {
       asin: item.ASIN,
       title: item.ItemInfo?.Title?.DisplayValue ?? null,
+      imageUrl: item.Images?.Primary?.Large?.URL ?? null,
       priceLow: summary?.LowestPrice?.Amount ?? listing?.Price?.Amount ?? null,
       priceHigh: summary?.HighestPrice?.Amount ?? listing?.Price?.Amount ?? null,
       availability:

@@ -20,6 +20,7 @@ import { logEvent } from '@/lib/events/log'
 import { regionProfileForZip } from '@/lib/region/profile'
 import { loadServeLookups } from '@/lib/score/priors'
 import { applyScoreOrdering, scoreItems, type ScoredItem } from '@/lib/score/score'
+import { resolveForReport } from '@/lib/commerce/resolve'
 import { runGate, exclusionLine } from './gate'
 import { generateCandidates } from './candidates'
 import { decideVerdicts } from './verdicts'
@@ -151,6 +152,24 @@ export async function runPipeline(input: PipelineInput): Promise<PipelineOutput>
   // 4. Cart artifacts for BUY recs (same pass; paid-tier disclosure).
   await computeCartArtifacts(enriched)
 
+  // 4b. v7.4.10 — commerce resolution for BUY + WAIT only (CR4).
+  // Degrades to search links on any failure; never blocks the result.
+  let resolutions = new Map<string, Awaited<ReturnType<typeof resolveForReport>> extends Map<string, infer R> ? R : never>()
+  try {
+    resolutions = await resolveForReport(
+      enriched.map((r) => ({
+        recKey: r.key,
+        verdict: r.verdict,
+        productCategory: r.cartMeta.productCategory,
+        searchQuery: r.cartMeta.searchQuery,
+        requiredSpecs: r.cartMeta.requiredSpecs,
+        specificity: scoreByKey.get(r.key)?.subScores.specificity ?? 0,
+      }))
+    )
+  } catch (e) {
+    console.error('[pipeline] resolution failed (non-fatal):', (e as Error).message.slice(0, 160))
+  }
+
   // 5. Validation pass (honesty invariant, precision/brand/person strip).
   const validated = validateReport(enriched)
 
@@ -229,6 +248,8 @@ export async function runPipeline(input: PipelineInput): Promise<PipelineOutput>
         scoreVersion: scoreByKey.get(rec.key)?.scoreVersion ?? null,
         suppressed: false, // suppressed items are never persisted as served rows
         claimLinksJson: rec.claimLinks as never,
+        // v7.4.10 — resolution outcome for this item (BUY/WAIT only)
+        resolutionJson: (resolutions.get(rec.key) ?? null) as never,
       },
     })
     recIds.set(rec.key, row.id)

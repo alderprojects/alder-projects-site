@@ -306,6 +306,76 @@ export const getZipStats = unstable_cache(
 )
 
 // ---------------------------------------------------------------------------
+// 8b. Commerce resolution (v7.4.10 §2.5): link coverage on BUY items,
+//     resolution-mode mix, CTR by lane position, PA-API error rate
+// ---------------------------------------------------------------------------
+
+export const getCommerceStats = unstable_cache(
+  async (): Promise<
+    Timed<{
+      buyTotal: number
+      coverage: { ASIN: number; SEARCH: number; none: number }
+      modeMix: Record<string, number>
+      ctrByLane: Array<{ lane: string; impressions: number; clicks: number }>
+      paapiErrorRate: number
+    }>
+  > =>
+    timed(async () => {
+      const buyRecs = await prisma.recommendation.findMany({
+        where: { verdict: 'BUY', createdAt: { gte: since(WINDOW_30D) }, report: { deletedAt: null } },
+        select: { resolutionJson: true },
+      })
+      const coverage = { ASIN: 0, SEARCH: 0, none: 0 }
+      for (const r of buyRecs) {
+        const mode = (r.resolutionJson as { resolutionMode?: string } | null)?.resolutionMode
+        if (mode === 'ASIN') coverage.ASIN++
+        else if (mode === 'SEARCH') coverage.SEARCH++
+        else coverage.none++
+      }
+
+      const modeRows = await prisma.resolvedProduct.groupBy({
+        by: ['resolutionMode'],
+        _count: { _all: true },
+      })
+      const modeMix: Record<string, number> = {}
+      for (const m of modeRows) modeMix[m.resolutionMode] = m._count._all
+
+      // CTR by lane: AFFILIATE_CLICKED carries verdict + lanePosition.
+      const clickRows = await prisma.$queryRaw<{ lane: string | null; n: bigint }[]>`
+        SELECT "payloadJson"->>'verdict' AS lane, count(*) AS n
+        FROM "EventLog"
+        WHERE "eventType" = 'AFFILIATE_CLICKED' AND "occurredAt" >= ${since(WINDOW_30D)}
+        GROUP BY 1`
+      const laneCounts = await prisma.recommendation.groupBy({
+        by: ['verdict'],
+        where: { createdAt: { gte: since(WINDOW_30D) }, report: { deletedAt: null } },
+        _count: { _all: true },
+      })
+      const clickMap = new Map(clickRows.map((r) => [r.lane ?? 'unknown', Number(r.n)]))
+      const ctrByLane = laneCounts.map((l) => ({
+        lane: l.verdict,
+        impressions: l._count._all,
+        clicks: clickMap.get(l.verdict) ?? 0,
+      }))
+
+      const [resolved, fallback] = await Promise.all([
+        prisma.eventLog.count({ where: { eventType: 'PRODUCT_RESOLVED', occurredAt: { gte: since(WINDOW_30D) } } }),
+        prisma.eventLog.count({ where: { eventType: 'PRODUCT_RESOLUTION_FALLBACK', occurredAt: { gte: since(WINDOW_30D) } } }),
+      ])
+
+      return {
+        buyTotal: buyRecs.length,
+        coverage,
+        modeMix,
+        ctrByLane,
+        paapiErrorRate: resolved + fallback > 0 ? fallback / (resolved + fallback) : 0,
+      }
+    }),
+  ['admin-metrics-commerce'],
+  { revalidate: CACHE_SECONDS }
+)
+
+// ---------------------------------------------------------------------------
 // 9. Review coverage (% of last-7-day sessions reviewed)
 // ---------------------------------------------------------------------------
 

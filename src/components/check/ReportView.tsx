@@ -11,10 +11,12 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import VerdictCard, { PALETTE, type VerdictCardData } from './VerdictCard'
 import AddressModule from './AddressModule'
+import { AffiliateDisclosure } from './ProductCard'
 import { fireFunnel } from '@/lib/check/funnel'
 
 interface WireRec extends VerdictCardData {
   id?: string
+  verdict: string
   key: string
   clarifyingQuestions: Array<{ key: string; question: string }>
   smartCartEligible: boolean
@@ -246,11 +248,22 @@ export default function ReportView({
       )}
 
       <div data-engage="verdicts" style={{ display: 'grid', gap: 14, margin: '16px 0' }}>
-        {report.recommendations.map((rec) => (
+        {report.recommendations.map((rec, idx) => (
           <div key={rec.key}>
             <VerdictCard
               data={rec}
-              onAffiliateClick={() => fireFunnel('AFFILIATE_CLICKED', { reportId: report.reportId, recKey: rec.key })}
+              onAffiliateClick={() =>
+                // §2.5 — conforms to the existing AFFILIATE_CLICKED event,
+                // now carrying sessionId + resolutionMode + lane position.
+                fireFunnel('AFFILIATE_CLICKED', {
+                  reportId: report.reportId,
+                  sessionId: report.reportId,
+                  recKey: rec.key,
+                  verdict: rec.verdict,
+                  lanePosition: idx,
+                  resolutionMode: rec.product?.resolutionMode ?? 'none',
+                })
+              }
             />
             {rec.clarifyingQuestions.length > 0 && (
               <details style={{ marginTop: 6 }}>
@@ -392,7 +405,9 @@ export default function ReportView({
         <p style={{ fontSize: 14, color: PALETTE.inkSoft }}>Thanks — that feedback tunes the engine.</p>
       )}
 
-      <p style={{ marginTop: 18, fontSize: 12.5, color: PALETTE.inkSoft }}>
+      <AffiliateDisclosure />
+
+      <p style={{ marginTop: 10, fontSize: 12.5, color: PALETTE.inkSoft }}>
         Photos are analyzed only to create your report.{' '}
         <button
           onClick={() => void deleteReport()}

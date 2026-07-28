@@ -37,7 +37,7 @@ You are the honest advisor whose differentiation is telling people what NOT to b
 # Reasoning rules
 
 1. Reason over the photo SET as a whole, not photo-by-photo. Cross-photo signals matter: moving boxes in two rooms suggest a recent move; a hydronic boiler plus single-pane windows suggests a heating-cost story.
-2. Ground every candidate in visible_evidence — specific observations from the extractions. Never invent evidence.
+2. Ground every candidate in visible_evidence — specific observations from the extractions. Never invent evidence. Each evidence entry is an object: {"claim": "...", "feature_refs": [n, ...]} where each n is the NUMBER of an observation in the numbered list below. Cite the observation number(s) that actually support that claim. If you cannot cite a numbered observation for a claim, do not make the claim. Claims with no valid citation are dropped from the report and may suppress the whole candidate.
 3. If seasonal cues in the observations conflict with the current date given to you (e.g. holiday decor in July), set recency_conflict.detected = true and describe it. Still produce candidates, but lower confidence.
 4. Respect tenure. If tenure is "rent", set renter_reversible honestly per candidate — the downstream engine drops or reframes non-reversible work for renters. If tenure is unknown, still produce candidates but expect the engine to ask own-vs-rent first.
 5. If equipment already visible in the photos does the job (dehumidifier present, sump pump present), set duplicate_of_present_equipment = true on any candidate that would duplicate it.
@@ -152,7 +152,7 @@ function buildUserMessage(input: CandidateInput): string {
       "title": "short title",
       "summary": "2-3 sentence plain-language summary, no numbers, no brands",
       "dataset_category": "${categories.join(' | ')} | other",
-      "visible_evidence": ["what in the photos supports this"],
+      "visible_evidence": [{"claim": "what in the photos supports this", "feature_refs": [0]}],
       "benefit_type": "cost_savings | comfort | safety | prevention | resale",
       "risk_flags": ["structural | electrical_panel | gas | roofing | mold_suspected | foundation | major_plumbing | fire_safety | none"],
       "duplicate_of_present_equipment": false,
@@ -192,10 +192,12 @@ function buildUserMessage(input: CandidateInput): string {
     lines.push(`  note: ${input.regionContext.regionNote}`)
   }
   lines.push('')
-  lines.push('Observations extracted from the photo set (type | location | condition | confidence | category):')
-  for (const f of input.features.slice(0, 80)) {
-    lines.push(`- ${f.type} | ${f.location} | ${f.condition} | ${f.confidence.toFixed(2)} | ${f.category_hint}`)
-  }
+  // v7.4.9: observations are NUMBERED so visible_evidence claims can cite
+  // them by index (feature_refs). The index is the grounding substrate.
+  lines.push('Numbered observations extracted from the photo set (N | type | location | condition | confidence | category):')
+  input.features.slice(0, 80).forEach((f, i) => {
+    lines.push(`${i} | ${f.type} | ${f.location} | ${f.condition} | ${f.confidence.toFixed(2)} | ${f.category_hint}`)
+  })
   lines.push('')
   lines.push(`Dataset categories available for pricing: ${categories.join(', ')}`)
   lines.push('')

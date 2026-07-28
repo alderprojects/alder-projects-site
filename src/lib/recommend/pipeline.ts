@@ -18,13 +18,15 @@
 import { prisma } from '@/lib/db'
 import { logEvent } from '@/lib/events/log'
 import { regionProfileForZip } from '@/lib/region/profile'
+import { loadServeLookups } from '@/lib/score/priors'
+import { applyScoreOrdering, scoreItems, type ScoredItem } from '@/lib/score/score'
 import { runGate, exclusionLine } from './gate'
 import { generateCandidates } from './candidates'
 import { decideVerdicts } from './verdicts'
 import { computeCartArtifacts } from './cart'
 import { validateReport } from './validate'
 import { RECOMMEND_MODEL, RECOMMEND_PROMPT_VERSION, RULES_VERSION } from './version'
-import type { EnrichedRecommendation, PipelineInput, Tenure } from './types'
+import type { EnrichedRecommendation, MergedFeature, PipelineInput, Tenure } from './types'
 
 export interface PipelineOutput {
   reportId: string
@@ -38,6 +40,23 @@ export interface PipelineOutput {
   recencyDetail: string | null
   tenure: Tenure | null
   tenureKnown: boolean
+}
+
+/** Score a set against live priors + active curation rules. */
+async function scoreEnriched(
+  recs: EnrichedRecommendation[],
+  features: MergedFeature[],
+  region: { climateZone: string; frostDepthClass: string; humidityClass: string } | null,
+  _tenure: Tenure | null
+): Promise<ScoredItem[]> {
+  const { priors, rules } = await loadServeLookups(recs)
+  return scoreItems({ recs, features, priors, rules, region })
+}
+
+/** >50% of candidates gated out — the synthesis itself is suspect. */
+function isMassSuppression(scored: ScoredItem[]): boolean {
+  if (scored.length === 0) return false
+  return scored.filter((s) => s.suppressed).length / scored.length > 0.5
 }
 
 export async function runPipeline(input: PipelineInput): Promise<PipelineOutput> {
@@ -64,7 +83,70 @@ export async function runPipeline(input: PipelineInput): Promise<PipelineOutput>
   })
 
   // 3. Deterministic verdicts + dataset cost/rebate/citation enrichment.
-  const enriched = decideVerdicts(candidateResult.set.candidates, input.tenure ?? null)
+  let enriched = decideVerdicts(candidateResult.set.candidates, input.tenure ?? null, gate.features)
+
+  // 3b. v7.4.9 RecScore — gate + rank, computed ONCE here and frozen.
+  //
+  // Mass-suppression guard (§1.2): if the grounding gate removes >50% of
+  // candidates, the synthesis itself is suspect, so re-reason ONCE with
+  // the same evidence. If it still fails, serve the survivors and
+  // auto-flag the session for review rather than shipping a thin report
+  // silently.
+  // Measures the SCORING work only (lookup + pure computation) so the
+  // <100ms serve-path budget stays meaningful; the retry's LLM call is
+  // accounted separately under candidatePrompt.
+  const scoreT0 = Date.now()
+  let scored = await scoreEnriched(enriched, gate.features, regionContext, input.tenure ?? null)
+  const scoreMs = Date.now() - scoreT0
+  let suppressionRetried = false
+  let massSuppression = isMassSuppression(scored)
+  if (massSuppression) {
+    suppressionRetried = true
+    const retry = await generateCandidates({
+      features: gate.features,
+      tenure: input.tenure ?? null,
+      userPrompt: input.userPrompt ?? null,
+      photoCount: gate.includedPhotoCount,
+      currentDate: new Date().toISOString().slice(0, 10),
+      regionContext,
+    })
+    const retryEnriched = decideVerdicts(retry.set.candidates, input.tenure ?? null, gate.features)
+    const retryScored = await scoreEnriched(retryEnriched, gate.features, regionContext, input.tenure ?? null)
+    if (!isMassSuppression(retryScored)) {
+      enriched = retryEnriched
+      scored = retryScored
+      massSuppression = false
+    }
+  }
+
+  const scoreByKey = new Map(scored.map((s) => [s.key, s]))
+  for (const s of scored) {
+    if (!s.suppressed) continue
+    await logEvent({
+      eventType: 'ITEM_SUPPRESSED_GROUNDING',
+      subjectType: 'Report',
+      subjectId: 'pending', // report row not created yet; key identifies the item
+      anonId: input.anonId,
+      source: 'system',
+      payload: { itemKey: s.key, reason: s.suppressedReason, failingClaims: s.failingClaims.slice(0, 6) },
+    })
+  }
+  for (const s of scored) {
+    if (s.demoted) {
+      await logEvent({
+        eventType: 'CURATION_RULE_APPLIED',
+        subjectType: 'CurationRule',
+        subjectId: s.demotedByRuleId ?? 'unknown',
+        anonId: input.anonId,
+        source: 'system',
+        payload: { itemKey: s.key },
+      })
+    }
+  }
+
+  // Suppressed items never reach the customer (CR1) — ordering also
+  // sinks rule-demoted items to their lane bottom.
+  enriched = applyScoreOrdering(enriched, scoreByKey)
 
   // 4. Cart artifacts for BUY recs (same pass; paid-tier disclosure).
   await computeCartArtifacts(enriched)
@@ -100,6 +182,15 @@ export async function runPipeline(input: PipelineInput): Promise<PipelineOutput>
         candidates: candidateResult.set.candidates,
         validationAdjustments: validated.adjustments,
         batchNotes: candidateResult.set.batch_notes,
+        // v7.4.9 scoring audit trail
+        scoring: {
+          scoreVersion: scored[0]?.scoreVersion ?? null,
+          suppressedKeys: scored.filter((s) => s.suppressed).map((s) => ({ key: s.key, reason: s.suppressedReason })),
+          demotedKeys: scored.filter((s) => s.demoted).map((s) => s.key),
+          suppressionRetried,
+          massSuppression,
+          scoreMs: scoreMs,
+        },
         totalMs: Date.now() - t0,
       } as never,
     },
@@ -131,6 +222,13 @@ export async function runPipeline(input: PipelineInput): Promise<PipelineOutput>
         disclosureTier: rec.disclosureTier,
         categorySearchQuery: rec.categorySearchQuery,
         sortOrder: rec.sortOrder,
+        // v7.4.9 — frozen at synthesis (CR3). Never updated for a
+        // served row; a config/version change affects new rows only.
+        compositeScore: scoreByKey.get(rec.key)?.compositeScore ?? null,
+        subScoresJson: (scoreByKey.get(rec.key)?.subScores ?? null) as never,
+        scoreVersion: scoreByKey.get(rec.key)?.scoreVersion ?? null,
+        suppressed: false, // suppressed items are never persisted as served rows
+        claimLinksJson: rec.claimLinks as never,
       },
     })
     recIds.set(rec.key, row.id)
@@ -154,6 +252,25 @@ export async function runPipeline(input: PipelineInput): Promise<PipelineOutput>
           lastPricedAt: a.priceLow !== null ? new Date() : null,
         })),
       })
+    }
+  }
+
+  // 6b. v7.4.9 — mass-suppression auto-flag (§1.5.4). A session that
+  // still gates out >50% of its candidates after a retry goes into the
+  // unreviewed queue with a HALLUCINATION flag rather than passing
+  // quietly.
+  if (massSuppression) {
+    try {
+      await prisma.qAFlag.create({
+        data: {
+          reportId: report.id,
+          type: 'HALLUCINATION',
+          note: `Auto-flag: grounding gate suppressed ${scored.filter((s) => s.suppressed).length}/${scored.length} candidates${suppressionRetried ? ' (retry did not recover)' : ''}.`,
+          createdBy: 'autoeval',
+        },
+      })
+    } catch {
+      /* flagging must never fail a report */
     }
   }
 

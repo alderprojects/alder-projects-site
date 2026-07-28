@@ -18,7 +18,8 @@
  *   R9 fallback               → WAIT (honest default: not sure ≠ buy)
  */
 
-import type { Candidate, EnrichedRecommendation, Tenure, Verdict } from './types'
+import type { Candidate, ClaimLink, EnrichedRecommendation, MergedFeature, Tenure, Verdict } from './types'
+import { computeSignature } from '@/lib/learning/signature'
 import { checkSafety } from './safety'
 import { matchItem, rebateFromItem, citationFromItem } from './dataset'
 import { buildAmazonUrl } from '@/lib/buildAmazonUrl'
@@ -26,8 +27,16 @@ import { buildAmazonUrl } from '@/lib/buildAmazonUrl'
 const CONFIDENCE_FLOOR_INVESTIGATE = 0.45
 const CONFIDENCE_FLOOR_BUY = 0.6
 
-export function decideVerdicts(candidates: Candidate[], tenure: Tenure | null): EnrichedRecommendation[] {
-  const recs = candidates.map((c) => enrich(c, tenure))
+export function decideVerdicts(
+  candidates: Candidate[],
+  tenure: Tenure | null,
+  // v7.4.9: the numbered observation set the candidates cited. Passing it
+  // resolves each claim's feature_refs into signatures + confidences
+  // (the GroundingScore substrate). Omitted → claims resolve ungrounded,
+  // which is the honest reading when the observation set is unavailable.
+  features: MergedFeature[] = []
+): EnrichedRecommendation[] {
+  const recs = candidates.map((c) => enrich(c, tenure, features))
   // ≥1 SKIP/WAIT invariant (product rule 1) is enforced in validate.ts —
   // here we just sort: BUYs first (they anchor the upsell), then WAIT,
   // SKIP, INVESTIGATE, each by confidence desc.
@@ -42,7 +51,32 @@ export function decideVerdicts(candidates: Candidate[], tenure: Tenure | null): 
   return recs
 }
 
-function enrich(c: Candidate, tenure: Tenure | null): EnrichedRecommendation {
+/**
+ * v7.4.9 — resolve one candidate's evidence entries against the numbered
+ * observation set. An out-of-range or absent ref contributes nothing:
+ * `groundedConfidence` stays 0 and the gate treats the claim as unproven.
+ */
+function resolveClaimLinks(c: Candidate, features: MergedFeature[]): ClaimLink[] {
+  return c.visible_evidence.map((e) => {
+    const valid = e.feature_refs.filter((n) => n >= 0 && n < features.length)
+    return {
+      claim: e.claim,
+      featureRefs: valid,
+      signatures: valid.map((n) =>
+        computeSignature({
+          type: features[n].type,
+          location: features[n].location,
+          condition: features[n].condition,
+          confidence: features[n].confidence,
+          category_hint: features[n].category_hint,
+        } as never)
+      ),
+      groundedConfidence: valid.length > 0 ? Math.max(...valid.map((n) => features[n].confidence)) : 0,
+    }
+  })
+}
+
+function enrich(c: Candidate, tenure: Tenure | null, features: MergedFeature[]): EnrichedRecommendation {
   const safety = checkSafety(c)
 
   let verdict: Verdict
@@ -100,7 +134,8 @@ function enrich(c: Candidate, tenure: Tenure | null): EnrichedRecommendation {
     verdictReason,
     title: c.title,
     summary: c.summary,
-    visibleEvidence: c.visible_evidence,
+    visibleEvidence: c.visible_evidence.map((e) => e.claim),
+    claimLinks: resolveClaimLinks(c, features),
     costLow: item?.costLow ?? null,
     costHigh: item?.costHigh ?? null,
     benefitType: c.benefit_type,

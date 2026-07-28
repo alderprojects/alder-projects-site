@@ -112,14 +112,18 @@ export async function refineReport(opts: {
   const parsedCandidates = z.array(CandidateSchema).safeParse(persisted.candidates)
   if (parsedCandidates.success) candidates = parsedCandidates.data
 
+  // v7.4.9: the gate runs on BOTH branches now — the rules-replay path
+  // needs the numbered observation set to re-resolve claim→feature
+  // grounding. It's a DB read + filter, no LLM call, so replay stays cheap.
+  const gate = await runGate(report.snapshotIds)
+
   let enriched: EnrichedRecommendation[]
   if (opts.questionKey === 'tenure' && candidates) {
     // Rules replay — no LLM call.
-    enriched = decideVerdicts(candidates, tenure)
+    enriched = decideVerdicts(candidates, tenure, gate.features)
   } else {
     // Full re-reason with all answers appended (same evidence).
     const answers = await prisma.clarifyingAnswer.findMany({ where: { reportId: report.id } })
-    const gate = await runGate(report.snapshotIds)
     if (gate.features.length === 0) throw new RefineError('no_usable_features', 'No usable observations.')
     // v7.4.7 — a ZIP stored on the report (upload-form or post-result)
     // regionalizes refinement re-reasoning the same way it does the
@@ -139,7 +143,7 @@ export async function refineReport(opts: {
       await prisma.report.update({ where: { id: report.id }, data: { regionContextUsed: true } })
     }
     candidates = result.set.candidates
-    enriched = decideVerdicts(candidates, tenure)
+    enriched = decideVerdicts(candidates, tenure, gate.features)
   }
 
   await computeCartArtifacts(enriched)

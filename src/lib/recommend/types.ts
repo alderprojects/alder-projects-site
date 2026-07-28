@@ -51,8 +51,26 @@ export const CandidateSchema = z.object({
   summary: z.string().min(10).max(500),
   // Dataset category this candidate maps to, or "other"
   dataset_category: z.string().max(60),
-  // Evidence must reference what is VISIBLE in the photos
-  visible_evidence: z.array(z.string().max(300)).min(1).max(6),
+  // Evidence must reference what is VISIBLE in the photos.
+  //
+  // v7.4.9: each claim carries the numbered observation(s) it is grounded
+  // in — this linkage is the substrate GroundingScore gates on (CR1).
+  // The legacy bare-string form is still accepted so historical
+  // pipelineLogJson candidate sets replay without a migration; a bare
+  // string yields zero feature_refs and therefore fails the gate, which
+  // is the honest reading of "we can't prove this claim".
+  visible_evidence: z
+    .array(
+      z.union([
+        z.object({
+          claim: z.string().max(300),
+          feature_refs: z.array(z.number().int().min(0)).max(8).catch([]).default([]),
+        }),
+        z.string().max(300).transform((claim) => ({ claim, feature_refs: [] as number[] })),
+      ])
+    )
+    .min(1)
+    .max(6),
   // Non-load-bearing fields carry .catch() fallbacks (v7.4.2e): a model
   // emitting quantity:0 or a typo'd enum must not kill the whole report
   // (observed in prod 2026-07-27). Load-bearing verdict inputs stay
@@ -151,6 +169,19 @@ export interface CartArtifact {
   installDifficulty: string
 }
 
+/**
+ * v7.4.9 — a single evidence claim resolved against the extraction set.
+ * `groundedConfidence` is the max extraction confidence among the
+ * referenced features (0 when nothing valid was cited).
+ */
+export interface ClaimLink {
+  claim: string
+  featureRefs: number[]
+  /** Signatures of the referenced features — the SignaturePrior keys. */
+  signatures: string[]
+  groundedConfidence: number
+}
+
 export interface EnrichedRecommendation {
   key: string
   verdict: Verdict
@@ -158,6 +189,8 @@ export interface EnrichedRecommendation {
   title: string
   summary: string
   visibleEvidence: string[]
+  /** v7.4.9 — per-claim grounding linkage; parallel to visibleEvidence. */
+  claimLinks: ClaimLink[]
   costLow: number | null
   costHigh: number | null
   benefitType: string

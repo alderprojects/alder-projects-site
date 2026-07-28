@@ -16,9 +16,28 @@
  *   V6 Upsell facts must be computed facts: buyCount reported to the
  *      caller is counted here, from the validated set — copy layers can
  *      only state what this function returns.
+ *   V7 A BUY may never rest on an ABSENCE claim. You cannot prove a
+ *      negative from one photo: "no exhaust fan visible" means the fan
+ *      wasn't seen, not that it isn't there. Observed on prod
+ *      2026-07-28 — the same bathroom extracted
+ *      `bathroom_ventilation_present` on one run and "no ventilation
+ *      visible" on the next, and the second produced BUY "Add exhaust
+ *      ventilation" for a room that already had a vent. The grounding
+ *      gate cannot catch this: the claim legitimately cites a feature,
+ *      and the falsehood lives inside that feature's text. So an
+ *      absence-grounded BUY is demoted to INVESTIGATE, which asks the
+ *      homeowner to confirm rather than telling them to spend.
  */
 
 import type { EnrichedRecommendation } from './types'
+
+/**
+ * Absence language in evidence text. Deliberately narrow — it must hit
+ * "no exhaust fan visible" / "lacks a vent" / "none visible" and NOT
+ * ordinary condition text like "no longer sealed" or "shows no rust".
+ */
+const ABSENCE_CLAIM =
+  /\b(?:no|not)\s+(?:\w+\s+){0,3}(?:visible|present|installed|evident|detected|apparent|found)\b|\b(?:missing|absent|lacks?|lacking|without)\b|\bnone\s+(?:visible|present)\b|\bdoes\s+not\s+(?:appear|have)\b/i
 
 const MONEY_OR_PRECISION = /\$\s?[\d,]+|(?:\d+(?:\.\d+)?)\s?%|\b\d+\s?(?:year|yr|month)s?\s+payback\b/gi
 
@@ -55,6 +74,22 @@ export function validateReport(recs: EnrichedRecommendation[]): ValidationResult
       rec.smartCartEligible = false
       adjustments.push(`${rec.key}: stripped smartCartEligible from INVESTIGATE`)
     }
+  }
+
+  // V7 — no BUY may rest on an absence claim (see header).
+  for (const rec of recs) {
+    if (rec.verdict !== 'BUY') continue
+    const evidenceText = [...rec.visibleEvidence, rec.summary].join(' ')
+    if (!ABSENCE_CLAIM.test(evidenceText)) continue
+    rec.verdict = 'INVESTIGATE'
+    rec.verdictReason = 'V7_absence_grounded_buy'
+    rec.riskLevel = rec.riskLevel === 'none' ? 'low' : rec.riskLevel
+    rec.smartCartEligible = false
+    rec.categorySearchQuery = null
+    rec.cartArtifacts = []
+    rec.nextAction =
+      'Check whether this is already there before buying anything — a single photo can miss equipment that exists just out of frame. If it genuinely is missing, this is worth doing.'
+    adjustments.push(`${rec.key}: demoted BUY→INVESTIGATE — recommendation rests on an absence claim (V7)`)
   }
 
   // V1 — the honesty invariant

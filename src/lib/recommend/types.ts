@@ -242,6 +242,9 @@ export interface PipelineInput {
 }
 
 export interface GateResult {
+  /** v7.4.12 — analyzed despite a bare people_present flag; session gets
+   *  a PEOPLE_VISIBLE QAFlag so it stays out of any dataset path. */
+  softPersonPhotoIds?: string[]
   features: MergedFeature[]
   includedPhotoCount: number
   excludedPhotoCount: number

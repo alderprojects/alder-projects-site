@@ -67,6 +67,17 @@ export async function runPipeline(input: PipelineInput): Promise<PipelineOutput>
   //    privacy-flagged photos, drop low-signal features.
   const gate = await runGate(input.snapshotIds)
   if (gate.features.length === 0) {
+    // Distinguish "we threw your photos away for privacy" from "we
+    // couldn't read them" — the previous message conflated the two and
+    // read as though the photo were unreadable (observed 2026-07-28).
+    const privacyExcluded = gate.exclusionSummary.filter((e) => e.reason.endsWith('_detected'))
+    if (privacyExcluded.length > 0 && privacyExcluded.length === gate.exclusionSummary.length) {
+      const reasons = Array.from(new Set(privacyExcluded.map((e) => e.reason.replace(/_/g, ' '))))
+      throw new PipelineError(
+        'all_photos_privacy_excluded',
+        `We set ${privacyExcluded.length === 1 ? 'your photo' : 'those photos'} aside without analyzing ${privacyExcluded.length === 1 ? 'it' : 'them'} — our privacy check flagged ${reasons.join(', ')}. Nothing was stored for analysis. Try a photo of just the room, with no people, documents, or screens in frame.`
+      )
+    }
     throw new PipelineError('no_usable_features', 'No usable observations in the provided photos.')
   }
 
@@ -288,6 +299,25 @@ export async function runPipeline(input: PipelineInput): Promise<PipelineOutput>
           type: 'HALLUCINATION',
           note: `Auto-flag: grounding gate suppressed ${scored.filter((s) => s.suppressed).length}/${scored.length} candidates${suppressionRetried ? ' (retry did not recover)' : ''}.`,
           createdBy: 'autoeval',
+        },
+      })
+    } catch {
+      /* flagging must never fail a report */
+    }
+  }
+
+  // 6c. v7.4.12 — photos admitted despite an uncorroborated
+  // people_present flag. The customer gets their read; the session is
+  // marked so a human reviews it and it never reaches a dataset
+  // (exportableConsentedRecords filters PEOPLE_VISIBLE).
+  if (gate.softPersonPhotoIds && gate.softPersonPhotoIds.length > 0) {
+    try {
+      await prisma.qAFlag.create({
+        data: {
+          reportId: report.id,
+          type: 'PEOPLE_VISIBLE',
+          note: `Auto: extraction reported people_present with no corroborating person feature on ${gate.softPersonPhotoIds.length} photo(s) (${gate.softPersonPhotoIds.map((id) => id.slice(-8)).join(', ')}). Analyzed for the customer; excluded from dataset paths pending review.`,
+          createdBy: 'gate',
         },
       })
     } catch {

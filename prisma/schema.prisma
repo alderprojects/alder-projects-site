@@ -1050,11 +1050,17 @@ model Report {
   clarifyingAnswers ClarifyingAnswer[]
   feedback        ReportFeedback[]
   qaFlags         QAFlag[]
+  // v7.4.13 — which Home Record(s) this read belongs to.
+  homeRecordLinks HomeRecordReport[]
 
   @@index([visitorAnonId])
   @@index([userId])
   @@index([projectId])
   @@index([status, createdAt])
+  // Created by the v7.4.7 migration but never declared here, so every
+  // `migrate diff` since 2026-07-27 has proposed dropping it. Declared
+  // in v7.4.13 to resolve the drift; the index itself is unchanged.
+  @@index([zip])
 }
 
 model Recommendation {
@@ -1465,4 +1471,130 @@ model ResolvedProduct {
 
   @@index([resolutionMode])
   @@index([resolvedAt])
+}
+
+// =============================================================================
+// HOME RECORD + COVERAGE (v7.4.13)
+// =============================================================================
+//
+// The Home Record is the durable spine that turns a series of one-off
+// Checks into an accumulating read of one home.
+//
+// KEYED TO EMAIL, NOT ADDRESS (locked decision #1). `propertyRecordId` is
+// a nullable enrichment that auto-links if/when ADDRESS_CAPTURE_ENABLED
+// flips; nothing here depends on it.
+//
+// NOTE ON "SESSION": the v7.4.13 spec says "session" throughout. In this
+// schema a `Session` is an auth session for a User. The thing a customer
+// experiences as a session — one upload → one read — is a `Report`. The
+// join below is therefore HomeRecord↔Report.
+
+model HomeRecord {
+  id        String   @id @default(cuid())
+  // One record per claimed email. Lowercased at write time.
+  email     String   @unique
+  // Set when the email resolves to a real User (magic-link claim). A record
+  // can exist without one: email capture creates it, auth only reveals it.
+  userId    String?
+  // v7.4.5/7.4.8 address enrichment. Nullable and unused while
+  // ADDRESS_CAPTURE_ENABLED is dark.
+  propertyRecordId String?
+  // Schema version the slots below were written against.
+  schemaVersion String @default("coverage-v1")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  reports HomeRecordReport[]
+  slots   CoverageSlot[]
+  summaries HomeSummary[]
+
+  @@index([userId])
+  @@index([propertyRecordId])
+}
+
+// Join: which reads belong to this record.
+model HomeRecordReport {
+  id           String     @id @default(cuid())
+  homeRecordId String
+  homeRecord   HomeRecord @relation(fields: [homeRecordId], references: [id], onDelete: Cascade)
+  reportId     String
+  report       Report     @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  attachedAt   DateTime   @default(now())
+
+  @@unique([homeRecordId, reportId])
+  @@index([reportId])
+}
+
+//
+// One filled shot slot. Rows exist ONLY for slots that have been read —
+// an unlit slot is the absence of a row, so the schema can grow slots
+// without backfilling empties.
+//
+// State (lit / aging / stale) is DERIVED from readAt, never stored, so it
+// cannot go out of date without a write. See lib/coverage/state.ts.
+//
+model CoverageSlot {
+  id           String     @id @default(cuid())
+  homeRecordId String
+  homeRecord   HomeRecord @relation(fields: [homeRecordId], references: [id], onDelete: Cascade)
+  systemId     String
+  slotId       String
+  // The read that filled it. Null only for rows repaired by hand.
+  filledByReportId String?
+  // CR3 gate value at fill time (lib/coverage/quality.ts).
+  photoQualityScore Float
+  readAt       DateTime
+  // readAt + 12 months. Stored so staleness is queryable in SQL without
+  // date arithmetic in every query.
+  freshUntil   DateTime
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  // One current row per (record, system, slot). A refresh UPDATEs it and
+  // appends the prior value to history rather than inserting a duplicate.
+  @@unique([homeRecordId, systemId, slotId])
+  @@index([homeRecordId, systemId])
+  @@index([freshUntil])
+}
+
+//
+// Prior reads of a slot, kept when a refresh supersedes them (§1.1: "prior
+// read preserved in history"). Append-only.
+//
+model CoverageSlotHistory {
+  id           String   @id @default(cuid())
+  homeRecordId String
+  systemId     String
+  slotId       String
+  filledByReportId String?
+  photoQualityScore Float
+  readAt       DateTime
+  supersededAt DateTime @default(now())
+
+  @@index([homeRecordId, systemId, slotId])
+}
+
+//
+// A generated Whole-Home Summary (§1.6). Queued, never inline — generation
+// can exceed the Vercel function budget.
+//
+model HomeSummary {
+  id           String     @id @default(cuid())
+  homeRecordId String
+  homeRecord   HomeRecord @relation(fields: [homeRecordId], references: [id], onDelete: Cascade)
+  status       String     @default("QUEUED") // QUEUED | RUNNING | READY | FAILED
+  // Ordered roll-up items, each carrying its grounding provenance (CR4).
+  itemsJson    Json?
+  // Reports the synthesis drew on, for replay.
+  sourceReportIds String[]
+  promptVersion String?
+  modelVersion  String?
+  failureReason String?
+  queuedAt     DateTime   @default(now())
+  startedAt    DateTime?
+  readyAt      DateTime?
+  emailedAt    DateTime?
+
+  @@index([homeRecordId, queuedAt])
+  @@index([status])
 }

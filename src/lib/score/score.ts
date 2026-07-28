@@ -121,19 +121,40 @@ export function reactionPriorScore(
 }
 
 /**
+ * The PhotoQualityScore formula, isolated from its substrate.
+ *
+ * v7.4.13 extracted this so coverage slot-gating can apply the SAME metric
+ * to a slot's supporting extraction features. The two callers differ only
+ * in what they count as an observation:
+ *
+ *   - photoQualityScore()     — confidences from a recommendation's
+ *                               claimLinks, distinct features by featureRef
+ *   - slotQualityScore()      — confidences from the extraction features
+ *                               mapped to one slot (lib/coverage/quality.ts)
+ *
+ * There is exactly one implementation of the metric; do not add a second.
+ * Changing the curve here changes both, which is the intent.
+ */
+export function qualityFromObservations(confidences: number[], distinctFeatureCount: number): number {
+  const usable = confidences.filter((c) => c > 0)
+  if (usable.length === 0) return 0
+  const mean = usable.reduce((s, c) => s + c, 0) / usable.length
+  // Completeness: 1 feature → 0.85×, 2 → 0.93×, 3+ → 1.0×
+  const completeness = distinctFeatureCount >= 3 ? 1 : distinctFeatureCount === 2 ? 0.93 : 0.85
+  return clamp01(mean * completeness)
+}
+
+/**
  * PhotoQualityScore: mean extraction confidence of the supporting
  * features, lifted by completeness (how many distinct observations back
  * the item). One thin observation scores lower than three strong ones.
  */
 export function photoQualityScore(rec: EnrichedRecommendation): number {
   const links = rec.claimLinks ?? []
-  const confidences = links.map((l) => l.groundedConfidence).filter((c) => c > 0)
-  if (confidences.length === 0) return 0
-  const mean = confidences.reduce((s, c) => s + c, 0) / confidences.length
-  const distinctFeatures = new Set(links.flatMap((l) => l.featureRefs)).size
-  // Completeness: 1 feature → 0.85×, 2 → 0.93×, 3+ → 1.0×
-  const completeness = distinctFeatures >= 3 ? 1 : distinctFeatures === 2 ? 0.93 : 0.85
-  return clamp01(mean * completeness)
+  return qualityFromObservations(
+    links.map((l) => l.groundedConfidence),
+    new Set(links.flatMap((l) => l.featureRefs)).size
+  )
 }
 
 /**

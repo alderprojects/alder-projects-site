@@ -215,7 +215,7 @@ console.log('\n=== CR1: no engine change in this release ===')
 {
   // The §2.1 golden gate cannot run, so assert the stronger property
   // instead: nothing this release touched can alter a verdict.
-  function changed(path: string): boolean {
+  const changed = (path: string): boolean => {
     try {
       return execSync(`git diff --name-only v7.4.14-site-refresh...HEAD -- ${path}`, { encoding: 'utf8' }).trim().length > 0
     } catch { return false }

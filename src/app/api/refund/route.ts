@@ -5,10 +5,13 @@
 // Plans. Auto-customer refund flow ships in V7.1 once we have 30 days of
 // issue-free data.
 //
-// v7.4.14 — the customer-facing window is REFUND_WINDOW_DAYS (30) from
-// lib/copy/canon.ts. This route does not enforce a window in code; the
-// operator applies the policy. Previously this comment said 24 hours,
-// which contradicted every marketing surface and the receipt email.
+// v7.4.16 — this route DOES enforce the window in code: the age check
+// below returns 422 outside it. (A v7.4.14 comment here claimed otherwise;
+// that was wrong.) The bound is CONFIG.products.smartCart.refundWindowHours,
+// which now derives from REFUND_WINDOW_DAYS in lib/copy/canon.ts — so the
+// enforced window and the promised window are the same number by
+// construction. Until v7.4.16 it was a hardcoded 24 while every marketing
+// surface promised 30 days, meaning a customer who asked on day 5 got a 422.
 //
 // Auth: ADMIN_REFUND_TOKEN env var. Send as Authorization: Bearer <token>
 // or as ?adminToken=<token> query string. Lock down at the WAF when

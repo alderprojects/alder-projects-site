@@ -27,6 +27,7 @@ import {
 } from '@/lib/analytics'
 import DynamicExampleCard from './intent/DynamicExampleCard'
 import { PhotoPanel, type PreviewMeta } from './smartCart/PhotoPanel'
+import { REFUND_POLICY_SHORT } from '@/lib/copy/canon'
 
 // v7.3.4-PR2: feature flag for the photo side panel. Off by default
 // until v7.3.4-PR3 lands Stripe webhook routing — without webhook
@@ -221,7 +222,7 @@ export default function CurationModal() {
   const cfg = product === 'smart_cart' ? CONFIG.products.smartCart : CONFIG.products.worthIt
   const refundCopy =
     product === 'smart_cart'
-      ? `${CONFIG.products.smartCart.refundWindowHours}-hour refund window`
+      ? REFUND_POLICY_SHORT
       : `${CONFIG.products.worthIt.refundWindowDays}-day refund window`
   const scopeLabel =
     variants.find(v => v.id === scopeVariantId)?.label ?? scopeVariantId

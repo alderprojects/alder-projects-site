@@ -13,6 +13,7 @@ import { formatPrice } from '@/lib/format'
 import { useEngagementGate } from '@/lib/useEngagementGate'
 import type { TopicId } from '@/lib/property-modules'
 import { SCOPE_VARIANTS } from '@/lib/scope-variants'
+import { REFUND_POLICY_SHORT } from '@/lib/copy/canon'
 
 type Props = {
   topic: TopicId | null
@@ -77,7 +78,7 @@ export default function SmartCartCTACard({ topic, intent, address, slug }: Props
           Build my Smart Cart →
         </button>
         <p className="text-xs text-[#1a1f1a]/65 mt-2">
-          {cfg.refundWindowHours}-hour refund window · No subscription
+          {REFUND_POLICY_SHORT} · No subscription
         </p>
       </div>
     </aside>

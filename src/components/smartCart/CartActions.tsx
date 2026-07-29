@@ -12,6 +12,7 @@ import { SCOPE_VARIANTS } from '@/lib/scope-variants'
 import { CONFIG } from '@/lib/recommender-config'
 import type { TopicId } from '@/lib/property-modules'
 import type { BriefScenarioId } from '@/lib/recommender-config.types'
+import { REFUND_WINDOW_DAYS } from '@/lib/copy/canon'
 
 const MAX_RESPINS = 3
 
@@ -147,7 +148,7 @@ export default function CartActions({
                   hello@alderprojects.com
                 </a>{' '}
                 for a refund — we refund liberally inside the{' '}
-                {CONFIG.products.smartCart.refundWindowHours}-hour window.
+                {REFUND_WINDOW_DAYS}-day window.
               </div>
             ) : (
               <>

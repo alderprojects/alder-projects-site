@@ -23,6 +23,20 @@ export const REFUND_WINDOW_DAYS = 30
 /** Canonical full line — price + policy. Use where both belong together. */
 export const REFUND_POLICY = '$19.99 · Full refund within 30 days, no questions asked.'
 
+/**
+ * The same window in hours. The Smart Cart config and the refund API
+ * express the window in hours; deriving it here means the enforced window
+ * and the promised window cannot diverge.
+ *
+ * v7.4.16: they HAD diverged. `CONFIG.products.smartCart.refundWindowHours`
+ * was a hardcoded 24, interpolated at runtime into the purchase modal, the
+ * pricing CTA, two CTA cards, the cart actions block, and the photo-cart
+ * receipt — and enforced by /api/refund, which returned 422 after 24h. The
+ * v7.4.14 grep searched for the literal text "24 hour" and so never saw any
+ * of it. Never express this window as a literal again.
+ */
+export const REFUND_WINDOW_HOURS = REFUND_WINDOW_DAYS * 24
+
 /** Policy alone, for surfaces that state the price separately. */
 export const REFUND_POLICY_SHORT = 'Full refund within 30 days'
 

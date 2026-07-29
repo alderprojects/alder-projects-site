@@ -5,6 +5,7 @@
 
 import { CONFIG } from '@/lib/recommender-config'
 import { formatPrice } from '@/lib/format'
+import { REFUND_POLICY_SHORT } from '@/lib/copy/canon'
 
 type Props = {
   topicHint?: string                  // 'kitchen', 'weatherization', etc.
@@ -59,7 +60,7 @@ export default function SmartCartGuideFooterCta({
           Build My Smart Cart — {formatPrice(cfg.priceUsd)}
         </a>
         <p className="text-xs text-white/65 mt-2">
-          {cfg.refundWindowHours}-hour refund window · No subscription
+          {REFUND_POLICY_SHORT} · No subscription
         </p>
       </div>
     </aside>

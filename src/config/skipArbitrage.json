@@ -1,0 +1,23 @@
+{
+  "_readme": "v7.4.16 §1.4 Component B. Every entry MUST carry a sourceGuide and a sourceLine quoting the verified guide it came from (CR2: no invented dollars). Deltas are per-unit savings from choosing the honest option over the premium one. At most ONE entry applies per read. To add an entry, quote a real figure from a real guide — a ratio ('5x the price') is not a figure and cannot seed an entry.",
+  "entries": [
+    {
+      "category": "window_weatherization",
+      "lowDelta": 320,
+      "highDelta": 385,
+      "unit": "per window",
+      "sourceGuide": "window-film-vs-replacement-vermont",
+      "sourceLine": "Custom acrylic interior storm inserts (Indow-style, $400+/window — premium tier when film does 80% of the job)",
+      "basis": "inserts at $400/window vs film at $15-80/window"
+    },
+    {
+      "category": "window_treatment",
+      "lowDelta": 110,
+      "highDelta": 260,
+      "unit": "per window",
+      "sourceGuide": "window-film-vs-replacement-vermont",
+      "sourceLine": "Designer insulated curtains ($150-300/window — same R-value as $40 thermal liner)",
+      "basis": "designer curtains at $150-300 vs thermal liner at $40"
+    }
+  ]
+}

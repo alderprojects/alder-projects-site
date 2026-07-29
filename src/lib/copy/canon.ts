@@ -142,3 +142,31 @@ export function betaBadge(endLabel: string | undefined = process.env.BETA_END_LA
 
 export const WORTH_IT_DEFINITION =
   "Worth-It is the whole-house version of a Check — for renovation-scale decisions. Join the waitlist and we'll open it to you first."
+
+// ---------------------------------------------------------------------------
+// v7.4.16 — the Check → Smart Cart upsell (§1.3)
+// ---------------------------------------------------------------------------
+
+/**
+ * Shared opener for both variants. The two variants differ ONLY in their
+ * middle sentence, so the estimate-vs-fallback A/B measures the claim and
+ * nothing else.
+ */
+const UPSELL_OPENER =
+  'Want the exact list? Smart Cart turns this read into it — precise products, quantities, what to skip, in what order.'
+
+/**
+ * With a qualifying estimate. `savings` MUST come from
+ * estimateCartSavings() — never a literal, never model output (CR2).
+ */
+export function upsellWithEstimate(savings: string): string {
+  return `${UPSELL_OPENER} Based on this read, we estimate it saves you ${savings}. ${REFUND_POLICY}`
+}
+
+/** No qualifying estimate. Always available, never a number. */
+export function upsellFallback(): string {
+  return `${UPSELL_OPENER} It typically pays for itself in one skipped purchase. ${REFUND_POLICY}`
+}
+
+/** CR4 — at most this many upsell modules per result. */
+export const MAX_UPSELLS_PER_RESULT = 2

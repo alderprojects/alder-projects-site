@@ -201,7 +201,7 @@ export default function CheckCta() {
             justifyContent: 'center',
           }}
         >
-          …or drag photos here — 1–5 of any room. Free, no account required.
+          …or drag photos here — 1–5 of any room.
         </div>
 
         {handoff.stage === 'ready' && (
@@ -230,7 +230,7 @@ export default function CheckCta() {
 
       {/* Mobile hint line (desktop shows the drop zone instead) */}
       <p className="md:hidden" style={{ marginTop: 12, fontSize: 13.5, color: 'rgba(34,48,31,0.6)' }}>
-        One tap — take photos or pick from your library. 1–5 of any room. Free, no account required.
+        One tap — take photos or pick from your library. 1–5 of any room.
       </p>
     </div>
   )

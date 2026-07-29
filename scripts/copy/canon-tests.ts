@@ -113,7 +113,7 @@ console.log('\n=== §1.4: hero + badges ===')
   const aboveFold = grep(
     'no account required',
     'src/app/page.tsx src/lib/check/content.ts src/components/check/CheckCta.tsx'
-  ).filter((l) => !/CheckCta\.tsx/.test(l)) // below-the-fold uploader helper text
+  )
   check('"no account required" gone from homepage prose', aboveFold.length === 0, aboveFold.join('\n'))
 }
 
@@ -150,6 +150,14 @@ console.log('\n=== §1.5: seasonal gate ===')
   check('wrapping window includes December', inWindow(wrap, dec1))
   check('wrapping window includes February', inWindow(wrap, new Date('2026-02-14T12:00:00')))
   check('wrapping window excludes July', !inWindow(wrap, jul28))
+}
+
+console.log('\n=== §1.3: hero chip row renders all four lanes ===')
+{
+  const art = grepFixed('MONITOR', 'src/components/check/CheckArt.tsx')
+  check('hero illustration carries a MONITOR chip', art.length > 0)
+  const blue = grepFixed('#3d4a7a', 'src/components/check/CheckArt.tsx')
+  check('MONITOR chip uses the canon blue', blue.length > 0)
 }
 
 console.log('\n=== §1.6: beta badge env slot ===')

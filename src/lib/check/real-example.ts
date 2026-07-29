@@ -132,16 +132,24 @@ async function load(): Promise<RealExample | null> {
   }
 }
 
+const loadCached = unstable_cache(load, ['home-real-example-v1'], {
+  revalidate: 3600,
+  tags: ['real-example'],
+})
+
 /**
- * Cached accessor for the homepage. `REAL_EXAMPLE_DISABLED=1` forces the
- * fallback path — used by the §2 CR2 test to prove the fallback renders
- * without a realness claim.
+ * Cached accessor for the homepage.
+ *
+ * `REAL_EXAMPLE_DISABLED=1` forces the fallback path — used by the §2 CR2
+ * test to prove the fallback renders without a realness claim.
+ *
+ * The kill switch is deliberately OUTSIDE unstable_cache. Inside, it was
+ * only consulted on a cache MISS, so flipping the env changed nothing until
+ * the hour expired — the switch appeared not to work at all. Anything that
+ * must take effect immediately has to sit in front of the cache, not
+ * behind it.
  */
-export const getRealExample = unstable_cache(
-  async (): Promise<RealExample | null> => {
-    if (process.env.REAL_EXAMPLE_DISABLED === '1') return null
-    return load()
-  },
-  ['home-real-example-v1'],
-  { revalidate: 3600, tags: ['real-example'] }
-)
+export async function getRealExample(): Promise<RealExample | null> {
+  if (process.env.REAL_EXAMPLE_DISABLED === '1') return null
+  return loadCached()
+}

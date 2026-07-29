@@ -10,6 +10,7 @@
  */
 
 import ProductCard from './ProductCard'
+import { LANES } from '@/lib/copy/canon'
 
 const PALETTE = {
   green: '#1f3d2b',
@@ -21,12 +22,13 @@ const PALETTE = {
   card: '#ffffff',
 }
 
-const VERDICT_STYLE: Record<string, { bg: string; fg: string; label: string }> = {
-  BUY: { bg: '#e5efe2', fg: '#2d5a3d', label: 'Buy' },
-  WAIT: { bg: '#f3ecd9', fg: '#8a6d1f', label: 'Wait' },
-  SKIP: { bg: '#f0e4e0', fg: '#8a3d2e', label: 'Skip' },
-  INVESTIGATE: { bg: '#e7e9f0', fg: '#3d4a7a', label: 'Investigate' },
-}
+// v7.4.14 — lane styling and labels come from the copy canon so the
+// result card and every marketing surface cannot drift apart. The stored
+// verdict enum is unchanged (still INVESTIGATE); only its label moved to
+// "Monitor".
+const VERDICT_STYLE: Record<string, { bg: string; fg: string; label: string }> = Object.fromEntries(
+  LANES.map((l) => [l.id, { bg: l.bg, fg: l.fg, label: l.label }])
+)
 
 export interface VerdictCardData {
   verdict: string

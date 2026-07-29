@@ -18,6 +18,8 @@
 
 import { kv } from '@vercel/kv'
 import { Resend } from 'resend'
+// v7.4.14 CR1 — refund window comes from the canon, never a literal.
+import { REFUND_WINDOW_DAYS } from '@/lib/copy/canon'
 import { CONFIG } from './recommender-config'
 import { formatPrice } from './format'
 import type { SmartCartOutput } from './buildSmartCart'
@@ -331,7 +333,7 @@ function renderSmartCartReceiptBodyV2(cart: SmartCartV2Output): string {
     '',
     `Designed to save more than ${formatPrice(CONFIG.products.smartCart.priceUsd)} before checkout.`,
     '',
-    `Need a refund? Within 24 hours of purchase, reply to this email or write hello@alderprojects.com — we refund liberally.`,
+    `Need a refund? Within ${REFUND_WINDOW_DAYS} days of purchase, reply to this email or write hello@alderprojects.com — we refund liberally.`,
   ].join('\n')
 }
 
@@ -348,7 +350,7 @@ function renderSmartCartReceiptBody(cart: SmartCartOutput): string {
     '',
     `Designed to save more than ${formatPrice(CONFIG.products.smartCart.priceUsd)} before checkout.`,
     '',
-    `Need a refund? Within 24 hours of purchase, reply to this email or write hello@alderprojects.com — we refund liberally.`,
+    `Need a refund? Within ${REFUND_WINDOW_DAYS} days of purchase, reply to this email or write hello@alderprojects.com — we refund liberally.`,
   ].join('\n')
 }
 

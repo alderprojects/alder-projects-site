@@ -1,8 +1,10 @@
 /**
  * v7.2.19 — Site-wide constants. Single source of truth.
  */
-export const REFUND_POLICY_FULL = '30-day refund. Reply "refund" to the receipt — no form.'
-export const REFUND_POLICY_SHORT = '30-day refund'
+// v7.4.14 — the refund strings now live in lib/copy/canon.ts (CR1: one
+// definition sitewide). Re-exported here so existing import paths keep
+// working without creating a second source of truth.
+export { REFUND_POLICY, REFUND_POLICY_FULL, REFUND_POLICY_SHORT, REFUND_WINDOW_DAYS } from '@/lib/copy/canon'
 
 /**
  * Maps contractor-vertical pages to their best Smart Cart / Worth-It scope.

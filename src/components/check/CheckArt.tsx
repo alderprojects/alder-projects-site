@@ -15,7 +15,7 @@ const LINE = 'rgba(31,61,43,0.35)'
 /** Hero: a room "photo" with verdict chips coming off it. */
 export function HeroArt() {
   return (
-    <svg viewBox="0 0 420 320" fill="none" aria-hidden="true" style={{ width: '100%', height: 'auto', maxWidth: 420 }}>
+    <svg viewBox="0 0 420 340" fill="none" aria-hidden="true" style={{ width: '100%', height: 'auto', maxWidth: 420 }}>
       {/* photo frame */}
       <rect x="24" y="28" width="252" height="196" rx="14" fill="#fff" stroke={LINE} strokeWidth="2" />
       <rect x="40" y="44" width="220" height="140" rx="8" fill={CREAM} />
@@ -42,6 +42,7 @@ export function HeroArt() {
       <path d="M278 84c28 2 44 10 58 24" stroke={GOLD} strokeWidth="2" strokeDasharray="2 6" strokeLinecap="round" />
       <path d="M278 140c30 4 46 14 60 30" stroke={GOLD} strokeWidth="2" strokeDasharray="2 6" strokeLinecap="round" />
       <path d="M240 226c26 24 60 30 96 26" stroke={GOLD} strokeWidth="2" strokeDasharray="2 6" strokeLinecap="round" />
+      <path d="M214 252c40 42 74 52 112 54" stroke={GOLD} strokeWidth="2" strokeDasharray="2 6" strokeLinecap="round" />
 
       {/* verdict chips */}
       <g>
@@ -60,6 +61,14 @@ export function HeroArt() {
         <rect x="330" y="238" width="72" height="32" rx="8" fill="#f0e4e0" stroke={RED} strokeWidth="1.5" />
         <text x="366" y="259" textAnchor="middle" fontFamily="system-ui, sans-serif" fontSize="14" fontWeight="700" fill={RED}>
           SKIP
+        </text>
+      </g>
+      {/* v7.4.14 §1.3 — the fourth lane. Blue, matching the MONITOR entry
+          in lib/copy/canon.ts and the result card. */}
+      <g>
+        <rect x="322" y="292" width="94" height="32" rx="8" fill="#e7e9f0" stroke="#3d4a7a" strokeWidth="1.5" />
+        <text x="369" y="313" textAnchor="middle" fontFamily="system-ui, sans-serif" fontSize="14" fontWeight="700" fill="#3d4a7a">
+          MONITOR
         </text>
       </g>
 

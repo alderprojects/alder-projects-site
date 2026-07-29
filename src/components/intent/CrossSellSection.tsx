@@ -7,6 +7,8 @@
 // list?" waitlist note. On Worth-It pages this component is no longer
 // rendered (the page is the coming-soon page).
 
+import FunnelLink from '@/components/check/FunnelLink'
+import { WORTH_IT_DEFINITION } from '@/lib/copy/canon'
 type Props = { fromProduct: 'smart_cart' | 'worth_it' }
 
 export default function CrossSellSection({ fromProduct }: Props) {
@@ -18,16 +20,20 @@ export default function CrossSellSection({ fromProduct }: Props) {
         <p className="font-medium text-[#1a1f1a] mb-1">
           Bigger than a shopping list?
         </p>
-        <p className="text-[#1a1f1a]/70">
-          Join the Worth-It waitlist for larger renovation decisions.
-        </p>
+        <p className="text-[#1a1f1a]/70">{WORTH_IT_DEFINITION}</p>
       </div>
-      <a
+      {/* v7.4.14 §1.7 — this link is demand instrumentation for the
+          premium tier. ASSESSMENT_INTEREST is the same event the coverage
+          work uses, so both waitlist surfaces feed one signal. Do not
+          remove the link without replacing the signal. */}
+      <FunnelLink
         href="/worth-it"
+        eventType="ASSESSMENT_INTEREST"
+        payload={{ source: 'smart_cart_cross_sell' }}
         className="text-[#1f3a2e] font-medium underline-offset-2 hover:underline"
       >
         Join waitlist →
-      </a>
+      </FunnelLink>
     </aside>
   )
 }

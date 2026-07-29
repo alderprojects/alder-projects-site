@@ -19,6 +19,7 @@
 
 import type { TopicId } from './property-modules'
 import type { BriefScenarioId, Season } from './recommender-config.types'
+import type { SeasonalWindow } from '@/lib/copy/seasonal'
 
 export type SmartCartCategoryId =
   | 'window_weatherization' // v7.2.14 pilot
@@ -61,6 +62,10 @@ export interface SmartCartCategory {
   defaultScopeVariantId: string
   defaultScenarioId: BriefScenarioId
   seasonality?: 'winter' | 'mud' | 'summer' | 'fall' | 'all'
+  // v7.4.14 §1.5 — display windows. Absent = evergreen (always renders).
+  // Present = renders only inside a window; the window may override the
+  // label. Gates the CHIP only; the catalog stays reachable year-round.
+  windows?: readonly SeasonalWindow[]
   teaser: IntentTeaser
   rightForYouIf: string[]
   notRightIfPointsToWorthIt: string[]
@@ -76,6 +81,10 @@ export interface WorthItDecision {
   defaultScopeVariantId: string
   defaultScenarioId: BriefScenarioId
   seasonality?: 'winter' | 'mud' | 'summer' | 'fall' | 'all'
+  // v7.4.14 §1.5 — display windows. Absent = evergreen (always renders).
+  // Present = renders only inside a window; the window may override the
+  // label. Gates the CHIP only; the catalog stays reachable year-round.
+  windows?: readonly SeasonalWindow[]
   teaser: IntentTeaser
   rightForYouIf: string[]
   notRightIfPointsToSmartCart: string[]
@@ -252,6 +261,7 @@ export const SMART_CART_CATEGORIES: SmartCartCategory[] = [
       'You are debating whether to refresh, repair, or rebuild the deck',
       'You have a contractor quote on deck rebuild',
     ],
+    windows: [{ from: '04-01', until: '09-30' }],
     curationStatus: 'curated',
   },
   {
@@ -321,6 +331,10 @@ export const SMART_CART_CATEGORIES: SmartCartCategory[] = [
       'You are deciding heat pump vs better windows vs insulation upgrade',
       'You have an EVT audit quote and want it ranked against alternatives',
     ],
+    windows: [
+        { from: '07-01', until: '09-30', label: 'Winterizing — early bird' },
+        { from: '10-01', until: '12-31' },
+      ],
     curationStatus: 'curated',
   },
   {
@@ -352,6 +366,7 @@ export const SMART_CART_CATEGORIES: SmartCartCategory[] = [
     ],
     // v7.2.14: removed beta — backed by launch-ready outdoor_lake_season +
     // outdoor_seasonal_opening + outdoor_dock_lake.
+    windows: [{ from: '04-01', until: '06-30' }],
     curationStatus: 'curated',
   },
   {
@@ -412,6 +427,7 @@ export const SMART_CART_CATEGORIES: SmartCartCategory[] = [
       'You are sequencing a multi-year outdoor renovation (dock + deck + landscaping)',
       'You want a vetted Vermont contractor to build a screen porch or pergola',
     ],
+    windows: [{ from: '04-15', until: '06-05' }],
     curationStatus: 'curated',
   },
   {
@@ -444,6 +460,7 @@ export const SMART_CART_CATEGORIES: SmartCartCategory[] = [
       'You want a built-in outdoor kitchen with gas line, hardscape, and pergola',
       'You are deciding between propane line install vs natural gas conversion',
     ],
+    windows: [{ from: '04-01', until: '08-31' }],
     curationStatus: 'curated',
   },
 ]

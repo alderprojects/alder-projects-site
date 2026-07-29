@@ -19,7 +19,7 @@ export const CHECK_PALETTE = {
 export const CHECK_FAQS = [
   {
     q: 'Is Alder Check free?',
-    a: 'Yes. The Alder Check photo report is free and does not require an account. You upload one to five photos of any room, and Alder returns Buy, Skip, Wait, or Investigate verdicts with evidence from your photos. The optional Smart Cart upgrade, which turns Buy verdicts into specific products with confirmed specs, costs $19.99.',
+    a: 'Yes. The Alder Check photo report is free and does not require an account. You upload one to five photos of any room, and Alder returns Buy, Skip, Wait, or Monitor verdicts with evidence from your photos. The optional Smart Cart upgrade, which turns Buy verdicts into specific products with confirmed specs, costs $19.99.',
   },
   {
     q: 'Do I need an account to use Alder Check?',
@@ -84,8 +84,9 @@ export const DIFFERENTIATION_STRIP = [
   'Photos with people are excluded automatically',
 ]
 
-export const CHECK_SUBLINE =
-  'Take a photo of any room. Your free Alder Check comes back with Buy / Skip / Wait verdicts — evidence from your photos, verified costs and rebates, no account required.'
+// v7.4.14 — CHECK_SUBLINE removed. The homepage subhead is HERO_SUBHEAD in
+// lib/copy/canon.ts, which moves the signup-friction claim out of prose and
+// into the badge row (§1.4).
 
 // v7.4.2c — SEO copy pass: three illustrated steps (see HowItWorks.tsx)
 export const HOW_IT_WORKS = {
@@ -94,7 +95,7 @@ export const HOW_IT_WORKS = {
     { title: 'Snap 1–5 photos', body: 'Any room, any angle. One tap opens your camera. No account, no forms.' },
     {
       title: 'Get your verdicts',
-      body: 'Buy / Skip / Wait / Investigate — with photo evidence, verified costs, and rebates.',
+      body: 'Buy / Skip / Wait / Monitor — with photo evidence, verified costs, and rebates.',
     },
     {
       title: 'Turn Buys into products',

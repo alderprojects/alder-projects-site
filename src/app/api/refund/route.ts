@@ -1,9 +1,14 @@
 // V7 — Refund endpoint.
 //
 // V7 launch ships an admin-only refund route — the operator hits this
-// (or runs it from a script) to issue refunds on Smart Carts within
-// 24 hours of purchase or Worth-It Plans within 7 days. Auto-customer
-// refund flow ships in V7.1 once we have 30 days of issue-free data.
+// (or runs it from a script) to issue refunds on Smart Carts or Worth-It
+// Plans. Auto-customer refund flow ships in V7.1 once we have 30 days of
+// issue-free data.
+//
+// v7.4.14 — the customer-facing window is REFUND_WINDOW_DAYS (30) from
+// lib/copy/canon.ts. This route does not enforce a window in code; the
+// operator applies the policy. Previously this comment said 24 hours,
+// which contradicted every marketing surface and the receipt email.
 //
 // Auth: ADMIN_REFUND_TOKEN env var. Send as Authorization: Bearer <token>
 // or as ?adminToken=<token> query string. Lock down at the WAF when

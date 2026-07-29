@@ -6,10 +6,11 @@ import CheckCta from '@/components/check/CheckCta'
 import VerdictCard from '@/components/check/VerdictCard'
 import HowItWorks from '@/components/check/HowItWorks'
 import { HeroArt, IconCheckBadge, IconCart, IconGuides } from '@/components/check/CheckArt'
+import FunnelLink from '@/components/check/FunnelLink'
+import { getRealExample } from '@/lib/check/real-example'
+import { HERO_SUBHEAD, HERO_BADGES, CTA_CHECK } from '@/lib/copy/canon'
 import {
   CHECK_PALETTE as C,
-  CHECK_SUBLINE,
-  DIFFERENTIATION_STRIP,
   EXAMPLE_BUY,
   EXAMPLE_WAIT,
   GUIDE_LINKS,
@@ -69,8 +70,8 @@ const PRODUCTS = [
   {
     eyebrow: 'Start here · Free',
     title: 'Alder Check',
-    body: 'Every project list has something on it that isn’t worth the money. Photograph the room and get Buy / Skip / Wait verdicts backed by what’s visible in your photos — including at least one thing NOT to buy, every time.',
-    cta: 'Run your free Check →',
+    body: 'Every project list has something on it that isn’t worth the money. Photograph the room and get Buy / Skip / Wait / Monitor verdicts backed by what’s visible in your photos — including at least one thing NOT to buy, every time.',
+    cta: CTA_CHECK,
     href: '/check',
     icon: 'check' as const,
   },
@@ -119,7 +120,7 @@ export default function HomePage() {
                 Know what’s worth buying — and what to skip.
               </h1>
               <p style={{ fontSize: 'clamp(16px, 2.5vw, 18px)', color: C.inkSoft, maxWidth: 620, margin: '0 auto 26px', lineHeight: 1.55 }}>
-                {CHECK_SUBLINE}
+                {HERO_SUBHEAD}
               </p>
               <CheckCta />
             </div>
@@ -128,7 +129,7 @@ export default function HomePage() {
             </div>
           </div>
           <div style={{ display: 'flex', gap: 10, justifyContent: 'center', flexWrap: 'wrap', marginTop: 26 }}>
-            {DIFFERENTIATION_STRIP.map((t) => (
+            {HERO_BADGES.map((t) => (
               <span
                 key={t}
                 style={{
@@ -186,33 +187,11 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* ── Example verdicts (static, server-rendered) ───────────── */}
-        <section style={{ maxWidth: 860, margin: '0 auto', padding: '0 20px 40px' }}>
-          <h2
-            style={{
-              fontSize: 14,
-              letterSpacing: '0.1em',
-              textTransform: 'uppercase',
-              color: C.gold,
-              textAlign: 'center',
-              marginBottom: 16,
-              fontWeight: 700,
-            }}
-          >
-            What a Check looks like
-          </h2>
-          <div style={{ display: 'grid', gap: 14, gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))' }}>
-            <VerdictCard data={EXAMPLE_BUY} />
-            <VerdictCard data={EXAMPLE_WAIT} />
-          </div>
-          <p style={{ textAlign: 'center', fontSize: 13.5, color: C.inkSoft, marginTop: 12 }}>
-            Real output. Every number carries a verified date and names the guide it came from —{' '}
-            <Link href="/check" style={{ color: C.green, textDecoration: 'underline' }}>
-              get your own free Check
-            </Link>
-            .
-          </p>
-        </section>
+        {/* ── The example section (v7.4.14 §1.2).
+            CR2: renders from live production rows when they load, and
+            claims realness ONLY then. Any failure → the authored fallback
+            under "Example Check", with no realness claim. ───────────── */}
+        <RealExampleSection />
 
         {/* ── Compact guides section (topical authority) ───────────── */}
         <section style={{ background: '#efe9db', padding: '28px 20px' }}>
@@ -244,5 +223,67 @@ export default function HomePage() {
       </main>
       <Footer />
     </>
+  )
+}
+
+/**
+ * v7.4.14 §1.2 — the example section.
+ *
+ * CR2 is enforced structurally: the "real" header and the provenance
+ * footer line are inside the `example != null` branch and cannot render
+ * over authored copy. The fallback branch says "Example Check" and makes
+ * no claim about where the content came from.
+ */
+async function RealExampleSection() {
+  const example = await getRealExample()
+  const heading = example ? 'A real Check, verbatim' : 'Example Check'
+  const buy = example?.buy ?? EXAMPLE_BUY
+  const wait = example?.wait ?? EXAMPLE_WAIT
+
+  return (
+    <section style={{ maxWidth: 860, margin: '0 auto', padding: '0 20px 40px' }}>
+      <h2
+        style={{
+          fontSize: 14,
+          letterSpacing: '0.1em',
+          textTransform: 'uppercase',
+          color: C.gold,
+          textAlign: 'center',
+          marginBottom: 16,
+          fontWeight: 700,
+        }}
+      >
+        {heading}
+      </h2>
+      <div style={{ display: 'grid', gap: 14, gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))' }}>
+        <VerdictCard data={buy} />
+        <VerdictCard data={wait} />
+      </div>
+      <p style={{ textAlign: 'center', fontSize: 13.5, color: C.inkSoft, marginTop: 12 }}>
+        {example ? (
+          <>
+            Unedited output from a real session, {example.sessionLabel} —{' '}
+            <FunnelLink
+              href="/check"
+              eventType="REAL_EXAMPLE_CTA_CLICKED"
+              payload={{ reportId: example.reportId }}
+              style={{ color: C.green, textDecoration: 'underline' }}
+            >
+              run your own free Check
+            </FunnelLink>
+            .
+          </>
+        ) : (
+          <>
+            An illustration of the format. Every number in a real Check carries a verified date and names the
+            guide it came from —{' '}
+            <FunnelLink href="/check" eventType="REAL_EXAMPLE_CTA_CLICKED" style={{ color: C.green, textDecoration: 'underline' }}>
+              get your own free Check
+            </FunnelLink>
+            .
+          </>
+        )}
+      </p>
+    </section>
   )
 }

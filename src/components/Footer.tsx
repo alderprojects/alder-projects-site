@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { CONFIG } from '@/lib/recommender-config'
 import { getTrackedVermontTownCount } from '@/data/projects'
 import { addressCaptureEnabled } from '@/lib/consent/licensing'
+import { FOOTER_TAGLINE } from '@/lib/copy/canon'
 
 // V5 footer. Replaces V4's marketplace-era copy ("renovation matching
 // service", "popular searches", "how we make money") with property-tool
@@ -80,7 +81,7 @@ export default function Footer() {
                 maxWidth: 240,
               }}
             >
-              Practical project guidance for Vermont homes.
+              {FOOTER_TAGLINE}
             </p>
             <a
               href="mailto:hello@alderprojects.com"

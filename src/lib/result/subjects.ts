@@ -111,9 +111,21 @@ export function subjectFor(item: GroupableItem): { label: string; grounded: bool
   // field can be switched on without revisiting this file).
   const supplied = item.subject?.trim()
   if (supplied) {
-    const types = featureTypesOf(item).join(' ')
+    const types = featureTypesOf(item)
+    // The grounding check needs the claimLinks to check AGAINST. Those are
+    // server-side only — the wire ships the derived label, not the raw
+    // `feature_type:room:severity` signatures. So on the client there is
+    // nothing to validate and the supplied label is trusted, having already
+    // been validated by shapeRows() on the way out.
+    //
+    // Getting this wrong once cost a render: the client re-ran the check
+    // with no evidence, every item failed it, and the whole read collapsed
+    // into a single "Also in this photo" group.
+    if (types.length === 0) return { label: supplied, grounded: true }
+
+    const haystack = types.join(' ')
     const tokens = supplied.toLowerCase().split(/\s+/).filter((t) => t.length > 3)
-    if (tokens.some((t) => types.includes(t.replace(/s$/, '')))) {
+    if (tokens.some((t) => haystack.includes(t.replace(/s$/, '')))) {
       return { label: supplied, grounded: true }
     }
     // Ungrounded: fall through to derivation and let the caller log

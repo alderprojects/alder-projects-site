@@ -128,3 +128,29 @@ export function estimateCartSavings(
 export function formatSavings(estimate: SavingsEstimate): string {
   return `$${estimate.low.toLocaleString()}–$${estimate.high.toLocaleString()}`
 }
+
+/**
+ * Subject label → arbitrage category.
+ *
+ * Kept deliberately small and literal. The category is derived from a SKIP
+ * item's OWN subject, which came from its own claimLinks — so an arbitrage
+ * delta can only apply to a read that actually contains a SKIP about that
+ * object. There is no path where a window delta lands on a read with no
+ * window item in it.
+ */
+const SUBJECT_TO_CATEGORY: Readonly<Record<string, string>> = {
+  Windows: 'window_weatherization',
+  'Window treatments': 'window_treatment',
+}
+
+/** The arbitrage category for a read, or null when none of its SKIPs match. */
+export function categoryForRead(
+  items: Array<{ verdict: string; subject?: string | null }>
+): string | null {
+  for (const item of items) {
+    if (item.verdict !== 'SKIP') continue
+    const category = SUBJECT_TO_CATEGORY[item.subject ?? '']
+    if (category) return category
+  }
+  return null
+}

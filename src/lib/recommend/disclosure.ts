@@ -52,6 +52,14 @@ export interface WireRecommendation {
   categorySearchUrl: string | null
   clarifyingQuestions: Array<{ key: string; question: string }>
   smartCartEligible: boolean
+  // v7.4.16 — presentation grouping. Computed SERVER-SIDE from claimLinks
+  // so the raw `feature_type:room:severity` signatures never cross the
+  // wire; the client receives only the derived label.
+  subject?: string
+  /** Safety-class item — drives the deterministic focus pick (§1.1.3). */
+  safety?: boolean
+  /** Frozen RecScore composite, for group ordering. Never recomputed. */
+  compositeScore?: number | null
   // email tier and up
   assumptions?: string[]
   limitations?: string[]

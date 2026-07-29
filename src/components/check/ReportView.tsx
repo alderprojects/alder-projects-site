@@ -13,6 +13,21 @@ import VerdictCard, { PALETTE, type VerdictCardData } from './VerdictCard'
 import AddressModule from './AddressModule'
 import { AffiliateDisclosure } from './ProductCard'
 import { fireFunnel } from '@/lib/check/funnel'
+import {
+  InventoryStrip,
+  FocusModule,
+  GroupHeader,
+  useResultStructure,
+  type StructurableItem,
+} from './ResultStructure'
+import UpsellModule, { upsellRenderable } from './UpsellModule'
+import { estimateCartSavings, categoryForRead } from '@/lib/result/savings'
+import { LANES } from '@/lib/copy/canon'
+
+function laneStyleFor(verdict: string): { bg: string; fg: string; label: string } {
+  const lane = LANES.find((l) => l.id === verdict) ?? LANES[LANES.length - 1]
+  return { bg: lane.bg, fg: lane.fg, label: lane.label }
+}
 
 interface WireRec extends VerdictCardData {
   id?: string
@@ -208,6 +223,60 @@ export default function ReportView({
   const buyCount = report.upsell.buyCount
   const cartHref = `/report/${report.reportId}/cart${accessKey ? `?key=${encodeURIComponent(accessKey)}` : ''}`
 
+  // v7.4.16 — one card renderer, shared by the grouped and flat paths so
+  // the two cannot drift.
+  const renderCard = (rec: WireRec, idx: number) => (
+  <div key={rec.key}>
+    <VerdictCard
+      data={rec}
+      onAffiliateClick={() =>
+        // §2.5 — conforms to the existing AFFILIATE_CLICKED event,
+        // now carrying sessionId + resolutionMode + lane position.
+        fireFunnel('AFFILIATE_CLICKED', {
+          reportId: report.reportId,
+          sessionId: report.reportId,
+          recKey: rec.key,
+          verdict: rec.verdict,
+          lanePosition: idx,
+          resolutionMode: rec.product?.resolutionMode ?? 'none',
+        })
+      }
+    />
+    {rec.clarifyingQuestions.length > 0 && (
+      <details style={{ marginTop: 6 }}>
+        <summary style={{ fontSize: 13.5, color: PALETTE.green, cursor: 'pointer', fontWeight: 600 }}>
+          Improve this recommendation
+        </summary>
+        <div style={{ padding: '8px 0 0' }}>
+          {rec.clarifyingQuestions.map((q) => (
+            <ImproveQuestion key={q.key} question={q.question} disabled={busy} onSubmit={(a) => void answerQuestion(q.key, a, rec.id)} />
+          ))}
+        </div>
+      </details>
+    )}
+  </div>
+  )
+
+  const structure = useResultStructure(report.recommendations as unknown as StructurableItem[])
+  // CR2 — the estimate is computed here from this read's own priced SKIPs
+  // plus at most one arbitrage entry keyed to a SKIP's own subject.
+  const savings = estimateCartSavings(
+  report.recommendations.map((r) => ({
+    key: r.key,
+    verdict: r.verdict,
+    resolvedPrice: r.product?.price ?? null,
+    costLow: r.costLow ?? null,
+    costHigh: r.costHigh ?? null,
+  })),
+  categoryForRead(report.recommendations)
+  )
+  // CR4 — never on a read that delivered nothing.
+  const upsellOk = upsellRenderable({
+  itemCount: report.recommendations.length,
+  coaching: report.recommendations.length === 0,
+  eligible: report.upsell.eligible,
+  })
+
   return (
     <div ref={rootRef} style={{ ...boxStyle, textAlign: 'left' }}>
       {report.exclusionNotice && <p style={noticeStyle}>{report.exclusionNotice} Not stored, not analyzed.</p>}
@@ -247,38 +316,33 @@ export default function ReportView({
         />
       )}
 
+      {/* v7.4.16 §1.1 — structure activates only at >=2 subjects. A
+          single-subject read renders exactly as before. */}
+      {structure.multiSubject && <InventoryStrip chips={structure.chips} />}
+      {structure.focus && (
+        <FocusModule
+          subject={structure.focus.subject}
+          lane={structure.focus.lane}
+          reason={structure.focus.reason}
+          safety={structure.focus.safety}
+          laneStyle={laneStyleFor(structure.focus.lane)}
+        />
+      )}
+      {upsellOk && (
+        <UpsellModule position="focus" estimate={savings} reportId={report.reportId} />
+      )}
+
       <div data-engage="verdicts" style={{ display: 'grid', gap: 14, margin: '16px 0' }}>
-        {report.recommendations.map((rec, idx) => (
-          <div key={rec.key}>
-            <VerdictCard
-              data={rec}
-              onAffiliateClick={() =>
-                // §2.5 — conforms to the existing AFFILIATE_CLICKED event,
-                // now carrying sessionId + resolutionMode + lane position.
-                fireFunnel('AFFILIATE_CLICKED', {
-                  reportId: report.reportId,
-                  sessionId: report.reportId,
-                  recKey: rec.key,
-                  verdict: rec.verdict,
-                  lanePosition: idx,
-                  resolutionMode: rec.product?.resolutionMode ?? 'none',
-                })
-              }
-            />
-            {rec.clarifyingQuestions.length > 0 && (
-              <details style={{ marginTop: 6 }}>
-                <summary style={{ fontSize: 13.5, color: PALETTE.green, cursor: 'pointer', fontWeight: 600 }}>
-                  Improve this recommendation
-                </summary>
-                <div style={{ padding: '8px 0 0' }}>
-                  {rec.clarifyingQuestions.map((q) => (
-                    <ImproveQuestion key={q.key} question={q.question} disabled={busy} onSubmit={(a) => void answerQuestion(q.key, a, rec.id)} />
-                  ))}
-                </div>
-              </details>
-            )}
-          </div>
-        ))}
+        {structure.multiSubject &&
+          structure.grouping.groups.map((group) => (
+            <section key={group.label}>
+              <GroupHeader label={group.label} count={group.items.length} />
+              <div style={{ display: 'grid', gap: 14 }}>
+                {group.items.map((rec) => renderCard(rec as WireRec, report.recommendations.indexOf(rec as WireRec)))}
+              </div>
+            </section>
+          ))}
+        {!structure.multiSubject && report.recommendations.map((rec, idx) => renderCard(rec, idx))}
         {busy && (
           <p style={{ fontSize: 13.5, color: PALETTE.inkSoft, textAlign: 'center' }}>Re-checking with your answer…</p>
         )}
@@ -403,6 +467,13 @@ export default function ReportView({
         </div>
       ) : (
         <p style={{ fontSize: 14, color: PALETTE.inkSoft }}>Thanks — that feedback tunes the engine.</p>
+      )}
+
+      {/* CR4 — the SECOND and final upsell. With the focus-block one above,
+          this is the cap: two per result, never inside a group, never on a
+          read that delivered nothing. */}
+      {upsellOk && (
+        <UpsellModule position="end" estimate={savings} reportId={report.reportId} compact />
       )}
 
       <AffiliateDisclosure />

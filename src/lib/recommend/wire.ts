@@ -9,6 +9,8 @@ import type { Prisma, Recommendation } from '@prisma/client'
 import { buildAmazonUrl } from '@/lib/buildAmazonUrl'
 import type { DisclosureTier } from './types'
 import type { LockedStub, WireRecommendation } from './disclosure'
+import { subjectFor } from '@/lib/result/subjects'
+import { isSafetyItem } from '@/lib/result/focus'
 
 const TIER_RANK: Record<DisclosureTier, number> = { free: 0, email: 1, paid: 2 }
 
@@ -59,6 +61,20 @@ export function shapeRows(
       // construction all the way to the client.
       product: (row.resolutionJson as WireRecommendation['product']) ?? null,
     }
+
+    // v7.4.16 — derive the grouping subject here, on the server. The
+    // claimLinks stay server-side; only the label ships.
+    const groupable = {
+      key: row.key ?? row.id,
+      verdict: row.verdict,
+      title: row.title,
+      claimLinks: (row.claimLinksJson as Array<{ signatures?: string[] }>) ?? [],
+      compositeScore: row.compositeScore,
+      sortOrder: row.sortOrder,
+    }
+    wire.subject = subjectFor(groupable).label
+    wire.safety = isSafetyItem(groupable)
+    wire.compositeScore = row.compositeScore
     if (rank >= TIER_RANK.email) {
       wire.assumptions = (row.assumptionsJson as string[]) ?? []
       wire.limitations = (row.limitationsJson as string[]) ?? []

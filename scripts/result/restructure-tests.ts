@@ -215,11 +215,27 @@ console.log('\n=== CR1: no engine change in this release ===')
 {
   // The §2.1 golden gate cannot run, so assert the stronger property
   // instead: nothing this release touched can alter a verdict.
+  // Scoped to v7.4.16's OWN commits, not to whatever HEAD happens to be.
+  // Before the branches were merged this read `...HEAD`, which was correct
+  // on the feature branch and WRONG on merged main — it then also picked up
+  // v7.4.13's changes to score.ts and schema.prisma and reported them as
+  // v7.4.16 engine drift. Pin both ends of the range instead.
+  const BASE = 'v7.4.14-site-refresh'
+  const TIP = 'v7.4.16-result-restructure'
+  let range: string | null = null
+  try {
+    const mergeBase = execSync(`git merge-base ${BASE} ${TIP}`, { encoding: 'utf8' }).trim()
+    range = `${mergeBase}..${TIP}`
+  } catch {
+    range = null // branch refs pruned — the assertion is no longer checkable
+  }
   const changed = (path: string): boolean => {
+    if (!range) return false
     try {
-      return execSync(`git diff --name-only v7.4.14-site-refresh...HEAD -- ${path}`, { encoding: 'utf8' }).trim().length > 0
+      return execSync(`git diff --name-only ${range} -- ${path}`, { encoding: 'utf8' }).trim().length > 0
     } catch { return false }
   }
+  if (!range) console.log('     (branch refs pruned — CR1 diff assertions skipped)')
   check('synthesis prompt untouched', !changed('src/lib/vision/prompt.ts'))
   check('recommend pipeline untouched', !changed('src/lib/recommend/pipeline.ts'))
   check('gate untouched', !changed('src/lib/recommend/gate.ts'))

@@ -165,7 +165,7 @@ Your home photo Smart Cart is ready. We read ${args.photoCount} ${args.photoCoun
 Open your cart:
 ${cartUrl}
 
-The link stays good for 30 days. ${CONFIG.products.smartCart.refundWindowHours}-hour refund window — email hello@alderprojects.com if anything's off.
+The link stays good for 30 days. Full refund within ${REFUND_WINDOW_DAYS} days — email hello@alderprojects.com if anything's off.
 
 — Alder
 `

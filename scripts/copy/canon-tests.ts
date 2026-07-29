@@ -23,6 +23,8 @@ import {
   HERO_BADGES,
   betaBadge,
 } from '@/lib/copy/canon'
+import { REFUND_WINDOW_HOURS } from '@/lib/copy/canon'
+import { CONFIG } from '@/lib/recommender-config'
 import { isActive, seasonalLabel, inWindow } from '@/lib/copy/seasonal'
 import { SMART_CART_CATEGORIES } from '@/lib/intent-config'
 
@@ -73,6 +75,27 @@ console.log('\n=== §2: refund single-source ===')
     .filter((l) => /\b(7|14|24|48|60|90)[ -]day\b/i.test(l))
     .filter((l) => !/canon\.ts/.test(l))
   check('no competing hardcoded refund window', hardcoded.length === 0, hardcoded.join('\n'))
+}
+
+console.log('\n=== v7.4.16: the window is never a literal, anywhere ===')
+{
+  // v7.4.14 asserted this with a TEXT grep and passed while eight surfaces
+  // rendered "24-hour refund window" from CONFIG at runtime. Assert the
+  // derivation instead of the prose.
+  check('REFUND_WINDOW_HOURS derives from the canonical days',
+    REFUND_WINDOW_HOURS === REFUND_WINDOW_DAYS * 24, String(REFUND_WINDOW_HOURS))
+  check('the Smart Cart config derives its window from the canon',
+    CONFIG.products.smartCart.refundWindowHours === REFUND_WINDOW_HOURS,
+    String(CONFIG.products.smartCart.refundWindowHours))
+
+  // The enforced window must equal the promised one — a customer told
+  // "30 days" must not get a 422 on day 5.
+  check('enforced window == promised window',
+    CONFIG.products.smartCart.refundWindowHours / 24 === REFUND_WINDOW_DAYS)
+
+  // No component may compute its own window phrase from the hours value.
+  const renders = grep('refundWindowHours', 'src/components src/lib/email.ts')
+  check('no component renders a window from refundWindowHours', renders.length === 0, renders.join('\n'))
 }
 
 console.log('\n=== §2: lane canon ===')

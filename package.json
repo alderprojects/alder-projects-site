@@ -19,7 +19,8 @@
     "score:test": "tsx scripts/score/unit-tests.ts && tsx scripts/score/db-tests.ts && tsx scripts/score/commerce-tests.ts",
     "coverage:test": "tsx scripts/coverage/unit-tests.ts",
     "copy:test": "tsx scripts/copy/canon-tests.ts",
-    "social:test": "tsx scripts/social/reminder-tests.ts"
+    "social:test": "tsx scripts/social/reminder-tests.ts",
+    "result:test": "tsx scripts/result/restructure-tests.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.30.1",

@@ -8,6 +8,7 @@
 // so future tuning passes can reason about why the number is what it is.
 
 import type { RecommenderConfig } from './recommender-config.types'
+import { REFUND_WINDOW_HOURS } from '@/lib/copy/canon'
 
 export const CONFIG: RecommenderConfig = {
   version: '2026.05.04-v7',
@@ -683,7 +684,8 @@ export const CONFIG: RecommenderConfig = {
       enabled: true,
       priceUsd: 19.99,
       productName: 'Smart Cart',
-      refundWindowHours: 24,
+      // v7.4.16 — derived from the copy canon; never a literal (CR1).
+      refundWindowHours: REFUND_WINDOW_HOURS,
       ttlDays: 30,
       headline: 'Buy this + this. Skip that.',
       subhead:

@@ -5,7 +5,9 @@
  *
  * Fewest-clicks rules:
  *  - Mobile: ONE tap — the button opens the camera/photo picker directly
- *    (hidden <input type="file" accept="image/*" capture="environment">).
+ *    (hidden <input type="file" accept="image/*,.heic,.heif" multiple>).
+ *    NO `capture` attribute — it would force the camera and block the
+ *    photo library.
  *  - Desktop: same button + drag-and-drop + an always-visible QR (reuses
  *    the v7.3.3 handoff-token infra, dest=check). Scan → phone shares the
  *    desktop's anon session → photos upload from the phone → THIS
@@ -143,11 +145,18 @@ export default function CheckCta() {
       {/* No `capture` attribute (v7.4.2f): with it, mobile browsers force
           the camera and BLOCK the photo library. Without it, one tap
           opens the native chooser — camera or existing photos, and
-          `multiple` lets library users select several at once. */}
+          `multiple` lets library users select several at once.
+
+          v7.4.16 — `.heic,.heif` added explicitly. iPhone photos are HEIC
+          by default, and Android Chrome plus several desktop browsers do
+          NOT match them against the `image/*` wildcard, so they render
+          greyed-out and unselectable in the library picker. The other
+          uploaders (PhotoUploader, PhotoPanel) already carried the
+          explicit extensions; these two Check inputs did not. */}
       <input
         ref={inputRef}
         type="file"
-        accept="image/*"
+        accept="image/*,.heic,.heif"
         multiple
         style={{ display: 'none' }}
         onChange={(e) => {

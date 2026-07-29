@@ -23,6 +23,20 @@ export const REFUND_WINDOW_DAYS = 30
 /** Canonical full line — price + policy. Use where both belong together. */
 export const REFUND_POLICY = '$19.99 · Full refund within 30 days, no questions asked.'
 
+/**
+ * The same window in hours. The Smart Cart config and the refund API
+ * express the window in hours; deriving it here means the enforced window
+ * and the promised window cannot diverge.
+ *
+ * v7.4.16: they HAD diverged. `CONFIG.products.smartCart.refundWindowHours`
+ * was a hardcoded 24, interpolated at runtime into the purchase modal, the
+ * pricing CTA, two CTA cards, the cart actions block, and the photo-cart
+ * receipt — and enforced by /api/refund, which returned 422 after 24h. The
+ * v7.4.14 grep searched for the literal text "24 hour" and so never saw any
+ * of it. Never express this window as a literal again.
+ */
+export const REFUND_WINDOW_HOURS = REFUND_WINDOW_DAYS * 24
+
 /** Policy alone, for surfaces that state the price separately. */
 export const REFUND_POLICY_SHORT = 'Full refund within 30 days'
 
@@ -128,3 +142,31 @@ export function betaBadge(endLabel: string | undefined = process.env.BETA_END_LA
 
 export const WORTH_IT_DEFINITION =
   "Worth-It is the whole-house version of a Check — for renovation-scale decisions. Join the waitlist and we'll open it to you first."
+
+// ---------------------------------------------------------------------------
+// v7.4.16 — the Check → Smart Cart upsell (§1.3)
+// ---------------------------------------------------------------------------
+
+/**
+ * Shared opener for both variants. The two variants differ ONLY in their
+ * middle sentence, so the estimate-vs-fallback A/B measures the claim and
+ * nothing else.
+ */
+const UPSELL_OPENER =
+  'Want the exact list? Smart Cart turns this read into it — precise products, quantities, what to skip, in what order.'
+
+/**
+ * With a qualifying estimate. `savings` MUST come from
+ * estimateCartSavings() — never a literal, never model output (CR2).
+ */
+export function upsellWithEstimate(savings: string): string {
+  return `${UPSELL_OPENER} Based on this read, we estimate it saves you ${savings}. ${REFUND_POLICY}`
+}
+
+/** No qualifying estimate. Always available, never a number. */
+export function upsellFallback(): string {
+  return `${UPSELL_OPENER} It typically pays for itself in one skipped purchase. ${REFUND_POLICY}`
+}
+
+/** CR4 — at most this many upsell modules per result. */
+export const MAX_UPSELLS_PER_RESULT = 2

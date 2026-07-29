@@ -7,6 +7,7 @@ import { CONFIG } from '@/lib/recommender-config'
 import { formatPrice } from '@/lib/format'
 import type { TopicId } from '@/lib/property-modules'
 import type { BriefScenarioId } from '@/lib/recommender-config.types'
+import { REFUND_POLICY_SHORT } from '@/lib/copy/canon'
 
 type Product = 'smart_cart' | 'worth_it'
 
@@ -35,7 +36,7 @@ export default function PricingCTA({
       : CONFIG.products.worthIt
   const refundCopy =
     product === 'smart_cart'
-      ? `${CONFIG.products.smartCart.refundWindowHours}-hour refund window`
+      ? REFUND_POLICY_SHORT
       : `${CONFIG.products.worthIt.refundWindowDays}-day refund window`
   const buttonText = ctaCopy ?? cfg.ctaCopy
   const wrapperClasses = sticky

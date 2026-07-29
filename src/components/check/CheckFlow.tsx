@@ -245,10 +245,12 @@ export default function CheckFlow({ initialFiles }: { initialFiles?: File[] }) {
         )}
       </div>
 
+      {/* v7.4.16 — explicit HEIC/HEIF: the `image/*` wildcard alone leaves
+          iPhone library photos unselectable on several browsers. */}
       <input
         ref={addInputRef}
         type="file"
-        accept="image/*"
+        accept="image/*,.heic,.heif"
         multiple
         style={{ display: 'none' }}
         onChange={(e) => {

@@ -84,8 +84,9 @@ export const DIFFERENTIATION_STRIP = [
   'Photos with people are excluded automatically',
 ]
 
-export const CHECK_SUBLINE =
-  'Take a photo of any room. Your free Alder Check comes back with Buy / Skip / Wait verdicts — evidence from your photos, verified costs and rebates, no account required.'
+// v7.4.14 — CHECK_SUBLINE removed. The homepage subhead is HERO_SUBHEAD in
+// lib/copy/canon.ts, which moves the signup-friction claim out of prose and
+// into the badge row (§1.4).
 
 // v7.4.2c — SEO copy pass: three illustrated steps (see HowItWorks.tsx)
 export const HOW_IT_WORKS = {

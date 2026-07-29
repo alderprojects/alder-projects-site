@@ -23,6 +23,7 @@ import {
 import IntentSelector, {
   type IntentSelectorItem,
 } from './IntentSelector'
+import { activeChips } from '@/lib/copy/seasonal'
 import DynamicExampleCard from './DynamicExampleCard'
 import Why1999Module, { type Why1999Variant } from '@/components/Why1999Module'
 import ValueProofGrid from './ValueProofGrid'
@@ -102,7 +103,11 @@ export default function SalesPageClient({
   void initialTopic
   const teaser = selected.teaser
 
-  const selectorItems: IntentSelectorItem[] = items.map(i => ({
+  // v7.4.14 §1.5 — out-of-window seasonal chips don't render, and an
+  // in-window override can relabel one ("Winterizing — early bird"). This
+  // is display gating only: every catalog stays reachable by URL (CR:
+  // no artificial locks).
+  const selectorItems: IntentSelectorItem[] = activeChips<SmartCartCategory | WorthItDecision>(items).map(i => ({
     id: i.id,
     label: i.label,
     iconSvg: i.iconSvg,

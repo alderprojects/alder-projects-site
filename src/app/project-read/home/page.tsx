@@ -24,6 +24,7 @@
 import type { Metadata } from 'next'
 import { PhotoUploader } from './PhotoUploader'
 import { HandoffQRCard } from '@/components/smartCart/HandoffQRCard'
+import { betaBadge } from '@/lib/copy/canon'
 
 // PR3.9 Bug #2: PhotoUploader uses useSearchParams() to read
 // ?source=handoff (mobile session arrived via desktop QR). That hook
@@ -42,7 +43,7 @@ export default function PhotoReadPage() {
     <main className="mx-auto max-w-2xl px-4 py-8">
       <header className="mb-8">
         <p className="text-sm uppercase tracking-wide text-emerald-700">
-          Beta · Vermont
+          {betaBadge()}
         </p>
         <h1 className="mt-2 text-3xl font-semibold text-gray-900">
           Home photo read

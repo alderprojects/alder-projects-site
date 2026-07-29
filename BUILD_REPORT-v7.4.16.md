@@ -2,8 +2,9 @@
 
 Run: 2026-07-29, unattended. Branch `v7.4.16-result-restructure`, 3 commits off
 `v7.4.14-site-refresh` (the canon dependency in §0.3 is not on `main`).
-**Logic layer complete and tested (63/63). The UI components and email
-template are not built. Not deployed.**
+**Logic layer AND UI complete, verified against the real production report
+(63/63 + 42/42). The cart email template and the dashboard panel are not
+built. Not deployed.**
 
 Read the first section before anything else — it is a live customer-facing
 bug in my own v7.4.14 work, not a v7.4.16 finding.
@@ -154,22 +155,49 @@ never a point estimate" correctly rejects it rather than rendering "$85–$85".
 So resolved prices alone never produce an estimate; they need a second SKIP or
 an arbitrage match. My first test asserted the opposite and was wrong.
 
+## The UI, verified on the real report
+
+`ReportView` now renders the restructure. Measured against the live July 29
+report (`/report/cms5bnzpi…`, free tier, DB-backed):
+
+| assert | result |
+|---|---|
+| inventory chips | **4** — Windows · Window treatments · Smoke & CO alarms · Ceiling |
+| group headers | **4** (Windows 2 items, Smoke & CO alarms 1 item, …) |
+| focus module | "If you do one thing: Smoke & CO alarms" — **Monitor** lane |
+| upsell modules (CR4 cap) | **exactly 2** — focus block + page end |
+| CR2 variant | **fallback** — "pays for itself in one skipped purchase"; zero occurrences of "we estimate it saves you" |
+| refund line | "$19.99 · Full refund within 30 days, no questions asked" (canon) |
+
+The focus pick is the release working: the smoke detector (composite 0.48)
+beats the draft-sealing BUY (0.71) because safety class outranks score. And
+the fallback variant is correct — that read has no SKIP items at all, so
+there is no qualifying estimate and no number is invented.
+
+### A bug the verification caught
+
+The first render collapsed every item into one group. Cause: `subjectFor()`
+re-ran the grounding check on the client, but `claimLinks` are server-side
+only — the wire ships the derived label, not the raw signatures. With no
+evidence to check against, every item failed the check and fell through to
+"Also in this photo". The check now applies only where the evidence exists;
+the wire's label was already validated by `shapeRows()` on the way out.
+
+Worth noting because it is the failure mode of validating the same thing
+twice in two places that do not share the inputs.
+
 ## What did NOT get built
 
-- **UI components** — inventory strip, grouped sections, focus module, upsell
-  modules. The logic they consume is done and tested; the rendering is not.
-- **Cart email template** mirroring the grouping.
-- **Events** — `FOCUS_ITEM_RENDERED`, `UPSELL_SHOWN`, `UPSELL_CLICKED`,
-  `SAVINGS_ESTIMATE_SHOWN`, `SUBJECT_UNGROUNDED`. The estimator already returns
-  the full arithmetic in `components` for the payload; nothing emits it yet.
-- **Dashboard upsell-CTR panel.**
+- **Cart email template** mirroring the grouping (§1.1.6).
+- **Dashboard upsell-CTR panel** (§1.5). The events fire; nothing aggregates
+  them yet.
+- **`SUBJECT_UNGROUNDED`** — `groupBySubject` returns the ungrounded list and
+  it is tested, but with §1.2 deferred no model ever supplies a subject, so
+  there is nothing to emit.
 - **§1.2 `subject` schema + prompt change** — deliberately deferred, above.
-- Screenshots, deploy, checkpoint, Resend email.
-
-Because no UI renders, the DOM asserts in §2 (CR4 upsell cap, no-`$`-in-
-fallback, coaching-state zero-upsell, CR3 lane linking) could not run. Their
-logic-layer equivalents are asserted: the cap constant, the fallback carrying
-no digits, and the estimator returning null rather than a number.
+- Screenshots, deploy, checkpoint, Resend email. Browser-pane screenshots
+  returned blank below the fold again, so the table above is DOM-measured
+  rather than visual.
 
 ## Recommended next
 

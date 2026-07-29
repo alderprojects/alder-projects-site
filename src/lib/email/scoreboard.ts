@@ -19,6 +19,7 @@ import { prisma } from '@/lib/db'
 import { SCORING_CONFIG } from '@/lib/score/config'
 import type { AutoEvalResult } from '@/lib/score/autoeval'
 import { buildLayeredStats } from './layers'
+import { nearEmptyWarning } from '@/lib/social/reminders'
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://alderprojects.com'
 
@@ -66,6 +67,10 @@ export async function buildDailyScoreboard(run: AutoEvalResult): Promise<Scorebo
     alerts.push(`SKIP+WAIT share ${fmtPct(stats.backend.skipWaitSharePct)} — honesty invariant thinning`)
   }
   if (run.judgeFlagsCreated > 0) alerts.push(`${run.judgeFlagsCreated} judge flag(s)`)
+  // v7.4.15 — the social reminder cron no-ops silently once the calendar
+  // runs out, so the digest is where that surfaces.
+  const socialWarning = nearEmptyWarning(new Date())
+  if (socialWarning) alerts.push(socialWarning)
 
   // ---------------- EXEC ----------------
   const e = stats.exec

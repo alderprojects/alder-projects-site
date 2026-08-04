@@ -26,7 +26,9 @@ const entry = (id: string): SocialEntry => SOCIAL_CALENDAR.find((e) => e.entryId
 
 console.log('\n=== calendar integrity ===')
 {
-  check('23 entries', SOCIAL_CALENDAR.length === 23, String(SOCIAL_CALENDAR.length))
+  // Count is NOT asserted: the calendar is appended to over time, and a
+  // hardcoded number turns every legitimate addition into a red test.
+  check('calendar is populated', SOCIAL_CALENDAR.length >= 20, String(SOCIAL_CALENDAR.length))
   const ids = SOCIAL_CALENDAR.map((e) => e.entryId)
   check('entryIds unique', new Set(ids).size === ids.length)
   check('every sendAtUtc parses', SOCIAL_CALENDAR.every((e) => !isNaN(Date.parse(e.sendAtUtc))))
@@ -72,7 +74,7 @@ console.log('\n=== §1: selection ===')
   const before = new Date('2026-07-29T00:00:00Z')
   const sel = selectDue(before, NONE)
   check('nothing due before the first entry', sel.due.length === 0 && sel.missed.length === 0)
-  check('everything is future', sel.future.length === 23)
+  check('everything is future', sel.future.length === SOCIAL_CALENDAR.length)
 
   // Exactly at the first entry's time.
   const atFirst = new Date('2026-07-30T12:30:00Z')
@@ -117,10 +119,11 @@ console.log('\n=== §2: missed handling (>24h) ===')
   const afterPause = new Date('2026-08-20T00:00:00Z')
   const flood = selectDue(afterPause, NONE)
   check('a resumed cron produces many missed, zero individual sends',
-    flood.missed.length === 23 && flood.due.length === 0,
+    flood.missed.length === SOCIAL_CALENDAR.length && flood.due.length === 0,
     `missed=${flood.missed.length} due=${flood.due.length}`)
   const digest = missedDigest(flood.missed)
-  check('missed digest is a single email with MISSED: prefix', digest.subject.startsWith('MISSED: 23'))
+  check('missed digest is a single email with MISSED: prefix',
+    digest.subject.startsWith(`MISSED: ${SOCIAL_CALENDAR.length}`), digest.subject)
   check('missed digest contains every entry body',
     flood.missed.every((e) => digest.body.includes(e.body.slice(0, 40))))
 }

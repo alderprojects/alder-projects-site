@@ -98,6 +98,33 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     payload: { reportId: report.id, emailSent: sent.ok },
   })
 
+  // v7.4.21 — email capture is create-or-attach for the Home Record.
+  //
+  // Placed AFTER the email send and the EMAIL_CAPTURED event on purpose:
+  // fillSlotsForReport reads every photo and extraction for the report and
+  // writes slot rows, and none of that should sit in front of the thing
+  // the customer is actually waiting for.
+  //
+  // Behind HOME_RECORD_ENABLED and OFF by default: this is the first code
+  // that touches the live unlock path since the record shipped, and it is
+  // landing the night before a launch post. With the flag off the path is
+  // byte-identical to what runs today.
+  //
+  // Wrapped so a record failure can NEVER cost the customer their unlock —
+  // they came here for the recommendations, not the coverage map.
+  if (process.env.HOME_RECORD_ENABLED === 'true') {
+    try {
+      const { attachReportToRecord, fillSlotsForReport } = await import('@/lib/coverage/record')
+      const { recordId } = await attachReportToRecord(report.id, email, {
+        userId: user.id,
+        source: 'capture',
+      })
+      await fillSlotsForReport(report.id, recordId)
+    } catch (e) {
+      console.error('[report/unlock] home record attach failed (non-fatal):', (e as Error).message)
+    }
+  }
+
   const { visible } = shapeRows(report.recommendations, 'email')
   return NextResponse.json({ ok: true, tier: 'email', emailSent: sent.ok, recommendations: visible })
 }

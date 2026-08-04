@@ -21,7 +21,8 @@
     "copy:test": "tsx scripts/copy/canon-tests.ts",
     "social:test": "tsx scripts/social/reminder-tests.ts",
     "result:test": "tsx scripts/result/restructure-tests.ts",
-    "daily:test": "tsx scripts/email/daily-tests.ts"
+    "daily:test": "tsx scripts/email/daily-tests.ts",
+    "coverage:wiring": "tsx scripts/coverage/wiring-tests.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.30.1",

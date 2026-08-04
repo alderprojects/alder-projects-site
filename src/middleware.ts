@@ -22,6 +22,42 @@ import type { NextRequest } from 'next/server'
 import { buildSessionCookies } from '@/lib/session-tracking'
 
 const VISITOR_ANON_COOKIE = 'alder_anon_id'
+
+/**
+ * v7.4.19 — first-touch inbound attribution.
+ *
+ * Until now `firstSource` was a hardcoded label per API ROUTE
+ * ('photo_upload', 'basement_landing') — it recorded which endpoint
+ * created the row, not where the person came from. So every visitor from
+ * every channel was indistinguishable, and a tagged link recorded nothing.
+ *
+ * The landing URL is the only place the source exists, and middleware is
+ * the only thing that sees it (API routes run outside this matcher). So we
+ * capture it here into a first-touch cookie that ensureVisitorSession
+ * reads later.
+ *
+ * FIRST-TOUCH means first-touch: once set, it is never overwritten. The
+ * channel that earned the visit keeps the credit even if they come back
+ * later by another route.
+ */
+const VISITOR_SRC_COOKIE = 'alder_src'
+
+/** Keep it short — this rides on every request. */
+function readInboundSource(req: NextRequest): string | null {
+  const url = req.nextUrl
+  const explicit = url.searchParams.get('s') || url.searchParams.get('utm_source')
+  if (explicit) return explicit.slice(0, 40).replace(/[^a-zA-Z0-9_.-]/g, '')
+  const referrer = req.headers.get('referer')
+  if (!referrer) return null
+  try {
+    const host = new URL(referrer).hostname.replace(/^www\./, '')
+    // Same-site navigation is not an inbound source.
+    if (host.endsWith('alderprojects.com') || host === 'localhost') return null
+    return host.slice(0, 40)
+  } catch {
+    return null
+  }
+}
 const VISITOR_ANON_TTL_DAYS = 90
 const AUTH_SESSION_COOKIE = 'alder_session'
 
@@ -79,6 +115,20 @@ export function middleware(req: NextRequest) {
       secure: process.env.NODE_ENV === 'production',
       path: '/',
     })
+  }
+
+  // v7.4.19 — first-touch source, set once and never overwritten.
+  if (!req.cookies.get(VISITOR_SRC_COOKIE)?.value) {
+    const source = readInboundSource(req)
+    if (source) {
+      res.cookies.set(VISITOR_SRC_COOKIE, source, {
+        maxAge: 60 * 60 * 24 * VISITOR_ANON_TTL_DAYS,
+        httpOnly: true,
+        sameSite: 'lax',
+        secure: process.env.NODE_ENV === 'production',
+        path: '/',
+      })
+    }
   }
 
   return res

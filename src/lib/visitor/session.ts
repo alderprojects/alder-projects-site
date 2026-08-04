@@ -51,12 +51,18 @@ export async function ensureVisitorSession(
     )
   }
 
+  // v7.4.19 — an inbound source, when one exists, outranks the endpoint
+  // label. Prefixed so `inbound:` rows are unmistakable in analytics and
+  // so the existing groupBy on firstSource keeps working unchanged.
+  const inbound = (await cookies()).get('alder_src')?.value ?? null
+  const firstSource = inbound ? `inbound:${inbound}` : (options.firstSource ?? null)
+
   await prisma.visitorSession.upsert({
     where: { anonId },
     create: {
       anonId,
-      firstSource: options.firstSource ?? null,
-      signalsJson: (options.signals ?? {}) as never,
+      firstSource,
+      signalsJson: { ...(options.signals ?? {}), ...(inbound ? { inbound, entryRoute: options.firstSource ?? null } : {}) } as never,
       lastSeenAt: new Date(),
     },
     update: {

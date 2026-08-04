@@ -27,6 +27,32 @@
  * 2. Quality: drop features below a confidence floor and photos with zero
  *    usable signal, then merge the surviving features across the SET —
  *    batch reasoning (life-stage, multi-room) requires the whole batch.
+ *
+ * v7.4.20 — REDACT, DON'T BLOCK.
+ *
+ * Privacy detection no longer discards the photo. It discards the
+ * OFFENDING FEATURES and keeps everything else, so the customer always
+ * gets their read.
+ *
+ * Why: detection is not 100%, and a false positive used to cost the whole
+ * session. Observed 2026-07-28 — an empty bathroom came back
+ * people_present=true with five clean fixture features and zero person
+ * features, and the hard gate threw all five away. v7.4.12 softened the
+ * `people_present` case specifically; this generalises the principle to
+ * every privacy signal. A wrong detection now costs a few observations,
+ * never the read.
+ *
+ * What is NOT weakened: person/document/screen features never reach the
+ * model, the session is still flagged so a human reviews it, and a flagged
+ * session is still excluded structurally from every dataset/export path
+ * (v7.4.8 exportableConsentedRecords). The data asset stays exactly as
+ * clean as before — only the customer's experience changes.
+ *
+ * NOT YET POSSIBLE — pixel redaction. Blurring a face requires a bounding
+ * box, and the extraction returns only booleans. Asking the vision model
+ * for regions is a prompt change, which is gated on the eval harness.
+ * Until then redaction is at the FEATURE level, which is the level the
+ * model actually sees.
  */
 
 import { prisma } from '@/lib/db'
@@ -75,19 +101,25 @@ export async function runGate(snapshotIds: string[]): Promise<GateResult> {
       continue
     }
     const json = extraction.extractionJson as unknown as ExtractionShape
-    const privacyReason = privacyExclusionReason(json)
-    if (privacyReason) {
-      exclusionSummary.push({ photoId: photo.id, reason: privacyReason })
-      continue
-    }
-    // Uncorroborated people_present: analyze, but mark the session so a
-    // human reviews it and it never reaches a dataset.
-    if (json.privacy?.people_present && !hasPersonFeature(json)) {
+    const privacyReason = privacySignal(json)
+
+    // v7.4.20 — a privacy signal flags the session for review and keeps it
+    // out of every dataset path, but never costs the customer their read.
+    if (privacyReason || json.privacy?.people_present) {
       softPersonPhotoIds.push(photo.id)
     }
-    const usable = (json.features ?? []).filter((f) => f.confidence >= FEATURE_CONFIDENCE_FLOOR)
+    if (privacyReason) {
+      exclusionSummary.push({ photoId: photo.id, reason: privacyReason })
+    }
+
+    // Redaction: drop the offending observations, keep the rest.
+    const usable = (json.features ?? [])
+      .filter((f) => f.confidence >= FEATURE_CONFIDENCE_FLOOR)
+      .filter((f) => !isSensitiveFeature(f))
+
     if (usable.length === 0) {
-      exclusionSummary.push({ photoId: photo.id, reason: 'no_usable_signal' })
+      // Nothing safe left to reason over. Still not fatal to the session.
+      if (!privacyReason) exclusionSummary.push({ photoId: photo.id, reason: 'no_usable_signal' })
       continue
     }
     includedPhotoCount++
@@ -114,19 +146,19 @@ function hasPersonFeature(json: ExtractionShape): boolean {
   return false
 }
 
-function privacyExclusionReason(json: ExtractionShape): string | null {
+/**
+ * What the extraction says it saw. v7.4.20: this is a REVIEW signal and a
+ * dataset-exclusion signal — it is no longer a reason to discard the photo.
+ */
+function privacySignal(json: ExtractionShape): string | null {
   const p = json.privacy
   if (p) {
-    // Faces are the identifiability signal — always an exclusion.
     if (p.faces_visible) return 'person_detected'
-    // people_present alone excludes only when the feature vocabulary
-    // agrees a person is actually in frame (v7.4.12).
     if (p.people_present && hasPersonFeature(json)) return 'person_detected'
     if (p.documents_visible) return 'document_detected'
     if (p.readable_screens) return 'screen_content_detected'
     if (p.address_visible) return 'address_detected'
   }
-  // Legacy-extraction fallback: keyword scan over feature vocabulary
   for (const f of json.features ?? []) {
     if (PRIVACY_KEYWORDS.test(f.type) || PRIVACY_KEYWORDS.test(f.condition.toLowerCase())) {
       return 'person_detected'
@@ -135,16 +167,31 @@ function privacyExclusionReason(json: ExtractionShape): string | null {
   return null
 }
 
+/**
+ * The redaction itself: an individual observation about a person,
+ * document, or screen never reaches the model, regardless of what the
+ * rest of the photo showed.
+ */
+function isSensitiveFeature(f: { type: string; condition: string }): boolean {
+  const haystack = `${f.type} ${f.condition}`.toLowerCase()
+  return PERSON_FEATURE.test(haystack) || PRIVACY_KEYWORDS.test(haystack)
+}
+
 function isPrivacyReason(reason: string): boolean {
   return reason.endsWith('_detected')
 }
 
-/** User-facing exclusion line, e.g. "1 photo excluded (person detected) — not analyzed." */
+/**
+ * User-facing line. v7.4.20: the photo is analyzed — only the sensitive
+ * observations are dropped — so the copy no longer says "not analyzed",
+ * which would now be a lie.
+ */
 export function exclusionLine(result: GateResult): string | null {
   if (result.excludedPhotoCount === 0) return null
   const reasons = new Set(
-    result.exclusionSummary.filter((e) => isPrivacyReason(e.reason)).map((e) => e.reason.replace(/_/g, ' '))
+    result.exclusionSummary.filter((e) => isPrivacyReason(e.reason)).map((e) => e.reason.replace(/_detected$/, '').replace(/_/g, ' '))
   )
   const noun = result.excludedPhotoCount === 1 ? 'photo' : 'photos'
-  return `${result.excludedPhotoCount} ${noun} excluded (${Array.from(reasons).join(', ')}) — not analyzed.`
+  const what = Array.from(reasons).join(', ')
+  return `${result.excludedPhotoCount} ${noun} had something private in frame (${what}). We ignored that part and read the rest.`
 }

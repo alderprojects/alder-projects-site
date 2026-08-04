@@ -20,7 +20,8 @@
     "coverage:test": "tsx scripts/coverage/unit-tests.ts",
     "copy:test": "tsx scripts/copy/canon-tests.ts",
     "social:test": "tsx scripts/social/reminder-tests.ts",
-    "result:test": "tsx scripts/result/restructure-tests.ts"
+    "result:test": "tsx scripts/result/restructure-tests.ts",
+    "daily:test": "tsx scripts/email/daily-tests.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.30.1",

@@ -17,14 +17,6 @@
       "schedule": "47 8 * * *"
     },
     {
-      "path": "/api/cron/daily-digest",
-      "schedule": "0 10 * * *"
-    },
-    {
-      "path": "/api/cron/autoeval",
-      "schedule": "0 10 * * *"
-    },
-    {
       "path": "/api/cron/gsc-sync",
       "schedule": "17 9 * * 1"
     },
@@ -33,8 +25,8 @@
       "schedule": "0 5 * * *"
     },
     {
-      "path": "/api/cron/social-reminders",
-      "schedule": "*/15 * * * *"
+      "path": "/api/cron/daily",
+      "schedule": "0 10 * * *"
     }
   ]
 }

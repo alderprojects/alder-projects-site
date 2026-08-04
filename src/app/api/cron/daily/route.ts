@@ -4,10 +4,14 @@
  * Runs the auto-eval work, then sends the single four-lens email
  * (Exec / CFO / SEO-Marketing / Data analyst) with today's actions on top.
  *
- * Replaces three cron entries:
- *   /api/cron/autoeval          — the job still runs, here
+ * Replaces ALL seven cron entries. Nothing depended on the stagger:
+ *   /api/cron/autoeval          — runs first, feeds the email
+ *   /api/cron/anon-cleanup      — budgeted step
+ *   /api/cron/catalog-expand    — budgeted step
+ *   /api/cron/gsc-sync          — budgeted step, Mondays only
+ *   /api/cron/catalog-refresh   — budgeted step, longest and most deferrable
  *   /api/cron/daily-digest      — already flag-disabled, sections absorbed
- *   /api/cron/social-reminders  — the `*\/15` schedule this plan rejects
+ *   /api/cron/social-reminders  — the sub-daily schedule this plan rejects
  *
  * Reminders are marked sent only AFTER the email is accepted by Resend, so
  * a send failure retries tomorrow rather than silently swallowing the day's
@@ -20,6 +24,7 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import { runAutoEval } from '@/lib/score/autoeval'
+import { runDailySteps, STEP_BUDGET_MS } from '@/lib/cron/daily-runner'
 import { buildDailyEmail } from '@/lib/email/daily'
 import { logEvent } from '@/lib/events/log'
 import { SOCIAL_REMINDER_SENT } from '@/lib/social/reminders'
@@ -52,11 +57,20 @@ export async function GET(request: NextRequest): Promise<Response> {
   const dryRun = new URL(request.url).searchParams.get('dryRun') === '1'
   const now = new Date()
 
+  const startedAt = Date.now()
+
+  // autoeval first and unconditionally — the email's data lens reads its
+  // typed result, so it is the one step that is never deferrable.
   const run = await runAutoEval(now)
-  const email = await buildDailyEmail(run, now)
+
+  // Then the former standalone crons, in priority order, under whatever
+  // wall clock remains. Anything that does not fit is reported, not lost.
+  const runner = await runDailySteps(now, startedAt, STEP_BUDGET_MS)
+
+  const email = await buildDailyEmail(run, now, runner)
 
   if (!email.sent) {
-    return NextResponse.json({ ok: true, sent: false, skippedReason: email.skippedReason, ...run })
+    return NextResponse.json({ ok: true, sent: false, skippedReason: email.skippedReason, steps: runner.steps, ...run })
   }
 
   if (dryRun) {
@@ -66,6 +80,8 @@ export async function GET(request: NextRequest): Promise<Response> {
       subject: email.subject,
       alerts: email.alerts,
       remindersWouldDeliver: email.deliveredReminderIds,
+      steps: runner.steps,
+      elapsedMs: runner.elapsedMs,
       htmlBytes: email.html?.length ?? 0,
     })
   }
@@ -100,6 +116,8 @@ export async function GET(request: NextRequest): Promise<Response> {
     subject: email.subject,
     alerts: email.alerts,
     remindersDelivered: emailSent ? email.deliveredReminderIds.length : 0,
+    steps: runner.steps,
+    elapsedMs: runner.elapsedMs,
     emailError,
     ...run,
   })

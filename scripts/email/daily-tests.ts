@@ -7,7 +7,10 @@
  */
 import { buildDailyEmail, buildSeoStats, buildDailyActions } from '@/lib/email/daily'
 import type { AutoEvalResult } from '@/lib/score/autoeval'
-import { readFileSync } from 'fs'
+import { readFileSync, existsSync } from 'fs'
+import { runDailySteps, STEP_BUDGET_MS, runnerAlerts } from '@/lib/cron/daily-runner'
+import { LOOKAHEAD_MS } from '@/lib/email/daily'
+import { SOCIAL_CALENDAR } from '@/lib/social/reminders'
 
 let pass = 0
 let fail = 0
@@ -81,12 +84,66 @@ async function main() {
   check('ZERO sub-daily crons — the deploy blocker is gone', subDaily.length === 0,
     subDaily.map((c) => `${c.schedule} ${c.path}`).join(', '))
   check('exactly one email cron', vercel.crons.filter((c) => c.path === '/api/cron/daily').length === 1)
-  for (const gone of ['/api/cron/autoeval', '/api/cron/social-reminders', '/api/cron/daily-digest']) {
-    check(`retired: ${gone}`, !vercel.crons.some((c) => c.path === gone))
+  for (const gone of ['/api/cron/autoeval', '/api/cron/social-reminders', '/api/cron/daily-digest',
+                      '/api/cron/catalog-refresh', '/api/cron/catalog-expand', '/api/cron/gsc-sync',
+                      '/api/cron/anon-cleanup']) {
+    check(`cron entry retired: ${gone}`, !vercel.crons.some((c) => c.path === gone))
   }
-  check('worker crons survive',
-    ['/api/cron/catalog-refresh', '/api/cron/catalog-expand', '/api/cron/gsc-sync', '/api/cron/anon-cleanup']
-      .every((p) => vercel.crons.some((c) => c.path === p)))
+
+  console.log('\n=== one cron, in the inbox before 5am ET ===')
+  const cron = vercel.crons
+  check('exactly ONE cron entry', cron.length === 1, JSON.stringify(cron))
+  check('it is the daily job', cron[0]?.path === '/api/cron/daily')
+  const [min, hr] = cron[0].schedule.split(' ')
+  const utcMinutes = Number(hr) * 60 + Number(min)
+  // EDT is UTC-4, EST is UTC-5. Convert and require both to land before 5am.
+  const edt = utcMinutes - 4 * 60
+  const est = utcMinutes - 5 * 60
+  check('lands before 5am ET in summer (EDT)', edt < 5 * 60 && edt > 0, `${edt / 60}h`)
+  check('lands before 5am ET in winter (EST)', est < 5 * 60 && est > 0, `${est / 60}h`)
+  check('leaves >=25min headroom for a 300s run before 5am EDT', 5 * 60 - edt >= 25, `${5 * 60 - edt}min`)
+  for (const gone of ['catalog-refresh','catalog-expand','gsc-sync','anon-cleanup','autoeval','daily-digest','social-reminders']) {
+    check(`route retired: ${gone}`, !existsSync(`src/app/api/cron/${gone}/route.ts`))
+  }
+
+  console.log('\n=== the briefing looks FORWARD ===')
+  // The send is at 08:30 UTC but most reminders are scheduled for working
+  // hours. Selecting only what is already past would deliver same-day
+  // reminders a day late — the bug this lookahead exists to prevent.
+  check('lookahead is a full day', LOOKAHEAD_MS === 24 * 60 * 60 * 1000)
+  const sendHourUtc = Number(cron[0].schedule.split(' ')[1])
+  const laterToday = SOCIAL_CALENDAR.filter((e) => {
+    const d = new Date(e.sendAtUtc)
+    return d.getUTCHours() > sendHourUtc
+  })
+  check('the calendar does contain reminders due after the send hour',
+    laterToday.length > 0, `${laterToday.length}`)
+  // Pick a real entry and prove it is surfaced on its own morning.
+  const target = SOCIAL_CALENDAR.find((e) => new Date(e.sendAtUtc).getUTCHours() > sendHourUtc)!
+  const morningOf = new Date(target.sendAtUtc)
+  morningOf.setUTCHours(sendHourUtc, 30, 0, 0)
+  const fresh = await buildDailyActions(morningOf)
+  check(`same-day reminder surfaces on its own morning (${target.entryId})`,
+    fresh.today.some((e) => e.entryId === target.entryId),
+    fresh.today.map((e) => e.entryId).join(','))
+  check('and is NOT misfiled as overdue',
+    !fresh.overdue.some((e) => e.entryId === target.entryId))
+
+  console.log('\n=== budget discipline ===')
+  // Simulate a run that has already burned nearly all its budget: every
+  // remaining step must be skipped, not attempted, and the email still ships.
+  const exhausted = await runDailySteps(new Date(), Date.now() - (STEP_BUDGET_MS - 1000), STEP_BUDGET_MS)
+  check('a nearly-spent budget skips every step',
+    exhausted.steps.every((s) => s.status !== 'ok'), JSON.stringify(exhausted.steps.map((s) => s.status)))
+  check('budget skips are reported, not silent',
+    exhausted.steps.some((s) => s.status === 'skipped_budget'))
+  check('budget skips surface as alerts', runnerAlerts(exhausted).length > 0)
+  check('the email still builds with an exhausted runner',
+    (await buildDailyEmail(RUN, new Date(), exhausted)).sent === true)
+  const withRunner = await buildDailyEmail(RUN, new Date(), exhausted)
+  check('Job run section renders', (withRunner.html ?? '').includes('>Job run<'))
+  check('every step is named in the email',
+    exhausted.steps.every((s) => (withRunner.html ?? '').includes(s.name)))
 
   console.log(`\n=== RESULT: ${pass} passed, ${fail} failed ===`)
   process.exit(fail === 0 ? 0 : 1)

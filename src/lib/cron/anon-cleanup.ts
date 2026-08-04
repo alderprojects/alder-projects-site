@@ -16,7 +16,6 @@
  * Disable via env: DISABLE_ANON_CLEANUP_CRON=true.
  */
 
-import type { NextRequest } from 'next/server'
 import { del } from '@vercel/blob'
 import { prisma } from '@/lib/db'
 import { logEvent } from '@/lib/events/log'
@@ -29,14 +28,19 @@ const BATCH_LIMIT = 100
 const DEFAULT_LIFETIME_DAYS = 30
 const RESEARCH_LIFETIME_DAYS = 90
 
-export async function GET(request: NextRequest): Promise<Response> {
-  const authHeader = request.headers.get('authorization')
-  if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
-    return new Response('Unauthorized', { status: 401 })
-  }
-  if (process.env.DISABLE_ANON_CLEANUP_CRON === 'true') {
-    return Response.json({ skipped: true, reason: 'DISABLE_ANON_CLEANUP_CRON=true' })
-  }
+export interface AnonCleanupResult {
+  sessionsProcessed: number
+  sessionsFullyDeleted: number
+  sessionsPartialKept: number
+  photosDeleted: number
+  blobsDeleted: number
+  blobErrors: number
+  retentionDays: number
+  retentionPhotosDeleted: number
+  retentionBlobsDeleted: number
+}
+
+export async function runAnonCleanup(): Promise<AnonCleanupResult> {
 
   const now = Date.now()
   const defaultCutoff = new Date(now - DEFAULT_LIFETIME_DAYS * 24 * 60 * 60 * 1000)
@@ -154,8 +158,7 @@ export async function GET(request: NextRequest): Promise<Response> {
     },
   })
 
-  return Response.json({
-    ok: true,
+  return {
     sessionsProcessed: candidateSessions.length,
     sessionsFullyDeleted,
     sessionsPartialKept,
@@ -165,5 +168,5 @@ export async function GET(request: NextRequest): Promise<Response> {
     retentionDays,
     retentionPhotosDeleted,
     retentionBlobsDeleted,
-  })
+  }
 }

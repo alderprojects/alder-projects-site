@@ -9,24 +9,8 @@
   ],
   "crons": [
     {
-      "path": "/api/cron/catalog-refresh",
-      "schedule": "17 8 * * *"
-    },
-    {
-      "path": "/api/cron/catalog-expand",
-      "schedule": "47 8 * * *"
-    },
-    {
-      "path": "/api/cron/gsc-sync",
-      "schedule": "17 9 * * 1"
-    },
-    {
-      "path": "/api/cron/anon-cleanup",
-      "schedule": "0 5 * * *"
-    },
-    {
       "path": "/api/cron/daily",
-      "schedule": "0 10 * * *"
+      "schedule": "30 8 * * *"
     }
   ]
 }

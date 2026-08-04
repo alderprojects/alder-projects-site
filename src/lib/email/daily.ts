@@ -34,6 +34,7 @@ import { buildLayeredStats, type LayeredStats } from './layers'
 import type { AutoEvalResult } from '@/lib/score/autoeval'
 import { selectDue, SOCIAL_REMINDER_SENT, type SocialEntry } from '@/lib/social/reminders'
 import { nearEmptyWarning } from '@/lib/social/reminders'
+import { runnerAlerts, type RunnerResult } from '@/lib/cron/daily-runner'
 
 // ---------------------------------------------------------------------------
 // Types
@@ -138,13 +139,27 @@ export async function buildSeoStats(from: Date, to: Date): Promise<SeoStats> {
 // Actions lens (the folded-in reminders)
 // ---------------------------------------------------------------------------
 
+/**
+ * The briefing looks FORWARD a full day, not backward.
+ *
+ * The send is at 08:30 UTC (4:30am ET). Most reminders are scheduled for
+ * working hours — the Aug 4 launch prep is 12:45 UTC. Selecting only what
+ * is already past would have delivered that the NEXT morning, a day late,
+ * which would have quietly broken the entire point of the consolidation.
+ * One daily email must carry the day AHEAD.
+ */
+export const LOOKAHEAD_MS = 24 * 60 * 60 * 1000
+
 export async function buildDailyActions(now: Date): Promise<DailyActions> {
   const rows = await prisma.eventLog.findMany({
     where: { eventType: SOCIAL_REMINDER_SENT },
     select: { subjectId: true },
   })
   const alreadySent = new Set(rows.map((r) => r.subjectId).filter((v): v is string => v != null))
-  const { due, missed } = selectDue(now, alreadySent)
+  // Selecting with the clock advanced by the lookahead pulls in everything
+  // that comes due before the next send. The >24h split inside selectDue
+  // still separates genuinely-stale items into `overdue`.
+  const { due, missed } = selectDue(new Date(now.getTime() + LOOKAHEAD_MS), alreadySent)
   return { today: due, overdue: missed, calendarWarning: nearEmptyWarning(now) }
 }
 
@@ -152,7 +167,11 @@ export async function buildDailyActions(now: Date): Promise<DailyActions> {
 // Compose
 // ---------------------------------------------------------------------------
 
-export async function buildDailyEmail(run: AutoEvalResult, now: Date = new Date()): Promise<DailyEmail> {
+export async function buildDailyEmail(
+  run: AutoEvalResult,
+  now: Date = new Date(),
+  runner?: RunnerResult
+): Promise<DailyEmail> {
   const dayStart = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()))
   const from = new Date(dayStart.getTime() - 24 * 3600 * 1000)
 
@@ -162,7 +181,7 @@ export async function buildDailyEmail(run: AutoEvalResult, now: Date = new Date(
   const seo = await buildSeoStats(from, dayStart)
   const actions = await buildDailyActions(now)
 
-  const alerts = collectAlerts(stats, run, seo, actions)
+  const alerts = [...collectAlerts(stats, run, seo, actions), ...(runner ? runnerAlerts(runner) : [])]
 
   // The old scoreboard skipped sending on a zero-activity day. This one
   // still sends when there are ACTIONS to deliver — a reminder you need
@@ -183,6 +202,7 @@ export async function buildDailyEmail(run: AutoEvalResult, now: Date = new Date(
     renderCfo(stats),
     renderSeo(seo),
     renderAnalyst(stats, run),
+    renderJobRun(runner),
   ]
 
   const subject = buildSubject(stats, actions, alerts, run.day)
@@ -356,6 +376,32 @@ function renderAnalyst(stats: LayeredStats, run: AutoEvalResult): string {
     metricRow('Median pipeline time', b.medianPipelineMs != null ? `${(b.medianPipelineMs / 1000).toFixed(1)}s` : '—'),
   ]
   return `${h1('Data analyst')}${table(rows)}`
+}
+
+/**
+ * What the one nightly job actually did. Every staggered cron that used to
+ * run on its own schedule now reports here, including what it skipped —
+ * a step that silently didn't run is the failure mode this block exists
+ * to make impossible.
+ */
+function renderJobRun(runner?: RunnerResult): string {
+  if (!runner) return ''
+  const icon: Record<string, string> = {
+    ok: '✓', failed: '✕', skipped_budget: '⏱', skipped_day: '·', skipped_flag: '·',
+  }
+  const rows = runner.steps.map((s) =>
+    metricRow(
+      `${icon[s.status] ?? '·'} ${esc(s.name)}`,
+      `${esc(s.detail ?? s.status)}${s.ms > 0 ? ` <span style="${MUTED_INLINE}">${(s.ms / 1000).toFixed(1)}s</span>` : ''}`,
+      s.status === 'failed'
+    )
+  )
+  return `${h1('Job run')}${table([
+    sectionRow('Nightly steps'),
+    ...rows,
+    sectionRow('Budget'),
+    metricRow('Elapsed', `${(runner.elapsedMs / 1000).toFixed(1)}s of ${(runner.budgetMs / 1000).toFixed(0)}s`),
+  ])}`
 }
 
 // ---------------------------------------------------------------------------
